@@ -1,0 +1,99 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.1",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "symfony/console": "6.0.*",
+        "symfony/dotenv": "6.0.*",
+        "symfony/flex": "^2",
+        "symfony/framework-bundle": "6.0.*",
+        "symfony/runtime": "6.0.*",
+        "symfony/yaml": "6.0.*"
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan": "^1.6",
+        "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.6",
+        "symfony/phpunit-bridge": "^6.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "cs-fixer-dry-run": "docker run --rm $(if [ ! -z \"${NO_TTY}\" ]; then echo \"\"; else echo \"-t\"; fi) -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --allow-risky=yes --dry-run --verbose --show-progress none",
+        "cs-fixer-fix": "docker run --rm $(if [ ! -z \"${NO_TTY}\" ]; then echo \"\"; else echo \"-t\"; fi) -w=/app -v ${PWD}:/app oskarstark/php-cs-fixer-ga:latest --allow-risky=yes --diff",
+        "cs-phpcs": "./vendor/bin/phpcs",
+        "cs": [
+            "@cs-fixer-dry-run",
+            "@cs-phpcs"
+        ],
+        "static-analysis": "./vendor/bin/phpstan analyse --ansi",
+        "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
+        "test-integration": "./vendor/bin/phpunit --colors=always tests/Integration",
+        "test": [
+            "@test-unit",
+            "@test-functional"
+        ],
+        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service",
+        "functional-teardown": [
+            "docker-compose -f ./tests/build/docker-compose.yml down"
+        ],
+        "functional-setup": [
+            "@functional-start"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "6.0.*"
+        }
+    }
+}
