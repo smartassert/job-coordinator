@@ -7,10 +7,14 @@
         "php": "^8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^2.6",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.12",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.0.*",
+        "symfony/proxy-manager-bridge": "6.0.*",
         "symfony/runtime": "6.0.*",
         "symfony/yaml": "6.0.*"
     },
@@ -19,6 +23,7 @@
         "phpstan/phpstan": "^1.6",
         "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "^3.6",
+        "symfony/maker-bundle": "^1.40",
         "symfony/phpunit-bridge": "^6.0"
     },
     "config": {
@@ -70,6 +75,10 @@
             "@cs-fixer-dry-run",
             "@cs-phpcs"
         ],
+        "db-setup": [
+            "php bin/console doctrine:database:create --if-not-exists",
+            "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+        ],
         "static-analysis": "./vendor/bin/phpstan analyse --ansi",
         "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
@@ -84,7 +93,9 @@
             "docker-compose -f ./tests/build/docker-compose.yml down"
         ],
         "functional-setup": [
-            "@functional-start"
+            "@functional-start",
+            "sleep 2",
+            "@db-setup"
         ]
     },
     "conflict": {
