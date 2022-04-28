@@ -1,0 +1,7 @@
+parameters:
+  level: 9
+  paths:
+    - public
+    - src
+    - tests
+  inferPrivatePropertyTypeFromConstructor: true
