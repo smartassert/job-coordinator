@@ -1,0 +1,52 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    GuzzleHttp\Psr7\HttpFactory:
+
+    Psr\Http\Message\RequestFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\ResponseFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\ServerRequestFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\StreamFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\UploadedFileFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Psr\Http\Message\UriFactoryInterface:
+        alias: GuzzleHttp\Psr7\HttpFactory
+
+    Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface:
+        class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
+
+    App\Tests\Services\ApplicationClient\ClientFactory:
+        public: true
+
+    SmartAssert\SymfonyTestClient\SymfonyClient:
+        public: true
+
+    App\Tests\Services\AuthenticationConfiguration:
+        public: true
+        arguments:
+            $userEmail: 'user@example.com'
+            $userPassword: 'password'
+
+    app.tests.integration.http.client:
+        public: true
+        class: GuzzleHttp\Client
+        arguments:
+            $config:
+                base_uri: "https://localhost/"
+                verify: false
+
+    SmartAssert\SymfonyTestClient\HttpClient:
+        public: true
+        arguments:
+            $httpClient: '@app.tests.integration.http.client'
