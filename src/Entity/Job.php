@@ -15,12 +15,21 @@ class Job
     #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(length: 32)]
     private readonly string $userId;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(length: 32)]
     private readonly string $suiteId;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(length: 32)]
     private readonly string $label;
 
@@ -44,16 +53,25 @@ class Job
         return $this->id;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getUserId(): string
     {
         return $this->userId;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getSuiteId(): string
     {
         return $this->suiteId;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getLabel(): string
     {
         return $this->label;
