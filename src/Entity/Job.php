@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-class Job
+class Job implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -75,5 +75,16 @@ class Job
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    /**
+     * @return array{suite_id: non-empty-string, label: non-empty-string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'suite_id' => $this->suiteId,
+            'label' => $this->label,
+        ];
     }
 }
