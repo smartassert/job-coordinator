@@ -16,14 +16,24 @@ class Client
     ) {
     }
 
+    /**
+     * @param array<mixed> $payload
+     */
     public function makeCreateJobRequest(
         ?string $authenticationToken,
+        array $payload = [],
         string $method = 'POST'
     ): ResponseInterface {
         return $this->client->makeRequest(
             $method,
             $this->router->generate('job_create'),
-            $this->createAuthorizationHeader($authenticationToken)
+            array_merge(
+                $this->createAuthorizationHeader($authenticationToken),
+                [
+                    'content-type' => 'application/x-www-form-urlencoded',
+                ]
+            ),
+            http_build_query($payload)
         );
     }
 
