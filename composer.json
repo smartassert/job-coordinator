@@ -26,6 +26,7 @@
     "require-dev": {
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.8",
+        "phpstan/phpstan-phpunit": "^1.1",
         "phpunit/phpunit": "^9.5",
         "smartassert/symfony-test-client": "^0.1.0",
         "smartassert/users-client": "*",
