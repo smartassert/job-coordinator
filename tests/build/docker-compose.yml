@@ -20,9 +20,9 @@ services:
     depends_on:
       - postgres
 
-  caddy-users-service:
+  users-http:
     image: caddy:2.4.5-alpine
-    container_name: caddy-users-service
+    container_name: users-http
     restart: unless-stopped
     ports:
       - "9080:80"
