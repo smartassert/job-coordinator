@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a27f9a9004b8b222e31e2d8d755429e5",
+    "content-hash": "76ee960dd2db05c1d27107dd2f1b3505",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2365,6 +2365,62 @@
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
+            "name": "smartassert/results-client",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/results-client.git",
+                "reference": "f181a48b0522ea44d20fb42ad13085602d557d8d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/results-client/zipball/f181a48b0522ea44d20fb42ad13085602d557d8d",
+                "reference": "f181a48b0522ea44d20fb42ad13085602d557d8d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.0",
+                "smartassert/service-client": ">=0.4,<1"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.5",
+                "mockery/mockery": "^1.5",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-mockery": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "smartassert/users-client": ">=1.1,<2",
+                "squizlabs/php_codesniffer": "^3.7",
+                "symfony/uid": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\ResultsClient\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/results-client",
+            "support": {
+                "issues": "https://github.com/smartassert/results-client/issues",
+                "source": "https://github.com/smartassert/results-client/tree/0.2"
+            },
+            "time": "2022-09-29T16:50:55+00:00"
+        },
+        {
             "name": "smartassert/security-token-extractor",
             "version": "0.2",
             "source": {
@@ -2416,28 +2472,31 @@
         },
         {
             "name": "smartassert/service-client",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-client.git",
-                "reference": "2077e2a344be3c656f9a65a761f527c98057f19d"
+                "reference": "2b44776d97bef93f2cd18ad70bd1a6831e50ae5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-client/zipball/2077e2a344be3c656f9a65a761f527c98057f19d",
-                "reference": "2077e2a344be3c656f9a65a761f527c98057f19d",
+                "url": "https://api.github.com/repos/smartassert/service-client/zipball/2b44776d97bef93f2cd18ad70bd1a6831e50ae5d",
+                "reference": "2b44776d97bef93f2cd18ad70bd1a6831e50ae5d",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.1",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.0",
+                "smartassert/security-token-extractor": ">=0.2,<1"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.4",
+                "mockery/mockery": "^1.5",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-mockery": "^1.1",
                 "phpstan/phpstan-phpunit": "^1.1",
                 "phpunit/phpunit": "^9.5",
                 "squizlabs/php_codesniffer": "^3.6",
@@ -2463,9 +2522,9 @@
             "homepage": "https://github.com/smartassert/service-client",
             "support": {
                 "issues": "https://github.com/smartassert/service-client/issues",
-                "source": "https://github.com/smartassert/service-client/tree/0.3"
+                "source": "https://github.com/smartassert/service-client/tree/0.4"
             },
-            "time": "2022-09-28T13:10:58+00:00"
+            "time": "2022-09-29T16:21:44+00:00"
         },
         {
             "name": "smartassert/users-client",
@@ -2524,16 +2583,16 @@
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "2.1",
+            "version": "2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "2ab04685767e012621e71bf72c1c586539494d07"
+                "reference": "3bec43cb5a38628edc471e6794ed7b17de3793b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/2ab04685767e012621e71bf72c1c586539494d07",
-                "reference": "2ab04685767e012621e71bf72c1c586539494d07",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/3bec43cb5a38628edc471e6794ed7b17de3793b6",
+                "reference": "3bec43cb5a38628edc471e6794ed7b17de3793b6",
                 "shasum": ""
             },
             "require": {
@@ -2583,9 +2642,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/2.1"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/2.2"
             },
-            "time": "2022-09-29T15:17:19+00:00"
+            "time": "2022-09-29T17:20:12+00:00"
         },
         {
             "name": "symfony/cache",
