@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90f698381a43dbf837bd01459470a777",
+    "content-hash": "1a475571ac4f681a8c5d331b169f93cf",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2365,17 +2365,17 @@
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
-            "name": "smartassert/users-client",
+            "name": "smartassert/service-client",
             "version": "0.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/smartassert/users-client.git",
-                "reference": "7aacd8cb2d9724ccab1758250de9f51172166c52"
+                "url": "https://github.com/smartassert/service-client.git",
+                "reference": "2077e2a344be3c656f9a65a761f527c98057f19d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/users-client/zipball/7aacd8cb2d9724ccab1758250de9f51172166c52",
-                "reference": "7aacd8cb2d9724ccab1758250de9f51172166c52",
+                "url": "https://api.github.com/repos/smartassert/service-client/zipball/2077e2a344be3c656f9a65a761f527c98057f19d",
+                "reference": "2077e2a344be3c656f9a65a761f527c98057f19d",
                 "shasum": ""
             },
             "require": {
@@ -2386,6 +2386,60 @@
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.4",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.6",
+                "symfony/uid": "^6.1",
+                "webignition/http-history-container": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\ServiceClient\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/service-client",
+            "support": {
+                "issues": "https://github.com/smartassert/service-client/issues",
+                "source": "https://github.com/smartassert/service-client/tree/0.3"
+            },
+            "time": "2022-09-28T13:10:58+00:00"
+        },
+        {
+            "name": "smartassert/users-client",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/users-client.git",
+                "reference": "03061f2d29517064a5d43ccd8e3da8e14c7472c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/users-client/zipball/03061f2d29517064a5d43ccd8e3da8e14c7472c3",
+                "reference": "03061f2d29517064a5d43ccd8e3da8e14c7472c3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.0",
+                "smartassert/service-client": ">=0.2,<1"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.5",
                 "lcobucci/jwt": "^4.2",
                 "phpstan/extension-installer": "^1.1",
                 "phpstan/phpstan": "^1.8",
@@ -2414,28 +2468,28 @@
             "homepage": "https://github.com/smartassert/users-client",
             "support": {
                 "issues": "https://github.com/smartassert/users-client/issues",
-                "source": "https://github.com/smartassert/users-client/tree/0.3"
+                "source": "https://github.com/smartassert/users-client/tree/1.1"
             },
-            "time": "2022-09-07T14:57:39+00:00"
+            "time": "2022-09-26T15:39:29+00:00"
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "1.1",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "ee75efab49d3ee5aaa9fa943b40c08502ffcf9e8"
+                "reference": "0b9b9e6d46cd79e67878ab66171210455c8afc67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/ee75efab49d3ee5aaa9fa943b40c08502ffcf9e8",
-                "reference": "ee75efab49d3ee5aaa9fa943b40c08502ffcf9e8",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/0b9b9e6d46cd79e67878ab66171210455c8afc67",
+                "reference": "0b9b9e6d46cd79e67878ab66171210455c8afc67",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^8.1",
-                "smartassert/users-client": "~0.3",
+                "smartassert/users-client": "^1.1",
                 "symfony/config": "^6.0",
                 "symfony/dependency-injection": "^6.0",
                 "symfony/http-foundation": "^6.0",
@@ -2478,9 +2532,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/1.1"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/2.0"
             },
-            "time": "2022-09-07T16:46:08+00:00"
+            "time": "2022-09-29T10:20:57+00:00"
         },
         {
             "name": "symfony/cache",
@@ -8657,5 +8711,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
