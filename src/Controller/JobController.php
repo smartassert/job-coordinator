@@ -24,12 +24,7 @@ class JobController
     ): JsonResponse {
         $userId = trim($user->getUserIdentifier());
         if ('' === $userId) {
-            return new ErrorResponse(
-                ErrorResponseType::SERVER_ERROR,
-                'user',
-                null,
-                'User identifier is empty.'
-            );
+            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'User identifier is empty.');
         }
 
         $suiteId = $request->request->get('suite_id');
@@ -37,8 +32,6 @@ class JobController
         if ('' === $suiteId) {
             return new ErrorResponse(
                 ErrorResponseType::INVALID_REQUEST,
-                'suite_id',
-                null,
                 'Required field "suite_id" invalid, missing from request or is an empty string.'
             );
         }
@@ -46,12 +39,7 @@ class JobController
         try {
             $label = $ulidFactory->create();
         } catch (EmptyUlidException) {
-            return new ErrorResponse(
-                ErrorResponseType::SERVER_ERROR,
-                'label',
-                null,
-                'Generated job label is an empty string.'
-            );
+            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job label is an empty string.');
         }
 
         $job = new Job($userId, $suiteId, $label);

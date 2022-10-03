@@ -65,15 +65,8 @@ class JobControllerTest extends TestCase
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => \Mockery::mock(UlidFactory::class),
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'server_error',
-                        'payload' => [
-                            'user' => [
-                                'value' => null,
-                                'message' => 'User identifier is empty.',
-                            ],
-                        ],
-                    ],
+                    'type' => 'server_error',
+                    'message' => 'User identifier is empty.',
                 ],
             ],
             'empty label generated' => [
@@ -98,15 +91,8 @@ class JobControllerTest extends TestCase
                     return $ulidFactory;
                 })(),
                 'expectedResponseData' => [
-                    'error' => [
-                        'type' => 'server_error',
-                        'payload' => [
-                            'label' => [
-                                'value' => null,
-                                'message' => 'Generated job label is an empty string.',
-                            ],
-                        ],
-                    ],
+                    'type' => 'server_error',
+                    'message' => 'Generated job label is an empty string.',
                 ],
             ],
         ];

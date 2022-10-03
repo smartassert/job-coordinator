@@ -112,15 +112,8 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     public function createInvalidRequestDataProvider(): array
     {
         $expectedEmptySuiteIdErrorData = [
-            'error' => [
-                'type' => 'invalid_request',
-                'payload' => [
-                    'suite_id' => [
-                        'value' => null,
-                        'message' => 'Required field "suite_id" invalid, missing from request or is an empty string.',
-                    ],
-                ],
-            ],
+            'type' => 'invalid_request',
+            'message' => 'Required field "suite_id" invalid, missing from request or is an empty string.',
         ];
 
         return [

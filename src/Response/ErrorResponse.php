@@ -12,21 +12,12 @@ class ErrorResponse extends JsonResponse
      */
     public function __construct(
         ErrorResponseType $errorResponseType,
-        string $field,
-        null|int|string $actual,
         string $message
     ) {
         parent::__construct(
             [
-                'error' => [
-                    'type' => $errorResponseType->value,
-                    'payload' => [
-                        $field => [
-                            'value' => $actual,
-                            'message' => $message,
-                        ],
-                    ],
-                ],
+                'type' => $errorResponseType->value,
+                'message' => $message,
             ],
             ErrorResponseType::SERVER_ERROR === $errorResponseType ? 500 : 400
         );
