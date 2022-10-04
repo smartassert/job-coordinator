@@ -15,17 +15,17 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\UsersSecurityBundle\Security\SymfonyRequestTokenExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Ulid;
 
 class JobControllerTest extends TestCase
 {
     /**
      * @dataProvider createFailureDataProvider
      *
-     * @param array<mixed> $expectedResponseData
+     * @param non-empty-string $suiteId
+     * @param array<mixed>     $expectedResponseData
      */
     public function testCreateFailure(
-        Request $request,
+        string $suiteId,
         UserInterface $user,
         JobRepository $jobRepository,
         UlidFactory $ulidFactory,
@@ -33,9 +33,18 @@ class JobControllerTest extends TestCase
         SymfonyRequestTokenExtractor $tokenExtractor,
         array $expectedResponseData,
     ): void {
-        $controller = new JobController();
+        $request = \Mockery::mock(Request::class);
 
-        $response = $controller->create($request, $user, $jobRepository, $ulidFactory, $resultsClient, $tokenExtractor);
+        $controller = new JobController();
+        $response = $controller->create(
+            $suiteId,
+            $request,
+            $user,
+            $jobRepository,
+            $ulidFactory,
+            $resultsClient,
+            $tokenExtractor
+        );
 
         self::assertSame(500, $response->getStatusCode());
         self::assertSame('application/json', $response->headers->get('content-type'));
@@ -63,7 +72,7 @@ class JobControllerTest extends TestCase
 
         return [
             'empty user' => [
-                'request' => \Mockery::mock(Request::class),
+                'suiteId' => $suiteId,
                 'user' => $this->createUser(''),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => \Mockery::mock(UlidFactory::class),
@@ -75,7 +84,7 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'empty label generated' => [
-                'request' => new Request(request: ['suite_id' => (string) new Ulid()]),
+                'suiteId' => $suiteId,
                 'user' => $this->createUser($userId),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => $this->createUlidFactory(new EmptyUlidException()),
@@ -87,7 +96,7 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'token extraction failed' => [
-                'request' => new Request(request: ['suite_id' => $suiteId]),
+                'suiteId' => $suiteId,
                 'user' => $this->createUser($userId),
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
@@ -99,7 +108,7 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed' => [
-                'request' => new Request(request: ['suite_id' => $suiteId]),
+                'suiteId' => $suiteId,
                 'user' => $this->createUser($userId),
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
@@ -111,7 +120,7 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service response lacking token' => [
-                'request' => new Request(request: ['suite_id' => $suiteId]),
+                'suiteId' => $suiteId,
                 'user' => $this->createUser($userId),
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),

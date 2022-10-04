@@ -22,14 +22,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class JobController
 {
+    public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
+
     /**
+     * @param non-empty-string $suiteId
+     *
      * @throws ClientExceptionInterface
      * @throws InvalidResponseDataException
      * @throws InvalidResponseContentException
      * @throws NonSuccessResponseException
      */
-    #[Route('/', name: 'job_create', methods: ['POST'])]
+    #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
+        string $suiteId,
         Request $request,
         UserInterface $user,
         JobRepository $repository,
@@ -40,15 +45,6 @@ class JobController
         $userId = trim($user->getUserIdentifier());
         if ('' === $userId) {
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'User identifier is empty.');
-        }
-
-        $suiteId = $request->request->get('suite_id');
-        $suiteId = is_string($suiteId) ? trim($suiteId) : '';
-        if ('' === $suiteId) {
-            return new ErrorResponse(
-                ErrorResponseType::INVALID_REQUEST,
-                'Required field "suite_id" invalid, missing from request or is an empty string.'
-            );
         }
 
         try {
