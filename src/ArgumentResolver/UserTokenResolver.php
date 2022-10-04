@@ -22,10 +22,12 @@ class UserTokenResolver implements ArgumentValueResolverInterface
     }
 
     /**
-     * @return \Traversable<?string>
+     * @return \Traversable<?non-empty-string>
      */
     public function resolve(Request $request, ArgumentMetadata $argument): \Traversable
     {
-        yield $this->tokenExtractor->extract($request);
+        $token = (string) $this->tokenExtractor->extract($request);
+
+        yield '' === $token ? null : $token;
     }
 }

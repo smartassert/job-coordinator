@@ -14,9 +14,7 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\UsersSecurityBundle\Security\SymfonyRequestTokenExtractor;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -25,7 +23,8 @@ class JobController
     public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
 
     /**
-     * @param non-empty-string $suiteId
+     * @param non-empty-string      $suiteId
+     * @param null|non-empty-string $userToken
      *
      * @throws ClientExceptionInterface
      * @throws InvalidResponseDataException
@@ -35,12 +34,11 @@ class JobController
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
         string $suiteId,
-        Request $request,
+        ?string $userToken,
         UserInterface $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
-        SymfonyRequestTokenExtractor $tokenExtractor,
     ): JsonResponse {
         $userId = trim($user->getUserIdentifier());
         if ('' === $userId) {
@@ -56,8 +54,7 @@ class JobController
         $job = new Job($userId, $suiteId, $label);
         $repository->add($job);
 
-        $userToken = (string) $tokenExtractor->extract($request);
-        if ('' === $userToken) {
+        if (null === $userToken) {
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Request user token is empty.');
         }
 
