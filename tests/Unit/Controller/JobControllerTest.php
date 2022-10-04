@@ -89,21 +89,7 @@ class JobControllerTest extends TestCase
             'token extraction failed' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
                 'user' => $this->createUser($userId),
-                'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
-                    $jobRepository = \Mockery::mock(JobRepository::class);
-                    $jobRepository
-                        ->shouldReceive('add')
-                        ->withArgs(function (Job $job) use ($userId, $suiteId, $label) {
-                            self::assertSame($userId, $job->getUserId());
-                            self::assertSame($suiteId, $job->getSuiteId());
-                            self::assertSame($label, $job->getLabel());
-
-                            return true;
-                        })
-                    ;
-
-                    return $jobRepository;
-                })(),
+                'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
                 'tokenExtractor' => (function (): SymfonyRequestTokenExtractor {
@@ -123,21 +109,7 @@ class JobControllerTest extends TestCase
             'results service job creation failed' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
                 'user' => $this->createUser($userId),
-                'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
-                    $jobRepository = \Mockery::mock(JobRepository::class);
-                    $jobRepository
-                        ->shouldReceive('add')
-                        ->withArgs(function (Job $job) use ($userId, $suiteId, $label) {
-                            self::assertSame($userId, $job->getUserId());
-                            self::assertSame($suiteId, $job->getSuiteId());
-                            self::assertSame($label, $job->getLabel());
-
-                            return true;
-                        })
-                    ;
-
-                    return $jobRepository;
-                })(),
+                'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => (function () use ($userToken, $label): ResultsClient {
                     $resultsClient = \Mockery::mock(ResultsClient::class);
@@ -166,21 +138,7 @@ class JobControllerTest extends TestCase
             'results service response lacking token' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
                 'user' => $this->createUser($userId),
-                'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
-                    $jobRepository = \Mockery::mock(JobRepository::class);
-                    $jobRepository
-                        ->shouldReceive('add')
-                        ->withArgs(function (Job $job) use ($userId, $suiteId, $label) {
-                            self::assertSame($userId, $job->getUserId());
-                            self::assertSame($suiteId, $job->getSuiteId());
-                            self::assertSame($label, $job->getLabel());
-
-                            return true;
-                        })
-                    ;
-
-                    return $jobRepository;
-                })(),
+                'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => (function () use ($userToken, $label): ResultsClient {
                     $resultsClient = \Mockery::mock(ResultsClient::class);
@@ -232,5 +190,22 @@ class JobControllerTest extends TestCase
         }
 
         return $ulidFactory;
+    }
+
+    private function createJobRepository(string $userId, string $suiteId, string $label): JobRepository
+    {
+        $jobRepository = \Mockery::mock(JobRepository::class);
+        $jobRepository
+            ->shouldReceive('add')
+            ->withArgs(function (Job $job) use ($userId, $suiteId, $label) {
+                self::assertSame($userId, $job->getUserId());
+                self::assertSame($suiteId, $job->getSuiteId());
+                self::assertSame($label, $job->getLabel());
+
+                return true;
+            })
+        ;
+
+        return $jobRepository;
     }
 }
