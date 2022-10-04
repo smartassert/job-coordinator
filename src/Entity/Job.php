@@ -34,15 +34,18 @@ class Job implements \JsonSerializable
     private readonly string $label;
 
     /**
+     * @var non-empty-string
+     */
+    #[ORM\Column(length: 32, nullable: true)]
+    private string $resultsToken;
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $label
      */
-    public function __construct(
-        string $userId,
-        string $suiteId,
-        string $label,
-    ) {
+    public function __construct(string $userId, string $suiteId, string $label)
+    {
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->label = $label;
@@ -75,6 +78,22 @@ class Job implements \JsonSerializable
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getResultsToken(): string
+    {
+        return $this->resultsToken;
+    }
+
+    /**
+     * @param non-empty-string $resultsToken
+     */
+    public function setResultsToken(string $resultsToken): void
+    {
+        $this->resultsToken = $resultsToken;
     }
 
     /**

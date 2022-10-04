@@ -166,5 +166,6 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         self::assertInstanceOf(Job::class, $job);
         self::assertSame($job->getUserId(), self::$authenticationConfiguration->getUser()->id);
         self::assertSame($job->getSuiteId(), $suiteId);
+        self::assertNotNull($job->getResultsToken());
     }
 }
