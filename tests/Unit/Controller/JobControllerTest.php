@@ -78,15 +78,7 @@ class JobControllerTest extends TestCase
                 'request' => new Request(request: ['suite_id' => (string) new Ulid()]),
                 'user' => $this->createUser($userId),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
-                'ulidFactory' => (function (): UlidFactory {
-                    $ulidFactory = \Mockery::mock(UlidFactory::class);
-                    $ulidFactory
-                        ->shouldReceive('create')
-                        ->andThrow(new EmptyUlidException())
-                    ;
-
-                    return $ulidFactory;
-                })(),
+                'ulidFactory' => $this->createUlidFactory(new EmptyUlidException()),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
                 'tokenExtractor' => \Mockery::mock(SymfonyRequestTokenExtractor::class),
                 'expectedResponseData' => [
@@ -112,15 +104,7 @@ class JobControllerTest extends TestCase
 
                     return $jobRepository;
                 })(),
-                'ulidFactory' => (function () use ($label): UlidFactory {
-                    $ulidFactory = \Mockery::mock(UlidFactory::class);
-                    $ulidFactory
-                        ->shouldReceive('create')
-                        ->andReturn($label)
-                    ;
-
-                    return $ulidFactory;
-                })(),
+                'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
                 'tokenExtractor' => (function (): SymfonyRequestTokenExtractor {
                     $tokenExtractor = \Mockery::mock(SymfonyRequestTokenExtractor::class);
@@ -154,15 +138,7 @@ class JobControllerTest extends TestCase
 
                     return $jobRepository;
                 })(),
-                'ulidFactory' => (function () use ($label): UlidFactory {
-                    $ulidFactory = \Mockery::mock(UlidFactory::class);
-                    $ulidFactory
-                        ->shouldReceive('create')
-                        ->andReturn($label)
-                    ;
-
-                    return $ulidFactory;
-                })(),
+                'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => (function () use ($userToken, $label): ResultsClient {
                     $resultsClient = \Mockery::mock(ResultsClient::class);
                     $resultsClient
@@ -205,15 +181,7 @@ class JobControllerTest extends TestCase
 
                     return $jobRepository;
                 })(),
-                'ulidFactory' => (function () use ($label): UlidFactory {
-                    $ulidFactory = \Mockery::mock(UlidFactory::class);
-                    $ulidFactory
-                        ->shouldReceive('create')
-                        ->andReturn($label)
-                    ;
-
-                    return $ulidFactory;
-                })(),
+                'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => (function () use ($userToken, $label): ResultsClient {
                     $resultsClient = \Mockery::mock(ResultsClient::class);
                     $resultsClient
@@ -250,5 +218,19 @@ class JobControllerTest extends TestCase
         ;
 
         return $user;
+    }
+
+    private function createUlidFactory(string|\Exception $outcome): UlidFactory
+    {
+        $ulidFactory = \Mockery::mock(UlidFactory::class);
+
+        $createCall = $ulidFactory->shouldReceive('create');
+        if ($outcome instanceof \Exception) {
+            $createCall->andThrow($outcome);
+        } else {
+            $createCall->andReturn($outcome);
+        }
+
+        return $ulidFactory;
     }
 }
