@@ -40,3 +40,11 @@ services:
 
     Psr\Http\Message\StreamFactoryInterface:
         alias: GuzzleHttp\Psr7\HttpFactory
+
+    SmartAssert\ServiceClient\RequestFactory: ~
+
+    SmartAssert\ResultsClient\ObjectFactory: ~
+
+    SmartAssert\ResultsClient\Client:
+        arguments:
+            $baseUrl: '%env(RESULTS_BASE_URL)%'
