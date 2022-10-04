@@ -64,15 +64,7 @@ class JobControllerTest extends TestCase
         return [
             'empty user' => [
                 'request' => \Mockery::mock(Request::class),
-                'user' => (function (): UserInterface {
-                    $user = \Mockery::mock(UserInterface::class);
-                    $user
-                        ->shouldReceive('getUserIdentifier')
-                        ->andReturn('')
-                    ;
-
-                    return $user;
-                })(),
+                'user' => $this->createUser(''),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => \Mockery::mock(UlidFactory::class),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
@@ -84,15 +76,7 @@ class JobControllerTest extends TestCase
             ],
             'empty label generated' => [
                 'request' => new Request(request: ['suite_id' => (string) new Ulid()]),
-                'user' => (function () use ($userId): UserInterface {
-                    $user = \Mockery::mock(UserInterface::class);
-                    $user
-                        ->shouldReceive('getUserIdentifier')
-                        ->andReturn($userId)
-                    ;
-
-                    return $user;
-                })(),
+                'user' => $this->createUser($userId),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => (function (): UlidFactory {
                     $ulidFactory = \Mockery::mock(UlidFactory::class);
@@ -112,15 +96,7 @@ class JobControllerTest extends TestCase
             ],
             'token extraction failed' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
-                'user' => (function () use ($userId): UserInterface {
-                    $user = \Mockery::mock(UserInterface::class);
-                    $user
-                        ->shouldReceive('getUserIdentifier')
-                        ->andReturn($userId)
-                    ;
-
-                    return $user;
-                })(),
+                'user' => $this->createUser($userId),
                 'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
                     $jobRepository = \Mockery::mock(JobRepository::class);
                     $jobRepository
@@ -162,15 +138,7 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
-                'user' => (function () use ($userId): UserInterface {
-                    $user = \Mockery::mock(UserInterface::class);
-                    $user
-                        ->shouldReceive('getUserIdentifier')
-                        ->andReturn($userId)
-                    ;
-
-                    return $user;
-                })(),
+                'user' => $this->createUser($userId),
                 'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
                     $jobRepository = \Mockery::mock(JobRepository::class);
                     $jobRepository
@@ -221,15 +189,7 @@ class JobControllerTest extends TestCase
             ],
             'results service response lacking token' => [
                 'request' => new Request(request: ['suite_id' => $suiteId]),
-                'user' => (function () use ($userId): UserInterface {
-                    $user = \Mockery::mock(UserInterface::class);
-                    $user
-                        ->shouldReceive('getUserIdentifier')
-                        ->andReturn($userId)
-                    ;
-
-                    return $user;
-                })(),
+                'user' => $this->createUser($userId),
                 'jobRepository' => (function () use ($userId, $suiteId, $label): JobRepository {
                     $jobRepository = \Mockery::mock(JobRepository::class);
                     $jobRepository
@@ -279,5 +239,16 @@ class JobControllerTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    private function createUser(string $userId): UserInterface
+    {
+        $user = \Mockery::mock(UserInterface::class);
+        $user
+            ->shouldReceive('getUserIdentifier')
+            ->andReturn($userId)
+        ;
+
+        return $user;
     }
 }
