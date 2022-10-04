@@ -92,15 +92,7 @@ class JobControllerTest extends TestCase
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
-                'tokenExtractor' => (function (): SymfonyRequestTokenExtractor {
-                    $tokenExtractor = \Mockery::mock(SymfonyRequestTokenExtractor::class);
-                    $tokenExtractor
-                        ->shouldReceive('extract')
-                        ->andReturnNull()
-                    ;
-
-                    return $tokenExtractor;
-                })(),
+                'tokenExtractor' => $this->createTokenExtractor(null),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Request user token is empty.',
@@ -121,15 +113,7 @@ class JobControllerTest extends TestCase
 
                     return $resultsClient;
                 })(),
-                'tokenExtractor' => (function () use ($userToken): SymfonyRequestTokenExtractor {
-                    $tokenExtractor = \Mockery::mock(SymfonyRequestTokenExtractor::class);
-                    $tokenExtractor
-                        ->shouldReceive('extract')
-                        ->andReturn($userToken)
-                    ;
-
-                    return $tokenExtractor;
-                })(),
+                'tokenExtractor' => $this->createTokenExtractor($userToken),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -150,15 +134,7 @@ class JobControllerTest extends TestCase
 
                     return $resultsClient;
                 })(),
-                'tokenExtractor' => (function () use ($userToken): SymfonyRequestTokenExtractor {
-                    $tokenExtractor = \Mockery::mock(SymfonyRequestTokenExtractor::class);
-                    $tokenExtractor
-                        ->shouldReceive('extract')
-                        ->andReturn($userToken)
-                    ;
-
-                    return $tokenExtractor;
-                })(),
+                'tokenExtractor' => $this->createTokenExtractor($userToken),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Results service job invalid, token missing.',
@@ -207,5 +183,16 @@ class JobControllerTest extends TestCase
         ;
 
         return $jobRepository;
+    }
+
+    private function createTokenExtractor(?string $token): SymfonyRequestTokenExtractor
+    {
+        $tokenExtractor = \Mockery::mock(SymfonyRequestTokenExtractor::class);
+        $tokenExtractor
+            ->shouldReceive('extract')
+            ->andReturn($token)
+        ;
+
+        return $tokenExtractor;
     }
 }
