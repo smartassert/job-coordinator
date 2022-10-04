@@ -103,16 +103,7 @@ class JobControllerTest extends TestCase
                 'user' => $this->createUser($userId),
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
-                'resultsClient' => (function () use ($userToken, $label): ResultsClient {
-                    $resultsClient = \Mockery::mock(ResultsClient::class);
-                    $resultsClient
-                        ->shouldReceive('createJob')
-                        ->with($userToken, $label)
-                        ->andReturnNull()
-                    ;
-
-                    return $resultsClient;
-                })(),
+                'resultsClient' => $this->createResultsClient($userToken, $label, null),
                 'tokenExtractor' => $this->createTokenExtractor($userToken),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -124,16 +115,11 @@ class JobControllerTest extends TestCase
                 'user' => $this->createUser($userId),
                 'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
                 'ulidFactory' => $this->createUlidFactory($label),
-                'resultsClient' => (function () use ($userToken, $label): ResultsClient {
-                    $resultsClient = \Mockery::mock(ResultsClient::class);
-                    $resultsClient
-                        ->shouldReceive('createJob')
-                        ->with($userToken, $label)
-                        ->andReturn(new ResultsJob('non-empty label', ''))
-                    ;
-
-                    return $resultsClient;
-                })(),
+                'resultsClient' => $this->createResultsClient(
+                    $userToken,
+                    $label,
+                    new ResultsJob('non-empty label', '')
+                ),
                 'tokenExtractor' => $this->createTokenExtractor($userToken),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -194,5 +180,17 @@ class JobControllerTest extends TestCase
         ;
 
         return $tokenExtractor;
+    }
+
+    private function createResultsClient(string $userToken, string $label, ?ResultsJob $job): ResultsClient
+    {
+        $resultsClient = \Mockery::mock(ResultsClient::class);
+        $resultsClient
+            ->shouldReceive('createJob')
+            ->with($userToken, $label)
+            ->andReturn($job)
+        ;
+
+        return $resultsClient;
     }
 }
