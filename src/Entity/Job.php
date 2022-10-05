@@ -10,10 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
 class Job implements \JsonSerializable
 {
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'bigint')]
-    private ?int $id = null;
+    #[ORM\Column(type: 'string', length: 32, unique: true)]
+    private string $id;
 
     /**
      * @var non-empty-string
@@ -30,28 +32,22 @@ class Job implements \JsonSerializable
     /**
      * @var non-empty-string
      */
-    #[ORM\Column(length: 32)]
-    private readonly string $label;
-
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 32, nullable: true)]
     private string $resultsToken;
 
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
-     * @param non-empty-string $label
+     * @param non-empty-string $id
      */
-    public function __construct(string $userId, string $suiteId, string $label)
+    public function __construct(string $id, string $userId, string $suiteId)
     {
+        $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
-        $this->label = $label;
     }
 
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -75,14 +71,6 @@ class Job implements \JsonSerializable
     /**
      * @return non-empty-string
      */
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    /**
-     * @return non-empty-string
-     */
     public function getResultsToken(): string
     {
         return $this->resultsToken;
@@ -97,13 +85,13 @@ class Job implements \JsonSerializable
     }
 
     /**
-     * @return array{suite_id: non-empty-string, label: non-empty-string}
+     * @return array{suite_id: non-empty-string, id: non-empty-string}
      */
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'suite_id' => $this->suiteId,
-            'label' => $this->label,
         ];
     }
 }

@@ -39,15 +39,15 @@ class JobController
         ResultsClient $resultsClient,
     ): JsonResponse {
         try {
-            $label = $ulidFactory->create();
+            $id = $ulidFactory->create();
         } catch (EmptyUlidException) {
-            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job label is an empty string.');
+            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
         }
 
-        $job = new Job($user->getUserIdentifier(), $suiteId, $label);
+        $job = new Job($id, $user->getUserIdentifier(), $suiteId);
         $repository->add($job);
 
-        $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $label);
+        $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
         if (!$resultsJob instanceof ResultsJob) {
             return new ErrorResponse(
                 ErrorResponseType::SERVER_ERROR,

@@ -17,13 +17,11 @@ final class Version20220920083238 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE SEQUENCE job_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('
             CREATE TABLE job (
-                id BIGINT NOT NULL, 
+                id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
-                label VARCHAR(32) NOT NULL, 
                 results_token VARCHAR(32),
                 PRIMARY KEY(id)
             )
@@ -34,7 +32,6 @@ final class Version20220920083238 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP SEQUENCE job_id_seq CASCADE');
         $this->addSql('DROP TABLE job');
     }
 }
