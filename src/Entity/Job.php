@@ -11,9 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Job implements \JsonSerializable
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'bigint')]
-    private ?int $id = null;
+    #[ORM\Column(type: 'string', length: 32, unique: true)]
+    private string $id;
 
     /**
      * @var non-empty-string
@@ -46,12 +45,13 @@ class Job implements \JsonSerializable
      */
     public function __construct(string $userId, string $suiteId, string $label)
     {
+        $this->id = $label;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->label = $label;
     }
 
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }
