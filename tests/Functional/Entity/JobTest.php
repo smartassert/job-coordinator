@@ -25,7 +25,7 @@ class JobTest extends WebTestCase
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
-        $job = new Job($userId, $suiteId, $id);
+        $job = new Job($id, $userId, $suiteId);
 
         $entityManager->persist($job);
         $entityManager->flush();

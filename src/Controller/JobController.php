@@ -44,7 +44,7 @@ class JobController
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
         }
 
-        $job = new Job($user->getUserIdentifier(), $suiteId, $id);
+        $job = new Job($id, $user->getUserIdentifier(), $suiteId);
         $repository->add($job);
 
         $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);

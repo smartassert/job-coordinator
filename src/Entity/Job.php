@@ -40,7 +40,7 @@ class Job implements \JsonSerializable
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
      */
-    public function __construct(string $userId, string $suiteId, string $id)
+    public function __construct(string $id, string $userId, string $suiteId)
     {
         $this->id = $id;
         $this->userId = $userId;
