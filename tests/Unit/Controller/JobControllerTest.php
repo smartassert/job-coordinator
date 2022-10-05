@@ -52,13 +52,13 @@ class JobControllerTest extends TestCase
             ->andThrow(new EmptyUlidException())
         ;
 
+        $id = (new UlidFactory())->create();
         $userId = (new UlidFactory())->create();
-        $label = (new UlidFactory())->create();
         $suiteId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
 
         return [
-            'empty label generated' => [
+            'empty id generated' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => \Mockery::mock(JobRepository::class),
@@ -66,15 +66,15 @@ class JobControllerTest extends TestCase
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
-                    'message' => 'Generated job label is an empty string.',
+                    'message' => 'Generated job id is an empty string.',
                 ],
             ],
             'results service job creation failed' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
-                'ulidFactory' => $this->createUlidFactory($label),
-                'resultsClient' => $this->createResultsClient($userToken, $label, null),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, null),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -83,11 +83,11 @@ class JobControllerTest extends TestCase
             'results service response lacking token' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($userId, $suiteId, $label),
-                'ulidFactory' => $this->createUlidFactory($label),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient(
                     $userToken,
-                    $label,
+                    $id,
                     new ResultsJob('non-empty label', '')
                 ),
                 'expectedResponseData' => [
@@ -112,15 +112,15 @@ class JobControllerTest extends TestCase
         return $ulidFactory;
     }
 
-    private function createJobRepository(string $userId, string $suiteId, string $label): JobRepository
+    private function createJobRepository(string $id, string $userId, string $suiteId): JobRepository
     {
         $jobRepository = \Mockery::mock(JobRepository::class);
         $jobRepository
             ->shouldReceive('add')
-            ->withArgs(function (Job $job) use ($userId, $suiteId, $label) {
+            ->withArgs(function (Job $job) use ($userId, $suiteId, $id) {
+                self::assertSame($id, $job->getId());
                 self::assertSame($userId, $job->getUserId());
                 self::assertSame($suiteId, $job->getSuiteId());
-                self::assertSame($label, $job->getLabel());
 
                 return true;
             })
@@ -129,12 +129,12 @@ class JobControllerTest extends TestCase
         return $jobRepository;
     }
 
-    private function createResultsClient(string $userToken, string $label, ?ResultsJob $job): ResultsClient
+    private function createResultsClient(string $userToken, string $id, ?ResultsJob $job): ResultsClient
     {
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
             ->shouldReceive('createJob')
-            ->with($userToken, $label)
+            ->with($userToken, $id)
             ->andReturn($job)
         ;
 
