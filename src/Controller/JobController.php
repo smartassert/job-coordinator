@@ -14,17 +14,16 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
+use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class JobController
 {
     public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
 
     /**
-     * @param non-empty-string      $suiteId
-     * @param null|non-empty-string $userToken
+     * @param non-empty-string $suiteId
      *
      * @throws ClientExceptionInterface
      * @throws InvalidResponseDataException
@@ -34,31 +33,21 @@ class JobController
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
         string $suiteId,
-        ?string $userToken,
-        UserInterface $user,
+        User $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
     ): JsonResponse {
-        $userId = trim($user->getUserIdentifier());
-        if ('' === $userId) {
-            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'User identifier is empty.');
-        }
-
         try {
             $label = $ulidFactory->create();
         } catch (EmptyUlidException) {
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job label is an empty string.');
         }
 
-        $job = new Job($userId, $suiteId, $label);
+        $job = new Job($user->getUserIdentifier(), $suiteId, $label);
         $repository->add($job);
 
-        if (null === $userToken) {
-            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Request user token is empty.');
-        }
-
-        $resultsJob = $resultsClient->createJob($userToken, $label);
+        $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $label);
         if (!$resultsJob instanceof ResultsJob) {
             return new ErrorResponse(
                 ErrorResponseType::SERVER_ERROR,
