@@ -98,8 +98,8 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service users-http results-service results-http",
-        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service users-http results-service results-http",
+        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service users-http results-service results-http worker-manager-service worker-manager-http",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service users-http results-service results-http worker-manager-service worker-manager-http",
         "functional-teardown": [
             "docker-compose -f ./tests/build/docker-compose.yml down"
         ],
@@ -108,7 +108,8 @@
             "sleep 2",
             "@db-setup",
             "@users-setup",
-            "@results-setup"
+            "@results-setup",
+            "@worker-manager-setup"
         ],
         "users-db-setup": [
             "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
@@ -127,6 +128,10 @@
         "results-setup": [
             "docker-compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:database:create --if-not-exists",
             "docker-compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+        ],
+        "worker-manager-setup": [
+            "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ]
     },
     "conflict": {
