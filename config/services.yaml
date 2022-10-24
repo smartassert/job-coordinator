@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    users_security_bundle_base_url: '%env(AUTHENTICATION_BASE_URL)%'
+    users_security_bundle_base_url: '%env(string:AUTHENTICATION_BASE_URL)%'
     users_security_bundle_public_pattern: '^/(status)|(health-check)'
     users_security_bundle_secured_pattern: '^/*'
     users_security_bundle_access_control_path: '^/*'
@@ -49,4 +49,8 @@ services:
 
     SmartAssert\ResultsClient\Client:
         arguments:
-            $baseUrl: '%env(RESULTS_BASE_URL)%'
+            $baseUrl: '%env(string:RESULTS_BASE_URL)%'
+
+    SmartAssert\WorkerManagerClient\Client:
+        arguments:
+            $baseUrl: '%env(string:WORKER_MANAGER_BASE_URL)%'
