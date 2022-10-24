@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8aef993b42352a8bb960bc772f9d7641",
+    "content-hash": "db34492bee2fd80460f123c5a3542576",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2645,6 +2645,62 @@
                 "source": "https://github.com/smartassert/UsersSecurityBundle/tree/2.3"
             },
             "time": "2022-10-05T11:06:03+00:00"
+        },
+        {
+            "name": "smartassert/worker-manager-client",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/worker-manager-client.git",
+                "reference": "ae3fb560cd2e457351463b646d09564ee2da575a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/worker-manager-client/zipball/ae3fb560cd2e457351463b646d09564ee2da575a",
+                "reference": "ae3fb560cd2e457351463b646d09564ee2da575a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.0",
+                "smartassert/service-client": "^0.4.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.5",
+                "mockery/mockery": "^1.5",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-mockery": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "smartassert/users-client": "^1.1",
+                "squizlabs/php_codesniffer": "^3.7",
+                "symfony/uid": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\WorkerManagerClient\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/smartassert/worker-manager-client",
+            "support": {
+                "issues": "https://github.com/smartassert/worker-manager-client/issues",
+                "source": "https://github.com/smartassert/worker-manager-client/tree/0.1"
+            },
+            "time": "2022-10-20T16:39:32+00:00"
         },
         {
             "name": "symfony/cache",
