@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8aef993b42352a8bb960bc772f9d7641",
+    "content-hash": "7d75d088b2bc3eea13eae53553eb66ec",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2365,17 +2365,65 @@
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
-            "name": "smartassert/results-client",
+            "name": "smartassert/array-inspector",
             "version": "0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/smartassert/results-client.git",
-                "reference": "f181a48b0522ea44d20fb42ad13085602d557d8d"
+                "url": "https://github.com/smartassert/array-inspector.git",
+                "reference": "0f65a628655dd1b10257ce121660083b509ff027"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/results-client/zipball/f181a48b0522ea44d20fb42ad13085602d557d8d",
-                "reference": "f181a48b0522ea44d20fb42ad13085602d557d8d",
+                "url": "https://api.github.com/repos/smartassert/array-inspector/zipball/0f65a628655dd1b10257ce121660083b509ff027",
+                "reference": "0f65a628655dd1b10257ce121660083b509ff027",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SmartAssert\\ArrayInspector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "description": "Get values from an array",
+            "homepage": "https://github.com/smartassert/array-inspector",
+            "support": {
+                "issues": "https://github.com/smartassert/array-inspector/issues",
+                "source": "https://github.com/smartassert/array-inspector/tree/0.2"
+            },
+            "time": "2022-11-02T10:29:57+00:00"
+        },
+        {
+            "name": "smartassert/results-client",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smartassert/results-client.git",
+                "reference": "50a4c513056321ad88694faa26791b6f87ef26b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smartassert/results-client/zipball/50a4c513056321ad88694faa26791b6f87ef26b2",
+                "reference": "50a4c513056321ad88694faa26791b6f87ef26b2",
                 "shasum": ""
             },
             "require": {
@@ -2383,7 +2431,8 @@
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0",
-                "smartassert/service-client": ">=0.4,<1"
+                "smartassert/array-inspector": ">=0.2,<1",
+                "smartassert/service-client": ">=1.3,<2"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.5",
@@ -2393,9 +2442,10 @@
                 "phpstan/phpstan-mockery": "^1.1",
                 "phpstan/phpstan-phpunit": "^1.1",
                 "phpunit/phpunit": "^9.5",
-                "smartassert/users-client": ">=1.1,<2",
+                "smartassert/users-client": ">=2.4,<3",
                 "squizlabs/php_codesniffer": "^3.7",
-                "symfony/uid": "^6.1"
+                "symfony/uid": "^6.1",
+                "webignition/http-history-container": "^2.5"
             },
             "type": "library",
             "autoload": {
@@ -2416,9 +2466,9 @@
             "homepage": "https://github.com/smartassert/results-client",
             "support": {
                 "issues": "https://github.com/smartassert/results-client/issues",
-                "source": "https://github.com/smartassert/results-client/tree/0.2"
+                "source": "https://github.com/smartassert/results-client/tree/2.0"
             },
-            "time": "2022-09-29T16:50:55+00:00"
+            "time": "2022-11-02T16:39:42+00:00"
         },
         {
             "name": "smartassert/security-token-extractor",
@@ -2472,16 +2522,16 @@
         },
         {
             "name": "smartassert/service-client",
-            "version": "0.4",
+            "version": "1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-client.git",
-                "reference": "2b44776d97bef93f2cd18ad70bd1a6831e50ae5d"
+                "reference": "556c27c810cade8c3f3fdc35a90f2e0ef7865888"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-client/zipball/2b44776d97bef93f2cd18ad70bd1a6831e50ae5d",
-                "reference": "2b44776d97bef93f2cd18ad70bd1a6831e50ae5d",
+                "url": "https://api.github.com/repos/smartassert/service-client/zipball/556c27c810cade8c3f3fdc35a90f2e0ef7865888",
+                "reference": "556c27c810cade8c3f3fdc35a90f2e0ef7865888",
                 "shasum": ""
             },
             "require": {
@@ -2522,22 +2572,22 @@
             "homepage": "https://github.com/smartassert/service-client",
             "support": {
                 "issues": "https://github.com/smartassert/service-client/issues",
-                "source": "https://github.com/smartassert/service-client/tree/0.4"
+                "source": "https://github.com/smartassert/service-client/tree/1.3"
             },
-            "time": "2022-09-29T16:21:44+00:00"
+            "time": "2022-10-31T10:35:03+00:00"
         },
         {
             "name": "smartassert/users-client",
-            "version": "1.1",
+            "version": "2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/users-client.git",
-                "reference": "03061f2d29517064a5d43ccd8e3da8e14c7472c3"
+                "reference": "d71d19972ee379c62030536a009dd19c731cf3ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/users-client/zipball/03061f2d29517064a5d43ccd8e3da8e14c7472c3",
-                "reference": "03061f2d29517064a5d43ccd8e3da8e14c7472c3",
+                "url": "https://api.github.com/repos/smartassert/users-client/zipball/d71d19972ee379c62030536a009dd19c731cf3ae",
+                "reference": "d71d19972ee379c62030536a009dd19c731cf3ae",
                 "shasum": ""
             },
             "require": {
@@ -2545,7 +2595,8 @@
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0",
-                "smartassert/service-client": ">=0.2,<1"
+                "smartassert/array-inspector": ">=0.1,<1",
+                "smartassert/service-client": ">=1.3,<2"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.5",
@@ -2577,22 +2628,22 @@
             "homepage": "https://github.com/smartassert/users-client",
             "support": {
                 "issues": "https://github.com/smartassert/users-client/issues",
-                "source": "https://github.com/smartassert/users-client/tree/1.1"
+                "source": "https://github.com/smartassert/users-client/tree/2.5"
             },
-            "time": "2022-09-26T15:39:29+00:00"
+            "time": "2022-10-31T11:14:57+00:00"
         },
         {
             "name": "smartassert/users-security-bundle",
-            "version": "2.3",
+            "version": "3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/UsersSecurityBundle.git",
-                "reference": "bffced8e4d12b98e12b65c04fc525ff73671b541"
+                "reference": "965041935bf4c54a224d39e27df35ddfacf4fd08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/bffced8e4d12b98e12b65c04fc525ff73671b541",
-                "reference": "bffced8e4d12b98e12b65c04fc525ff73671b541",
+                "url": "https://api.github.com/repos/smartassert/UsersSecurityBundle/zipball/965041935bf4c54a224d39e27df35ddfacf4fd08",
+                "reference": "965041935bf4c54a224d39e27df35ddfacf4fd08",
                 "shasum": ""
             },
             "require": {
@@ -2600,14 +2651,14 @@
                 "php": "^8.1",
                 "psr/http-factory": "^1.0",
                 "smartassert/security-token-extractor": ">=0.2,<1",
-                "smartassert/users-client": "^1.1",
-                "symfony/config": "^6.0",
-                "symfony/dependency-injection": "^6.0",
-                "symfony/http-foundation": "^6.0",
-                "symfony/http-kernel": "^6.0",
-                "symfony/security-core": "^6.0",
-                "symfony/security-http": "^6.0",
-                "symfony/yaml": "^6.0"
+                "smartassert/users-client": ">=2.5,<3",
+                "symfony/config": "^6.1",
+                "symfony/dependency-injection": "^6.1",
+                "symfony/http-foundation": "^6.1",
+                "symfony/http-kernel": "^6.1",
+                "symfony/security-core": "^6.1",
+                "symfony/security-http": "^6.1",
+                "symfony/yaml": "^6.1"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.4",
@@ -2642,9 +2693,9 @@
             "homepage": "https://github.com/smartassert/UsersSecurityBundle",
             "support": {
                 "issues": "https://github.com/smartassert/UsersSecurityBundle/issues",
-                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/2.3"
+                "source": "https://github.com/smartassert/UsersSecurityBundle/tree/3.1"
             },
-            "time": "2022-10-05T11:06:03+00:00"
+            "time": "2022-10-31T14:10:38+00:00"
         },
         {
             "name": "symfony/cache",
