@@ -10,7 +10,7 @@ use App\Response\ErrorResponse;
 use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
@@ -47,8 +47,9 @@ class JobController
         $job = new Job($id, $user->getUserIdentifier(), $suiteId);
         $repository->add($job);
 
-        $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
-        if (!$resultsJob instanceof ResultsJob) {
+        try {
+            $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
+        } catch (InvalidModelDataException) {
             return new ErrorResponse(
                 ErrorResponseType::SERVER_ERROR,
                 'Failed creating job in results service.'

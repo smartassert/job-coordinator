@@ -10,8 +10,10 @@ use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
 use App\Services\UlidFactory;
 use Monolog\Test\TestCase;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 class JobControllerTest extends TestCase
@@ -74,7 +76,11 @@ class JobControllerTest extends TestCase
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'ulidFactory' => $this->createUlidFactory($id),
-                'resultsClient' => $this->createResultsClient($userToken, $id, null),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                    ResultsJob::class,
+                    \Mockery::mock(ResponseInterface::class),
+                    []
+                )),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -129,14 +135,20 @@ class JobControllerTest extends TestCase
         return $jobRepository;
     }
 
-    private function createResultsClient(string $userToken, string $id, ?ResultsJob $job): ResultsClient
+    private function createResultsClient(string $userToken, string $id, ResultsJob|\Exception $outcome): ResultsClient
     {
         $resultsClient = \Mockery::mock(ResultsClient::class);
-        $resultsClient
+
+        $expectation = $resultsClient
             ->shouldReceive('createJob')
             ->with($userToken, $id)
-            ->andReturn($job)
         ;
+
+        if ($outcome instanceof ResultsJob) {
+            $expectation->andReturn($outcome);
+        } else {
+            $expectation->andThrow($outcome);
+        }
 
         return $resultsClient;
     }
