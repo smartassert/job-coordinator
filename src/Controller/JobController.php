@@ -49,10 +49,11 @@ class JobController
 
         try {
             $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
-        } catch (InvalidModelDataException) {
+        } catch (InvalidModelDataException $invalidModelDataException) {
             return new ErrorResponse(
                 ErrorResponseType::SERVER_ERROR,
-                'Failed creating job in results service.'
+                'Failed creating job in results service.',
+                $invalidModelDataException->payload
             );
         }
 
