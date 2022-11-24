@@ -71,7 +71,7 @@ class JobControllerTest extends TestCase
                     'message' => 'Generated job id is an empty string.',
                 ],
             ],
-            'results service job creation failed' => [
+            'results service job creation failed, empty results service response payload' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
@@ -84,6 +84,29 @@ class JobControllerTest extends TestCase
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
+                    'context' => [],
+                ],
+            ],
+            'results service job creation failed, non-empty results service response payload' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                    ResultsJob::class,
+                    \Mockery::mock(ResponseInterface::class),
+                    [
+                        'key1' => 'value1',
+                        'key2' => 'value2',
+                    ]
+                )),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed creating job in results service.',
+                    'context' => [
+                        'key1' => 'value1',
+                        'key2' => 'value2',
+                    ],
                 ],
             ],
             'results service response lacking token' => [
