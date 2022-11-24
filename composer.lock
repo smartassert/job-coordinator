@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d75d088b2bc3eea13eae53553eb66ec",
+    "content-hash": "045cb9a0bebf4d842b0b1e765fc8f4c9",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2414,16 +2414,16 @@
         },
         {
             "name": "smartassert/results-client",
-            "version": "2.0",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/results-client.git",
-                "reference": "50a4c513056321ad88694faa26791b6f87ef26b2"
+                "reference": "cc338130fff9320c1c9f19ab6cb2a948271ce088"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/results-client/zipball/50a4c513056321ad88694faa26791b6f87ef26b2",
-                "reference": "50a4c513056321ad88694faa26791b6f87ef26b2",
+                "url": "https://api.github.com/repos/smartassert/results-client/zipball/cc338130fff9320c1c9f19ab6cb2a948271ce088",
+                "reference": "cc338130fff9320c1c9f19ab6cb2a948271ce088",
                 "shasum": ""
             },
             "require": {
@@ -2432,7 +2432,7 @@
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0",
                 "smartassert/array-inspector": ">=0.2,<1",
-                "smartassert/service-client": ">=1.3,<2"
+                "smartassert/service-client": ">=1.4,<2"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.5",
@@ -2466,9 +2466,9 @@
             "homepage": "https://github.com/smartassert/results-client",
             "support": {
                 "issues": "https://github.com/smartassert/results-client/issues",
-                "source": "https://github.com/smartassert/results-client/tree/2.0"
+                "source": "https://github.com/smartassert/results-client/tree/2.1"
             },
-            "time": "2022-11-02T16:39:42+00:00"
+            "time": "2022-11-24T17:52:46+00:00"
         },
         {
             "name": "smartassert/security-token-extractor",
@@ -2522,16 +2522,16 @@
         },
         {
             "name": "smartassert/service-client",
-            "version": "1.3",
+            "version": "1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/service-client.git",
-                "reference": "556c27c810cade8c3f3fdc35a90f2e0ef7865888"
+                "reference": "75b16d22057c41410a57a11a80ee429d941a4b73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/service-client/zipball/556c27c810cade8c3f3fdc35a90f2e0ef7865888",
-                "reference": "556c27c810cade8c3f3fdc35a90f2e0ef7865888",
+                "url": "https://api.github.com/repos/smartassert/service-client/zipball/75b16d22057c41410a57a11a80ee429d941a4b73",
+                "reference": "75b16d22057c41410a57a11a80ee429d941a4b73",
                 "shasum": ""
             },
             "require": {
@@ -2572,9 +2572,9 @@
             "homepage": "https://github.com/smartassert/service-client",
             "support": {
                 "issues": "https://github.com/smartassert/service-client/issues",
-                "source": "https://github.com/smartassert/service-client/tree/1.3"
+                "source": "https://github.com/smartassert/service-client/tree/1.4"
             },
-            "time": "2022-10-31T10:35:03+00:00"
+            "time": "2022-11-24T17:42:40+00:00"
         },
         {
             "name": "smartassert/users-client",
