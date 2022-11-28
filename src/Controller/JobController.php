@@ -11,8 +11,7 @@ use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
+use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -28,7 +27,6 @@ class JobController
      *
      * @throws ClientExceptionInterface
      * @throws InvalidResponseDataException
-     * @throws InvalidResponseContentException
      * @throws NonSuccessResponseException
      */
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
@@ -51,9 +49,9 @@ class JobController
 
         try {
             $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
-        } catch (InvalidModelDataException $invalidModelDataException) {
+        } catch (HttpResponseExceptionInterface $exception) {
             return $errorResponseFactory->createFromHttpResponseException(
-                $invalidModelDataException,
+                $exception,
                 'Failed creating job in results service.'
             );
         }

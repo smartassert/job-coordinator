@@ -15,6 +15,7 @@ use Monolog\Test\TestCase;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 class JobControllerTest extends TestCase
@@ -79,7 +80,35 @@ class JobControllerTest extends TestCase
                     'message' => 'Generated job id is an empty string.',
                 ],
             ],
-            'results service job creation failed, empty results service response payload' => [
+            'results service job creation failed, invalid response content type' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseContentException(
+                    new Response(
+                        200,
+                        [
+                            'content-type' => 'text/html',
+                        ],
+                        '<body />'
+                    ),
+                    'application/json',
+                    'text/html'
+                )),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed creating job in results service.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'text/html',
+                            'data' => '<body />',
+                        ],
+                    ],
+                ],
+            ],
+            'results service job creation failed, invalid empty results service response payload' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
@@ -107,7 +136,7 @@ class JobControllerTest extends TestCase
                     ],
                 ],
             ],
-            'results service job creation failed, non-empty results service response payload' => [
+            'results service job creation failed, invalid non-empty results service response payload' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
