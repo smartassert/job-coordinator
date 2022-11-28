@@ -16,9 +16,15 @@ class ErrorResponseFactory
         HttpResponseExceptionInterface $exception,
         string $responseMessage,
     ): ErrorResponse {
+        $httpResponse = $exception->getResponse();
+
         $responseData = $exception instanceof HttpResponsePayloadExceptionInterface
             ? $exception->getPayload()
-            : $exception->getResponse()->getBody();
+            : $httpResponse->getBody()->getContents();
+
+        if ('' === $responseData) {
+            $responseData = $httpResponse->getReasonPhrase();
+        }
 
         return new ErrorResponse(
             ErrorResponseType::SERVER_ERROR,
