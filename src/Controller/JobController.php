@@ -7,6 +7,7 @@ use App\Enum\ErrorResponseType;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
 use App\Response\ErrorResponse;
+use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
@@ -37,6 +38,7 @@ class JobController
         JobRepository $repository,
         UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
+        ErrorResponseFactory $errorResponseFactory,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
@@ -50,10 +52,9 @@ class JobController
         try {
             $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
         } catch (InvalidModelDataException $invalidModelDataException) {
-            return new ErrorResponse(
-                ErrorResponseType::SERVER_ERROR,
-                'Failed creating job in results service.',
-                $invalidModelDataException->getPayload()
+            return $errorResponseFactory->createFromHttpResponseException(
+                $invalidModelDataException,
+                'Failed creating job in results service.'
             );
         }
 
