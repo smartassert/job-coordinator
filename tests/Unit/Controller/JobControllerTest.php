@@ -8,9 +8,10 @@ use App\Controller\JobController;
 use App\Entity\Job;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
+use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
+use GuzzleHttp\Psr7\Response;
 use Monolog\Test\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
@@ -33,7 +34,14 @@ class JobControllerTest extends TestCase
         array $expectedResponseData,
     ): void {
         $controller = new JobController();
-        $response = $controller->create($suiteId, $user, $jobRepository, $ulidFactory, $resultsClient);
+        $response = $controller->create(
+            $suiteId,
+            $user,
+            $jobRepository,
+            $ulidFactory,
+            $resultsClient,
+            new ErrorResponseFactory(),
+        );
 
         self::assertSame(500, $response->getStatusCode());
         self::assertSame('application/json', $response->headers->get('content-type'));
@@ -77,22 +85,26 @@ class JobControllerTest extends TestCase
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
-                    (function (): ResponseInterface {
-                        $response = \Mockery::mock(ResponseInterface::class);
-                        $response
-                            ->shouldReceive('getStatusCode')
-                            ->andReturn(500)
-                        ;
-
-                        return $response;
-                    })(),
+                    new Response(
+                        500,
+                        [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode([])
+                    ),
                     ResultsJob::class,
                     []
                 )),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
-                    'context' => [],
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 500,
+                            'content_type' => 'application/json',
+                            'data' => [],
+                        ],
+                    ],
                 ],
             ],
             'results service job creation failed, non-empty results service response payload' => [
@@ -101,15 +113,16 @@ class JobControllerTest extends TestCase
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
-                    (function (): ResponseInterface {
-                        $response = \Mockery::mock(ResponseInterface::class);
-                        $response
-                            ->shouldReceive('getStatusCode')
-                            ->andReturn(200)
-                        ;
-
-                        return $response;
-                    })(),
+                    new Response(
+                        200,
+                        [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode([
+                            'key1' => 'value1',
+                            'key2' => 'value2',
+                        ]),
+                    ),
                     ResultsJob::class,
                     [
                         'key1' => 'value1',
@@ -120,8 +133,14 @@ class JobControllerTest extends TestCase
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
                     'context' => [
-                        'key1' => 'value1',
-                        'key2' => 'value2',
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'application/json',
+                            'data' => [
+                                'key1' => 'value1',
+                                'key2' => 'value2',
+                            ],
+                        ],
                     ],
                 ],
             ],
