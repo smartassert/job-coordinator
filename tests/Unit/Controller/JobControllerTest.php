@@ -77,8 +77,16 @@ class JobControllerTest extends TestCase
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                    (function (): ResponseInterface {
+                        $response = \Mockery::mock(ResponseInterface::class);
+                        $response
+                            ->shouldReceive('getStatusCode')
+                            ->andReturn(500)
+                        ;
+
+                        return $response;
+                    })(),
                     ResultsJob::class,
-                    \Mockery::mock(ResponseInterface::class),
                     []
                 )),
                 'expectedResponseData' => [
@@ -93,8 +101,16 @@ class JobControllerTest extends TestCase
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                    (function (): ResponseInterface {
+                        $response = \Mockery::mock(ResponseInterface::class);
+                        $response
+                            ->shouldReceive('getStatusCode')
+                            ->andReturn(200)
+                        ;
+
+                        return $response;
+                    })(),
                     ResultsJob::class,
-                    \Mockery::mock(ResponseInterface::class),
                     [
                         'key1' => 'value1',
                         'key2' => 'value2',

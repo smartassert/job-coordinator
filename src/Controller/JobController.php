@@ -53,7 +53,7 @@ class JobController
             return new ErrorResponse(
                 ErrorResponseType::SERVER_ERROR,
                 'Failed creating job in results service.',
-                $invalidModelDataException->payload
+                $invalidModelDataException->getPayload()
             );
         }
 
