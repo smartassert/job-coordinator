@@ -17,6 +17,7 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
+use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 class JobControllerTest extends TestCase
@@ -79,6 +80,46 @@ class JobControllerTest extends TestCase
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Generated job id is an empty string.',
+                ],
+            ],
+            'results service job creation failed, invalid response status code, default reason phrase' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
+                    new Response(503),
+                )),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed creating job in results service.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 503,
+                            'content_type' => '',
+                            'data' => 'Service Unavailable',
+                        ],
+                    ],
+                ],
+            ],
+            'results service job creation failed, invalid response status code, custom reason phrase' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
+                    new Response(503, [], '', '1.1', 'Maintenance ...'),
+                )),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed creating job in results service.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 503,
+                            'content_type' => '',
+                            'data' => 'Maintenance ...',
+                        ],
+                    ],
                 ],
             ],
             'results service job creation failed, invalid response content type' => [
