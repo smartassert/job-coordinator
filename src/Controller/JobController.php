@@ -12,7 +12,6 @@ use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +25,6 @@ class JobController
      * @param non-empty-string $suiteId
      *
      * @throws ClientExceptionInterface
-     * @throws InvalidResponseDataException
      * @throws NonSuccessResponseException
      */
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]

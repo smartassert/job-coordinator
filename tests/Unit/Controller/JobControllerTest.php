@@ -16,6 +16,7 @@ use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 
 class JobControllerTest extends TestCase
@@ -104,6 +105,34 @@ class JobControllerTest extends TestCase
                             'status_code' => 200,
                             'content_type' => 'text/html',
                             'data' => '<body />',
+                        ],
+                    ],
+                ],
+            ],
+            'results service job creation failed, invalid response data type' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseDataException(
+                    'array',
+                    'int',
+                    new Response(
+                        200,
+                        [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode(123)
+                    ),
+                )),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed creating job in results service.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'application/json',
+                            'data' => '123',
                         ],
                     ],
                 ],
