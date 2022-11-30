@@ -24,8 +24,48 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class JobControllerTest extends TestCase
 {
+    private JobController $controller;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->controller = new JobController();
+    }
+
+    public function testCreateFailureUnableToGenerateJobId(): void
+    {
+        $ulidFactory = \Mockery::mock(UlidFactory::class);
+        $ulidFactory
+            ->shouldReceive('create')
+            ->andThrow(new EmptyUlidException())
+        ;
+
+        $response = $this->controller->create(
+            'suite id value',
+            new User((new UlidFactory())->create(), md5((string) rand())),
+            \Mockery::mock(JobRepository::class),
+            $ulidFactory,
+            \Mockery::mock(ResultsClient::class),
+            new ErrorResponseFactory(),
+            \Mockery::mock(WorkerManagerClient::class),
+        );
+
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('application/json', $response->headers->get('content-type'));
+
+        $responseData = json_decode((string) $response->getContent(), true);
+        self::assertIsArray($responseData);
+        self::assertEquals(
+            [
+                'type' => 'server_error',
+                'message' => 'Generated job id is an empty string.',
+            ],
+            $responseData
+        );
+    }
+
     /**
-     * @dataProvider createFailureDataProvider
      * @dataProvider createFailureResultsServiceJobFailureDataProvider
      * @dataProvider createFailureWorkerManagerMachineCreateRequestFailureDataProvider
      *
@@ -41,8 +81,7 @@ class JobControllerTest extends TestCase
         WorkerManagerClient $workerManagerClient,
         array $expectedResponseData,
     ): void {
-        $controller = new JobController();
-        $response = $controller->create(
+        $response = $this->controller->create(
             $suiteId,
             $user,
             $jobRepository,
@@ -63,45 +102,8 @@ class JobControllerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function createFailureDataProvider(): array
-    {
-        $emptyUlidFactory = \Mockery::mock(UlidFactory::class);
-        $emptyUlidFactory
-            ->shouldReceive('create')
-            ->andThrow(new EmptyUlidException())
-        ;
-
-        $userId = (new UlidFactory())->create();
-        $suiteId = (new UlidFactory())->create();
-        $userToken = md5((string) rand());
-
-        return [
-            'empty id generated' => [
-                'suiteId' => $suiteId,
-                'user' => new User($userId, $userToken),
-                'jobRepository' => \Mockery::mock(JobRepository::class),
-                'ulidFactory' => $this->createUlidFactory(new EmptyUlidException()),
-                'resultsClient' => \Mockery::mock(ResultsClient::class),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
-                'expectedResponseData' => [
-                    'type' => 'server_error',
-                    'message' => 'Generated job id is an empty string.',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
     public function createFailureResultsServiceJobFailureDataProvider(): array
     {
-        $emptyUlidFactory = \Mockery::mock(UlidFactory::class);
-        $emptyUlidFactory
-            ->shouldReceive('create')
-            ->andThrow(new EmptyUlidException())
-        ;
-
         $id = (new UlidFactory())->create();
         $userId = (new UlidFactory())->create();
         $suiteId = (new UlidFactory())->create();
@@ -299,12 +301,6 @@ class JobControllerTest extends TestCase
      */
     public function createFailureWorkerManagerMachineCreateRequestFailureDataProvider(): array
     {
-        $emptyUlidFactory = \Mockery::mock(UlidFactory::class);
-        $emptyUlidFactory
-            ->shouldReceive('create')
-            ->andThrow(new EmptyUlidException())
-        ;
-
         $id = (new UlidFactory())->create();
         $userId = (new UlidFactory())->create();
         $suiteId = (new UlidFactory())->create();
