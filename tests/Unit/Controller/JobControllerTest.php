@@ -77,7 +77,7 @@ class JobControllerTest extends TestCase
         string $suiteId,
         User $user,
         ResultsJob|\Exception $resultsClientOutcome,
-        WorkerManagerClient $workerManagerClient,
+        Machine|\Exception|null $workerManagerClientOutcome,
         array $expectedResponseData,
     ): void {
         $jobRepository = \Mockery::mock(JobRepository::class);
@@ -99,6 +99,10 @@ class JobControllerTest extends TestCase
         ;
 
         $resultsClient = $this->createResultsClient($user->getSecurityToken(), $jobId, $resultsClientOutcome);
+
+        $workerManagerClient = null === $workerManagerClientOutcome
+            ? \Mockery::mock(WorkerManagerClient::class)
+            : $this->createWorkerManagerClient($user->getSecurityToken(), $jobId, $workerManagerClientOutcome);
 
         $response = $this->controller->create(
             $suiteId,
@@ -136,7 +140,7 @@ class JobControllerTest extends TestCase
                 'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503),
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -156,7 +160,7 @@ class JobControllerTest extends TestCase
                 'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -184,7 +188,7 @@ class JobControllerTest extends TestCase
                     'application/json',
                     'text/html'
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -212,7 +216,7 @@ class JobControllerTest extends TestCase
                         (string) json_encode(123)
                     ),
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -240,7 +244,7 @@ class JobControllerTest extends TestCase
                     ResultsJob::class,
                     []
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -274,7 +278,7 @@ class JobControllerTest extends TestCase
                         'key2' => 'value2',
                     ]
                 ),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -295,7 +299,7 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => new ResultsJob('non-empty label', ''),
-                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
+                'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Results service job invalid, token missing.',
@@ -323,12 +327,8 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new NonSuccessResponseException(
-                        new Response(503),
-                    )
+                'workerManagerClientOutcome' => new NonSuccessResponseException(
+                    new Response(503),
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -347,12 +347,8 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new NonSuccessResponseException(
-                        new Response(503, [], '', '1.1', 'Maintenance ...'),
-                    )
+                'workerManagerClientOutcome' => new NonSuccessResponseException(
+                    new Response(503, [], '', '1.1', 'Maintenance ...'),
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -371,20 +367,16 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new InvalidResponseContentException(
-                        new Response(
-                            200,
-                            [
-                                'content-type' => 'text/html',
-                            ],
-                            '<body />'
-                        ),
-                        'application/json',
-                        'text/html'
-                    )
+                'workerManagerClientOutcome' => new InvalidResponseContentException(
+                    new Response(
+                        200,
+                        [
+                            'content-type' => 'text/html',
+                        ],
+                        '<body />'
+                    ),
+                    'application/json',
+                    'text/html'
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -403,20 +395,16 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new InvalidResponseDataException(
-                        'array',
-                        'int',
-                        new Response(
-                            200,
-                            [
-                                'content-type' => 'application/json',
-                            ],
-                            (string) json_encode(123)
-                        ),
-                    )
+                'workerManagerClientOutcome' => new InvalidResponseDataException(
+                    'array',
+                    'int',
+                    new Response(
+                        200,
+                        [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode(123)
+                    ),
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -435,20 +423,16 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new InvalidModelDataException(
-                        new Response(
-                            500,
-                            [
-                                'content-type' => 'application/json',
-                            ],
-                            (string) json_encode([])
-                        ),
-                        ResultsJob::class,
-                        []
-                    )
+                'workerManagerClientOutcome' => new InvalidModelDataException(
+                    new Response(
+                        500,
+                        [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode([])
+                    ),
+                    ResultsJob::class,
+                    []
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -467,26 +451,22 @@ class JobControllerTest extends TestCase
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClient' => $this->createWorkerManagerClient(
-                    $userToken,
-                    $id,
-                    new InvalidModelDataException(
-                        new Response(
-                            200,
-                            [
-                                'content-type' => 'application/json',
-                            ],
-                            (string) json_encode([
-                                'key1' => 'value1',
-                                'key2' => 'value2',
-                            ]),
-                        ),
-                        ResultsJob::class,
+                'workerManagerClientOutcome' => new InvalidModelDataException(
+                    new Response(
+                        200,
                         [
+                            'content-type' => 'application/json',
+                        ],
+                        (string) json_encode([
                             'key1' => 'value1',
                             'key2' => 'value2',
-                        ]
-                    )
+                        ]),
+                    ),
+                    ResultsJob::class,
+                    [
+                        'key1' => 'value1',
+                        'key2' => 'value2',
+                    ]
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',
