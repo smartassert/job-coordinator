@@ -69,16 +69,15 @@ class JobControllerTest extends TestCase
      * @dataProvider createFailureResultsServiceJobFailureDataProvider
      * @dataProvider createFailureWorkerManagerMachineCreateRequestFailureDataProvider
      *
-     * @param non-empty-string $suiteId
-     * @param array<mixed>     $expectedResponseData
+     * @param array<mixed> $expectedResponseData
      */
     public function testCreateFailure(
         string $jobId,
-        string $suiteId,
         ResultsJob|\Exception $resultsClientOutcome,
         Machine|\Exception|null $workerManagerClientOutcome,
         array $expectedResponseData,
     ): void {
+        $suiteId = (new UlidFactory())->create();
         $userId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
         $user = new User($userId, $userToken);
@@ -131,12 +130,10 @@ class JobControllerTest extends TestCase
     public function createFailureResultsServiceJobFailureDataProvider(): array
     {
         $id = (new UlidFactory())->create();
-        $suiteId = (new UlidFactory())->create();
 
         return [
             'results service job creation failed, invalid response status code, default reason phrase' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503),
                 ),
@@ -155,7 +152,6 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid response status code, custom reason phrase' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
                 ),
@@ -174,7 +170,6 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid response content type' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new InvalidResponseContentException(
                     new Response(
                         200,
@@ -201,7 +196,6 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid response data type' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new InvalidResponseDataException(
                     'array',
                     'int',
@@ -228,7 +222,6 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid empty results service response payload' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new InvalidModelDataException(
                     new Response(
                         500,
@@ -255,7 +248,6 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid non-empty results service response payload' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new InvalidModelDataException(
                     new Response(
                         200,
@@ -291,7 +283,6 @@ class JobControllerTest extends TestCase
             ],
             'results service response lacking token' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => new ResultsJob('non-empty label', ''),
                 'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
@@ -308,7 +299,6 @@ class JobControllerTest extends TestCase
     public function createFailureWorkerManagerMachineCreateRequestFailureDataProvider(): array
     {
         $id = (new UlidFactory())->create();
-        $suiteId = (new UlidFactory())->create();
         $resultsJobToken = md5((string) rand());
 
         $resultsJob = new ResultsJob($id, $resultsJobToken);
@@ -316,7 +306,6 @@ class JobControllerTest extends TestCase
         return [
             'worker manager service create failed, invalid response status code, default reason phrase' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new NonSuccessResponseException(
                     new Response(503),
@@ -335,7 +324,6 @@ class JobControllerTest extends TestCase
             ],
             'worker manager service create failed, invalid response status code, custom reason phrase' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
@@ -354,7 +342,6 @@ class JobControllerTest extends TestCase
             ],
             'worker manager service create failed, invalid response content type' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new InvalidResponseContentException(
                     new Response(
@@ -381,7 +368,6 @@ class JobControllerTest extends TestCase
             ],
             'worker manager service create failed, invalid response data type' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new InvalidResponseDataException(
                     'array',
@@ -408,7 +394,6 @@ class JobControllerTest extends TestCase
             ],
             'worker manager service create failed, invalid empty results service response payload' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new InvalidModelDataException(
                     new Response(
@@ -435,7 +420,6 @@ class JobControllerTest extends TestCase
             ],
             'worker manager service create failed, invalid non-empty results service response payload' => [
                 'jobId' => $id,
-                'suiteId' => $suiteId,
                 'resultsClientOutcome' => $resultsJob,
                 'workerManagerClientOutcome' => new InvalidModelDataException(
                     new Response(
