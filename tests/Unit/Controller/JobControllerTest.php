@@ -26,6 +26,8 @@ class JobControllerTest extends TestCase
 {
     /**
      * @dataProvider createFailureDataProvider
+     * @dataProvider createFailureResultsServiceJobFailureDataProvider
+     * @dataProvider createFailureWorkerManagerMachineCreateRequestFailureDataProvider
      *
      * @param non-empty-string $suiteId
      * @param array<mixed>     $expectedResponseData
@@ -69,13 +71,9 @@ class JobControllerTest extends TestCase
             ->andThrow(new EmptyUlidException())
         ;
 
-        $id = (new UlidFactory())->create();
         $userId = (new UlidFactory())->create();
         $suiteId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
-        $resultsJobToken = md5((string) rand());
-
-        $resultsJob = new ResultsJob($id, $resultsJobToken);
 
         return [
             'empty id generated' => [
@@ -90,6 +88,26 @@ class JobControllerTest extends TestCase
                     'message' => 'Generated job id is an empty string.',
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFailureResultsServiceJobFailureDataProvider(): array
+    {
+        $emptyUlidFactory = \Mockery::mock(UlidFactory::class);
+        $emptyUlidFactory
+            ->shouldReceive('create')
+            ->andThrow(new EmptyUlidException())
+        ;
+
+        $id = (new UlidFactory())->create();
+        $userId = (new UlidFactory())->create();
+        $suiteId = (new UlidFactory())->create();
+        $userToken = md5((string) rand());
+
+        return [
             'results service job creation failed, invalid response status code, default reason phrase' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
@@ -273,6 +291,29 @@ class JobControllerTest extends TestCase
                     'message' => 'Results service job invalid, token missing.',
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createFailureWorkerManagerMachineCreateRequestFailureDataProvider(): array
+    {
+        $emptyUlidFactory = \Mockery::mock(UlidFactory::class);
+        $emptyUlidFactory
+            ->shouldReceive('create')
+            ->andThrow(new EmptyUlidException())
+        ;
+
+        $id = (new UlidFactory())->create();
+        $userId = (new UlidFactory())->create();
+        $suiteId = (new UlidFactory())->create();
+        $userToken = md5((string) rand());
+        $resultsJobToken = md5((string) rand());
+
+        $resultsJob = new ResultsJob($id, $resultsJobToken);
+
+        return [
             'worker manager service create failed, invalid response status code, default reason phrase' => [
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
