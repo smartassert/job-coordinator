@@ -20,6 +20,7 @@ use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class JobControllerTest extends TestCase
 {
@@ -35,6 +36,7 @@ class JobControllerTest extends TestCase
         JobRepository $jobRepository,
         UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
+        WorkerManagerClient $workerManagerClient,
         array $expectedResponseData,
     ): void {
         $controller = new JobController();
@@ -45,7 +47,7 @@ class JobControllerTest extends TestCase
             $ulidFactory,
             $resultsClient,
             new ErrorResponseFactory(),
-            \Mockery::mock(WorkerManagerClient::class),
+            $workerManagerClient,
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -71,6 +73,9 @@ class JobControllerTest extends TestCase
         $userId = (new UlidFactory())->create();
         $suiteId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
+        $resultsJobToken = md5((string) rand());
+
+        $resultsJob = new ResultsJob($id, $resultsJobToken);
 
         return [
             'empty id generated' => [
@@ -79,6 +84,7 @@ class JobControllerTest extends TestCase
                 'jobRepository' => \Mockery::mock(JobRepository::class),
                 'ulidFactory' => $this->createUlidFactory(new EmptyUlidException()),
                 'resultsClient' => \Mockery::mock(ResultsClient::class),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Generated job id is an empty string.',
@@ -92,6 +98,7 @@ class JobControllerTest extends TestCase
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503),
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -112,6 +119,7 @@ class JobControllerTest extends TestCase
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -140,6 +148,7 @@ class JobControllerTest extends TestCase
                     'application/json',
                     'text/html'
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -168,6 +177,7 @@ class JobControllerTest extends TestCase
                         (string) json_encode(123)
                     ),
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -196,6 +206,7 @@ class JobControllerTest extends TestCase
                     ResultsJob::class,
                     []
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -230,6 +241,7 @@ class JobControllerTest extends TestCase
                         'key2' => 'value2',
                     ]
                 )),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Failed creating job in results service.',
@@ -255,9 +267,201 @@ class JobControllerTest extends TestCase
                     $id,
                     new ResultsJob('non-empty label', '')
                 ),
+                'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
                     'message' => 'Results service job invalid, token missing.',
+                ],
+            ],
+            'worker manager service create failed, invalid response status code, default reason phrase' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new NonSuccessResponseException(
+                        new Response(503),
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 503,
+                            'content_type' => '',
+                            'data' => 'Service Unavailable',
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, invalid response status code, custom reason phrase' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new NonSuccessResponseException(
+                        new Response(503, [], '', '1.1', 'Maintenance ...'),
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 503,
+                            'content_type' => '',
+                            'data' => 'Maintenance ...',
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, invalid response content type' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new InvalidResponseContentException(
+                        new Response(
+                            200,
+                            [
+                                'content-type' => 'text/html',
+                            ],
+                            '<body />'
+                        ),
+                        'application/json',
+                        'text/html'
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'text/html',
+                            'data' => '<body />',
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, invalid response data type' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new InvalidResponseDataException(
+                        'array',
+                        'int',
+                        new Response(
+                            200,
+                            [
+                                'content-type' => 'application/json',
+                            ],
+                            (string) json_encode(123)
+                        ),
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'application/json',
+                            'data' => '123',
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, invalid empty results service response payload' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new InvalidModelDataException(
+                        new Response(
+                            500,
+                            [
+                                'content-type' => 'application/json',
+                            ],
+                            (string) json_encode([])
+                        ),
+                        ResultsJob::class,
+                        []
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 500,
+                            'content_type' => 'application/json',
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, invalid non-empty results service response payload' => [
+                'suiteId' => $suiteId,
+                'user' => new User($userId, $userToken),
+                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
+                'ulidFactory' => $this->createUlidFactory($id),
+                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'workerManagerClient' => $this->createWorkerManagerClient(
+                    $userToken,
+                    $id,
+                    new InvalidModelDataException(
+                        new Response(
+                            200,
+                            [
+                                'content-type' => 'application/json',
+                            ],
+                            (string) json_encode([
+                                'key1' => 'value1',
+                                'key2' => 'value2',
+                            ]),
+                        ),
+                        ResultsJob::class,
+                        [
+                            'key1' => 'value1',
+                            'key2' => 'value2',
+                        ]
+                    )
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'service_response' => [
+                            'status_code' => 200,
+                            'content_type' => 'application/json',
+                            'data' => [
+                                'key1' => 'value1',
+                                'key2' => 'value2',
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -304,6 +508,27 @@ class JobControllerTest extends TestCase
         ;
 
         if ($outcome instanceof ResultsJob) {
+            $expectation->andReturn($outcome);
+        } else {
+            $expectation->andThrow($outcome);
+        }
+
+        return $resultsClient;
+    }
+
+    private function createWorkerManagerClient(
+        string $userToken,
+        string $id,
+        Machine|\Exception $outcome
+    ): WorkerManagerClient {
+        $resultsClient = \Mockery::mock(WorkerManagerClient::class);
+
+        $expectation = $resultsClient
+            ->shouldReceive('createMachine')
+            ->with($userToken, $id)
+        ;
+
+        if ($outcome instanceof Machine) {
             $expectation->andReturn($outcome);
         } else {
             $expectation->andThrow($outcome);

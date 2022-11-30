@@ -69,7 +69,7 @@ class JobController
         } catch (HttpResponseExceptionInterface $exception) {
             return $errorResponseFactory->createFromHttpResponseException(
                 $exception,
-                'Failed creating worker machine.'
+                'Failed requesting worker machine creation.'
             );
         }
 
