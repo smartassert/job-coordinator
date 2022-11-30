@@ -76,11 +76,22 @@ class JobControllerTest extends TestCase
         string $jobId,
         string $suiteId,
         User $user,
-        JobRepository $jobRepository,
         ResultsClient $resultsClient,
         WorkerManagerClient $workerManagerClient,
         array $expectedResponseData,
     ): void {
+        $jobRepository = \Mockery::mock(JobRepository::class);
+        $jobRepository
+            ->shouldReceive('add')
+            ->withArgs(function (Job $job) use ($jobId, $user, $suiteId) {
+                self::assertSame($jobId, $job->getId());
+                self::assertSame($user->getUserIdentifier(), $job->getUserId());
+                self::assertSame($suiteId, $job->getSuiteId());
+
+                return true;
+            })
+        ;
+
         $ulidFactory = \Mockery::mock(UlidFactory::class);
         $ulidFactory
             ->shouldReceive('create')
@@ -120,7 +131,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503),
                 )),
@@ -141,7 +151,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
                 )),
@@ -162,7 +171,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseContentException(
                     new Response(
                         200,
@@ -191,7 +199,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseDataException(
                     'array',
                     'int',
@@ -220,7 +227,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
                     new Response(
                         500,
@@ -249,7 +255,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
                     new Response(
                         200,
@@ -287,7 +292,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient(
                     $userToken,
                     $id,
@@ -320,7 +324,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -345,7 +348,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -370,7 +372,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -403,7 +404,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -436,7 +436,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -469,7 +468,6 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -508,23 +506,6 @@ class JobControllerTest extends TestCase
                 ],
             ],
         ];
-    }
-
-    private function createJobRepository(string $id, string $userId, string $suiteId): JobRepository
-    {
-        $jobRepository = \Mockery::mock(JobRepository::class);
-        $jobRepository
-            ->shouldReceive('add')
-            ->withArgs(function (Job $job) use ($userId, $suiteId, $id) {
-                self::assertSame($id, $job->getId());
-                self::assertSame($userId, $job->getUserId());
-                self::assertSame($suiteId, $job->getSuiteId());
-
-                return true;
-            })
-        ;
-
-        return $jobRepository;
     }
 
     private function createResultsClient(string $userToken, string $id, ResultsJob|\Exception $outcome): ResultsClient
