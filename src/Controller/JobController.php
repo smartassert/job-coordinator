@@ -13,6 +13,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
+use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -33,6 +34,7 @@ class JobController
         UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
         ErrorResponseFactory $errorResponseFactory,
+        WorkerManagerClient $workerManagerClient,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
@@ -61,6 +63,15 @@ class JobController
 
         $job->setResultsToken($resultsJob->token);
         $repository->add($job);
+
+        try {
+            $workerManagerClient->createMachine($user->getSecurityToken(), $id);
+        } catch (HttpResponseExceptionInterface $exception) {
+            return $errorResponseFactory->createFromHttpResponseException(
+                $exception,
+                'Failed requesting worker machine creation.'
+            );
+        }
 
         return new JsonResponse($job);
     }
