@@ -76,7 +76,7 @@ class JobControllerTest extends TestCase
         string $jobId,
         string $suiteId,
         User $user,
-        ResultsClient $resultsClient,
+        ResultsJob|\Exception $resultsClientOutcome,
         WorkerManagerClient $workerManagerClient,
         array $expectedResponseData,
     ): void {
@@ -97,6 +97,8 @@ class JobControllerTest extends TestCase
             ->shouldReceive('create')
             ->andReturn($jobId)
         ;
+
+        $resultsClient = $this->createResultsClient($user->getSecurityToken(), $jobId, $resultsClientOutcome);
 
         $response = $this->controller->create(
             $suiteId,
@@ -131,9 +133,9 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
+                'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503),
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -151,9 +153,9 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
+                'resultsClientOutcome' => new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -171,7 +173,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseContentException(
+                'resultsClientOutcome' => new InvalidResponseContentException(
                     new Response(
                         200,
                         [
@@ -181,7 +183,7 @@ class JobControllerTest extends TestCase
                     ),
                     'application/json',
                     'text/html'
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -199,7 +201,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseDataException(
+                'resultsClientOutcome' => new InvalidResponseDataException(
                     'array',
                     'int',
                     new Response(
@@ -209,7 +211,7 @@ class JobControllerTest extends TestCase
                         ],
                         (string) json_encode(123)
                     ),
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -227,7 +229,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                'resultsClientOutcome' => new InvalidModelDataException(
                     new Response(
                         500,
                         [
@@ -237,7 +239,7 @@ class JobControllerTest extends TestCase
                     ),
                     ResultsJob::class,
                     []
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -255,7 +257,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
+                'resultsClientOutcome' => new InvalidModelDataException(
                     new Response(
                         200,
                         [
@@ -271,7 +273,7 @@ class JobControllerTest extends TestCase
                         'key1' => 'value1',
                         'key2' => 'value2',
                     ]
-                )),
+                ),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -292,11 +294,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient(
-                    $userToken,
-                    $id,
-                    new ResultsJob('non-empty label', '')
-                ),
+                'resultsClientOutcome' => new ResultsJob('non-empty label', ''),
                 'workerManagerClient' => \Mockery::mock(WorkerManagerClient::class),
                 'expectedResponseData' => [
                     'type' => 'server_error',
@@ -324,7 +322,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
@@ -348,7 +346,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
@@ -372,7 +370,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
@@ -404,7 +402,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
@@ -436,7 +434,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
@@ -468,7 +466,7 @@ class JobControllerTest extends TestCase
                 'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
-                'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
+                'resultsClientOutcome' => $resultsJob,
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
                     $id,
