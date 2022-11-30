@@ -19,6 +19,7 @@ use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
+use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 
 class JobControllerTest extends TestCase
 {
@@ -44,6 +45,7 @@ class JobControllerTest extends TestCase
             $ulidFactory,
             $resultsClient,
             new ErrorResponseFactory(),
+            \Mockery::mock(WorkerManagerClient::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
