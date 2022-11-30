@@ -73,14 +73,20 @@ class JobControllerTest extends TestCase
      * @param array<mixed>     $expectedResponseData
      */
     public function testCreateFailure(
+        string $jobId,
         string $suiteId,
         User $user,
         JobRepository $jobRepository,
-        UlidFactory $ulidFactory,
         ResultsClient $resultsClient,
         WorkerManagerClient $workerManagerClient,
         array $expectedResponseData,
     ): void {
+        $ulidFactory = \Mockery::mock(UlidFactory::class);
+        $ulidFactory
+            ->shouldReceive('create')
+            ->andReturn($jobId)
+        ;
+
         $response = $this->controller->create(
             $suiteId,
             $user,
@@ -111,10 +117,10 @@ class JobControllerTest extends TestCase
 
         return [
             'results service job creation failed, invalid response status code, default reason phrase' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503),
                 )),
@@ -132,10 +138,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed, invalid response status code, custom reason phrase' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new NonSuccessResponseException(
                     new Response(503, [], '', '1.1', 'Maintenance ...'),
                 )),
@@ -153,10 +159,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed, invalid response content type' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseContentException(
                     new Response(
                         200,
@@ -182,10 +188,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed, invalid response data type' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidResponseDataException(
                     'array',
                     'int',
@@ -211,10 +217,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed, invalid empty results service response payload' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
                     new Response(
                         500,
@@ -240,10 +246,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service job creation failed, invalid non-empty results service response payload' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, new InvalidModelDataException(
                     new Response(
                         200,
@@ -278,10 +284,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'results service response lacking token' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient(
                     $userToken,
                     $id,
@@ -311,10 +317,10 @@ class JobControllerTest extends TestCase
 
         return [
             'worker manager service create failed, invalid response status code, default reason phrase' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -336,10 +342,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'worker manager service create failed, invalid response status code, custom reason phrase' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -361,10 +367,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'worker manager service create failed, invalid response content type' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -394,10 +400,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'worker manager service create failed, invalid response data type' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -427,10 +433,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'worker manager service create failed, invalid empty results service response payload' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -460,10 +466,10 @@ class JobControllerTest extends TestCase
                 ],
             ],
             'worker manager service create failed, invalid non-empty results service response payload' => [
+                'jobId' => $id,
                 'suiteId' => $suiteId,
                 'user' => new User($userId, $userToken),
                 'jobRepository' => $this->createJobRepository($id, $userId, $suiteId),
-                'ulidFactory' => $this->createUlidFactory($id),
                 'resultsClient' => $this->createResultsClient($userToken, $id, $resultsJob),
                 'workerManagerClient' => $this->createWorkerManagerClient(
                     $userToken,
@@ -502,20 +508,6 @@ class JobControllerTest extends TestCase
                 ],
             ],
         ];
-    }
-
-    private function createUlidFactory(string|\Exception $outcome): UlidFactory
-    {
-        $ulidFactory = \Mockery::mock(UlidFactory::class);
-
-        $createCall = $ulidFactory->shouldReceive('create');
-        if ($outcome instanceof \Exception) {
-            $createCall->andThrow($outcome);
-        } else {
-            $createCall->andReturn($outcome);
-        }
-
-        return $ulidFactory;
     }
 
     private function createJobRepository(string $id, string $userId, string $suiteId): JobRepository
