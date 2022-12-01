@@ -20,6 +20,7 @@ use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class JobControllerTest extends TestCase
@@ -449,6 +450,24 @@ class JobControllerTest extends TestCase
                                 'key1' => 'value1',
                                 'key2' => 'value2',
                             ],
+                        ],
+                    ],
+                ],
+            ],
+            'worker manager service create failed, job already exists with id' => [
+                'jobId' => $id,
+                'resultsClientOutcome' => $resultsJob,
+                'workerManagerClientOutcome' => new CreateMachineException(
+                    'id taken',
+                    100
+                ),
+                'expectedResponseData' => [
+                    'type' => 'server_error',
+                    'message' => 'Failed requesting worker machine creation.',
+                    'context' => [
+                        'exception' => [
+                            'message' => 'id taken',
+                            'code' => 100,
                         ],
                     ],
                 ],

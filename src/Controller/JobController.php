@@ -14,6 +14,7 @@ use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -66,10 +67,16 @@ class JobController
 
         try {
             $workerManagerClient->createMachine($user->getSecurityToken(), $id);
-        } catch (HttpResponseExceptionInterface $exception) {
+        } catch (HttpResponseExceptionInterface $httpResponseException) {
             return $errorResponseFactory->createFromHttpResponseException(
-                $exception,
+                $httpResponseException,
                 'Failed requesting worker machine creation.'
+            );
+        } catch (CreateMachineException $createMachineException) {
+            return $errorResponseFactory->createFromThrowable(
+                ErrorResponseType::SERVER_ERROR,
+                'Failed requesting worker machine creation.',
+                $createMachineException
             );
         }
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "baec3d3d9541c6519841a89b0e0a2b74",
+    "content-hash": "c93e204c1eaa33e234e62679aba1d52f",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2699,16 +2699,16 @@
         },
         {
             "name": "smartassert/worker-manager-client",
-            "version": "0.3",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smartassert/worker-manager-client.git",
-                "reference": "46cf5bc792efaecf3125f05f0502f83e04bda5bd"
+                "reference": "4b6f91e17c99ac466715dfed83726cd17fc1c905"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smartassert/worker-manager-client/zipball/46cf5bc792efaecf3125f05f0502f83e04bda5bd",
-                "reference": "46cf5bc792efaecf3125f05f0502f83e04bda5bd",
+                "url": "https://api.github.com/repos/smartassert/worker-manager-client/zipball/4b6f91e17c99ac466715dfed83726cd17fc1c905",
+                "reference": "4b6f91e17c99ac466715dfed83726cd17fc1c905",
                 "shasum": ""
             },
             "require": {
@@ -2750,9 +2750,9 @@
             "homepage": "https://github.com/smartassert/worker-manager-client",
             "support": {
                 "issues": "https://github.com/smartassert/worker-manager-client/issues",
-                "source": "https://github.com/smartassert/worker-manager-client/tree/0.3"
+                "source": "https://github.com/smartassert/worker-manager-client/tree/1.0"
             },
-            "time": "2022-11-28T15:39:40+00:00"
+            "time": "2022-11-30T17:29:58+00:00"
         },
         {
             "name": "symfony/cache",
