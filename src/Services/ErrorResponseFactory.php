@@ -38,4 +38,20 @@ class ErrorResponseFactory
             ],
         );
     }
+
+    /**
+     * @param non-empty-string $message
+     */
+    public function createFromThrowable(
+        ErrorResponseType $errorResponseType,
+        string $message,
+        \Throwable $exception
+    ): ErrorResponse {
+        return new ErrorResponse($errorResponseType, $message, [
+            'exception' => [
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ],
+        ]);
+    }
 }
