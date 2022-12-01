@@ -109,11 +109,26 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         $responseData = json_decode($response->getBody()->getContents(), true);
         self::assertIsArray($responseData);
 
-        self::assertArrayHasKey('id', $responseData);
-        self::assertTrue(Ulid::isValid($responseData['id']));
+        self::assertArrayHasKey('job', $responseData);
+        $jobData = $responseData['job'];
 
-        self::assertArrayHasKey('suite_id', $responseData);
-        self::assertSame($this->suiteId, $responseData['suite_id']);
+        self::assertArrayHasKey('id', $jobData);
+        self::assertTrue(Ulid::isValid($jobData['id']));
+
+        self::assertArrayHasKey('suite_id', $jobData);
+        self::assertSame($this->suiteId, $jobData['suite_id']);
+
+        self::assertArrayHasKey('machine', $responseData);
+        $machineData = $responseData['machine'];
+
+        self::assertArrayHasKey('id', $machineData);
+        self::assertSame($jobData['id'], $machineData['id']);
+
+        self::assertArrayHasKey('state', $machineData);
+        self::assertSame('create/received', $machineData['state']);
+
+        self::assertArrayHasKey('ip_addresses', $machineData);
+        self::assertSame([], $machineData['ip_addresses']);
 
         $jobs = $jobRepository->findAll();
         self::assertCount(1, $jobs);

@@ -66,7 +66,7 @@ class JobController
         $repository->add($job);
 
         try {
-            $workerManagerClient->createMachine($user->getSecurityToken(), $id);
+            $machine = $workerManagerClient->createMachine($user->getSecurityToken(), $id);
         } catch (HttpResponseExceptionInterface $httpResponseException) {
             return $errorResponseFactory->createFromHttpResponseException(
                 $httpResponseException,
@@ -80,6 +80,13 @@ class JobController
             );
         }
 
-        return new JsonResponse($job);
+        return new JsonResponse([
+            'job' => $job->jsonSerialize(),
+            'machine' => [
+                'id' => $machine->id,
+                'state' => $machine->state,
+                'ip_addresses' => $machine->ipAddresses,
+            ],
+        ]);
     }
 }
