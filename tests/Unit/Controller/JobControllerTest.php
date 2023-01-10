@@ -11,7 +11,7 @@ use App\Repository\JobRepository;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use GuzzleHttp\Psr7\Response;
-use Monolog\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;

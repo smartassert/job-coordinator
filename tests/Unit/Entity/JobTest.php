@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Job;
-use Monolog\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
 class JobTest extends TestCase
