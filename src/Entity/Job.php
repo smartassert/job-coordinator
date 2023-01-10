@@ -33,18 +33,20 @@ class Job implements \JsonSerializable
      * @var non-empty-string
      */
     #[ORM\Column(length: 32, nullable: true)]
-    private string $resultsToken;
+    private readonly string $resultsToken;
 
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
+     * @param non-empty-string $resultsToken
      */
-    public function __construct(string $id, string $userId, string $suiteId)
+    public function __construct(string $id, string $userId, string $suiteId, string $resultsToken)
     {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
+        $this->resultsToken = $resultsToken;
     }
 
     public function getId(): string
@@ -74,14 +76,6 @@ class Job implements \JsonSerializable
     public function getResultsToken(): string
     {
         return $this->resultsToken;
-    }
-
-    /**
-     * @param non-empty-string $resultsToken
-     */
-    public function setResultsToken(string $resultsToken): void
-    {
-        $this->resultsToken = $resultsToken;
     }
 
     /**

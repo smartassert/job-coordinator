@@ -43,9 +43,6 @@ class JobController
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $suiteId);
-        $repository->add($job);
-
         try {
             $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
         } catch (HttpResponseExceptionInterface $exception) {
@@ -62,9 +59,6 @@ class JobController
             );
         }
 
-        $job->setResultsToken($resultsJob->token);
-        $repository->add($job);
-
         try {
             $machine = $workerManagerClient->createMachine($user->getSecurityToken(), $id);
         } catch (HttpResponseExceptionInterface $httpResponseException) {
@@ -79,6 +73,9 @@ class JobController
                 $createMachineException
             );
         }
+
+        $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token);
+        $repository->add($job);
 
         return new JsonResponse([
             'job' => $job->jsonSerialize(),
