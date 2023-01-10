@@ -87,9 +87,9 @@ class JobControllerTest extends TestCase
         $jobRepository
             ->shouldReceive('add')
             ->withArgs(function (Job $job) use ($jobId, $user, $suiteId) {
-                self::assertSame($jobId, $job->getId());
-                self::assertSame($user->getUserIdentifier(), $job->getUserId());
-                self::assertSame($suiteId, $job->getSuiteId());
+                self::assertSame($jobId, $job->id);
+                self::assertSame($user->getUserIdentifier(), $job->userId);
+                self::assertSame($suiteId, $job->suiteId);
 
                 return true;
             })

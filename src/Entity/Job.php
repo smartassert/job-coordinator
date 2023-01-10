@@ -15,25 +15,25 @@ class Job implements \JsonSerializable
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
-    private string $id;
+    public readonly string $id;
 
     /**
      * @var non-empty-string
      */
     #[ORM\Column(length: 32)]
-    private readonly string $userId;
+    public readonly string $userId;
 
     /**
      * @var non-empty-string
      */
     #[ORM\Column(length: 32)]
-    private readonly string $suiteId;
+    public readonly string $suiteId;
 
     /**
      * @var non-empty-string
      */
     #[ORM\Column(length: 32, nullable: true)]
-    private readonly string $resultsToken;
+    public readonly string $resultsToken;
 
     /**
      * @param non-empty-string $userId
@@ -47,35 +47,6 @@ class Job implements \JsonSerializable
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->resultsToken = $resultsToken;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getUserId(): string
-    {
-        return $this->userId;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getSuiteId(): string
-    {
-        return $this->suiteId;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getResultsToken(): string
-    {
-        return $this->resultsToken;
     }
 
     /**
