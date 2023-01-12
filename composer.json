@@ -15,9 +15,11 @@
         "smartassert/users-security-bundle": "^5.2",
         "smartassert/worker-manager-client": "^1.1",
         "symfony/console": "6.2.*",
+        "symfony/doctrine-messenger": "6.2.*",
         "symfony/dotenv": "6.2.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.2.*",
+        "symfony/messenger": "6.2.*",
         "symfony/monolog-bundle": "^3.8",
         "symfony/proxy-manager-bridge": "6.2.*",
         "symfony/runtime": "6.2.*",
@@ -108,6 +110,7 @@
             "@functional-start",
             "sleep 2",
             "@db-setup",
+            "@messenger-setup",
             "@users-setup",
             "@results-setup",
             "@worker-manager-setup"
@@ -133,7 +136,9 @@
         "worker-manager-setup": [
             "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:database:create --if-not-exists",
             "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
-        ]
+        ],
+        "messenger-setup": "php bin/console messenger:setup-transports",
+        "messenger-listen": "php bin/console messenger:consume async -vv"
     },
     "conflict": {
         "symfony/symfony": "*"
