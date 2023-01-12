@@ -13,15 +13,18 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
 {
-    public function testFoo(): void
+    public function testDispatch(): void
     {
         $dispatcher = self::getContainer()->get(MachineStateChangeCheckMessageDispatcher::class);
         \assert($dispatcher instanceof MachineStateChangeCheckMessageDispatcher);
 
         $authenticationToken = md5((string) rand());
         $machineId = md5((string) rand());
+        $machineState = 'current_machine_state';
 
-        $dispatcher->createAndDispatch($authenticationToken, $machineId);
+        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, $machineState);
+
+        $dispatcher->dispatch($message);
 
         $transport = self::getContainer()->get('messenger.transport.async');
         \assert($transport instanceof InMemoryTransport);
@@ -32,10 +35,7 @@ class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
-        self::assertEquals(
-            new MachineStateChangeCheckMessage($authenticationToken, $machineId, null),
-            $dispatchedEnvelope->getMessage()
-        );
+        self::assertEquals($message, $dispatchedEnvelope->getMessage());
 
         $delayStamps = $dispatchedEnvelope->all(DelayStamp::class);
         self::assertCount(1, $delayStamps);
