@@ -42,6 +42,8 @@ final class MachineStateChangeCheckMessageHandler
             ));
         }
 
-        $this->messageDispatcher->dispatch($message->withCurrentState($machine->state));
+        if (!$machine->hasEndState) {
+            $this->messageDispatcher->dispatch($message->withCurrentState($machine->state));
+        }
     }
 }
