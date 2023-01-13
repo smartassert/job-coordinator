@@ -24,6 +24,9 @@ class AuthenticationConfiguration
     ) {
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getValidApiToken(): string
     {
         if (!isset($this->apiToken)) {
