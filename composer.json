@@ -13,7 +13,7 @@
         "guzzlehttp/guzzle": "^7.5",
         "smartassert/results-client": "^3.0",
         "smartassert/users-security-bundle": "^5.2",
-        "smartassert/worker-manager-client": "^1.1",
+        "smartassert/worker-manager-client": "^1.2",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
         "symfony/flex": "^2",
