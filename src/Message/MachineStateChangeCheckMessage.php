@@ -7,9 +7,8 @@ namespace App\Message;
 class MachineStateChangeCheckMessage
 {
     /**
-     * @param non-empty-string      $authenticationToken
-     * @param non-empty-string      $machineId
-     * @param null|non-empty-string $currentState
+     * @param non-empty-string $authenticationToken
+     * @param non-empty-string $machineId
      */
     public function __construct(
         public readonly string $authenticationToken,
@@ -18,9 +17,6 @@ class MachineStateChangeCheckMessage
     ) {
     }
 
-    /**
-     * @param non-empty-string $state
-     */
     public function withCurrentState(string $state): MachineStateChangeCheckMessage
     {
         return new MachineStateChangeCheckMessage($this->authenticationToken, $this->machineId, $state);
