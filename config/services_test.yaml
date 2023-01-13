@@ -26,3 +26,6 @@ services:
         arguments:
             $userEmail: 'user@example.com'
             $userPassword: 'password'
+
+    App\Tests\Services\EventSubscriber\EventRecorder:
+        public: true
