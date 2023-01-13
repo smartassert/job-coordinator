@@ -17,4 +17,12 @@ class MachineStateChangeCheckMessage
         public readonly ?string $currentState,
     ) {
     }
+
+    /**
+     * @param non-empty-string $state
+     */
+    public function withCurrentState(string $state): MachineStateChangeCheckMessage
+    {
+        return new MachineStateChangeCheckMessage($this->authenticationToken, $this->machineId, $state);
+    }
 }
