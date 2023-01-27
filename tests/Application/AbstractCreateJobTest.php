@@ -28,6 +28,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         $response = $this->applicationClient->makeCreateJobRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $this->suiteId,
+            [],
             $method
         );
 
@@ -62,7 +63,8 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     {
         $response = $this->applicationClient->makeCreateJobRequest(
             $userTokenCreator(self::$authenticationConfiguration),
-            $this->suiteId
+            $this->suiteId,
+            []
         );
 
         self::assertSame(401, $response->getStatusCode());
@@ -92,15 +94,43 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         ];
     }
 
+    public function testCreateNoManifestPaths(): void
+    {
+        $response = $this->applicationClient->makeCreateJobRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $this->suiteId,
+            [],
+        );
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+
+        $responseData = json_decode($response->getBody()->getContents(), true);
+        self::assertSame(
+            [
+                'type' => 'invalid_request',
+                'message' => 'Manifest paths collection is empty.',
+            ],
+            $responseData
+        );
+    }
+
     public function testCreateSuccess(): void
     {
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
+        $manifestPaths = [
+            'test1.yml',
+            'test2.yml',
+            'test3.yml',
+        ];
+
         $response = $this->applicationClient->makeCreateJobRequest(
             self::$authenticationConfiguration->getValidApiToken(),
-            $this->suiteId
+            $this->suiteId,
+            $manifestPaths,
         );
 
         self::assertSame(200, $response->getStatusCode());
@@ -117,6 +147,9 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
 
         self::assertArrayHasKey('suite_id', $jobData);
         self::assertSame($this->suiteId, $jobData['suite_id']);
+
+        self::assertArrayHasKey('manifest_paths', $jobData);
+        self::assertSame($manifestPaths, $jobData['manifest_paths']);
 
         self::assertArrayHasKey('machine', $responseData);
         $machineData = $responseData['machine'];
