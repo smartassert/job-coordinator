@@ -25,10 +25,12 @@ class JobTest extends WebTestCase
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
+        $manifestPaths = ['test1.yml', 'test2.yml'];
+
         $resultToken = (string) new Ulid();
         \assert('' !== $resultToken);
 
-        $job = new Job($id, $userId, $suiteId, $resultToken);
+        $job = new Job($id, $userId, $suiteId, $manifestPaths, $resultToken);
 
         $entityManager->persist($job);
         $entityManager->flush();
@@ -42,5 +44,6 @@ class JobTest extends WebTestCase
         self::assertSame($id, $retrievedJob->id);
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
+        self::assertSame($manifestPaths, $retrievedJob->manifestPaths);
     }
 }
