@@ -101,8 +101,8 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d postgres users-service users-http results-service results-http worker-manager-service worker-manager-http",
-        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps postgres users-service users-http results-service results-http worker-manager-service worker-manager-http",
+        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps",
         "functional-teardown": [
             "docker-compose -f ./tests/build/docker-compose.yml down"
         ],
