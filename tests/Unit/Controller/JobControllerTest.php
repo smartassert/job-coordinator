@@ -16,13 +16,14 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use SmartAssert\WorkerManagerClient\Model\Machine;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class JobControllerTest extends TestCase
 {
@@ -173,7 +174,7 @@ class JobControllerTest extends TestCase
             ],
             'results service job creation failed, invalid response content type' => [
                 'jobId' => $id,
-                'resultsClientOutcome' => new InvalidResponseContentException(
+                'resultsClientOutcome' => new InvalidResponseTypeException(
                     new Response(
                         200,
                         [
@@ -181,8 +182,8 @@ class JobControllerTest extends TestCase
                         ],
                         '<body />'
                     ),
-                    'application/json',
-                    'text/html'
+                    JsonResponse::class,
+                    Response::class
                 ),
                 'workerManagerClientOutcome' => null,
                 'expectedResponseData' => [
@@ -346,7 +347,7 @@ class JobControllerTest extends TestCase
             'worker manager service create failed, invalid response content type' => [
                 'jobId' => $id,
                 'resultsClientOutcome' => $resultsJob,
-                'workerManagerClientOutcome' => new InvalidResponseContentException(
+                'workerManagerClientOutcome' => new InvalidResponseTypeException(
                     new Response(
                         200,
                         [
@@ -354,8 +355,8 @@ class JobControllerTest extends TestCase
                         ],
                         '<body />'
                     ),
-                    'application/json',
-                    'text/html'
+                    JsonResponse::class,
+                    Response::class
                 ),
                 'expectedResponseData' => [
                     'type' => 'server_error',

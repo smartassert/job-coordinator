@@ -7,8 +7,8 @@ use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseContentException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,9 +27,9 @@ final class MachineStateChangeCheckMessageHandler
     /**
      * @throws ClientExceptionInterface
      * @throws InvalidModelDataException
-     * @throws InvalidResponseContentException
      * @throws InvalidResponseDataException
      * @throws NonSuccessResponseException
+     * @throws InvalidResponseTypeException
      */
     public function __invoke(MachineStateChangeCheckMessage $message): void
     {
