@@ -52,9 +52,11 @@ services:
         arguments:
             $baseUrl: '%env(string:RESULTS_BASE_URL)%'
 
-    SmartAssert\WorkerManagerClient\Client:
+    SmartAssert\WorkerManagerClient\RequestFactory:
         arguments:
             $baseUrl: '%env(string:WORKER_MANAGER_BASE_URL)%'
+
+    SmartAssert\WorkerManagerClient\Client: ~
 
     App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher:
         arguments:
