@@ -88,7 +88,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
                 'currentState' => $unknownMachineState,
                 'newState' => $findReceivedMachineState,
                 'expectedEvent' => new MachineStateChangeEvent(
-                    new Machine($machineId, $findReceivedMachineState, [], false),
+                    new Machine($machineId, $findReceivedMachineState, [], false, false),
                     'unknown'
                 ),
             ],
