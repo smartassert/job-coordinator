@@ -20,14 +20,7 @@ class MachineStateChangeCheckMessageDispatcher
     public function dispatch(MachineStateChangeCheckMessage $message): Envelope
     {
         return $this->messageBus->dispatch(
-            new Envelope(
-                new MachineStateChangeCheckMessage(
-                    $message->authenticationToken,
-                    $message->machineId,
-                    $message->currentState
-                ),
-                [new DelayStamp($this->dispatchDelay)]
-            )
+            new Envelope($message, [new DelayStamp($this->dispatchDelay)])
         );
     }
 }

@@ -20,11 +20,12 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     public function testHandleChangeToEndState(): void
     {
         $machineId = md5((string) rand());
+        $machine = new Machine($machineId, 'an_end_state', [], true, false);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
             ->shouldReceive('getMachine')
-            ->andReturn(new Machine($machineId, 'an_end_state', [], true, false))
+            ->andReturn($machine)
         ;
 
         $messageDispatcher = \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class);
@@ -44,7 +45,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         );
 
         $authenticationToken = md5((string) rand());
-        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, null);
+        $message = MachineStateChangeCheckMessage::createFromMachine($authenticationToken, $machine);
 
         ($handler)($message);
     }
