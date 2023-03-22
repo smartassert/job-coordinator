@@ -35,9 +35,9 @@ final class MachineStateChangeCheckMessageHandler
     {
         $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $message->machineId);
 
-        if ($message->currentState !== $machine->state) {
+        if ($message->machineState !== $machine->state) {
             $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $message->currentState,
+                $message->machineState,
                 $machine->state
             ));
         }
