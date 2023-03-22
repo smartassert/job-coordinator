@@ -76,3 +76,11 @@ services:
             $baseUrl: '%env(string:SOURCES_BASE_URL)%'
 
     SmartAssert\SourcesClient\SerializedSuiteClient: ~
+
+    SmartAssert\WorkerClient\ResourceReferenceFactory: ~
+
+    SmartAssert\WorkerClient\EventFactory: ~
+
+    SmartAssert\WorkerClient\TestFactory: ~
+
+    SmartAssert\WorkerClient\JobFactory: ~
