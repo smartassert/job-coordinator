@@ -68,3 +68,11 @@ services:
     SmartAssert\SourcesClient\ExceptionFactory: ~
 
     SmartAssert\SourcesClient\SerializedSuiteClient:
+
+    SmartAssert\WorkerClient\ResourceReferenceFactory: ~
+
+    SmartAssert\WorkerClient\EventFactory: ~
+
+    SmartAssert\WorkerClient\TestFactory: ~
+
+    SmartAssert\WorkerClient\JobFactory: ~
