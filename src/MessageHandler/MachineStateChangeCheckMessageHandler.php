@@ -37,7 +37,7 @@ final class MachineStateChangeCheckMessageHandler
 
         if ($message->machineState !== $machine->state) {
             $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $message->machineState,
+                $machine,
                 $machine->state
             ));
         }
