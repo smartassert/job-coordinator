@@ -48,14 +48,10 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
      *
      * @param non-empty-string $machineId
      */
-    public function testInvoke(
-        string $machineId,
-        string $currentMachineState,
-        string $expectedNewMachineState,
-        ?Event $expectedEvent,
-    ): void {
+    public function testInvoke(string $machineId, string $currentState, string $newState, ?Event $expectedEvent): void
+    {
         $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
-        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, $currentMachineState);
+        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, $currentState);
 
         ($this->handler)($message);
 
@@ -68,7 +64,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals($message->withCurrentState($expectedNewMachineState), $envelope->getMessage());
+        self::assertEquals($message->withCurrentState($newState), $envelope->getMessage());
     }
 
     /**
@@ -83,14 +79,14 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         return [
             'no state change' => [
                 'machineId' => $machineId,
-                'currentMachineState' => $findReceivedMachineState,
-                'expectedNewMachineState' => $findReceivedMachineState,
+                'currentState' => $findReceivedMachineState,
+                'newState' => $findReceivedMachineState,
                 'expectedEvent' => null,
             ],
             'has state change' => [
                 'machineId' => $machineId,
-                'currentMachineState' => $unknownMachineState,
-                'expectedNewMachineState' => $findReceivedMachineState,
+                'currentState' => $unknownMachineState,
+                'newState' => $findReceivedMachineState,
                 'expectedEvent' => new MachineStateChangeEvent(
                     new Machine($machineId, $findReceivedMachineState, [], false),
                     'unknown'
