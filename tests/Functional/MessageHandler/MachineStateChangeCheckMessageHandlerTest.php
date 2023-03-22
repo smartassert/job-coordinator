@@ -48,14 +48,11 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
      *
      * @param callable(string): ?Event $expectedEventCreator
      */
-    public function testInvokeFoo(
-        string $currentMachineState,
-        string $expectedNewMachineState,
-        callable $expectedEventCreator,
-    ): void {
+    public function testInvoke(string $currentState, string $newState, callable $expectedEventCreator): void
+    {
         $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
         $machineId = md5((string) rand());
-        $machine = new Machine($machineId, $currentMachineState, [], false, false, false);
+        $machine = new Machine($machineId, $currentState, [], false, false, false);
         $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
         ($this->handler)($message);
@@ -72,7 +69,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         self::assertEquals(
             new MachineStateChangeCheckMessage(
                 $authenticationToken,
-                new Machine($machineId, $expectedNewMachineState, [], false, false, false)
+                new Machine($machineId, $newState, [], false, false, false)
             ),
             $envelope->getMessage()
         );
@@ -85,15 +82,15 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     {
         return [
             'no state change' => [
-                'currentMachineState' => 'find/received',
-                'expectedNewMachineState' => 'find/received',
+                'currentState' => 'find/received',
+                'newState' => 'find/received',
                 'expectedEventCreator' => function () {
                     return null;
                 },
             ],
             'has state change' => [
-                'currentMachineState' => 'unknown',
-                'expectedNewMachineState' => 'find/received',
+                'currentState' => 'unknown',
+                'newState' => 'find/received',
                 'expectedEventCreator' => function (string $machineId) {
                     \assert('' !== $machineId);
 
