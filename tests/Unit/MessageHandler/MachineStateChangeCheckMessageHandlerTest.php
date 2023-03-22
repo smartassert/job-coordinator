@@ -24,7 +24,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
             ->shouldReceive('getMachine')
-            ->andReturn(new Machine($machineId, 'an_end_state', [], true))
+            ->andReturn(new Machine($machineId, 'an_end_state', [], true, false))
         ;
 
         $messageDispatcher = \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class);
