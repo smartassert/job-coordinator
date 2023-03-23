@@ -16,13 +16,9 @@ class Client
     ) {
     }
 
-    /**
-     * @param non-empty-string[] $manifestPaths
-     */
     public function makeCreateJobRequest(
         ?string $authenticationToken,
         string $suiteId,
-        array $manifestPaths,
         string $method = 'POST'
     ): ResponseInterface {
         return $this->client->makeRequest(
@@ -33,8 +29,7 @@ class Client
                 [
                     'content-type' => 'application/json',
                 ]
-            ),
-            (string) json_encode($manifestPaths)
+            )
         );
     }
 

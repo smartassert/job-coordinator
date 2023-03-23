@@ -8,7 +8,6 @@ use App\Controller\JobController;
 use App\Entity\Job;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
-use App\Request\CreateJobRequest;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use GuzzleHttp\Psr7\Response;
@@ -45,7 +44,7 @@ class JobControllerTest extends TestCase
         ;
 
         $response = $this->controller->create(
-            new CreateJobRequest('suite id value', ['test.yml']),
+            'suite id value',
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
             $ulidFactory,
@@ -81,7 +80,6 @@ class JobControllerTest extends TestCase
         array $expectedResponseData,
     ): void {
         $suiteId = (new UlidFactory())->create();
-        $createJobRequest = new CreateJobRequest($suiteId, ['test.yml']);
         $userId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
         $user = new User($userId, $userToken);
@@ -111,7 +109,7 @@ class JobControllerTest extends TestCase
             : $this->createWorkerManagerClient($user->getSecurityToken(), $jobId, $workerManagerClientOutcome);
 
         $response = $this->controller->create(
-            $createJobRequest,
+            $suiteId,
             $user,
             $jobRepository,
             $ulidFactory,

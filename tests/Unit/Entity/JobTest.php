@@ -21,10 +21,6 @@ class JobTest extends TestCase
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
-        $manifestPaths = [
-            'test.yml',
-        ];
-
         $resultToken = (string) new Ulid();
         \assert('' !== $resultToken);
 
@@ -32,9 +28,8 @@ class JobTest extends TestCase
             [
                 'id' => $id,
                 'suite_id' => $suiteId,
-                'manifest_paths' => $manifestPaths,
             ],
-            (new Job($id, $userId, $suiteId, $manifestPaths, $resultToken))->jsonSerialize()
+            (new Job($id, $userId, $suiteId, $resultToken))->jsonSerialize()
         );
     }
 }
