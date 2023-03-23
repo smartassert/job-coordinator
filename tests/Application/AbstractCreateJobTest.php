@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\Job;
-use App\Repository\JobRepository;
 use App\Tests\Services\AuthenticationConfiguration;
 use SmartAssert\SourcesClient\FileClient;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
