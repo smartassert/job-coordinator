@@ -30,26 +30,6 @@ class CreateJobRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        if ('application/json' !== $request->headers->get('content-type')) {
-            return [];
-        }
-
-        $requestManifestPaths = json_decode($request->getContent(), true);
-        if (!is_array($requestManifestPaths)) {
-            return [];
-        }
-
-        $manifestPaths = [];
-        foreach ($requestManifestPaths as $requestManifestPath) {
-            if (is_string($requestManifestPath)) {
-                $comparator = trim($requestManifestPath);
-
-                if ('' !== $comparator) {
-                    $manifestPaths[] = $comparator;
-                }
-            }
-        }
-
-        return [new CreateJobRequest($suiteId, $manifestPaths)];
+        return [new CreateJobRequest($suiteId)];
     }
 }

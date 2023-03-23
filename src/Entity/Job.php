@@ -36,37 +36,27 @@ class Job implements \JsonSerializable
     public readonly string $resultsToken;
 
     /**
-     * @var non-empty-string[]
-     */
-    #[ORM\Column(type: 'simple_array')]
-    public readonly array $manifestPaths;
-
-    /**
-     * @param non-empty-string   $userId
-     * @param non-empty-string   $suiteId
-     * @param non-empty-string[] $manifestPaths
-     * @param non-empty-string   $id
-     * @param non-empty-string   $resultsToken
+     * @param non-empty-string $userId
+     * @param non-empty-string $suiteId
+     * @param non-empty-string $id
+     * @param non-empty-string $resultsToken
      */
     public function __construct(
         string $id,
         string $userId,
         string $suiteId,
-        array $manifestPaths,
         string $resultsToken
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
-        $this->manifestPaths = $manifestPaths;
         $this->resultsToken = $resultsToken;
     }
 
     /**
      * @return array{
-     *   suite_id: non-empty-string,
-     *   manifest_paths: non-empty-string[],
-     *   id: non-empty-string
+     *   id: non-empty-string,
+     *   suite_id: non-empty-string
      *  }
      */
     public function jsonSerialize(): array
@@ -74,7 +64,6 @@ class Job implements \JsonSerializable
         return [
             'id' => $this->id,
             'suite_id' => $this->suiteId,
-            'manifest_paths' => $this->manifestPaths,
         ];
     }
 }

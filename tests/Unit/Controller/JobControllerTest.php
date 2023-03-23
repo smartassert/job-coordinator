@@ -45,7 +45,7 @@ class JobControllerTest extends TestCase
         ;
 
         $response = $this->controller->create(
-            new CreateJobRequest('suite id value', ['test.yml']),
+            new CreateJobRequest('suite id value'),
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
             $ulidFactory,
@@ -81,7 +81,7 @@ class JobControllerTest extends TestCase
         array $expectedResponseData,
     ): void {
         $suiteId = (new UlidFactory())->create();
-        $createJobRequest = new CreateJobRequest($suiteId, ['test.yml']);
+        $createJobRequest = new CreateJobRequest($suiteId);
         $userId = (new UlidFactory())->create();
         $userToken = md5((string) rand());
         $user = new User($userId, $userToken);

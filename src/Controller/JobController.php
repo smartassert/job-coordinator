@@ -36,13 +36,6 @@ class JobController
         ErrorResponseFactory $errorResponseFactory,
         WorkerManagerClient $workerManagerClient,
     ): JsonResponse {
-        if ([] === $request->manifestPaths) {
-            return new ErrorResponse(
-                ErrorResponseType::INVALID_REQUEST,
-                'Manifest paths collection is empty.'
-            );
-        }
-
         try {
             $id = $ulidFactory->create();
         } catch (EmptyUlidException) {
@@ -80,7 +73,7 @@ class JobController
             );
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $request->manifestPaths, $resultsJob->token);
+        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $resultsJob->token);
         $repository->add($job);
 
         return new JsonResponse([
