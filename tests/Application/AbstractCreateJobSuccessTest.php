@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\Job;
+use App\Message\MachineStateChangeCheckMessage;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\FileClient;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -12,6 +13,9 @@ use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
+use SmartAssert\WorkerManagerClient\Model\Machine;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
@@ -89,5 +93,27 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 
         self::assertSame($serializedSuiteId, $serializedSuite->getId());
         self::assertSame($suite->getId(), $serializedSuite->getSuiteId());
+
+        $messengerTransport = self::getContainer()->get('messenger.transport.async');
+        \assert($messengerTransport instanceof InMemoryTransport);
+
+        $envelopes = $messengerTransport->get();
+        self::assertIsArray($envelopes);
+        self::assertCount(1, $envelopes);
+
+        $envelope = $envelopes[0];
+        self::assertInstanceOf(Envelope::class, $envelope);
+
+        $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
+            self::$authenticationConfiguration->getValidApiToken(),
+            new Machine(
+                $machineData['id'],
+                $machineData['state'],
+                $machineData['state_category'],
+                $machineData['ip_addresses']
+            )
+        );
+
+        self::assertEquals($expectedMachineStateChangeCheckMessage, $envelope->getMessage());
     }
 }
