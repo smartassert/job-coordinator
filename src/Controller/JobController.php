@@ -7,6 +7,8 @@ namespace App\Controller;
 use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Exception\EmptyUlidException;
+use App\Message\MachineStateChangeCheckMessage;
+use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\Model\Machine;
 use App\Model\SerializedSuite;
 use App\Repository\JobRepository;
@@ -50,6 +52,7 @@ class JobController
         ErrorResponseFactory $errorResponseFactory,
         WorkerManagerClient $workerManagerClient,
         SerializedSuiteClient $serializedSuiteClient,
+        MachineStateChangeCheckMessageDispatcher $machineStateChangeCheckMessageDispatcher,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
@@ -96,6 +99,10 @@ class JobController
 
         $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token, $serializedSuite->getId());
         $repository->add($job);
+
+        $machineStateChangeCheckMessageDispatcher->dispatch(
+            MachineStateChangeCheckMessage::createFromMachine($user->getSecurityToken(), $machine)
+        );
 
         return new JsonResponse([
             'job' => $job,
