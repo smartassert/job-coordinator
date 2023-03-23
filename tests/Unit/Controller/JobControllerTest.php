@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Controller;
 use App\Controller\JobController;
 use App\Entity\Job;
 use App\Exception\EmptyUlidException;
+use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\Repository\JobRepository;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
@@ -51,6 +52,7 @@ class JobControllerTest extends TestCase
             \Mockery::mock(ResultsClient::class),
             new ErrorResponseFactory(),
             \Mockery::mock(WorkerManagerClient::class),
+            \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -116,6 +118,7 @@ class JobControllerTest extends TestCase
             $resultsClient,
             new ErrorResponseFactory(),
             $workerManagerClient,
+            \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
