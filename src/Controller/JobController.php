@@ -6,7 +6,6 @@ use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
-use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
@@ -24,11 +23,13 @@ class JobController
     public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
 
     /**
+     * @param non-empty-string $suiteId
+     *
      * @throws ClientExceptionInterface
      */
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
-        CreateJobRequest $request,
+        string $suiteId,
         User $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
@@ -73,7 +74,7 @@ class JobController
             );
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $resultsJob->token);
+        $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token);
         $repository->add($job);
 
         return new JsonResponse([
