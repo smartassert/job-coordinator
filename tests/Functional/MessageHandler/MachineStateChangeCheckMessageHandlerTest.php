@@ -9,6 +9,7 @@ use App\Message\MachineStateChangeCheckMessage;
 use App\MessageHandler\MachineStateChangeCheckMessageHandler;
 use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EventSubscriber\EventRecorder;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
@@ -44,20 +45,23 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
     /**
      * @dataProvider invokeDataProvider
+     *
+     * @param callable(string): ?Event $expectedEventCreator
      */
     public function testInvokeFoo(
         string $currentMachineState,
         string $expectedNewMachineState,
-        ?Event $expectedEvent,
+        callable $expectedEventCreator,
     ): void {
         $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
         $machineId = md5((string) rand());
-        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, $currentMachineState);
+        $machine = new Machine($machineId, $currentMachineState, [], false, false, false);
+        $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
         ($this->handler)($message);
 
         $latestEvent = $this->eventRecorder->getLatest();
-        self::assertEquals($expectedEvent, $latestEvent);
+        self::assertEquals($expectedEventCreator($machineId), $latestEvent);
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
@@ -65,7 +69,13 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals($message->withCurrentState($expectedNewMachineState), $envelope->getMessage());
+        self::assertEquals(
+            new MachineStateChangeCheckMessage(
+                $authenticationToken,
+                new Machine($machineId, $expectedNewMachineState, [], false, false, false)
+            ),
+            $envelope->getMessage()
+        );
     }
 
     /**
@@ -77,12 +87,21 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             'no state change' => [
                 'currentMachineState' => 'find/received',
                 'expectedNewMachineState' => 'find/received',
-                'expectedEvent' => null,
+                'expectedEventCreator' => function () {
+                    return null;
+                },
             ],
             'has state change' => [
                 'currentMachineState' => 'unknown',
                 'expectedNewMachineState' => 'find/received',
-                'expectedEvent' => new MachineStateChangeEvent('unknown', 'find/received'),
+                'expectedEventCreator' => function (string $machineId) {
+                    \assert('' !== $machineId);
+
+                    return new MachineStateChangeEvent(
+                        new Machine($machineId, 'unknown', [], false, false, false),
+                        new Machine($machineId, 'find/received', [], false, false, false),
+                    );
+                },
             ],
         ];
     }

@@ -45,7 +45,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         );
 
         $authenticationToken = md5((string) rand());
-        $message = MachineStateChangeCheckMessage::createFromMachine($authenticationToken, $machine);
+        $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
         ($handler)($message);
     }

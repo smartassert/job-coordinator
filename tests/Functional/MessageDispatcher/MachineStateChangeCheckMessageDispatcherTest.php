@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -19,10 +20,12 @@ class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
         \assert($dispatcher instanceof MachineStateChangeCheckMessageDispatcher);
 
         $authenticationToken = md5((string) rand());
+
         $machineId = md5((string) rand());
         $machineState = 'current_machine_state';
+        $machine = new Machine($machineId, $machineState, [], false, false, false);
 
-        $message = new MachineStateChangeCheckMessage($authenticationToken, $machineId, $machineState);
+        $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
         $dispatcher->dispatch($message);
 
