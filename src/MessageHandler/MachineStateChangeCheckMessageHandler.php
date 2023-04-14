@@ -33,17 +33,19 @@ final class MachineStateChangeCheckMessageHandler
      */
     public function __invoke(MachineStateChangeCheckMessage $message): void
     {
-        $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $message->machineId);
+        $previousMachine = $message->machine;
 
-        if ($message->machineState !== $machine->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $message->machineState,
-                $machine->state
-            ));
+        $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
+
+        if ($previousMachine->state !== $machine->state) {
+            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($previousMachine, $machine));
         }
 
         if (!$machine->hasEndState) {
-            $this->messageDispatcher->dispatch($message->withCurrentState($machine->state));
+            $this->messageDispatcher->dispatch(new MachineStateChangeCheckMessage(
+                $message->authenticationToken,
+                $machine
+            ));
         }
     }
 }
