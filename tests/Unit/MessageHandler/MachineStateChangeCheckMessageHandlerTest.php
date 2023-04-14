@@ -20,7 +20,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     public function testHandleChangeToEndState(): void
     {
         $machineId = md5((string) rand());
-        $machine = new Machine($machineId, 'an_end_state', [], true, false);
+        $machine = new Machine($machineId, 'an_end_state', [], false, true, false);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
