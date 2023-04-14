@@ -83,7 +83,7 @@ class JobController
         $repository->add($job);
 
         $machineStateChangeCheckMessageDispatcher->dispatch(
-            MachineStateChangeCheckMessage::createFromMachine($user->getSecurityToken(), $machine)
+            new MachineStateChangeCheckMessage($user->getSecurityToken(), $machine)
         );
 
         return new JsonResponse([
