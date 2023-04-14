@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Message\MachineStateChangeCheckMessage;
 use App\Repository\JobRepository;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
@@ -74,8 +75,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 
         $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
             self::$authenticationConfiguration->getValidApiToken(),
-            $job->id,
-            'create/received'
+            new Machine($machineData['id'], $machineData['state'], $machineData['ip_addresses'], true, false, false)
         );
 
         self::assertEquals($expectedMachineStateChangeCheckMessage, $envelope->getMessage());
