@@ -41,7 +41,7 @@ final class MachineStateChangeCheckMessageHandler
             $this->eventDispatcher->dispatch(new MachineStateChangeEvent($previousMachine, $machine));
         }
 
-        if (!$machine->hasEndState) {
+        if ('end' !== $machine->stateCategory) {
             $this->messageDispatcher->dispatch(new MachineStateChangeCheckMessage(
                 $message->authenticationToken,
                 $machine

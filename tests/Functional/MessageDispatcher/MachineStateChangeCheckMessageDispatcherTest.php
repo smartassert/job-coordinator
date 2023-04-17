@@ -23,7 +23,7 @@ class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
 
         $machineId = md5((string) rand());
         $machineState = 'current_machine_state';
-        $machine = new Machine($machineId, $machineState, [], false, false, false);
+        $machine = new Machine($machineId, $machineState, 'unknown', []);
 
         $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
