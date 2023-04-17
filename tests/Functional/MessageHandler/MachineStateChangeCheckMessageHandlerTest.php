@@ -46,21 +46,24 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     /**
      * @dataProvider invokeDataProvider
      *
-     * @param callable(string): ?Event $expectedEventCreator
+     * @param callable(non-empty-string): Machine $machineCreator
+     * @param callable(non-empty-string): Machine $expectedMachineCreator
+     * @param callable(string): ?Event            $expectedEventCreator
      */
-    public function testInvokeFoo(
-        string $currentMachineState,
-        string $expectedNewMachineState,
+    public function testInvoke(
+        callable $machineCreator,
+        callable $expectedMachineCreator,
         callable $expectedEventCreator,
     ): void {
         $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
         $machineId = md5((string) rand());
-        $machine = new Machine($machineId, $currentMachineState, [], false, false, false);
+        $machine = $machineCreator($machineId);
         $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
 
         ($this->handler)($message);
 
         $latestEvent = $this->eventRecorder->getLatest();
+
         self::assertEquals($expectedEventCreator($machineId), $latestEvent);
 
         $envelopes = $this->messengerTransport->get();
@@ -70,10 +73,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new MachineStateChangeCheckMessage(
-                $authenticationToken,
-                new Machine($machineId, $expectedNewMachineState, [], false, false, false)
-            ),
+            new MachineStateChangeCheckMessage($authenticationToken, $expectedMachineCreator($machineId)),
             $envelope->getMessage()
         );
     }
@@ -85,21 +85,37 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     {
         return [
             'no state change' => [
-                'currentMachineState' => 'find/received',
-                'expectedNewMachineState' => 'find/received',
+                'machineCreator' => function (string $machineId) {
+                    \assert('' !== $machineId);
+
+                    return new Machine($machineId, 'find/received', 'finding', []);
+                },
+                'expectedMachineCreator' => function (string $machineId) {
+                    \assert('' !== $machineId);
+
+                    return new Machine($machineId, 'find/received', 'finding', []);
+                },
                 'expectedEventCreator' => function () {
                     return null;
                 },
             ],
             'has state change' => [
-                'currentMachineState' => 'unknown',
-                'expectedNewMachineState' => 'find/received',
+                'machineCreator' => function (string $machineId) {
+                    \assert('' !== $machineId);
+
+                    return new Machine($machineId, 'unknown', 'unknown', []);
+                },
+                'expectedMachineCreator' => function (string $machineId) {
+                    \assert('' !== $machineId);
+
+                    return new Machine($machineId, 'find/received', 'finding', []);
+                },
                 'expectedEventCreator' => function (string $machineId) {
                     \assert('' !== $machineId);
 
                     return new MachineStateChangeEvent(
-                        new Machine($machineId, 'unknown', [], false, false, false),
-                        new Machine($machineId, 'find/received', [], false, false, false),
+                        new Machine($machineId, 'unknown', 'unknown', []),
+                        new Machine($machineId, 'find/received', 'finding', []),
                     );
                 },
             ],
