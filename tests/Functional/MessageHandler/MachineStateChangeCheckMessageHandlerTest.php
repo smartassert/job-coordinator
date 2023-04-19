@@ -46,9 +46,9 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     /**
      * @dataProvider invokeDataProvider
      *
-     * @param callable(non-empty-string): Machine $machineCreator
-     * @param callable(non-empty-string): Machine $expectedMachineCreator
-     * @param callable(string): ?Event            $expectedEventCreator
+     * @param callable(non-empty-string): Machine                  $machineCreator
+     * @param callable(non-empty-string): Machine                  $expectedMachineCreator
+     * @param callable(non-empty-string, non-empty-string): ?Event $expectedEventCreator
      */
     public function testInvoke(
         callable $machineCreator,
@@ -64,7 +64,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
         $latestEvent = $this->eventRecorder->getLatest();
 
-        self::assertEquals($expectedEventCreator($machineId), $latestEvent);
+        self::assertEquals($expectedEventCreator($machineId, $authenticationToken), $latestEvent);
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
@@ -110,10 +110,12 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
                     return new Machine($machineId, 'find/received', 'finding', []);
                 },
-                'expectedEventCreator' => function (string $machineId) {
+                'expectedEventCreator' => function (string $machineId, string $authenticationToken) {
                     \assert('' !== $machineId);
+                    \assert('' !== $authenticationToken);
 
                     return new MachineStateChangeEvent(
+                        $authenticationToken,
                         new Machine($machineId, 'unknown', 'unknown', []),
                         new Machine($machineId, 'find/received', 'finding', []),
                     );
