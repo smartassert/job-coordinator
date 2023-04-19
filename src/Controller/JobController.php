@@ -101,6 +101,7 @@ class JobController
             'machine' => [
                 'id' => $machine->id,
                 'state' => $machine->state,
+                'state_category' => $machine->stateCategory,
                 'ip_addresses' => $machine->ipAddresses,
             ],
         ]);
