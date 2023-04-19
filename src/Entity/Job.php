@@ -67,7 +67,8 @@ class Job implements \JsonSerializable
     /**
      * @return array{
      *   id: non-empty-string,
-     *   suite_id: non-empty-string
+     *   suite_id: non-empty-string,
+     *   serialized_suite_id: non-empty-string
      *  }
      */
     public function jsonSerialize(): array
@@ -75,6 +76,7 @@ class Job implements \JsonSerializable
         return [
             'id' => $this->id,
             'suite_id' => $this->suiteId,
+            'serialized_suite_id' => $this->serializedSuiteId,
         ];
     }
 }

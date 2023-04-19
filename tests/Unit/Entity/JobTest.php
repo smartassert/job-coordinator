@@ -31,6 +31,7 @@ class JobTest extends TestCase
             [
                 'id' => $id,
                 'suite_id' => $suiteId,
+                'serialized_suite_id' => $serializedSuiteId,
             ],
             (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId))->jsonSerialize()
         );

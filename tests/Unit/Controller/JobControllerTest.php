@@ -18,11 +18,13 @@ use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
+use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class JobControllerTest extends TestCase
 {
@@ -44,6 +46,7 @@ class JobControllerTest extends TestCase
         ;
 
         $response = $this->controller->create(
+            new Request(),
             'suite id value',
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
@@ -51,6 +54,7 @@ class JobControllerTest extends TestCase
             \Mockery::mock(ResultsClient::class),
             new ErrorResponseFactory(),
             \Mockery::mock(WorkerManagerClient::class),
+            \Mockery::mock(SerializedSuiteClient::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -109,6 +113,7 @@ class JobControllerTest extends TestCase
             : $this->createWorkerManagerClient($user->getSecurityToken(), $jobId, $workerManagerClientOutcome);
 
         $response = $this->controller->create(
+            new Request(),
             $suiteId,
             $user,
             $jobRepository,
@@ -116,6 +121,7 @@ class JobControllerTest extends TestCase
             $resultsClient,
             new ErrorResponseFactory(),
             $workerManagerClient,
+            \Mockery::mock(SerializedSuiteClient::class)
         );
 
         self::assertSame(500, $response->getStatusCode());

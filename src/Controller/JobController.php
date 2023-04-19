@@ -14,10 +14,12 @@ use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
+use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class JobController
@@ -31,6 +33,7 @@ class JobController
      */
     #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
+        Request $request,
         string $suiteId,
         User $user,
         JobRepository $repository,
@@ -38,6 +41,7 @@ class JobController
         ResultsClient $resultsClient,
         ErrorResponseFactory $errorResponseFactory,
         WorkerManagerClient $workerManagerClient,
+        SerializedSuiteClient $serializedSuiteClient,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
@@ -69,7 +73,20 @@ class JobController
             );
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token);
+        try {
+            $serializedSuite = $serializedSuiteClient->create(
+                $user->getSecurityToken(),
+                $suiteId,
+                $this->createSuiteSerializationParameters($request)
+            );
+        } catch (HttpResponseExceptionInterface $exception) {
+            return $errorResponseFactory->createFromHttpResponseException(
+                $exception,
+                'Failed requesting suite serialization in sources service.'
+            );
+        }
+
+        $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token, $serializedSuite->getId());
         $repository->add($job);
 
         return new JsonResponse([
@@ -80,5 +97,39 @@ class JobController
                 'ip_addresses' => $machine->ipAddresses,
             ],
         ]);
+    }
+
+    /**
+     * @return array<non-empty-string, non-empty-string>
+     */
+    private function createSuiteSerializationParameters(Request $request): array
+    {
+        if ('application/json' !== $request->getContentTypeFormat()) {
+            return [];
+        }
+
+        $requestPayload = $request->request;
+        if (!$requestPayload->has('parameters')) {
+            return [];
+        }
+
+        $requestParameters = $requestPayload->get('parameters');
+        if (!is_string($requestParameters)) {
+            return [];
+        }
+
+        $decodedRequestParameters = json_decode($requestParameters, true);
+        if (!is_array($decodedRequestParameters)) {
+            return [];
+        }
+
+        $parameters = [];
+        foreach ($decodedRequestParameters as $key => $value) {
+            if (is_string($key) && '' !== $key && is_string($value) && '' !== $value) {
+                $parameters[$key] = $value;
+            }
+        }
+
+        return $parameters;
     }
 }
