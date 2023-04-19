@@ -54,13 +54,6 @@ class JobController
             );
         }
 
-        if ('' === $resultsJob->token) {
-            return new ErrorResponse(
-                ErrorResponseType::SERVER_ERROR,
-                'Results service job invalid, token missing.'
-            );
-        }
-
         try {
             $machine = $workerManagerClient->createMachine($user->getSecurityToken(), $id);
         } catch (HttpResponseExceptionInterface $httpResponseException) {

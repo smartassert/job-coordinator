@@ -283,15 +283,6 @@ class JobControllerTest extends TestCase
                     ],
                 ],
             ],
-            'results service response lacking token' => [
-                'jobId' => $id,
-                'resultsClientOutcome' => new ResultsJob('non-empty label', ''),
-                'workerManagerClientOutcome' => null,
-                'expectedResponseData' => [
-                    'type' => 'server_error',
-                    'message' => 'Results service job invalid, token missing.',
-                ],
-            ],
         ];
     }
 
