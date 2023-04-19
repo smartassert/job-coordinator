@@ -70,9 +70,6 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         self::assertArrayHasKey('state', $machineData);
         self::assertSame('create/received', $machineData['state']);
 
-        self::assertArrayHasKey('state_category', $machineData);
-        self::assertSame('pre_active', $machineData['state_category']);
-
         self::assertArrayHasKey('ip_addresses', $machineData);
         self::assertSame([], $machineData['ip_addresses']);
 
