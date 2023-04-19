@@ -12,6 +12,7 @@
         "doctrine/orm": "^2.12",
         "guzzlehttp/guzzle": "^7.5",
         "smartassert/results-client": ">=5.5,<6",
+        "smartassert/sources-client": ">=0.1,<1",
         "smartassert/users-security-bundle": "~6.0",
         "smartassert/worker-manager-client": ">=3.0,<4",
         "symfony/console": "6.2.*",
