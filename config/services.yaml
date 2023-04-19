@@ -61,3 +61,13 @@ services:
     App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher:
         arguments:
             $dispatchDelay: '%machine_state_change_check_message_dispatch_delay%'
+
+    SmartAssert\SourcesClient\ExceptionFactory: ~
+
+    SmartAssert\SourcesClient\SerializedSuiteFactory: ~
+
+    SmartAssert\SourcesClient\RequestFactory:
+        arguments:
+            $baseUrl: '%env(string:SOURCES_BASE_URL)%'
+
+    SmartAssert\SourcesClient\SerializedSuiteClient: ~

@@ -29,3 +29,16 @@ services:
 
     App\Tests\Services\EventSubscriber\EventRecorder:
         public: true
+
+    SmartAssert\SourcesClient\SourceFactory: ~
+
+    SmartAssert\SourcesClient\SourceClient:
+        public: true
+
+    SmartAssert\SourcesClient\FileClient:
+        public: true
+
+    SmartAssert\SourcesClient\SuiteFactory: ~
+
+    SmartAssert\SourcesClient\SuiteClient:
+        public: true
