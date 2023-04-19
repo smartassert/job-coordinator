@@ -51,6 +51,9 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         self::assertArrayHasKey('state', $machineData);
         self::assertSame('create/received', $machineData['state']);
 
+        self::assertArrayHasKey('state_category', $machineData);
+        self::assertSame('pre_active', $machineData['state_category']);
+
         self::assertArrayHasKey('ip_addresses', $machineData);
         self::assertSame([], $machineData['ip_addresses']);
 
@@ -75,7 +78,12 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 
         $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
             self::$authenticationConfiguration->getValidApiToken(),
-            new Machine($machineData['id'], $machineData['state'], $machineData['ip_addresses'], true, false, false)
+            new Machine(
+                $machineData['id'],
+                $machineData['state'],
+                $machineData['state_category'],
+                $machineData['ip_addresses']
+            )
         );
 
         self::assertEquals($expectedMachineStateChangeCheckMessage, $envelope->getMessage());
