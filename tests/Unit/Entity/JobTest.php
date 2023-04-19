@@ -24,12 +24,15 @@ class JobTest extends TestCase
         $resultToken = (string) new Ulid();
         \assert('' !== $resultToken);
 
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
         self::assertEquals(
             [
                 'id' => $id,
                 'suite_id' => $suiteId,
             ],
-            (new Job($id, $userId, $suiteId, $resultToken))->jsonSerialize()
+            (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId))->jsonSerialize()
         );
     }
 }

@@ -34,25 +34,34 @@ class Job implements \JsonSerializable
     /**
      * @var non-empty-string
      */
-    #[ORM\Column(length: 32, nullable: true)]
+    #[ORM\Column(length: 32)]
     public readonly string $resultsToken;
+
+    /**
+     * @var non-empty-string
+     */
+    #[ORM\Column(length: 32)]
+    public readonly string $serializedSuiteId;
 
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
      * @param non-empty-string $resultsToken
+     * @param non-empty-string $serializedSuiteId
      */
     public function __construct(
         string $id,
         string $userId,
         string $suiteId,
-        string $resultsToken
+        string $resultsToken,
+        string $serializedSuiteId,
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->resultsToken = $resultsToken;
+        $this->serializedSuiteId = $serializedSuiteId;
     }
 
     /**

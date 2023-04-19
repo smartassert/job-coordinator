@@ -22,7 +22,8 @@ final class Version20220920083238 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
-                results_token VARCHAR(32),
+                results_token VARCHAR(32) NOT NULL,
+                serialized_suite_id VARCHAR(32) NOT NULL,
                 PRIMARY KEY(id)
             )
         ');
