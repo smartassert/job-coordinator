@@ -7,6 +7,10 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Message\MachineStateChangeCheckMessage;
 use App\Repository\JobRepository;
+use SmartAssert\SourcesClient\FileClient;
+use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SourceClient;
+use SmartAssert\SourcesClient\SuiteClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
@@ -16,7 +20,19 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 {
     public function testCreateSuccess(): void
     {
-        $suiteId = (string) new Ulid();
+        $apiToken = self::$authenticationConfiguration->getValidApiToken();
+
+        $sourceClient = self::getContainer()->get(SourceClient::class);
+        \assert($sourceClient instanceof SourceClient);
+        $source = $sourceClient->createFileSource($apiToken, md5((string) rand()));
+
+        $fileClient = self::getContainer()->get(FileClient::class);
+        \assert($fileClient instanceof FileClient);
+        $fileClient->add($apiToken, $source->getId(), 'test1.yaml', 'test 1 contents');
+
+        $suiteClient = self::getContainer()->get(SuiteClient::class);
+        \assert($suiteClient instanceof SuiteClient);
+        $suite = $suiteClient->create($apiToken, $source->getId(), md5((string) rand()), ['test1.yaml']);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -24,7 +40,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 
         $response = $this->applicationClient->makeCreateJobRequest(
             self::$authenticationConfiguration->getValidApiToken(),
-            $suiteId,
+            $suite->getId(),
         );
 
         self::assertSame(200, $response->getStatusCode());
@@ -40,7 +56,10 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($jobData['id']));
 
         self::assertArrayHasKey('suite_id', $jobData);
-        self::assertSame($suiteId, $jobData['suite_id']);
+        self::assertSame($suite->getId(), $jobData['suite_id']);
+
+        self::assertArrayHasKey('serialized_suite_id', $jobData);
+        $serializedSuiteId = $jobData['serialized_suite_id'];
 
         self::assertArrayHasKey('machine', $responseData);
         $machineData = $responseData['machine'];
@@ -51,9 +70,6 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         self::assertArrayHasKey('state', $machineData);
         self::assertSame('create/received', $machineData['state']);
 
-        self::assertArrayHasKey('state_category', $machineData);
-        self::assertSame('pre_active', $machineData['state_category']);
-
         self::assertArrayHasKey('ip_addresses', $machineData);
         self::assertSame([], $machineData['ip_addresses']);
 
@@ -63,8 +79,16 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         $job = $jobs[0];
         self::assertInstanceOf(Job::class, $job);
         self::assertSame($job->userId, self::$authenticationConfiguration->getUser()->id);
-        self::assertSame($job->suiteId, $suiteId);
+        self::assertSame($job->suiteId, $suite->getId());
         self::assertNotNull($job->resultsToken);
+
+        $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
+        \assert($serializedSuiteClient instanceof SerializedSuiteClient);
+
+        $serializedSuite = $serializedSuiteClient->get($apiToken, $serializedSuiteId);
+
+        self::assertSame($serializedSuiteId, $serializedSuite->getId());
+        self::assertSame($suite->getId(), $serializedSuite->getSuiteId());
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);
