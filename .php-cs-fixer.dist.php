@@ -42,6 +42,7 @@ return (new PhpCsFixer\Config())
                 'yield_from',
             ],
         ],
+        'declare_strict_types' => true,
     ])
     ->setFinder($finder)
     ;
