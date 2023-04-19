@@ -78,3 +78,37 @@ services:
     volumes:
       - ./http-config/caddy/index.php:/app/public/index.php
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  s3-mock:
+    image: adobe/s3mock:2.4.14
+    container_name: s3-mock
+    ports:
+      - "9090:9090"
+    environment:
+      - validKmsKeys=remote_storage_key_id
+      - initialBuckets=file_source_bucket,serialized_suite_bucket
+    restart: unless-stopped
+
+  sources-service:
+    image: ghcr.io/smartassert/sources:1.7
+    container_name: sources-service
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
+      AUTHENTICATION_BASE_URL: http://users-http
+      REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
+      REMOTE_STORAGE_KEY_ID: remote_storage_key_id
+      IS_READY: 1
+    depends_on:
+      - postgres
+
+  sources-http:
+    image: caddy:2.4.5-alpine
+    container_name: sources-http
+    restart: unless-stopped
+    ports:
+      - "9083:80"
+    links:
+      - sources-service:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
