@@ -154,6 +154,11 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         $serializedSuite = $serializedSuiteClient->get($apiToken, $job->serializedSuiteId);
         \assert($serializedSuite instanceof SerializedSuite);
 
+        $responseData = json_decode($getResponse->getBody()->getContents(), true);
+        \assert(is_array($responseData));
+        $serializedSuiteData = $responseData['serialized_suite'];
+        \assert(is_array($serializedSuiteData));
+
         self::assertEquals(
             [
                 'job' => [
@@ -168,10 +173,10 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
                 ],
                 'serialized_suite' => [
                     'id' => $serializedSuite->getId(),
-                    'state' => $serializedSuite->getState(),
+                    'state' => $serializedSuiteData['state'],
                 ],
             ],
-            json_decode($getResponse->getBody()->getContents(), true)
+            $responseData
         );
     }
 }
