@@ -6,12 +6,12 @@ namespace App\Tests\Application;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
-use App\Tests\Services\AuthenticationConfiguration;
 use SmartAssert\SourcesClient\FileClient;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
+use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Uid\Ulid;
@@ -32,11 +32,11 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
      */
     public function testGetBadMethod(string $method): void
     {
-        $response = $this->applicationClient->makeGetJobRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $this->jobId,
-            $method
-        );
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $apiToken = $apiTokenProvider->get('user@example.com');
+
+        $response = $this->applicationClient->makeGetJobRequest($apiToken, $this->jobId, $method);
 
         self::assertSame(405, $response->getStatusCode());
     }
@@ -59,12 +59,9 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testGetUnauthorizedUser(callable $userTokenCreator): void
+    public function testGetUnauthorizedUser(?string $apiToken): void
     {
-        $response = $this->applicationClient->makeGetJobRequest(
-            $userTokenCreator(self::$authenticationConfiguration),
-            $this->jobId,
-        );
+        $response = $this->applicationClient->makeGetJobRequest($apiToken, $this->jobId);
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -76,26 +73,22 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     {
         return [
             'no user token' => [
-                'userTokenCreator' => function () {
-                    return null;
-                },
+                'apiToken' => null,
             ],
             'empty user token' => [
-                'userTokenCreator' => function () {
-                    return '';
-                },
+                'apiToken' => '',
             ],
             'non-empty invalid user token' => [
-                'userTokenCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return $authenticationConfiguration->getInvalidApiToken();
-                },
+                'apiToken' => 'invalid api token',
             ],
         ];
     }
 
     public function testGetSuccess(): void
     {
-        $apiToken = self::$authenticationConfiguration->getValidApiToken();
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $apiToken = $apiTokenProvider->get('user@example.com');
 
         $sourceClient = self::getContainer()->get(SourceClient::class);
         \assert($sourceClient instanceof SourceClient);
@@ -113,10 +106,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        $createResponse = $this->applicationClient->makeCreateJobRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $suite->getId(),
-        );
+        $createResponse = $this->applicationClient->makeCreateJobRequest($apiToken, $suite->getId());
 
         self::assertSame(200, $createResponse->getStatusCode());
         self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
@@ -130,10 +120,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($jobData['id']));
         $jobId = $jobData['id'];
 
-        $getResponse = $this->applicationClient->makeGetJobRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $jobId
-        );
+        $getResponse = $this->applicationClient->makeGetJobRequest($apiToken, $jobId);
 
         self::assertSame(200, $getResponse->getStatusCode());
         self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));
@@ -143,10 +130,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
-        $machine = $workerManagerClient->getMachine(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $jobId
-        );
+        $machine = $workerManagerClient->getMachine($apiToken, $jobId);
         \assert($machine instanceof Machine);
 
         $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
