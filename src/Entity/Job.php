@@ -44,6 +44,12 @@ class Job implements \JsonSerializable
     public readonly string $serializedSuiteId;
 
     /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $machineIpAddress;
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
@@ -55,13 +61,31 @@ class Job implements \JsonSerializable
         string $userId,
         string $suiteId,
         string $resultsToken,
-        string $serializedSuiteId,
+        string $serializedSuiteId
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->resultsToken = $resultsToken;
         $this->serializedSuiteId = $serializedSuiteId;
+    }
+
+    /**
+     * @param non-empty-string $machineIpAddress
+     */
+    public function setMachineIpAddress(string $machineIpAddress): self
+    {
+        $this->machineIpAddress = $machineIpAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getMachineIpAddress(): ?string
+    {
+        return $this->machineIpAddress;
     }
 
     /**
