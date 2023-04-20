@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\EventSubscriber;
 
+use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -22,6 +23,9 @@ class EventRecorder implements EventSubscriberInterface
     {
         return [
             MachineStateChangeEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineIsActiveEvent::class => [
                 ['addEvent', 1000],
             ],
         ];
