@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Exception\EmptyUlidException;
+use App\Model\Machine;
 use App\Repository\JobRepository;
 use App\Response\ErrorResponse;
 use App\Services\ErrorResponseFactory;
@@ -96,12 +97,8 @@ class JobController
         $repository->add($job);
 
         return new JsonResponse([
-            'job' => $job->jsonSerialize(),
-            'machine' => [
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'ip_addresses' => $machine->ipAddresses,
-            ],
+            'job' => $job,
+            'machine' => new Machine($machine),
         ]);
     }
 
@@ -147,12 +144,8 @@ class JobController
         }
 
         return new JsonResponse([
-            'job' => $job->jsonSerialize(),
-            'machine' => [
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'ip_addresses' => $machine->ipAddresses,
-            ],
+            'job' => $job,
+            'machine' => new Machine($machine),
             'serialized_suite' => $serializedSuiteData,
         ]);
     }
