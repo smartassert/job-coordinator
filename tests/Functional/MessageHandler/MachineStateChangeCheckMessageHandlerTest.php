@@ -9,8 +9,8 @@ use App\Event\MachineStateChangeEvent;
 use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageHandler\MachineStateChangeCheckMessageHandler;
-use App\Tests\Services\AuthenticationConfiguration;
 use App\Tests\Services\EventSubscriber\EventRecorder;
+use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -21,17 +21,21 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 {
-    private AuthenticationConfiguration $authenticationConfiguration;
     private EventRecorder $eventRecorder;
     private InMemoryTransport $messengerTransport;
+
+    /**
+     * @var non-empty-string
+     */
+    private string $apiToken;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $authenticationConfiguration = self::getContainer()->get(AuthenticationConfiguration::class);
-        \assert($authenticationConfiguration instanceof AuthenticationConfiguration);
-        $this->authenticationConfiguration = $authenticationConfiguration;
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $this->apiToken = $apiTokenProvider->get('user@example.com');
 
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
@@ -54,12 +58,10 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
      */
     public function testInvokeNoStateChange(Machine $previous, Machine $current): void
     {
-        $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
-
-        $this->createMessageAndHandleMessage($previous, $current, $authenticationToken);
+        $this->createMessageAndHandleMessage($previous, $current, $this->apiToken);
 
         self::assertNull($this->eventRecorder->getLatest());
-        $this->assertDispatchedMessage($authenticationToken, $current);
+        $this->assertDispatchedMessage($this->apiToken, $current);
     }
 
     /**
@@ -98,9 +100,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
      */
     public function testInvokeHasStateChange(Machine $previous, Machine $current, string $expectedEventClass): void
     {
-        $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
-
-        $this->createMessageAndHandleMessage($previous, $current, $authenticationToken);
+        $this->createMessageAndHandleMessage($previous, $current, $this->apiToken);
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -108,9 +108,9 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
         self::assertEquals($previous, $latestEvent->previous);
         self::assertEquals($current, $latestEvent->current);
-        self::assertEquals($authenticationToken, $latestEvent->authenticationToken);
+        self::assertEquals($this->apiToken, $latestEvent->authenticationToken);
 
-        $this->assertDispatchedMessage($authenticationToken, $current);
+        $this->assertDispatchedMessage($this->apiToken, $current);
     }
 
     /**
@@ -141,9 +141,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
      */
     public function testInvokeHasEndStateChange(Machine $previous, Machine $current, string $expectedEventClass): void
     {
-        $authenticationToken = $this->authenticationConfiguration->getValidApiToken();
-
-        $this->createMessageAndHandleMessage($previous, $current, $authenticationToken);
+        $this->createMessageAndHandleMessage($previous, $current, $this->apiToken);
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -151,7 +149,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
         self::assertEquals($previous, $latestEvent->previous);
         self::assertEquals($current, $latestEvent->current);
-        self::assertEquals($authenticationToken, $latestEvent->authenticationToken);
+        self::assertEquals($this->apiToken, $latestEvent->authenticationToken);
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);

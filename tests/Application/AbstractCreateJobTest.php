@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Tests\Services\AuthenticationConfiguration;
+use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractCreateJobTest extends AbstractApplicationTest
@@ -23,11 +23,11 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
      */
     public function testCreateBadMethod(string $method): void
     {
-        $response = $this->applicationClient->makeCreateJobRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $this->suiteId,
-            $method
-        );
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $apiToken = $apiTokenProvider->get('user@example.com');
+
+        $response = $this->applicationClient->makeCreateJobRequest($apiToken, $this->suiteId, $method);
 
         self::assertSame(405, $response->getStatusCode());
     }
@@ -50,12 +50,9 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateUnauthorizedUser(callable $userTokenCreator): void
+    public function testCreateUnauthorizedUser(?string $apiToken): void
     {
-        $response = $this->applicationClient->makeCreateJobRequest(
-            $userTokenCreator(self::$authenticationConfiguration),
-            $this->suiteId,
-        );
+        $response = $this->applicationClient->makeCreateJobRequest($apiToken, $this->suiteId);
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -67,19 +64,13 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     {
         return [
             'no user token' => [
-                'userTokenCreator' => function () {
-                    return null;
-                },
+                'apiToken' => null,
             ],
             'empty user token' => [
-                'userTokenCreator' => function () {
-                    return '';
-                },
+                'apiToken' => '',
             ],
             'non-empty invalid user token' => [
-                'userTokenCreator' => function (AuthenticationConfiguration $authenticationConfiguration) {
-                    return $authenticationConfiguration->getInvalidApiToken();
-                },
+                'apiToken' => 'invalid api token',
             ],
         ];
     }

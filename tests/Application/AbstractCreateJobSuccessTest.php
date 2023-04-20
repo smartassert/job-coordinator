@@ -10,13 +10,20 @@ use SmartAssert\SourcesClient\FileClient;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
+use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
+use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 {
     public function testCreateSuccess(): void
     {
-        $apiToken = self::$authenticationConfiguration->getValidApiToken();
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $apiToken = $apiTokenProvider->get('user@example.com');
+
+        $userProvider = self::getContainer()->get(UserProvider::class);
+        \assert($userProvider instanceof UserProvider);
 
         $sourceClient = self::getContainer()->get(SourceClient::class);
         \assert($sourceClient instanceof SourceClient);
@@ -34,10 +41,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        $response = $this->applicationClient->makeCreateJobRequest(
-            self::$authenticationConfiguration->getValidApiToken(),
-            $suite->getId(),
-        );
+        $response = $this->applicationClient->makeCreateJobRequest($apiToken, $suite->getId());
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
@@ -74,7 +78,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
 
         $job = $jobs[0];
         self::assertInstanceOf(Job::class, $job);
-        self::assertSame($job->userId, self::$authenticationConfiguration->getUser()->id);
+        self::assertSame($job->userId, $userProvider->get('user@example.com')->id);
         self::assertSame($job->suiteId, $suite->getId());
         self::assertNotNull($job->resultsToken);
 

@@ -1,3 +1,7 @@
+parameters:
+    test_authentication_provider_bundle_frontend_token_provider_users:
+        'user@example.com': 'password'
+
 services:
     _defaults:
         autowire: true
@@ -20,12 +24,6 @@ services:
 
     SmartAssert\SymfonyTestClient\SymfonyClient:
         public: true
-
-    App\Tests\Services\AuthenticationConfiguration:
-        public: true
-        arguments:
-            $userEmail: 'user@example.com'
-            $userPassword: 'password'
 
     App\Tests\Services\EventSubscriber\EventRecorder:
         public: true
