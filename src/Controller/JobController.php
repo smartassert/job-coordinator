@@ -7,6 +7,8 @@ namespace App\Controller;
 use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Exception\EmptyUlidException;
+use App\Model\Machine;
+use App\Model\SerializedSuite;
 use App\Repository\JobRepository;
 use App\Response\ErrorResponse;
 use App\Services\ErrorResponseFactory;
@@ -96,12 +98,8 @@ class JobController
         $repository->add($job);
 
         return new JsonResponse([
-            'job' => $job->jsonSerialize(),
-            'machine' => [
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'ip_addresses' => $machine->ipAddresses,
-            ],
+            'job' => $job,
+            'machine' => new Machine($machine),
         ]);
     }
 
@@ -133,27 +131,10 @@ class JobController
         $machine = $workerManagerClient->getMachine($user->getSecurityToken(), $job->id);
         $serializedSuite = $serializedSuiteClient->get($user->getSecurityToken(), $job->serializedSuiteId);
 
-        $serializedSuiteData = [
-            'id' => $serializedSuite->getId(),
-            'state' => $serializedSuite->getState(),
-        ];
-
-        if (null !== $serializedSuite->getFailureReason()) {
-            $serializedSuiteData['failure_reason'] = $serializedSuite->getFailureReason();
-        }
-
-        if (null !== $serializedSuite->getFailureMessage()) {
-            $serializedSuiteData['failure_message'] = $serializedSuite->getFailureMessage();
-        }
-
         return new JsonResponse([
-            'job' => $job->jsonSerialize(),
-            'machine' => [
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'ip_addresses' => $machine->ipAddresses,
-            ],
-            'serialized_suite' => $serializedSuiteData,
+            'job' => $job,
+            'machine' => new Machine($machine),
+            'serialized_suite' => new SerializedSuite($serializedSuite),
         ]);
     }
 
