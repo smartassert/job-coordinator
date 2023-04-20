@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
@@ -13,6 +14,7 @@ use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerMachine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -40,11 +42,9 @@ final class MachineStateChangeCheckMessageHandler
         $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
 
         if ($previousMachine->state !== $machine->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $message->authenticationToken,
-                $previousMachine,
-                $machine
-            ));
+            $this->eventDispatcher->dispatch(
+                $this->createMachineStateChangeEvent($message, $previousMachine, $machine)
+            );
         }
 
         if ('end' !== $machine->stateCategory) {
@@ -53,5 +53,17 @@ final class MachineStateChangeCheckMessageHandler
                 $machine
             ));
         }
+    }
+
+    private function createMachineStateChangeEvent(
+        MachineStateChangeCheckMessage $message,
+        WorkerManagerMachine $previousMachine,
+        WorkerManagerMachine $machine,
+    ): MachineStateChangeEvent {
+        if ('active' === $machine->stateCategory) {
+            return new MachineIsActiveEvent($message->authenticationToken, $previousMachine, $machine);
+        }
+
+        return new MachineStateChangeEvent($message->authenticationToken, $previousMachine, $machine);
     }
 }
