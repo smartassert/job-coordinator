@@ -105,7 +105,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractApplicationTest
         self::assertInstanceOf(Envelope::class, $envelope);
 
         $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
-            self::$authenticationConfiguration->getValidApiToken(),
+            $apiToken,
             new Machine(
                 $machineData['id'],
                 $machineData['state'],
