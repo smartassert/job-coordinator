@@ -161,16 +161,8 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
 
         self::assertEquals(
             [
-                'job' => [
-                    'id' => $jobId,
-                    'suite_id' => $job->suiteId,
-                    'serialized_suite_id' => $job->serializedSuiteId,
-                ],
-                'machine' => [
-                    'id' => $machine->id,
-                    'state' => $machine->state,
-                    'ip_addresses' => $machine->ipAddresses,
-                ],
+                'job' => $job->jsonSerialize(),
+                'machine' => (new \App\Model\Machine($machine))->jsonSerialize(),
                 'serialized_suite' => [
                     'id' => $serializedSuite->getId(),
                     'state' => $serializedSuiteData['state'],
