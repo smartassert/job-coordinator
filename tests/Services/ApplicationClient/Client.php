@@ -24,12 +24,19 @@ class Client
         return $this->client->makeRequest(
             $method,
             $this->router->generate('job_create', ['suiteId' => $suiteId]),
-            array_merge(
-                $this->createAuthorizationHeader($authenticationToken),
-                [
-                    'content-type' => 'application/json',
-                ]
-            )
+            $this->createAuthorizationHeader($authenticationToken)
+        );
+    }
+
+    public function makeGetJobRequest(
+        ?string $authenticationToken,
+        string $jobId,
+        string $method = 'GET'
+    ): ResponseInterface {
+        return $this->client->makeRequest(
+            $method,
+            $this->router->generate('job_get', ['jobId' => $jobId]),
+            $this->createAuthorizationHeader($authenticationToken)
         );
     }
 

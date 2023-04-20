@@ -8,30 +8,33 @@ use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Tests\Services\AuthenticationConfiguration;
 use SmartAssert\SourcesClient\FileClient;
+use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
+use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Uid\Ulid;
 
-abstract class AbstractCreateJobTest extends AbstractApplicationTest
+abstract class AbstractGetJobTest extends AbstractApplicationTest
 {
-    private string $suiteId;
+    private string $jobId;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->suiteId = (string) new Ulid();
+        $this->jobId = (string) new Ulid();
     }
 
     /**
-     * @dataProvider createBadMethodDataProvider
+     * @dataProvider getBadMethodDataProvider
      */
-    public function testCreateBadMethod(string $method): void
+    public function testGetBadMethod(string $method): void
     {
-        $response = $this->applicationClient->makeCreateJobRequest(
+        $response = $this->applicationClient->makeGetJobRequest(
             self::$authenticationConfiguration->getValidApiToken(),
-            $this->suiteId,
+            $this->jobId,
             $method
         );
 
@@ -41,7 +44,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function createBadMethodDataProvider(): array
+    public function getBadMethodDataProvider(): array
     {
         return [
             'PUT' => [
@@ -56,11 +59,11 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     /**
      * @dataProvider unauthorizedUserDataProvider
      */
-    public function testCreateUnauthorizedUser(callable $userTokenCreator): void
+    public function testGetUnauthorizedUser(callable $userTokenCreator): void
     {
-        $response = $this->applicationClient->makeCreateJobRequest(
+        $response = $this->applicationClient->makeGetJobRequest(
             $userTokenCreator(self::$authenticationConfiguration),
-            $this->suiteId,
+            $this->jobId,
         );
 
         self::assertSame(401, $response->getStatusCode());
@@ -90,7 +93,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         ];
     }
 
-    public function testCreateSuccess(): void
+    public function testGetSuccess(): void
     {
         $apiToken = self::$authenticationConfiguration->getValidApiToken();
 
@@ -110,56 +113,65 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        $response = $this->applicationClient->makeCreateJobRequest(
+        $createResponse = $this->applicationClient->makeCreateJobRequest(
             self::$authenticationConfiguration->getValidApiToken(),
             $suite->getId(),
         );
 
-        self::assertSame(200, $response->getStatusCode());
-        self::assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertSame(200, $createResponse->getStatusCode());
+        self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
-        self::assertIsArray($responseData);
-
-        self::assertArrayHasKey('job', $responseData);
-        $jobData = $responseData['job'];
+        $createResponseData = json_decode($createResponse->getBody()->getContents(), true);
+        self::assertIsArray($createResponseData);
+        self::assertArrayHasKey('job', $createResponseData);
+        $jobData = $createResponseData['job'];
 
         self::assertArrayHasKey('id', $jobData);
         self::assertTrue(Ulid::isValid($jobData['id']));
+        $jobId = $jobData['id'];
 
-        self::assertArrayHasKey('suite_id', $jobData);
-        self::assertSame($suite->getId(), $jobData['suite_id']);
+        $getResponse = $this->applicationClient->makeGetJobRequest(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $jobId
+        );
 
-        self::assertArrayHasKey('serialized_suite_id', $jobData);
-        $serializedSuiteId = $jobData['serialized_suite_id'];
+        self::assertSame(200, $getResponse->getStatusCode());
+        self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));
 
-        self::assertArrayHasKey('machine', $responseData);
-        $machineData = $responseData['machine'];
-
-        self::assertArrayHasKey('id', $machineData);
-        self::assertSame($jobData['id'], $machineData['id']);
-
-        self::assertArrayHasKey('state', $machineData);
-        self::assertSame('create/received', $machineData['state']);
-
-        self::assertArrayHasKey('ip_addresses', $machineData);
-        self::assertSame([], $machineData['ip_addresses']);
-
-        $jobs = $jobRepository->findAll();
-        self::assertCount(1, $jobs);
-
-        $job = $jobs[0];
+        $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
-        self::assertSame($job->userId, self::$authenticationConfiguration->getUser()->id);
-        self::assertSame($job->suiteId, $suite->getId());
-        self::assertNotNull($job->resultsToken);
+
+        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
+        \assert($workerManagerClient instanceof WorkerManagerClient);
+        $machine = $workerManagerClient->getMachine(
+            self::$authenticationConfiguration->getValidApiToken(),
+            $jobId
+        );
+        \assert($machine instanceof Machine);
 
         $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
         \assert($serializedSuiteClient instanceof SerializedSuiteClient);
+        $serializedSuite = $serializedSuiteClient->get($apiToken, $job->serializedSuiteId);
+        \assert($serializedSuite instanceof SerializedSuite);
 
-        $serializedSuite = $serializedSuiteClient->get($apiToken, $serializedSuiteId);
-
-        self::assertSame($serializedSuiteId, $serializedSuite->getId());
-        self::assertSame($suite->getId(), $serializedSuite->getSuiteId());
+        self::assertEquals(
+            [
+                'job' => [
+                    'id' => $jobId,
+                    'suite_id' => $job->suiteId,
+                    'serialized_suite_id' => $job->serializedSuiteId,
+                ],
+                'machine' => [
+                    'id' => $machine->id,
+                    'state' => $machine->state,
+                    'ip_addresses' => $machine->ipAddresses,
+                ],
+                'serialized_suite' => [
+                    'id' => $serializedSuite->getId(),
+                    'state' => $serializedSuite->getState(),
+                ],
+            ],
+            json_decode($getResponse->getBody()->getContents(), true)
+        );
     }
 }
