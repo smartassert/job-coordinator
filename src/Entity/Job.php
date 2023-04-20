@@ -47,7 +47,7 @@ class Job implements \JsonSerializable
      * @var ?non-empty-string
      */
     #[ORM\Column(length: 128, nullable: true)]
-    private ?string $machineIpAddress;
+    private ?string $machineIpAddress = null;
 
     /**
      * @param non-empty-string $userId
