@@ -43,6 +43,10 @@ return (new PhpCsFixer\Config())
             ],
         ],
         'declare_strict_types' => true,
+        'types_spaces' => [
+            'space' => 'none',
+            'space_multiple_catch' => 'single',
+        ],
     ])
     ->setFinder($finder)
     ;

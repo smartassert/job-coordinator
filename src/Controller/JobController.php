@@ -14,17 +14,23 @@ use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
+use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
+use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
+use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class JobController
 {
     public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
+    public const ROUTE_JOB_ID_PATTERN = '{jobId<[A-Z90-9]{26}>}';
 
     /**
      * @param non-empty-string $suiteId
@@ -96,6 +102,58 @@ class JobController
                 'state' => $machine->state,
                 'ip_addresses' => $machine->ipAddresses,
             ],
+        ]);
+    }
+
+    /**
+     * @throws NonSuccessResponseException
+     * @throws InvalidResponseDataException
+     * @throws ClientExceptionInterface
+     * @throws InvalidResponseTypeException
+     * @throws HttpResponseExceptionInterface
+     * @throws InvalidModelDataException
+     */
+    #[Route('/' . self::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
+    public function get(
+        string $jobId,
+        User $user,
+        JobRepository $repository,
+        WorkerManagerClient $workerManagerClient,
+        SerializedSuiteClient $serializedSuiteClient,
+    ): Response {
+        $job = $repository->find($jobId);
+        if (null === $job) {
+            return new Response(null, 404);
+        }
+
+        if ($job->userId !== $user->getUserIdentifier()) {
+            return new Response(null, 401);
+        }
+
+        $machine = $workerManagerClient->getMachine($user->getSecurityToken(), $job->id);
+        $serializedSuite = $serializedSuiteClient->get($user->getSecurityToken(), $job->serializedSuiteId);
+
+        $serializedSuiteData = [
+            'id' => $serializedSuite->getId(),
+            'state' => $serializedSuite->getState(),
+        ];
+
+        if (null !== $serializedSuite->getFailureReason()) {
+            $serializedSuiteData['failure_reason'] = $serializedSuite->getFailureReason();
+        }
+
+        if (null !== $serializedSuite->getFailureMessage()) {
+            $serializedSuiteData['failure_message'] = $serializedSuite->getFailureMessage();
+        }
+
+        return new JsonResponse([
+            'job' => $job->jsonSerialize(),
+            'machine' => [
+                'id' => $machine->id,
+                'state' => $machine->state,
+                'ip_addresses' => $machine->ipAddresses,
+            ],
+            'serialized_suite' => $serializedSuiteData,
         ]);
     }
 
