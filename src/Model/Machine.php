@@ -17,6 +17,7 @@ class Machine implements \JsonSerializable
      * @return array{
      *   id: non-empty-string,
      *   state: string,
+     *   state_category: string,
      *   ip_addresses: non-empty-string[]
      *  }
      */
@@ -25,6 +26,7 @@ class Machine implements \JsonSerializable
         return [
             'id' => $this->workerManagerMachine->id,
             'state' => $this->workerManagerMachine->state,
+            'state_category' => $this->workerManagerMachine->stateCategory,
             'ip_addresses' => $this->workerManagerMachine->ipAddresses,
         ];
     }
