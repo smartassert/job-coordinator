@@ -56,6 +56,7 @@ class JobMutatorTest extends WebTestCase
             'authentication token',
             new Machine($machineId, 'find/received', 'finding', ['127.0.0.1']),
             new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
+            '127.0.0.1',
         );
 
         $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
@@ -77,8 +78,9 @@ class JobMutatorTest extends WebTestCase
 
         $event = new MachineIsActiveEvent(
             'authentication token',
-            new Machine($machineId, 'find/received', 'finding', []),
-            new Machine($machineId, 'up/active', 'active', []),
+            new Machine($machineId, 'find/received', 'finding', ['127.0.0.1']),
+            new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
+            '127.0.0.1',
         );
 
         $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
@@ -103,6 +105,7 @@ class JobMutatorTest extends WebTestCase
             'authentication token',
             new Machine($jobId, 'find/received', 'finding', []),
             new Machine($jobId, 'up/active', 'active', [$ipAddress]),
+            $ipAddress
         );
 
         $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
