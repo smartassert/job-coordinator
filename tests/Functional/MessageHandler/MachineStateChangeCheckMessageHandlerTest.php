@@ -128,7 +128,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             ],
             'unknown => active' => [
                 'previous' => new Machine($machineId, 'unknown', 'unknown', []),
-                'current' => new Machine($machineId, 'up/active', 'active', []),
+                'current' => new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
                 'expectedEventClass' => MachineIsActiveEvent::class,
             ],
         ];
