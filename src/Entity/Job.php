@@ -40,7 +40,7 @@ class Job implements \JsonSerializable
     /**
      * @var non-empty-string
      */
-    #[ORM\Column(length: 32)]
+    #[ORM\Column(length: 32, unique: true)]
     public readonly string $serializedSuiteId;
 
     /**
