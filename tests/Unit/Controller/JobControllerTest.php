@@ -10,6 +10,7 @@ use App\Exception\EmptyUlidException;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Repository\JobRepository;
+use App\Request\CreateJobRequest;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use GuzzleHttp\Psr7\Response;
@@ -26,7 +27,6 @@ use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 class JobControllerTest extends TestCase
 {
@@ -48,8 +48,7 @@ class JobControllerTest extends TestCase
         ;
 
         $response = $this->controller->create(
-            new Request(),
-            'suite id value',
+            new CreateJobRequest('suite id value', []),
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
             $ulidFactory,
@@ -117,8 +116,7 @@ class JobControllerTest extends TestCase
             : $this->createWorkerManagerClient($user->getSecurityToken(), $jobId, $workerManagerClientOutcome);
 
         $response = $this->controller->create(
-            new Request(),
-            $suiteId,
+            new CreateJobRequest($suiteId, []),
             $user,
             $jobRepository,
             $ulidFactory,

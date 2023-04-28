@@ -14,6 +14,7 @@ use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Model\Machine;
 use App\Model\SerializedSuite;
 use App\Repository\JobRepository;
+use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
@@ -29,21 +30,17 @@ use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class JobController
 {
     /**
-     * @param non-empty-string $suiteId
-     *
      * @throws ClientExceptionInterface
      */
     #[Route('/' . JobRoutes::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
-        Request $request,
-        string $suiteId,
+        CreateJobRequest $request,
         User $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
@@ -87,8 +84,8 @@ class JobController
         try {
             $serializedSuite = $serializedSuiteClient->create(
                 $user->getSecurityToken(),
-                $suiteId,
-                $this->createSuiteSerializationParameters($request)
+                $request->suiteId,
+                $request->parameters,
             );
         } catch (HttpResponseExceptionInterface $exception) {
             return $errorResponseFactory->createFromHttpResponseException(
@@ -97,7 +94,13 @@ class JobController
             );
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $suiteId, $resultsJob->token, $serializedSuite->getId());
+        $job = new Job(
+            $id,
+            $user->getUserIdentifier(),
+            $request->suiteId,
+            $resultsJob->token,
+            $serializedSuite->getId()
+        );
         $repository->add($job);
 
         $machineStateChangeCheckMessageDispatcher->dispatch(
@@ -147,39 +150,5 @@ class JobController
             'machine' => new Machine($machine),
             'serialized_suite' => new SerializedSuite($serializedSuite),
         ]);
-    }
-
-    /**
-     * @return array<non-empty-string, non-empty-string>
-     */
-    private function createSuiteSerializationParameters(Request $request): array
-    {
-        if ('application/json' !== $request->getContentTypeFormat()) {
-            return [];
-        }
-
-        $requestPayload = $request->request;
-        if (!$requestPayload->has('parameters')) {
-            return [];
-        }
-
-        $requestParameters = $requestPayload->get('parameters');
-        if (!is_string($requestParameters)) {
-            return [];
-        }
-
-        $decodedRequestParameters = json_decode($requestParameters, true);
-        if (!is_array($decodedRequestParameters)) {
-            return [];
-        }
-
-        $parameters = [];
-        foreach ($decodedRequestParameters as $key => $value) {
-            if (is_string($key) && '' !== $key && is_string($value) && '' !== $value) {
-                $parameters[$key] = $value;
-            }
-        }
-
-        return $parameters;
     }
 }
