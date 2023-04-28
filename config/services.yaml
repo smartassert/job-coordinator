@@ -9,6 +9,7 @@ parameters:
     users_security_bundle_secured_pattern: '^/*'
     users_security_bundle_access_control_path: '^/*'
     machine_state_change_check_message_dispatch_delay: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
+    serialized_suite_state_change_check_message_dispatch_delay: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
 
 services:
     # default configuration for services in *this* file
@@ -61,6 +62,10 @@ services:
     App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher:
         arguments:
             $dispatchDelay: '%machine_state_change_check_message_dispatch_delay%'
+
+    App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher:
+        arguments:
+            $dispatchDelay: '%serialized_suite_state_change_check_message_dispatch_delay%'
 
     SmartAssert\SourcesClient\ExceptionFactory: ~
 
