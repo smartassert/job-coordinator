@@ -14,6 +14,7 @@ class StartWorkerJobMessage
     public function __construct(
         public readonly string $authenticationToken,
         public readonly Machine $machine,
+        public readonly string $machineIpAddress,
     ) {
     }
 }

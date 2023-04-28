@@ -40,6 +40,10 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        $this->messageBus->dispatch(new StartWorkerJobMessage($event->authenticationToken, $machine));
+        $this->messageBus->dispatch(new StartWorkerJobMessage(
+            $event->authenticationToken,
+            $machine,
+            $event->ipAddress
+        ));
     }
 }
