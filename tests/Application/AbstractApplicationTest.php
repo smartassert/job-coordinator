@@ -42,8 +42,8 @@ abstract class AbstractApplicationTest extends WebTestCase
         $factory = self::getContainer()->get(ClientFactory::class);
         \assert($factory instanceof ClientFactory);
 
-        $this->applicationClient = $factory->create($this->getClientAdapter());
+        $this->applicationClient = $factory->create(static::getClientAdapter());
     }
 
-    abstract protected function getClientAdapter(): ClientInterface;
+    abstract protected static function getClientAdapter(): ClientInterface;
 }
