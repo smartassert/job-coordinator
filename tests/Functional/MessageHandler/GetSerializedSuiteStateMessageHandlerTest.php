@@ -62,21 +62,9 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
      */
     public function testInvokeJobSerializedSuiteStateIsEndState(string $jobSerializedSuiteState): void
     {
-        $serializedSuiteId = md5((string) rand());
+        $job = $this->createJob($jobSerializedSuiteState);
 
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            $serializedSuiteId,
-        );
-        $job->setSerializedSuiteState($jobSerializedSuiteState);
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        $this->createMessageAndHandleMessage($this->apiToken, $serializedSuiteId);
+        $this->createMessageAndHandleMessage($this->apiToken, $job->serializedSuiteId);
 
         $this->assertNoMessagesDispatched();
     }
@@ -98,58 +86,35 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
 
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
-        $serializedSuiteId = md5((string) rand());
-
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            $serializedSuiteId,
-        );
-        $job->setSerializedSuiteState('requested');
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $job = $this->createJob(md5((string) rand()));
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with($this->apiToken, $serializedSuiteId)
+            ->with($this->apiToken, $job->serializedSuiteId)
             ->andThrow($serializedSuiteClientException)
         ;
 
         self::expectException(SerializedSuiteRetrievalException::class);
         self::expectExceptionMessage(sprintf(
             'Failed to retrieve serialized suite "%s": %s',
-            $serializedSuiteId,
+            $job->serializedSuiteId,
             $serializedSuiteClientException->getMessage()
         ));
 
-        $this->createMessageAndHandleMessage($this->apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage($this->apiToken, $job->serializedSuiteId, $serializedSuiteClient);
     }
 
     public function testInvokeNoStateChangeNotEndState(): void
     {
-        $serializedSuiteId = md5((string) rand());
-        $serializedSuiteState = md5((string) rand());
-
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            $serializedSuiteId,
-        );
-        $job->setSerializedSuiteState($serializedSuiteState);
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $job = $this->createJob(md5((string) rand()));
+        $serializedSuiteState = $job->getSerializedSuiteState();
+        \assert(is_string($serializedSuiteState));
 
         $serializedSuite = new SerializedSuite(
-            $serializedSuiteId,
+            $job->serializedSuiteId,
             md5((string) rand()),
             [],
             $serializedSuiteState,
@@ -160,36 +125,23 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with($this->apiToken, $serializedSuiteId)
+            ->with($this->apiToken, $job->serializedSuiteId)
             ->andReturn($serializedSuite)
         ;
 
-        $this->createMessageAndHandleMessage($this->apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage($this->apiToken, $job->serializedSuiteId, $serializedSuiteClient);
 
         self::assertSame($serializedSuiteState, $job->getSerializedSuiteState());
-        self::assertDispatchedMessage($this->apiToken, $serializedSuiteId);
+        self::assertDispatchedMessage($this->apiToken, $job->serializedSuiteId);
     }
 
     public function testInvokeHasStateChangeNotEndState(): void
     {
-        $serializedSuiteId = md5((string) rand());
-        $serializedSuiteState = md5((string) rand());
+        $job = $this->createJob(md5((string) rand()));
         $newSerializedSuiteState = md5((string) rand());
 
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            $serializedSuiteId,
-        );
-        $job->setSerializedSuiteState($serializedSuiteState);
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
         $serializedSuite = new SerializedSuite(
-            $serializedSuiteId,
+            $job->serializedSuiteId,
             md5((string) rand()),
             [],
             $newSerializedSuiteState,
@@ -200,14 +152,14 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with($this->apiToken, $serializedSuiteId)
+            ->with($this->apiToken, $job->serializedSuiteId)
             ->andReturn($serializedSuite)
         ;
 
-        $this->createMessageAndHandleMessage($this->apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage($this->apiToken, $job->serializedSuiteId, $serializedSuiteClient);
 
         self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
-        self::assertDispatchedMessage($this->apiToken, $serializedSuiteId);
+        self::assertDispatchedMessage($this->apiToken, $job->serializedSuiteId);
     }
 
     /**
@@ -217,22 +169,10 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
      */
     public function testInvokeHasStateChangeIsEndState(string $serializedSuiteState): void
     {
-        $serializedSuiteId = md5((string) rand());
-
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            $serializedSuiteId,
-        );
-        $job->setSerializedSuiteState(md5((string) rand()));
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $job = $this->createJob($serializedSuiteState);
 
         $serializedSuite = new SerializedSuite(
-            $serializedSuiteId,
+            $job->serializedSuiteId,
             md5((string) rand()),
             [],
             $serializedSuiteState,
@@ -243,11 +183,11 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with($this->apiToken, $serializedSuiteId)
+            ->with($this->apiToken, $job->serializedSuiteId)
             ->andReturn($serializedSuite)
         ;
 
-        $this->createMessageAndHandleMessage($this->apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage($this->apiToken, $job->serializedSuiteId, $serializedSuiteClient);
 
         self::assertSame($serializedSuiteState, $job->getSerializedSuiteState());
         self::assertNoMessagesDispatched();
@@ -309,5 +249,26 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
             new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
+    }
+
+    /**
+     * @param non-empty-string $serializedSuiteState
+     */
+    private function createJob(string $serializedSuiteState): Job
+    {
+        $job = new Job(
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+        );
+        $job->setSerializedSuiteState($serializedSuiteState);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+        $jobRepository->add($job);
+
+        return $job;
     }
 }
