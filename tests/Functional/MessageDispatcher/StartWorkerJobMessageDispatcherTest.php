@@ -13,6 +13,7 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class StartWorkerJobMessageDispatcherTest extends WebTestCase
@@ -39,7 +40,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
-    public function testDispatchMessageIsNotDispatchedIfNoJob(): void
+    public function testDispatchForMachineIsActiveEventMessageIsNotDispatchedIfNoJob(): void
     {
         $machineId = md5((string) rand());
         $machineIpAddress = '127.0.0.1';
@@ -53,15 +54,16 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
             $machineIpAddress,
         );
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 
         self::assertCount(0, $this->messengerTransport->get());
     }
 
-    public function testDispatchSuccess(): void
+    public function testDispatchForMachineIsActiveEventSuccess(): void
     {
         $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id');
+        $serializedSuiteId = md5((string) rand());
+        $job = new Job($jobId, 'user id', 'suite id', 'results token', $serializedSuiteId);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
@@ -78,7 +80,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
             $machineIpAddress
         );
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
@@ -89,5 +91,36 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
+    }
+
+    public function testDispatch(): void
+    {
+        $authenticationToken = md5((string) rand());
+
+        $machineIpAddress = '127.0.0.1';
+        $machine = new Machine(md5((string) rand()), 'up/active', 'active', [$machineIpAddress]);
+
+        $message = new StartWorkerJobMessage($authenticationToken, $machine, $machineIpAddress);
+
+        $this->dispatcher->dispatch($message);
+
+        $envelopes = $this->messengerTransport->get();
+        self::assertIsArray($envelopes);
+        self::assertCount(1, $envelopes);
+
+        $dispatchedEnvelope = $envelopes[0];
+        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
+        self::assertEquals($message, $dispatchedEnvelope->getMessage());
+
+        $delayStamps = $dispatchedEnvelope->all(DelayStamp::class);
+        self::assertCount(1, $delayStamps);
+
+        $delayStamp = $delayStamps[0];
+        self::assertInstanceOf(DelayStamp::class, $delayStamp);
+
+        $expectedDelay = self::getContainer()->getParameter('start_worker_job_message_dispatch_delay');
+        \assert(is_int($expectedDelay));
+
+        self::assertEquals(new DelayStamp($expectedDelay), $delayStamp);
     }
 }
