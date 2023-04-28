@@ -35,15 +35,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class JobController
 {
-    public const ROUTE_SUITE_ID_PATTERN = '{suiteId<[A-Z90-9]{26}>}';
-    public const ROUTE_JOB_ID_PATTERN = '{jobId<[A-Z90-9]{26}>}';
-
     /**
      * @param non-empty-string $suiteId
      *
      * @throws ClientExceptionInterface
      */
-    #[Route('/' . self::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
+    #[Route('/' . JobRoutes::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
         Request $request,
         string $suiteId,
@@ -125,7 +122,7 @@ class JobController
      * @throws HttpResponseExceptionInterface
      * @throws InvalidModelDataException
      */
-    #[Route('/' . self::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
+    #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
     public function get(
         string $jobId,
         User $user,
