@@ -22,6 +22,11 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
     protected static Suite $suite;
 
     /**
+     * @var non-empty-string
+     */
+    protected static string $apiToken;
+
+    /**
      * @var array<mixed>
      */
     protected static array $createResponseData;
@@ -32,7 +37,7 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
-        $apiToken = $apiTokenProvider->get('user@example.com');
+        self::$apiToken = $apiTokenProvider->get('user@example.com');
 
         $userProvider = self::getContainer()->get(UserProvider::class);
         \assert($userProvider instanceof UserProvider);
@@ -40,21 +45,24 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 
         $sourceClient = self::getContainer()->get(SourceClient::class);
         \assert($sourceClient instanceof SourceClient);
-        $source = $sourceClient->createFileSource($apiToken, md5((string) rand()));
+        $source = $sourceClient->createFileSource(self::$apiToken, md5((string) rand()));
 
         $fileClient = self::getContainer()->get(FileClient::class);
         \assert($fileClient instanceof FileClient);
-        $fileClient->add($apiToken, $source->getId(), 'test1.yaml', 'test 1 contents');
+        $fileClient->add(self::$apiToken, $source->getId(), 'test1.yaml', 'test 1 contents');
 
         $suiteClient = self::getContainer()->get(SuiteClient::class);
         \assert($suiteClient instanceof SuiteClient);
-        self::$suite = $suiteClient->create($apiToken, $source->getId(), md5((string) rand()), ['test1.yaml']);
+        self::$suite = $suiteClient->create(self::$apiToken, $source->getId(), md5((string) rand()), ['test1.yaml']);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, self::$suite->getId());
+        self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(
+            self::$apiToken,
+            self::$suite->getId()
+        );
 
         self::assertSame(200, self::$createResponse->getStatusCode());
         self::assertSame('application/json', self::$createResponse->getHeaderLine('content-type'));
