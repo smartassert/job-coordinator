@@ -36,7 +36,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user@example.com');
 
-        $response = $this->applicationClient->makeGetJobRequest($apiToken, $this->jobId, $method);
+        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, $this->jobId, $method);
 
         self::assertSame(405, $response->getStatusCode());
     }
@@ -61,7 +61,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
      */
     public function testGetUnauthorizedUser(?string $apiToken): void
     {
-        $response = $this->applicationClient->makeGetJobRequest($apiToken, $this->jobId);
+        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, $this->jobId);
 
         self::assertSame(401, $response->getStatusCode());
     }
@@ -106,7 +106,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        $createResponse = $this->applicationClient->makeCreateJobRequest($apiToken, $suite->getId());
+        $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suite->getId());
 
         self::assertSame(200, $createResponse->getStatusCode());
         self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
@@ -120,7 +120,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($jobData['id']));
         $jobId = $jobData['id'];
 
-        $getResponse = $this->applicationClient->makeGetJobRequest($apiToken, $jobId);
+        $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
         self::assertSame(200, $getResponse->getStatusCode());
         self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));

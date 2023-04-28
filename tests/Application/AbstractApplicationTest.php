@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 abstract class AbstractApplicationTest extends WebTestCase
 {
     protected static KernelBrowser $kernelBrowser;
-    protected Client $applicationClient;
+    protected static Client $staticApplicationClient;
 
     public static function setUpBeforeClass(): void
     {
@@ -33,17 +33,15 @@ abstract class AbstractApplicationTest extends WebTestCase
                 $entityManager->flush();
             }
         }
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
 
         $factory = self::getContainer()->get(ClientFactory::class);
         \assert($factory instanceof ClientFactory);
 
-        $this->applicationClient = $factory->create($this->getClientAdapter());
+        self::$staticApplicationClient = $factory->create(static::getClientAdapter());
     }
 
-    abstract protected function getClientAdapter(): ClientInterface;
+    public static function getClientAdapter(): ClientInterface
+    {
+        return \Mockery::mock(ClientInterface::class);
+    }
 }

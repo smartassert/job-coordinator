@@ -27,7 +27,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user@example.com');
 
-        $response = $this->applicationClient->makeCreateJobRequest($apiToken, $this->suiteId, $method);
+        $response = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $this->suiteId, $method);
 
         self::assertSame(405, $response->getStatusCode());
     }
@@ -52,7 +52,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
      */
     public function testCreateUnauthorizedUser(?string $apiToken): void
     {
-        $response = $this->applicationClient->makeCreateJobRequest($apiToken, $this->suiteId);
+        $response = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $this->suiteId);
 
         self::assertSame(401, $response->getStatusCode());
     }

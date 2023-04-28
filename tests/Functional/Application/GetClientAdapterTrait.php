@@ -9,7 +9,7 @@ use SmartAssert\SymfonyTestClient\SymfonyClient;
 
 trait GetClientAdapterTrait
 {
-    protected function getClientAdapter(): ClientInterface
+    public static function getClientAdapter(): ClientInterface
     {
         $client = self::getContainer()->get(SymfonyClient::class);
         \assert($client instanceof SymfonyClient);
