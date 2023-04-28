@@ -42,13 +42,15 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     public function testDispatchMessageIsNotDispatchedIfNoJob(): void
     {
         $machineId = md5((string) rand());
+        $machineIpAddress = '127.0.0.1';
 
-        $currentMachine = new Machine($machineId, 'up/active', 'active', ['127.0.0.1']);
+        $currentMachine = new Machine($machineId, 'up/active', 'active', [$machineIpAddress]);
 
         $event = new MachineIsActiveEvent(
             'authentication token',
             \Mockery::mock(Machine::class),
-            $currentMachine
+            $currentMachine,
+            $machineIpAddress,
         );
 
         $this->dispatcher->dispatch($event);
@@ -64,14 +66,16 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
-        $currentMachine = new Machine($jobId, 'up/active', 'active', ['127.0.0.1']);
+        $machineIpAddress = '127.0.0.1';
+        $currentMachine = new Machine($jobId, 'up/active', 'active', [$machineIpAddress]);
 
         $authenticationToken = md5((string) rand());
 
         $event = new MachineIsActiveEvent(
             $authenticationToken,
             \Mockery::mock(Machine::class),
-            $currentMachine
+            $currentMachine,
+            $machineIpAddress
         );
 
         $this->dispatcher->dispatch($event);
