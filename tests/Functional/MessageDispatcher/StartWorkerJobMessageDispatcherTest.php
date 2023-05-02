@@ -86,7 +86,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $currentMachine, $machineIpAddress);
+        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $currentMachine->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
@@ -100,7 +100,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
         $machine = new Machine(md5((string) rand()), 'up/active', 'active', [$machineIpAddress]);
 
-        $message = new StartWorkerJobMessage($authenticationToken, $machine, $machineIpAddress);
+        $message = new StartWorkerJobMessage($authenticationToken, $machine->id, $machineIpAddress);
 
         $this->dispatcher->dispatch($message);
 
