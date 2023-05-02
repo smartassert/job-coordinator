@@ -9,7 +9,6 @@ use App\Event\MachineIsActiveEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -50,43 +49,13 @@ class JobMutatorTest extends WebTestCase
     {
         self::assertSame(0, $this->jobRepository->count([]));
 
-        $machineId = md5((string) rand());
+        $jobId = md5((string) rand());
 
-        $event = new MachineIsActiveEvent(
-            'authentication token',
-            new Machine($machineId, 'find/received', 'finding', ['127.0.0.1']),
-            new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
-            '127.0.0.1',
-        );
+        $event = new MachineIsActiveEvent('authentication token', $jobId, '127.0.0.1');
 
         $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
 
         self::assertSame(0, $this->jobRepository->count([]));
-    }
-
-    public function testSetMachineIpAddressOnMachineIsActiveEventNoMachineIpAddress(): void
-    {
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id', 600);
-        $this->jobRepository->add($job);
-        self::assertNull($job->getMachineIpAddress());
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $machineId = md5((string) rand());
-
-        $event = new MachineIsActiveEvent(
-            'authentication token',
-            new Machine($machineId, 'find/received', 'finding', ['127.0.0.1']),
-            new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
-            '127.0.0.1',
-        );
-
-        $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
-
-        self::assertSame(1, $this->jobRepository->count([]));
-        self::assertNull($job->getMachineIpAddress());
     }
 
     public function testSetMachineIpAddressOnMachineIsActiveEventIpAddressIsSet(): void
@@ -101,12 +70,7 @@ class JobMutatorTest extends WebTestCase
 
         $ipAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $event = new MachineIsActiveEvent(
-            'authentication token',
-            new Machine($jobId, 'find/received', 'finding', []),
-            new Machine($jobId, 'up/active', 'active', [$ipAddress]),
-            $ipAddress
-        );
+        $event = new MachineIsActiveEvent('authentication token', $jobId, $ipAddress);
 
         $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
 

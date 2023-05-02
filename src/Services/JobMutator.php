@@ -30,9 +30,7 @@ class JobMutator implements EventSubscriberInterface
 
     public function setMachineIpAddressOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $machine = $event->current;
-
-        $job = $this->jobRepository->find($machine->id);
+        $job = $this->jobRepository->find($event->jobId);
         if (!$job instanceof Job) {
             return;
         }
