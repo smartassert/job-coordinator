@@ -51,8 +51,7 @@ final class MachineStateChangeCheckMessageHandler
 
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
                 $message->authenticationToken,
-                $previousMachine,
-                $machine,
+                $machine->id,
                 $primaryIpAddress
             ));
         }
