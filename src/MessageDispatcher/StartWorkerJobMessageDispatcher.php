@@ -48,11 +48,7 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        $this->doDispatch(new StartWorkerJobMessage(
-            $event->authenticationToken,
-            $machine,
-            $event->ipAddress
-        ));
+        $this->doDispatch(new StartWorkerJobMessage($event->authenticationToken, $machine->id, $event->ipAddress));
     }
 
     private function doDispatch(StartWorkerJobMessage $message, int $delay = 0): Envelope
