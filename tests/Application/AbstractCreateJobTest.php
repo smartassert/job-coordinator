@@ -96,7 +96,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
                     'payload' => [
                         'name' => 'maximum_duration_in_seconds',
                         'value' => 0,
-                        'message' => 'Maximum duration in seconds must be an integer between 1 and 2147483647'
+                        'message' => 'Maximum duration in seconds must be an integer between 1 and 2147483647',
                     ],
                 ],
             ],

@@ -99,7 +99,8 @@ class JobController
             $user->getUserIdentifier(),
             $request->suiteId,
             $resultsJob->token,
-            $serializedSuite->getId()
+            $serializedSuite->getId(),
+            $request->maximumDurationInSeconds,
         );
         $repository->add($job);
 
