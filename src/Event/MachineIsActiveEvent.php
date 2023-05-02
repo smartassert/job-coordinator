@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineIsActiveEvent extends MachineStateChangeEvent
+class MachineIsActiveEvent extends Event
 {
     /**
+     * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
      * @param non-empty-string $ipAddress
      */
     public function __construct(
-        string $authenticationToken,
-        Machine $previous,
-        Machine $current,
+        public readonly string $authenticationToken,
+        public readonly string $jobId,
         public readonly string $ipAddress,
     ) {
-        parent::__construct($authenticationToken, $previous, $current);
     }
 }

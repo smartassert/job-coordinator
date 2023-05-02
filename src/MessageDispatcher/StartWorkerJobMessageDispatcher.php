@@ -41,14 +41,12 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $machine = $event->current;
-
-        $job = $this->jobRepository->find($machine->id);
+        $job = $this->jobRepository->find($event->jobId);
         if (!$job instanceof Job) {
             return;
         }
 
-        $this->doDispatch(new StartWorkerJobMessage($event->authenticationToken, $machine->id, $event->ipAddress));
+        $this->doDispatch(new StartWorkerJobMessage($event->authenticationToken, $job->id, $event->ipAddress));
     }
 
     private function doDispatch(StartWorkerJobMessage $message, int $delay = 0): Envelope
