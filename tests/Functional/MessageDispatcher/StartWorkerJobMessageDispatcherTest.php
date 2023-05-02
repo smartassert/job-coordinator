@@ -63,7 +63,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     {
         $jobId = md5((string) rand());
         $serializedSuiteId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 'results token', $serializedSuiteId);
+        $job = new Job($jobId, 'user id', 'suite id', 'results token', $serializedSuiteId, 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
