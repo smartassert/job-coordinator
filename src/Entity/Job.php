@@ -44,6 +44,12 @@ class Job implements \JsonSerializable
     public readonly string $serializedSuiteId;
 
     /**
+     * @var positive-int
+     */
+    #[ORM\Column]
+    public readonly int $maximumDurationInSeconds;
+
+    /**
      * @var ?non-empty-string
      */
     #[ORM\Column(length: 128, nullable: true)]
@@ -61,19 +67,22 @@ class Job implements \JsonSerializable
      * @param non-empty-string $id
      * @param non-empty-string $resultsToken
      * @param non-empty-string $serializedSuiteId
+     * @param positive-int     $maximumDurationInSeconds
      */
     public function __construct(
         string $id,
         string $userId,
         string $suiteId,
         string $resultsToken,
-        string $serializedSuiteId
+        string $serializedSuiteId,
+        int $maximumDurationInSeconds
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->resultsToken = $resultsToken;
         $this->serializedSuiteId = $serializedSuiteId;
+        $this->maximumDurationInSeconds = $maximumDurationInSeconds;
     }
 
     /**
@@ -116,7 +125,8 @@ class Job implements \JsonSerializable
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
-     *   serialized_suite_id: non-empty-string
+     *   serialized_suite_id: non-empty-string,
+     *   maximum_duration_in_seconds: positive-int
      *  }
      */
     public function jsonSerialize(): array
@@ -125,6 +135,7 @@ class Job implements \JsonSerializable
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'serialized_suite_id' => $this->serializedSuiteId,
+            'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
         ];
     }
 }

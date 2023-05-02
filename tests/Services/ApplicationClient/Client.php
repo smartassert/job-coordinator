@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\ApplicationClient;
 
+use App\Request\CreateJobRequest;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\ClientInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -19,12 +20,22 @@ class Client
     public function makeCreateJobRequest(
         ?string $authenticationToken,
         string $suiteId,
+        ?int $maximumDurationInSeconds,
         string $method = 'POST'
     ): ResponseInterface {
+        $requestPayload = [];
+        if (is_int($maximumDurationInSeconds)) {
+            $requestPayload[CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS] = $maximumDurationInSeconds;
+        }
+
         return $this->client->makeRequest(
             $method,
             $this->router->generate('job_create', ['suiteId' => $suiteId]),
-            $this->createAuthorizationHeader($authenticationToken)
+            array_merge(
+                $this->createAuthorizationHeader($authenticationToken),
+                ['content-type' => 'application/json'],
+            ),
+            (string) json_encode($requestPayload)
         );
     }
 

@@ -27,13 +27,18 @@ class JobTest extends TestCase
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
+        $maximumDurationInSeconds = rand(1, 1000);
+
+        $job = (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId, $maximumDurationInSeconds));
+
         self::assertEquals(
             [
                 'id' => $id,
                 'suite_id' => $suiteId,
                 'serialized_suite_id' => $serializedSuiteId,
+                'maximum_duration_in_seconds' => $maximumDurationInSeconds,
             ],
-            (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId))->jsonSerialize()
+            $job->jsonSerialize()
         );
     }
 }

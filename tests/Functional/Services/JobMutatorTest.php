@@ -69,7 +69,7 @@ class JobMutatorTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id');
+        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id', 600);
         $this->jobRepository->add($job);
         self::assertNull($job->getMachineIpAddress());
         self::assertSame(1, $this->jobRepository->count([]));
@@ -94,7 +94,7 @@ class JobMutatorTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id');
+        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id', 600);
         $this->jobRepository->add($job);
         self::assertNull($job->getMachineIpAddress());
         self::assertSame(1, $this->jobRepository->count([]));

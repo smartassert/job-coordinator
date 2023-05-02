@@ -106,7 +106,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($jobRepository instanceof JobRepository);
         self::assertCount(0, $jobRepository->findAll());
 
-        $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suite->getId());
+        $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suite->getId(), 600);
 
         self::assertSame(200, $createResponse->getStatusCode());
         self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));

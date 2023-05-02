@@ -31,7 +31,9 @@ class JobTest extends WebTestCase
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
-        $job = new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId);
+        $maximumDurationInSeconds = 600;
+
+        $job = new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();
@@ -45,5 +47,6 @@ class JobTest extends WebTestCase
         self::assertSame($id, $retrievedJob->id);
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
+        self::assertSame($maximumDurationInSeconds, $retrievedJob->maximumDurationInSeconds);
     }
 }
