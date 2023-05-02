@@ -48,7 +48,7 @@ class JobControllerTest extends TestCase
         ;
 
         $response = $this->controller->create(
-            new CreateJobRequest('suite id value', []),
+            new CreateJobRequest('suite id value', 600, []),
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
             $ulidFactory,
@@ -116,7 +116,7 @@ class JobControllerTest extends TestCase
             : $this->createWorkerManagerClient($user->getSecurityToken(), $jobId, $workerManagerClientOutcome);
 
         $response = $this->controller->create(
-            new CreateJobRequest($suiteId, []),
+            new CreateJobRequest($suiteId, 600, []),
             $user,
             $jobRepository,
             $ulidFactory,

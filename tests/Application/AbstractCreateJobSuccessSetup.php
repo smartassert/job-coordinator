@@ -61,7 +61,8 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 
         self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(
             self::$apiToken,
-            self::$suite->getId()
+            self::$suite->getId(),
+            600
         );
 
         self::assertSame(200, self::$createResponse->getStatusCode());
