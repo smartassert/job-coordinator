@@ -33,7 +33,7 @@ class JobMutator implements EventSubscriberInterface
         $machine = $event->current;
 
         $job = $this->jobRepository->find($machine->id);
-        if (!$job instanceof Job || null !== $job->getMachineIpAddress()) {
+        if (!$job instanceof Job) {
             return;
         }
 
