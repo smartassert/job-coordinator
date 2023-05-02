@@ -8,6 +8,9 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class MachineIsActiveEvent extends MachineStateChangeEvent
 {
+    /**
+     * @param non-empty-string $ipAddress
+     */
     public function __construct(
         string $authenticationToken,
         Machine $previous,
