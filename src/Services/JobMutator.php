@@ -37,12 +37,7 @@ class JobMutator implements EventSubscriberInterface
             return;
         }
 
-        $primaryIpAddress = $machine->ipAddresses[0] ?? null;
-        if (!is_string($primaryIpAddress)) {
-            return;
-        }
-
-        $job->setMachineIpAddress($primaryIpAddress);
+        $job->setMachineIpAddress($event->ipAddress);
         $this->jobRepository->add($job);
     }
 }
