@@ -63,7 +63,10 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
         $jobData = self::$createResponseData['job'] ?? [];
         \assert(is_array($jobData));
 
-        $serializedSuiteId = $jobData['serialized_suite_id'] ?? null;
+        $serializedSuitedData = $jobData['serialized_suite'];
+        \assert(is_array($serializedSuitedData));
+
+        $serializedSuiteId = $serializedSuitedData['id'] ?? null;
         \assert(is_string($serializedSuiteId));
         \assert('' !== $serializedSuiteId);
 

@@ -12,7 +12,6 @@ use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Model\Machine;
-use App\Model\SerializedSuite;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
@@ -123,7 +122,6 @@ class JobController
      * @throws InvalidResponseDataException
      * @throws ClientExceptionInterface
      * @throws InvalidResponseTypeException
-     * @throws HttpResponseExceptionInterface
      * @throws InvalidModelDataException
      */
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
@@ -132,7 +130,6 @@ class JobController
         User $user,
         JobRepository $repository,
         WorkerManagerClient $workerManagerClient,
-        SerializedSuiteClient $serializedSuiteClient,
     ): Response {
         $job = $repository->find($jobId);
         if (null === $job) {
@@ -144,12 +141,10 @@ class JobController
         }
 
         $machine = $workerManagerClient->getMachine($user->getSecurityToken(), $job->id);
-        $serializedSuite = $serializedSuiteClient->get($user->getSecurityToken(), $job->serializedSuiteId);
 
         return new JsonResponse([
             'job' => $job,
             'machine' => new Machine($machine),
-            'serialized_suite' => new SerializedSuite($serializedSuite),
         ]);
     }
 }
