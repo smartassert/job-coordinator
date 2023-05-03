@@ -43,7 +43,29 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeJobSerializedSuiteStateIsFailed(): void
     {
         $jobId = md5((string) rand());
-        $this->createJob($jobId, 'failed');
+        $this->createJob(
+            jobId: $jobId,
+            resultsToken: 'results token',
+            serializedSuiteState: 'failed',
+        );
+
+        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
+        \assert($handler instanceof StartWorkerJobMessageHandler);
+
+        $message = new StartWorkerJobMessage($this->apiToken, $jobId, md5((string) rand()));
+
+        $handler($message);
+
+        $this->assertNoMessagesDispatched();
+    }
+
+    public function testInvokeNoJobResultsToken(): void
+    {
+        $jobId = md5((string) rand());
+        $this->createJob(
+            jobId: $jobId,
+            serializedSuiteState: 'failed',
+        );
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
@@ -60,10 +82,14 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      *
      * @param non-empty-string $serializedSuiteState
      */
-    public function testInvokeMessageIsRedispatched(string $serializedSuiteState): void
+    public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(string $serializedSuiteState): void
     {
         $jobId = md5((string) rand());
-        $this->createJob($jobId, $serializedSuiteState);
+        $this->createJob(
+            jobId: $jobId,
+            resultsToken: 'results token',
+            serializedSuiteState: $serializedSuiteState,
+        );
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
@@ -95,10 +121,34 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ];
     }
 
+    public function testInvokeMessageIsRedispatchedDueToNoJobResultsToken(): void
+    {
+        $jobId = md5((string) rand());
+        $this->createJob(
+            jobId: $jobId,
+            serializedSuiteState: 'prepared',
+        );
+
+        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
+        \assert($handler instanceof StartWorkerJobMessageHandler);
+
+        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+
+        $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
+
+        $handler($message);
+
+        $this->assertDispatchedMessage($message);
+    }
+
     public function testInvokeReadSerializedSuiteThrowsException(): void
     {
         $jobId = md5((string) rand());
-        $job = $this->createJob($jobId, 'prepared');
+        $job = $this->createJob(
+            jobId: $jobId,
+            resultsToken: 'results token',
+            serializedSuiteState: 'prepared',
+        );
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
 
@@ -129,7 +179,11 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccess(): void
     {
         $jobId = md5((string) rand());
-        $job = $this->createJob($jobId, 'prepared');
+        $job = $this->createJob(
+            jobId: $jobId,
+            resultsToken: 'results token',
+            serializedSuiteState: 'prepared'
+        );
 
         $serializedSuiteContent = md5((string) rand());
 
@@ -197,20 +251,30 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param non-empty-string $jobId
-     * @param non-empty-string $serializedSuiteState
+     * @param non-empty-string  $jobId
+     * @param ?non-empty-string $resultsToken
+     * @param ?non-empty-string $serializedSuiteState
      */
-    private function createJob(string $jobId, string $serializedSuiteState): Job
-    {
+    private function createJob(
+        string $jobId,
+        ?string $resultsToken = null,
+        ?string $serializedSuiteState = null,
+    ): Job {
         $job = new Job(
             $jobId,
             md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
-            md5((string) rand()),
             600
         );
-        $job->setSerializedSuiteState($serializedSuiteState);
+
+        if (is_string($resultsToken)) {
+            $job = $job->setResultsToken($resultsToken);
+        }
+
+        if (is_string($serializedSuiteState)) {
+            $job = $job->setSerializedSuiteState($serializedSuiteState);
+        }
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

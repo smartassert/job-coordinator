@@ -237,7 +237,6 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
             md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
-            md5((string) rand()),
             rand(1, 1000),
         );
         $job->setSerializedSuiteState($serializedSuiteState);
