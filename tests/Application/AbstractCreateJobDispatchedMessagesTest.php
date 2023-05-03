@@ -39,17 +39,13 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
         $envelope = self::$envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
 
-        $machineData = self::$createResponseData['machine'] ?? [];
-        self::assertIsArray($machineData);
+        $jobId = self::$createResponseData['id'] ?? null;
+        \assert(is_string($jobId));
+        \assert('' !== $jobId);
 
         $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
             self::$apiToken,
-            new Machine(
-                $machineData['id'],
-                $machineData['state'],
-                $machineData['state_category'],
-                $machineData['ip_addresses']
-            )
+            new Machine($jobId, 'create/received', 'pre_active', [])
         );
 
         self::assertEquals($expectedMachineStateChangeCheckMessage, $envelope->getMessage());
@@ -60,10 +56,7 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
         $envelope = self::$envelopes[1];
         self::assertInstanceOf(Envelope::class, $envelope);
 
-        $jobData = self::$createResponseData['job'] ?? [];
-        \assert(is_array($jobData));
-
-        $serializedSuitedData = $jobData['serialized_suite'];
+        $serializedSuitedData = self::$createResponseData['serialized_suite'];
         \assert(is_array($serializedSuitedData));
 
         $serializedSuiteId = $serializedSuitedData['id'] ?? null;

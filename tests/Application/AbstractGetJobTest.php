@@ -113,12 +113,9 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
 
         $createResponseData = json_decode($createResponse->getBody()->getContents(), true);
         self::assertIsArray($createResponseData);
-        self::assertArrayHasKey('job', $createResponseData);
-        $jobData = $createResponseData['job'];
-
-        self::assertArrayHasKey('id', $jobData);
-        self::assertTrue(Ulid::isValid($jobData['id']));
-        $jobId = $jobData['id'];
+        self::assertArrayHasKey('id', $createResponseData);
+        self::assertTrue(Ulid::isValid($createResponseData['id']));
+        $jobId = $createResponseData['id'];
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
@@ -140,12 +137,6 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 
-        self::assertEquals(
-            [
-                'job' => $job->jsonSerialize(),
-                'machine' => (new \App\Model\Machine($machine))->jsonSerialize(),
-            ],
-            $responseData
-        );
+        self::assertEquals($job->jsonSerialize(), $responseData);
     }
 }
