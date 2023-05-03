@@ -29,7 +29,7 @@ class JobTest extends TestCase
 
         $maximumDurationInSeconds = rand(1, 1000);
 
-        $job = (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId, $maximumDurationInSeconds));
+        $job = (new Job($id, $userId, $suiteId, $serializedSuiteId, $maximumDurationInSeconds));
 
         self::assertEquals(
             [

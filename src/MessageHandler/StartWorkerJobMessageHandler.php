@@ -39,7 +39,11 @@ final class StartWorkerJobMessageHandler
             return;
         }
 
-        if (in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
+        $resultsToken = $job->getResultsToken();
+        if (
+            null === $resultsToken
+            || in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])
+        ) {
             $this->messageDispatcher->dispatch($message);
 
             return;
@@ -55,7 +59,7 @@ final class StartWorkerJobMessageHandler
 
             $workerClient->createJob(
                 $job->id,
-                $job->resultsToken,
+                $resultsToken,
                 $job->maximumDurationInSeconds,
                 $serializedSuite
             );

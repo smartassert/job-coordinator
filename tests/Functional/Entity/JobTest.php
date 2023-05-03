@@ -33,7 +33,7 @@ class JobTest extends WebTestCase
 
         $maximumDurationInSeconds = 600;
 
-        $job = new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId, $maximumDurationInSeconds);
+        $job = new Job($id, $userId, $suiteId, $serializedSuiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();
