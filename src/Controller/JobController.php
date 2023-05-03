@@ -11,7 +11,6 @@ use App\Message\GetSerializedSuiteStateMessage;
 use App\Message\MachineStateChangeCheckMessage;
 use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
-use App\Model\Machine;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
@@ -20,10 +19,6 @@ use App\Services\UlidFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -111,26 +106,12 @@ class JobController
             new GetSerializedSuiteStateMessage($user->getSecurityToken(), $serializedSuite->getId())
         );
 
-        return new JsonResponse([
-            'job' => $job,
-            'machine' => new Machine($machine),
-        ]);
+        return new JsonResponse($job);
     }
 
-    /**
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseDataException
-     * @throws ClientExceptionInterface
-     * @throws InvalidResponseTypeException
-     * @throws InvalidModelDataException
-     */
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
-    public function get(
-        string $jobId,
-        User $user,
-        JobRepository $repository,
-        WorkerManagerClient $workerManagerClient,
-    ): Response {
+    public function get(string $jobId, User $user, JobRepository $repository): Response
+    {
         $job = $repository->find($jobId);
         if (null === $job) {
             return new Response(null, 404);
@@ -140,11 +121,6 @@ class JobController
             return new Response(null, 401);
         }
 
-        $machine = $workerManagerClient->getMachine($user->getSecurityToken(), $job->id);
-
-        return new JsonResponse([
-            'job' => $job,
-            'machine' => new Machine($machine),
-        ]);
+        return new JsonResponse($job);
     }
 }

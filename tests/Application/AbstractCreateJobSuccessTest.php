@@ -43,20 +43,16 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
 
         self::assertSame(
             [
-                'job' => [
-                    'id' => $job->id,
-                    'suite_id' => $job->suiteId,
-                    'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                    'serialized_suite' => [
-                        'id' => $job->serializedSuiteId,
-                        'state' => $job->getSerializedSuiteState(),
-                    ],
+                'id' => $job->id,
+                'suite_id' => $job->suiteId,
+                'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                'serialized_suite' => [
+                    'id' => $job->serializedSuiteId,
+                    'state' => $job->getSerializedSuiteState(),
                 ],
                 'machine' => [
-                    'id' => $job->id,
-                    'state' => 'create/received',
-                    'state_category' => 'pre_active',
-                    'ip_addresses' => [],
+                    'state_category' => null,
+                    'ip_address' => null,
                 ],
             ],
             self::$createResponseData,

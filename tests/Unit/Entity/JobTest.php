@@ -40,6 +40,10 @@ class JobTest extends TestCase
                     'id' => $serializedSuiteId,
                     'state' => null,
                 ],
+                'machine' => [
+                    'state_category' => null,
+                    'ip_address' => null,
+                ],
             ],
             $job->jsonSerialize()
         );
