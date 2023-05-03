@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 {
@@ -96,19 +97,17 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     /**
      * @dataProvider invokeHasStateChangeDataProvider
      *
-     * @param class-string $expectedEventClass
+     * @param callable(string): Event $expectedEventCreator
      */
-    public function testInvokeHasStateChange(Machine $previous, Machine $current, string $expectedEventClass): void
+    public function testInvokeHasStateChange(Machine $previous, Machine $current, callable $expectedEventCreator): void
     {
         $this->createMessageAndHandleMessage($previous, $current, $this->apiToken);
 
+        $expectedEvent = $expectedEventCreator($this->apiToken);
+
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
-        self::assertInstanceOf($expectedEventClass, $latestEvent);
-        self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
-        self::assertEquals($previous, $latestEvent->previous);
-        self::assertEquals($current, $latestEvent->current);
-        self::assertEquals($this->apiToken, $latestEvent->authenticationToken);
+        self::assertEquals($expectedEvent, $latestEvent);
 
         $this->assertDispatchedMessage($this->apiToken, $current);
     }
@@ -119,17 +118,34 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     public function invokeHasStateChangeDataProvider(): array
     {
         $machineId = md5((string) rand());
+        $machineUnknown = new Machine($machineId, 'unknown', 'unknown', []);
+        $machineFinding = new Machine($machineId, 'find/received', 'finding', []);
+        $machineIpAddress = '127.0.0.1';
+        $machineActive = new Machine($machineId, 'up/active', 'active', [$machineIpAddress]);
 
         return [
             'unknown => find/received' => [
-                'previous' => new Machine($machineId, 'unknown', 'unknown', []),
+                'previous' => $machineUnknown,
                 'current' => new Machine($machineId, 'find/received', 'finding', []),
-                'expectedEventClass' => MachineStateChangeEvent::class,
+                'expectedEventCreator' => function (
+                    string $authenticationToken
+                ) use (
+                    $machineUnknown,
+                    $machineFinding
+                ) {
+                    \assert('' !== $authenticationToken);
+
+                    return new MachineStateChangeEvent($authenticationToken, $machineUnknown, $machineFinding);
+                },
             ],
             'unknown => active' => [
-                'previous' => new Machine($machineId, 'unknown', 'unknown', []),
-                'current' => new Machine($machineId, 'up/active', 'active', ['127.0.0.1']),
-                'expectedEventClass' => MachineIsActiveEvent::class,
+                'previous' => $machineUnknown,
+                'current' => $machineActive,
+                'expectedEventCreator' => function (string $authenticationToken) use ($machineId, $machineIpAddress) {
+                    \assert('' !== $authenticationToken);
+
+                    return new MachineIsActiveEvent($authenticationToken, $machineId, $machineIpAddress);
+                },
             ],
         ];
     }
