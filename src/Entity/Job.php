@@ -32,10 +32,10 @@ class Job implements \JsonSerializable
     public readonly string $suiteId;
 
     /**
-     * @var non-empty-string
+     * @var ?non-empty-string
      */
-    #[ORM\Column(length: 32)]
-    public readonly string $resultsToken;
+    #[ORM\Column(length: 32, nullable: true)]
+    public ?string $resultsToken = null;
 
     /**
      * @var non-empty-string
@@ -71,7 +71,6 @@ class Job implements \JsonSerializable
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
-     * @param non-empty-string $resultsToken
      * @param non-empty-string $serializedSuiteId
      * @param positive-int     $maximumDurationInSeconds
      */
@@ -79,14 +78,12 @@ class Job implements \JsonSerializable
         string $id,
         string $userId,
         string $suiteId,
-        string $resultsToken,
         string $serializedSuiteId,
         int $maximumDurationInSeconds
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
-        $this->resultsToken = $resultsToken;
         $this->serializedSuiteId = $serializedSuiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
     }
@@ -107,6 +104,24 @@ class Job implements \JsonSerializable
     public function getMachineIpAddress(): ?string
     {
         return $this->machineIpAddress;
+    }
+
+    /**
+     * @param non-empty-string $resultsToken
+     */
+    public function setResultsToken(string $resultsToken): self
+    {
+        $this->resultsToken = $resultsToken;
+
+        return $this;
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getResultsToken(): ?string
+    {
+        return $this->resultsToken;
     }
 
     /**
