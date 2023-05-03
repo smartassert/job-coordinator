@@ -6,9 +6,11 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
 use Doctrine\ORM\EntityManagerInterface;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -43,6 +45,7 @@ class JobMutatorTest extends WebTestCase
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->jobMutator);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->jobMutator::getSubscribedEvents());
+        self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
     }
 
     public function testSetMachineIpAddressOnMachineIsActiveEventNoJob(): void
@@ -76,5 +79,44 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame(1, $this->jobRepository->count([]));
         self::assertSame($ipAddress, $job->getMachineIpAddress());
+    }
+
+    public function testSetMachineStateCategoryOnMachineStateChangeEventNoJob(): void
+    {
+        self::assertSame(0, $this->jobRepository->count([]));
+
+        $event = new MachineStateChangeEvent(
+            'authentication token',
+            new Machine('machine id', 'unknown', 'unknown', []),
+            new Machine('machine id', 'find/finding', 'finding', []),
+        );
+
+        $this->jobMutator->setMachineStateCategoryOnMachineStateChangeEvent($event);
+
+        self::assertSame(0, $this->jobRepository->count([]));
+    }
+
+    public function testSetMachineStateCategoryOnMachineStateChangeEventMachineStateIsSet(): void
+    {
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $job = new Job($jobId, 'user id', 'suite id', 'results token', 'serialized suite id', 600);
+        $this->jobRepository->add($job);
+        self::assertNull($job->getMachineStateCategory());
+        self::assertSame(1, $this->jobRepository->count([]));
+
+        $machineStateCategory = 'finding';
+
+        $event = new MachineStateChangeEvent(
+            'authentication token',
+            new Machine($jobId, 'unknown', 'unknown', []),
+            new Machine($jobId, 'find/finding', $machineStateCategory, []),
+        );
+
+        $this->jobMutator->setMachineStateCategoryOnMachineStateChangeEvent($event);
+
+        self::assertSame(1, $this->jobRepository->count([]));
+        self::assertSame($machineStateCategory, $job->getMachineStateCategory());
     }
 }
