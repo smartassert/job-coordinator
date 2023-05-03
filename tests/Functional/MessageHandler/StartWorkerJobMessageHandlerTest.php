@@ -79,11 +79,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             ->andReturnNull()
         ;
 
-        $handler = new StartWorkerJobMessageHandler(
-            \Mockery::mock(StartWorkerJobMessageDispatcher::class),
-            $jobRepository,
-            \Mockery::mock(SerializedSuiteClient::class),
-            \Mockery::mock(WorkerClientFactory::class),
+        $handler = $this->createHandler(
+            jobRepository: $jobRepository,
         );
 
         $message = new StartWorkerJobMessage($this->apiToken, $jobId, md5((string) rand()));
@@ -165,12 +162,6 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $job = $this->createJob($jobId, 'prepared');
         $jobRepository->add($job);
 
-        $messageDispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
-        \assert($messageDispatcher instanceof StartWorkerJobMessageDispatcher);
-
-        $workerClientFactory = self::getContainer()->get(WorkerClientFactory::class);
-        \assert($workerClientFactory instanceof WorkerClientFactory);
-
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
@@ -180,11 +171,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             ->andThrow($serializedSuiteReadException)
         ;
 
-        $handler = new StartWorkerJobMessageHandler(
-            $messageDispatcher,
-            $jobRepository,
-            $serializedSuiteClient,
-            $workerClientFactory,
+        $handler = $this->createHandler(
+            serializedSuiteClient: $serializedSuiteClient,
         );
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
@@ -208,9 +196,6 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob($jobId, 'prepared');
         $jobRepository->add($job);
-
-        $messageDispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
-        \assert($messageDispatcher instanceof StartWorkerJobMessageDispatcher);
 
         $serializedSuiteContent = md5((string) rand());
 
@@ -236,11 +221,9 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             ->andReturn($workerClient)
         ;
 
-        $handler = new StartWorkerJobMessageHandler(
-            $messageDispatcher,
-            $jobRepository,
-            $serializedSuiteClient,
-            $workerClientFactory,
+        $handler = $this->createHandler(
+            serializedSuiteClient: $serializedSuiteClient,
+            workerClientFactory: $workerClientFactory,
         );
 
         $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
@@ -285,5 +268,36 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $job->setSerializedSuiteState($serializedSuiteState);
 
         return $job;
+    }
+
+    private function createHandler(
+        ?JobRepository $jobRepository = null,
+        ?SerializedSuiteClient $serializedSuiteClient = null,
+        ?WorkerClientFactory $workerClientFactory = null,
+    ): StartWorkerJobMessageHandler {
+        $messageDispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
+        \assert($messageDispatcher instanceof StartWorkerJobMessageDispatcher);
+
+        if (null === $jobRepository) {
+            $jobRepository = self::getContainer()->get(JobRepository::class);
+            \assert($jobRepository instanceof JobRepository);
+        }
+
+        if (null === $serializedSuiteClient) {
+            $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
+            \assert($serializedSuiteClient instanceof SerializedSuiteClient);
+        }
+
+        if (null === $workerClientFactory) {
+            $workerClientFactory = self::getContainer()->get(WorkerClientFactory::class);
+            \assert($workerClientFactory instanceof WorkerClientFactory);
+        }
+
+        return new StartWorkerJobMessageHandler(
+            $messageDispatcher,
+            $jobRepository,
+            $serializedSuiteClient,
+            $workerClientFactory,
+        );
     }
 }
