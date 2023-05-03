@@ -46,8 +46,11 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 'job' => [
                     'id' => $job->id,
                     'suite_id' => $job->suiteId,
-                    'serialized_suite_id' => $job->serializedSuiteId,
                     'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                    'serialized_suite' => [
+                        'id' => $job->serializedSuiteId,
+                        'state' => $job->getSerializedSuiteState(),
+                    ],
                 ],
                 'machine' => [
                     'id' => $job->id,

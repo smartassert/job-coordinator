@@ -139,18 +139,11 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($serializedSuite instanceof SerializedSuite);
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
-        \assert(is_array($responseData));
-        $serializedSuiteData = $responseData['serialized_suite'];
-        \assert(is_array($serializedSuiteData));
 
         self::assertEquals(
             [
                 'job' => $job->jsonSerialize(),
                 'machine' => (new \App\Model\Machine($machine))->jsonSerialize(),
-                'serialized_suite' => [
-                    'id' => $serializedSuite->getId(),
-                    'state' => $serializedSuiteData['state'],
-                ],
             ],
             $responseData
         );
