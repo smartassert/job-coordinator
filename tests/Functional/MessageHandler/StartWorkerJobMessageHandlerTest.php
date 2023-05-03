@@ -92,12 +92,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
     public function testInvokeJobSerializedSuiteStateIsFailed(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobId = md5((string) rand());
-        $job = $this->createJob($jobId, 'failed');
-        $jobRepository->add($job);
+        $this->createJob($jobId, 'failed');
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
@@ -116,12 +112,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
      */
     public function testInvokeMessageIsRedispatched(string $serializedSuiteState): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobId = md5((string) rand());
-        $job = $this->createJob($jobId, $serializedSuiteState);
-        $jobRepository->add($job);
+        $this->createJob($jobId, $serializedSuiteState);
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
@@ -155,12 +147,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
     public function testInvokeReadSerializedSuiteThrowsException(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobId = md5((string) rand());
         $job = $this->createJob($jobId, 'prepared');
-        $jobRepository->add($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
 
@@ -190,12 +178,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobId = md5((string) rand());
         $job = $this->createJob($jobId, 'prepared');
-        $jobRepository->add($job);
 
         $serializedSuiteContent = md5((string) rand());
 
@@ -266,6 +250,10 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             600
         );
         $job->setSerializedSuiteState($serializedSuiteState);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+        $jobRepository->add($job);
 
         return $job;
     }
