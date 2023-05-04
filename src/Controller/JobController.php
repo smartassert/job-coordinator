@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Job;
 use App\Enum\ErrorResponseType;
+use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
 use App\Message\GetSerializedSuiteStateMessage;
 use App\Message\MachineStateChangeCheckMessage;
@@ -14,6 +15,7 @@ use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
 use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
@@ -42,6 +44,7 @@ class JobController
         WorkerManagerClient $workerManagerClient,
         SerializedSuiteClient $serializedSuiteClient,
         MessageBusInterface $messageBus,
+        EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
@@ -92,6 +95,10 @@ class JobController
             $request->suiteId,
             $request->maximumDurationInSeconds,
         );
+
+        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id));
+        $repository->add($job);
+
         $job = $job->setResultsToken($resultsJob->token);
         $job = $job->setSerializedSuiteId($serializedSuite->getId());
         $repository->add($job);
