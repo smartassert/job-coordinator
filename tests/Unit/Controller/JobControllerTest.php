@@ -15,6 +15,7 @@ use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
@@ -58,6 +59,7 @@ class JobControllerTest extends TestCase
             \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
             \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
+            \Mockery::mock(EventDispatcherInterface::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -126,6 +128,7 @@ class JobControllerTest extends TestCase
             \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
             \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
+            \Mockery::mock(EventDispatcherInterface::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
