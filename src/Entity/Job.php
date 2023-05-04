@@ -38,16 +38,16 @@ class Job implements \JsonSerializable
     public ?string $resultsToken = null;
 
     /**
-     * @var non-empty-string
-     */
-    #[ORM\Column(length: 32, unique: true)]
-    public readonly string $serializedSuiteId;
-
-    /**
      * @var positive-int
      */
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
+
+    /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 32, unique: true, nullable: true)]
+    private ?string $serializedSuiteId = null;
 
     /**
      * @var ?non-empty-string
@@ -71,21 +71,36 @@ class Job implements \JsonSerializable
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
-     * @param non-empty-string $serializedSuiteId
      * @param positive-int     $maximumDurationInSeconds
      */
     public function __construct(
         string $id,
         string $userId,
         string $suiteId,
-        string $serializedSuiteId,
         int $maximumDurationInSeconds
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
-        $this->serializedSuiteId = $serializedSuiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
+    }
+
+    /**
+     * @param non-empty-string $serializedSuiteId
+     */
+    public function setSerializedSuiteId(string $serializedSuiteId): self
+    {
+        $this->serializedSuiteId = $serializedSuiteId;
+
+        return $this;
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getSerializedSuiteId(): ?string
+    {
+        return $this->serializedSuiteId;
     }
 
     /**
