@@ -199,6 +199,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             jobId: $jobId,
             resultsToken: 'results token',
             serializedSuiteState: 'prepared',
+            serializedSuiteId: md5((string) rand()),
         );
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -206,7 +207,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with($this->apiToken, $job->serializedSuiteId)
+            ->with($this->apiToken, $job->getSerializedSuiteId())
             ->andThrow($serializedSuiteReadException)
         ;
 
@@ -233,7 +234,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $job = $this->createJob(
             jobId: $jobId,
             resultsToken: 'results token',
-            serializedSuiteState: 'prepared'
+            serializedSuiteState: 'prepared',
+            serializedSuiteId: md5((string) rand()),
         );
 
         $serializedSuiteContent = md5((string) rand());
@@ -241,7 +243,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with($this->apiToken, $job->serializedSuiteId)
+            ->with($this->apiToken, $job->getSerializedSuiteId())
             ->andReturn($serializedSuiteContent)
         ;
 
@@ -302,15 +304,16 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
      * @param non-empty-string  $jobId
      * @param ?non-empty-string $resultsToken
      * @param ?non-empty-string $serializedSuiteState
+     * @param ?non-empty-string $serializedSuiteId
      */
     private function createJob(
         string $jobId,
         ?string $resultsToken = null,
         ?string $serializedSuiteState = null,
+        ?string $serializedSuiteId = null,
     ): Job {
         $job = new Job(
             $jobId,
-            md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
             600
@@ -322,6 +325,10 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
         if (is_string($serializedSuiteState)) {
             $job = $job->setSerializedSuiteState($serializedSuiteState);
+        }
+
+        if (is_string($serializedSuiteId)) {
+            $job = $job->setSerializedSuiteId($serializedSuiteId);
         }
 
         $jobRepository = self::getContainer()->get(JobRepository::class);

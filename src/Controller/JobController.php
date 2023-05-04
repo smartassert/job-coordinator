@@ -90,11 +90,10 @@ class JobController
             $id,
             $user->getUserIdentifier(),
             $request->suiteId,
-            $serializedSuite->getId(),
             $request->maximumDurationInSeconds,
         );
         $job = $job->setResultsToken($resultsJob->token);
-
+        $job = $job->setSerializedSuiteId($serializedSuite->getId());
         $repository->add($job);
 
         $messageBus->dispatch(new MachineStateChangeCheckMessage($user->getSecurityToken(), $machine));
