@@ -28,12 +28,9 @@ class JobTest extends WebTestCase
         $resultToken = (string) new Ulid();
         \assert('' !== $resultToken);
 
-        $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
-
         $maximumDurationInSeconds = 600;
 
-        $job = new Job($id, $userId, $suiteId, $serializedSuiteId, $maximumDurationInSeconds);
+        $job = new Job($id, $userId, $suiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();

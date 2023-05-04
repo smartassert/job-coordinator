@@ -52,7 +52,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
 
         $handler($message);
 
@@ -134,7 +134,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
 
         $handler($message);
 
@@ -148,6 +148,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             jobId: $jobId,
             resultsToken: 'results token',
             serializedSuiteState: 'prepared',
+            serializedSuiteId: md5((string) rand()),
         );
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -155,7 +156,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $job->serializedSuiteId)
+            ->with(self::$apiToken, $job->getSerializedSuiteId())
             ->andThrow($serializedSuiteReadException)
         ;
 
@@ -182,7 +183,8 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob(
             jobId: $jobId,
             resultsToken: 'results token',
-            serializedSuiteState: 'prepared'
+            serializedSuiteState: 'prepared',
+            serializedSuiteId: md5((string) rand()),
         );
 
         $serializedSuiteContent = md5((string) rand());
@@ -190,7 +192,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $job->serializedSuiteId)
+            ->with(self::$apiToken, $job->getSerializedSuiteId())
             ->andReturn($serializedSuiteContent)
         ;
 
@@ -254,15 +256,16 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      * @param non-empty-string  $jobId
      * @param ?non-empty-string $resultsToken
      * @param ?non-empty-string $serializedSuiteState
+     * @param ?non-empty-string $serializedSuiteId
      */
     private function createJob(
         string $jobId,
         ?string $resultsToken = null,
         ?string $serializedSuiteState = null,
+        ?string $serializedSuiteId = null,
     ): Job {
         $job = new Job(
             $jobId,
-            md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
             600
@@ -274,6 +277,10 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         if (is_string($serializedSuiteState)) {
             $job = $job->setSerializedSuiteState($serializedSuiteState);
+        }
+
+        if (is_string($serializedSuiteId)) {
+            $job = $job->setSerializedSuiteId($serializedSuiteId);
         }
 
         $jobRepository = self::getContainer()->get(JobRepository::class);

@@ -42,8 +42,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     public function testDispatchForMachineIsActiveEventSuccess(): void
     {
         $jobId = md5((string) rand());
-        $serializedSuiteId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', $serializedSuiteId, 600);
+        $job = new Job($jobId, 'user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
