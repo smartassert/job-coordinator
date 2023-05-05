@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Message\CreateResultsJobMessage;
 use App\Message\GetSerializedSuiteStateMessage;
 use App\Message\MachineStateChangeCheckMessage;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -13,7 +14,7 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
 {
     /**
-     * @var array<mixed>
+     * @var Envelope[]
      */
     private static array $envelopes;
 
@@ -31,41 +32,68 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
 
     public function testDispatchedMessageCount(): void
     {
-        self::assertCount(2, self::$envelopes);
+        self::assertCount(3, self::$envelopes);
     }
 
-    public function testMachineStateChangeCheckMessageIsDispatched(): void
+    /**
+     * @dataProvider messageIsDispatchedDataProvider
+     */
+    public function testMessageIsDispatchedFoo(callable $expectedMessageCreator): void
     {
-        $envelope = self::$envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
+        $expectedMessage = $expectedMessageCreator();
 
-        $jobId = self::$createResponseData['id'] ?? null;
-        \assert(is_string($jobId));
-        \assert('' !== $jobId);
+        $messageIsFound = false;
+        foreach (self::$envelopes as $envelope) {
+            if ($envelope->getMessage()::class === $expectedMessage::class) {
+                $messageIsFound = true;
+                self::assertEquals($expectedMessage, $envelope->getMessage());
+            }
+        }
 
-        $expectedMachineStateChangeCheckMessage = new MachineStateChangeCheckMessage(
-            self::$apiToken,
-            new Machine($jobId, 'create/received', 'pre_active', [])
-        );
-
-        self::assertEquals($expectedMachineStateChangeCheckMessage, $envelope->getMessage());
+        if (false === $messageIsFound) {
+            self::fail('Message "' . $expectedMessage::class . '" not found.');
+        }
     }
 
-    public function testGetSerializedSuiteStateMessageIsDispatched(): void
+    /**
+     * @return array<mixed>
+     */
+    public function messageIsDispatchedDataProvider(): array
     {
-        $envelope = self::$envelopes[1];
-        self::assertInstanceOf(Envelope::class, $envelope);
+        return [
+            MachineStateChangeCheckMessage::class => [
+                'expectedMessageCreator' => function () {
+                    $jobId = self::$createResponseData['id'] ?? null;
+                    \assert(is_string($jobId));
+                    \assert('' !== $jobId);
 
-        $serializedSuitedData = self::$createResponseData['serialized_suite'];
-        \assert(is_array($serializedSuitedData));
+                    return new MachineStateChangeCheckMessage(
+                        self::$apiToken,
+                        new Machine($jobId, 'create/received', 'pre_active', [])
+                    );
+                },
+            ],
+            GetSerializedSuiteStateMessage::class => [
+                'expectedMessageCreator' => function () {
+                    $serializedSuitedData = self::$createResponseData['serialized_suite'];
+                    \assert(is_array($serializedSuitedData));
 
-        $serializedSuiteId = $serializedSuitedData['id'] ?? null;
-        \assert(is_string($serializedSuiteId));
-        \assert('' !== $serializedSuiteId);
+                    $serializedSuiteId = $serializedSuitedData['id'] ?? null;
+                    \assert(is_string($serializedSuiteId));
+                    \assert('' !== $serializedSuiteId);
 
-        self::assertEquals(
-            new GetSerializedSuiteStateMessage(self::$apiToken, $serializedSuiteId),
-            $envelope->getMessage()
-        );
+                    return new GetSerializedSuiteStateMessage(self::$apiToken, $serializedSuiteId);
+                },
+            ],
+            CreateResultsJobMessage::class => [
+                'expectedMessageCreator' => function () {
+                    $jobId = self::$createResponseData['id'] ?? null;
+                    \assert(is_string($jobId));
+                    \assert('' !== $jobId);
+
+                    return new CreateResultsJobMessage(self::$apiToken, $jobId);
+                },
+            ],
+        ];
     }
 }
