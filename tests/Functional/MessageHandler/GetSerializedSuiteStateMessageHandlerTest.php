@@ -245,9 +245,11 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
             new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
-        $expectedDelayStampValue = self::getContainer()->getParameter(
-            'serialized_suite_state_change_check_message_dispatch_delay'
-        );
+
+        $messageDelays = self::getContainer()->getParameter('message_delays');
+        \assert(is_array($messageDelays));
+
+        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteStateMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
