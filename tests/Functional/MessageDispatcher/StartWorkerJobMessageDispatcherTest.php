@@ -12,6 +12,7 @@ use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class StartWorkerJobMessageDispatcherTest extends WebTestCase
@@ -63,5 +64,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
+
+        self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 }

@@ -34,10 +34,23 @@ class DelayMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $messageDelay = $this->delays[$envelope->getMessage()::class] ?? null;
-        if (is_int($messageDelay) && null === $envelope->last(DelayStamp::class)) {
+        if (is_int($messageDelay) && $this->shouldAddDelayStamp($envelope)) {
             $envelope = $envelope->with(new DelayStamp($messageDelay));
         }
 
         return $stack->next()->handle($envelope, $stack);
+    }
+
+    private function shouldAddDelayStamp(Envelope $envelope): bool
+    {
+        if (null !== $envelope->last(DelayStamp::class)) {
+            return false;
+        }
+
+        if (null !== $envelope->last(NonDelayedStamp::class)) {
+            return false;
+        }
+
+        return true;
     }
 }
