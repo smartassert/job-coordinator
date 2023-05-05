@@ -11,64 +11,13 @@ use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
-use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\WorkerClient\Client as WorkerClient;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class StartWorkerJobMessageHandlerTest extends WebTestCase
+class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private InMemoryTransport $messengerTransport;
-
-    /**
-     * @var non-empty-string
-     */
-    private string $apiToken;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
-        \assert($apiTokenProvider instanceof ApiTokenProvider);
-        $this->apiToken = $apiTokenProvider->get('user@example.com');
-
-        $messengerTransport = self::getContainer()->get('messenger.transport.async');
-        \assert($messengerTransport instanceof InMemoryTransport);
-        $this->messengerTransport = $messengerTransport;
-    }
-
-    public function testHandlerExistsInContainerAndIsAMessageHandler(): void
-    {
-        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
-        self::assertInstanceOf(StartWorkerJobMessageHandler::class, $handler);
-        self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
-    }
-
-    public function testHandlesExpectedMessage(): void
-    {
-        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
-        \assert($handler instanceof StartWorkerJobMessageHandler);
-
-        $invokeMethod = (new \ReflectionClass($handler::class))->getMethod('__invoke');
-
-        $invokeMethodParameters = $invokeMethod->getParameters();
-        self::assertIsArray($invokeMethodParameters);
-        self::assertCount(1, $invokeMethodParameters);
-
-        $messageParameter = $invokeMethodParameters[0];
-        \assert($messageParameter instanceof \ReflectionParameter);
-
-        $messageParameterType = $messageParameter->getType();
-        \assert($messageParameterType instanceof \ReflectionNamedType);
-
-        self::assertSame(StartWorkerJobMessage::class, $messageParameterType->getName());
-    }
-
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -84,7 +33,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             jobRepository: $jobRepository,
         );
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
 
         $handler($message);
 
@@ -99,7 +48,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
 
         $handler($message);
 
@@ -121,7 +70,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
 
         $handler($message);
 
@@ -156,7 +105,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with($this->apiToken, $job->serializedSuiteId)
+            ->with(self::$apiToken, $job->serializedSuiteId)
             ->andThrow($serializedSuiteReadException)
         ;
 
@@ -166,7 +115,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
 
         try {
             $handler($message);
@@ -187,7 +136,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with($this->apiToken, $job->serializedSuiteId)
+            ->with(self::$apiToken, $job->serializedSuiteId)
             ->andReturn($serializedSuiteContent)
         ;
 
@@ -211,18 +160,21 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new StartWorkerJobMessage($this->apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
 
         $handler($message);
 
         $this->assertNoMessagesDispatched();
     }
 
-    private function assertNoMessagesDispatched(): void
+    protected function getHandlerClass(): string
     {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
+        return StartWorkerJobMessageHandler::class;
+    }
+
+    protected function getHandledMessageClass(): string
+    {
+        return StartWorkerJobMessage::class;
     }
 
     private function assertDispatchedMessage(StartWorkerJobMessage $message): void
