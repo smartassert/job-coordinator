@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\MachineStateChangeCheckMessage;
-use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageHandler\MachineStateChangeCheckMessageHandler;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -17,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -196,8 +197,8 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         Machine $current,
         string $authenticationToken,
     ): void {
-        $messageDispatcher = self::getContainer()->get(MachineStateChangeCheckMessageDispatcher::class);
-        \assert($messageDispatcher instanceof MachineStateChangeCheckMessageDispatcher);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -210,7 +211,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         ;
 
         $handler = new MachineStateChangeCheckMessageHandler(
-            $messageDispatcher,
+            $messageBus,
             $workerManagerClient,
             $eventDispatcher
         );
@@ -228,6 +229,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         $envelopes = $this->messengerTransport->get();
 
         $machineStateChangeCheckMessage = null;
+        $machineStateChangeCheckMessageDelayStamps = [];
         $foundMessageClasses = [];
 
         foreach ($envelopes as $envelope) {
@@ -237,6 +239,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 
                 if (MachineStateChangeCheckMessage::class === $message::class) {
                     $machineStateChangeCheckMessage = $message;
+                    $machineStateChangeCheckMessageDelayStamps = $envelope->all(DelayStamp::class);
                 }
             }
         }
@@ -253,5 +256,12 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             new MachineStateChangeCheckMessage($authenticationToken, $current),
             $machineStateChangeCheckMessage
         );
+
+        $expectedDelayStampValue = self::getContainer()->getParameter(
+            'machine_state_change_check_message_dispatch_delay'
+        );
+        \assert(is_int($expectedDelayStampValue));
+
+        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);
     }
 }

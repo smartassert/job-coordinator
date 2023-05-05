@@ -6,10 +6,10 @@ namespace App\MessageHandler;
 
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteStateMessage;
-use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class GetSerializedSuiteStateMessageHandler
@@ -19,7 +19,7 @@ final class GetSerializedSuiteStateMessageHandler
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly SerializedSuiteStateChangeCheckMessageDispatcher $messageDispatcher,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -53,7 +53,7 @@ final class GetSerializedSuiteStateMessageHandler
         }
 
         if (!in_array($job->getSerializedSuiteState(), self::SERIALIZED_SUITE_END_STATES)) {
-            $this->messageDispatcher->dispatch($message);
+            $this->messageBus->dispatch($message);
         }
     }
 }

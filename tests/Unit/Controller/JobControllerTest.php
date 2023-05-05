@@ -7,8 +7,6 @@ namespace App\Tests\Unit\Controller;
 use App\Controller\JobController;
 use App\Entity\Job;
 use App\Exception\EmptyUlidException;
-use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
-use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\ErrorResponseFactory;
@@ -27,6 +25,7 @@ use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class JobControllerTest extends TestCase
 {
@@ -56,8 +55,7 @@ class JobControllerTest extends TestCase
             new ErrorResponseFactory(),
             \Mockery::mock(WorkerManagerClient::class),
             \Mockery::mock(SerializedSuiteClient::class),
-            \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
-            \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
+            \Mockery::mock(MessageBusInterface::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -124,8 +122,7 @@ class JobControllerTest extends TestCase
             new ErrorResponseFactory(),
             $workerManagerClient,
             \Mockery::mock(SerializedSuiteClient::class),
-            \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class),
-            \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
+            \Mockery::mock(MessageBusInterface::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
