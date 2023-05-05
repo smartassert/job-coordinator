@@ -60,18 +60,6 @@ services:
 
     SmartAssert\WorkerManagerClient\Client: ~
 
-    App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher:
-        arguments:
-            $dispatchDelay: '%machine_state_change_check_message_dispatch_delay%'
-
-    App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher:
-        arguments:
-            $dispatchDelay: '%serialized_suite_state_change_check_message_dispatch_delay%'
-
-    App\MessageDispatcher\StartWorkerJobMessageDispatcher:
-        arguments:
-            $dispatchDelay: '%start_worker_job_message_dispatch_delay%'
-
     SmartAssert\SourcesClient\ExceptionFactory: ~
 
     SmartAssert\SourcesClient\SerializedSuiteFactory: ~
