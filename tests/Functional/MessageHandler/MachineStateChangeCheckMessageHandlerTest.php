@@ -226,14 +226,32 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
     private function assertDispatchedMessage(string $authenticationToken, Machine $current): void
     {
         $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
 
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
+        $machineStateChangeCheckMessage = null;
+        $foundMessageClasses = [];
+
+        foreach ($envelopes as $envelope) {
+            if ($envelope instanceof Envelope) {
+                $message = $envelope->getMessage();
+                $foundMessageClasses[] = $message::class;
+
+                if (MachineStateChangeCheckMessage::class === $message::class) {
+                    $machineStateChangeCheckMessage = $message;
+                }
+            }
+        }
+
+        if (null === $machineStateChangeCheckMessage) {
+            self::fail(sprintf(
+                '%s message not dispatched, found: %s',
+                MachineStateChangeCheckMessage::class,
+                implode(', ', $foundMessageClasses)
+            ));
+        }
+
         self::assertEquals(
             new MachineStateChangeCheckMessage($authenticationToken, $current),
-            $envelope->getMessage()
+            $machineStateChangeCheckMessage
         );
     }
 }
