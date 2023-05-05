@@ -257,9 +257,10 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             $machineStateChangeCheckMessage
         );
 
-        $expectedDelayStampValue = self::getContainer()->getParameter(
-            'machine_state_change_check_message_dispatch_delay'
-        );
+        $messageDelays = self::getContainer()->getParameter('message_delays');
+        \assert(is_array($messageDelays));
+
+        $expectedDelayStampValue = $messageDelays[MachineStateChangeCheckMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);

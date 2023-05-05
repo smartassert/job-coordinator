@@ -235,9 +235,10 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals($message, $envelope->getMessage());
 
-        $expectedDelayStampValue = self::getContainer()->getParameter(
-            'start_worker_job_message_dispatch_delay'
-        );
+        $messageDelays = self::getContainer()->getParameter('message_delays');
+        \assert(is_array($messageDelays));
+
+        $expectedDelayStampValue = $messageDelays[StartWorkerJobMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
