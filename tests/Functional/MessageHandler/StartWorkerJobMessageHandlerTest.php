@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
-use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
@@ -17,6 +16,7 @@ use SmartAssert\WorkerClient\Client as WorkerClient;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
@@ -271,8 +271,8 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
     ): StartWorkerJobMessageHandler {
-        $messageDispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
-        \assert($messageDispatcher instanceof StartWorkerJobMessageDispatcher);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
 
         if (null === $jobRepository) {
             $jobRepository = self::getContainer()->get(JobRepository::class);
@@ -290,7 +290,7 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         }
 
         return new StartWorkerJobMessageHandler(
-            $messageDispatcher,
+            $messageBus,
             $jobRepository,
             $serializedSuiteClient,
             $workerClientFactory,

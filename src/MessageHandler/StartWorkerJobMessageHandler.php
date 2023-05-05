@@ -6,17 +6,17 @@ namespace App\MessageHandler;
 
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
-use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class StartWorkerJobMessageHandler
 {
     public function __construct(
-        private readonly StartWorkerJobMessageDispatcher $messageDispatcher,
+        private readonly MessageBusInterface $messageBus,
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly WorkerClientFactory $workerClientFactory,
@@ -40,7 +40,7 @@ final class StartWorkerJobMessageHandler
         }
 
         if (in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
-            $this->messageDispatcher->dispatch($message);
+            $this->messageBus->dispatch($message);
 
             return;
         }

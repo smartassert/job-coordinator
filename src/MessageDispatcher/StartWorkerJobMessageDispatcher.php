@@ -7,7 +7,6 @@ namespace App\MessageDispatcher;
 use App\Event\MachineIsActiveEvent;
 use App\Message\StartWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
@@ -27,11 +26,6 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
                 ['dispatchForMachineIsActiveEvent', 100],
             ],
         ];
-    }
-
-    public function dispatch(StartWorkerJobMessage $message): Envelope
-    {
-        return $this->messageBus->dispatch($message);
     }
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
