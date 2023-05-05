@@ -1,5 +1,9 @@
 framework:
     messenger:
+        buses:
+            messenger.bus.default:
+                middleware:
+                    - App\Messenger\DelayMiddleware
         transports:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'

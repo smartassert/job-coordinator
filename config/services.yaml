@@ -89,3 +89,10 @@ services:
     SmartAssert\WorkerClient\TestFactory: ~
 
     SmartAssert\WorkerClient\JobFactory: ~
+
+    App\Messenger\DelayMiddleware:
+        arguments:
+            $delays:
+                App\Message\StartWorkerJobMessage: '%start_worker_job_message_dispatch_delay%'
+                App\Message\GetSerializedSuiteStateMessage: '%serialized_suite_state_change_check_message_dispatch_delay%'
+                App\Message\MachineStateChangeCheckMessage: '%machine_state_change_check_message_dispatch_delay%'
