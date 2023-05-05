@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\ResultsJobCreationState;
 use App\Repository\JobRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
@@ -42,6 +44,9 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
+
+    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: ResultsJobCreationState::class)]
+    public ?ResultsJobCreationState $resultsJobCreationState = null;
 
     /**
      * @var ?non-empty-string
@@ -175,13 +180,30 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
+    public function setResultsJobCreationState(?ResultsJobCreationState $state): self
+    {
+        $this->resultsJobCreationState = $state;
+
+        return $this;
+    }
+
+    public function getResultsJobCreationState(): ResultsJobCreationState
+    {
+        if (null !== $this->resultsJobCreationState) {
+            return $this->resultsJobCreationState;
+        }
+
+        return is_string($this->resultsToken) ? ResultsJobCreationState::SUCCEEDED : ResultsJobCreationState::UNKNOWN;
+    }
+
     /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
-     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
+     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
+     *   results_job: array{state: non-empty-string}
      *  }
      */
     public function jsonSerialize(): array
@@ -197,6 +219,9 @@ class Job implements \JsonSerializable
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
+            ],
+            'results_job' => [
+                'state' => $this->getResultsJobCreationState()->value,
             ],
         ];
     }
