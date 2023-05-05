@@ -17,6 +17,7 @@ use SmartAssert\WorkerClient\Client as WorkerClient;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class StartWorkerJobMessageHandlerTest extends WebTestCase
@@ -233,6 +234,13 @@ class StartWorkerJobMessageHandlerTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals($message, $envelope->getMessage());
+
+        $expectedDelayStampValue = self::getContainer()->getParameter(
+            'start_worker_job_message_dispatch_delay'
+        );
+        \assert(is_int($expectedDelayStampValue));
+
+        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
     }
 
     /**
