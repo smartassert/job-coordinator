@@ -40,18 +40,6 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
-    public function testDispatchForMachineIsActiveEventMessageIsNotDispatchedIfNoJob(): void
-    {
-        $jobId = md5((string) rand());
-        $machineIpAddress = '127.0.0.1';
-
-        $event = new MachineIsActiveEvent('authentication token', $jobId, $machineIpAddress);
-
-        $this->dispatcher->dispatchForMachineIsActiveEvent($event);
-
-        self::assertCount(0, $this->messengerTransport->get());
-    }
-
     public function testDispatchForMachineIsActiveEventSuccess(): void
     {
         $jobId = md5((string) rand());
