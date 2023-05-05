@@ -7,7 +7,6 @@ namespace App\Tests\Unit\Controller;
 use App\Controller\JobController;
 use App\Entity\Job;
 use App\Exception\EmptyUlidException;
-use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\ErrorResponseFactory;
@@ -57,7 +56,6 @@ class JobControllerTest extends TestCase
             \Mockery::mock(WorkerManagerClient::class),
             \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MessageBusInterface::class),
-            \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
         );
 
         self::assertSame(500, $response->getStatusCode());
@@ -125,7 +123,6 @@ class JobControllerTest extends TestCase
             $workerManagerClient,
             \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MessageBusInterface::class),
-            \Mockery::mock(SerializedSuiteStateChangeCheckMessageDispatcher::class),
         );
 
         self::assertSame(500, $response->getStatusCode());

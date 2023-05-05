@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteStateMessage;
-use App\MessageDispatcher\SerializedSuiteStateChangeCheckMessageDispatcher;
 use App\MessageHandler\GetSerializedSuiteStateMessageHandler;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
@@ -17,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
@@ -205,8 +206,8 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $messageDispatcher = self::getContainer()->get(SerializedSuiteStateChangeCheckMessageDispatcher::class);
-        \assert($messageDispatcher instanceof SerializedSuiteStateChangeCheckMessageDispatcher);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -215,12 +216,7 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
             ? $serializedSuiteClient
             : \Mockery::mock(SerializedSuiteClient::class);
 
-        $handler = new GetSerializedSuiteStateMessageHandler(
-            $jobRepository,
-            $serializedSuiteClient,
-            $messageDispatcher
-        );
-
+        $handler = new GetSerializedSuiteStateMessageHandler($jobRepository, $serializedSuiteClient, $messageBus);
         $message = new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId);
 
         ($handler)($message);
@@ -249,6 +245,12 @@ class GetSerializedSuiteStateMessageHandlerTest extends WebTestCase
             new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
+        $expectedDelayStampValue = self::getContainer()->getParameter(
+            'serialized_suite_state_change_check_message_dispatch_delay'
+        );
+        \assert(is_int($expectedDelayStampValue));
+
+        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
     }
 
     /**
