@@ -8,9 +8,10 @@ parameters:
     users_security_bundle_public_pattern: '^/(status)|(health-check)'
     users_security_bundle_secured_pattern: '^/*'
     users_security_bundle_access_control_path: '^/*'
-    machine_state_change_check_message_dispatch_delay: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
-    serialized_suite_state_change_check_message_dispatch_delay: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
-    start_worker_job_message_dispatch_delay: '%env(int:START_WORKER_JOB_DELAY_MS)%'
+    message_delays:
+        App\Message\StartWorkerJobMessage: '%env(int:START_WORKER_JOB_DELAY_MS)%'
+        App\Message\GetSerializedSuiteStateMessage: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
+        App\Message\MachineStateChangeCheckMessage: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
 
 services:
     # default configuration for services in *this* file
@@ -80,7 +81,4 @@ services:
 
     App\Messenger\DelayMiddleware:
         arguments:
-            $delays:
-                App\Message\StartWorkerJobMessage: '%start_worker_job_message_dispatch_delay%'
-                App\Message\GetSerializedSuiteStateMessage: '%serialized_suite_state_change_check_message_dispatch_delay%'
-                App\Message\MachineStateChangeCheckMessage: '%machine_state_change_check_message_dispatch_delay%'
+            $delays: '%message_delays%'
