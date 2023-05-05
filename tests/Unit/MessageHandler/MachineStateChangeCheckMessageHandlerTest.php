@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\MessageHandler;
 
 use App\Message\MachineStateChangeCheckMessage;
-use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
 use App\MessageHandler\MachineStateChangeCheckMessageHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
 {
@@ -28,8 +28,8 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             ->andReturn($machine)
         ;
 
-        $messageDispatcher = \Mockery::mock(MachineStateChangeCheckMessageDispatcher::class);
-        $messageDispatcher
+        $messageBus = \Mockery::mock(MessageBusInterface::class);
+        $messageBus
             ->shouldNotHaveReceived('dispatch')
         ;
 
@@ -39,7 +39,7 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
         ;
 
         $handler = new MachineStateChangeCheckMessageHandler(
-            $messageDispatcher,
+            $messageBus,
             $workerManagerClient,
             $eventDispatcher,
         );
