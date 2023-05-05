@@ -17,7 +17,6 @@ use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientExceptionInterface;
-use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -39,7 +38,6 @@ class JobController
         User $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
-        ResultsClient $resultsClient,
         ErrorResponseFactory $errorResponseFactory,
         WorkerManagerClient $workerManagerClient,
         SerializedSuiteClient $serializedSuiteClient,
@@ -50,15 +48,6 @@ class JobController
             $id = $ulidFactory->create();
         } catch (EmptyUlidException) {
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
-        }
-
-        try {
-            $resultsJob = $resultsClient->createJob($user->getSecurityToken(), $id);
-        } catch (HttpResponseExceptionInterface $exception) {
-            return $errorResponseFactory->createFromHttpResponseException(
-                $exception,
-                'Failed creating job in results service.'
-            );
         }
 
         try {
@@ -99,7 +88,6 @@ class JobController
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id));
         $repository->add($job);
 
-        $job = $job->setResultsToken($resultsJob->token);
         $job = $job->setSerializedSuiteId($serializedSuite->getId());
         $repository->add($job);
 
