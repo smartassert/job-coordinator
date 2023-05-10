@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum ResultsJobCreationState: string
+enum RequestState: string
 {
     case UNKNOWN = 'unknown';
     case REQUESTING = 'requesting';

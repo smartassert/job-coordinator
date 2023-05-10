@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\Job;
-use App\Enum\ResultsJobCreationState;
+use App\Enum\RequestState;
 use App\Repository\JobRepository;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetup
@@ -56,7 +56,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                     'ip_address' => null,
                 ],
                 'results_job' => [
-                    'state' => ResultsJobCreationState::UNKNOWN->value,
+                    'request_state' => RequestState::UNKNOWN->value,
                 ],
             ],
             self::$createResponseData,
