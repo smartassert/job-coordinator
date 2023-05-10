@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Enum\ResultsJobCreationState;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
@@ -42,12 +43,12 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(
             jobId: $jobId,
-            resultsToken: 'results token',
             serializedSuiteState: 'prepared',
             serializedSuiteId: md5((string) rand()),
         );
+        self::assertSame(ResultsJobCreationState::UNKNOWN, $job->getResultsJobCreationState());
 
-        $resultsClientException = new \Exception('Failed to create resuls job');
+        $resultsClientException = new \Exception('Failed to create results job');
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
@@ -69,6 +70,8 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::assertSame($resultsClientException, $e->previousException);
             $this->assertNoMessagesDispatched();
         }
+
+        self::assertSame(ResultsJobCreationState::HALTED, $job->getResultsJobCreationState());
     }
 
     public function testInvokeSuccess(): void
@@ -79,6 +82,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             serializedSuiteState: 'prepared',
             serializedSuiteId: md5((string) rand()),
         );
+        self::assertSame(ResultsJobCreationState::UNKNOWN, $job->getResultsJobCreationState());
 
         $resultsJob = new ResultsJob($jobId, md5((string) rand()));
 
@@ -97,6 +101,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
 
+        self::assertSame(ResultsJobCreationState::SUCCEEDED, $job->getResultsJobCreationState());
         self::assertSame($resultsJob->token, $job->getResultsToken());
         $this->assertNoMessagesDispatched();
     }

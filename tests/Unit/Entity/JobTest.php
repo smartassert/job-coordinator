@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Job;
+use App\Enum\ResultsJobCreationState;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -40,6 +41,9 @@ class JobTest extends TestCase
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
+                ],
+                'results_job' => [
+                    'state' => ResultsJobCreationState::UNKNOWN->value,
                 ],
             ],
             $job->jsonSerialize()
