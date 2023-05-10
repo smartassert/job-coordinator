@@ -42,11 +42,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'prepared',
-            serializedSuiteId: md5((string) rand()),
-        );
+        $job = $this->createJob(jobId: $jobId);
         self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $resultsClientException = new \Exception('Failed to create results job');
@@ -84,11 +80,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccess(): void
     {
         $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'prepared',
-            serializedSuiteId: md5((string) rand()),
-        );
+        $job = $this->createJob(jobId: $jobId);
         self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $resultsJob = new ResultsJob($jobId, md5((string) rand()));
@@ -124,35 +116,16 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param non-empty-string  $jobId
-     * @param ?non-empty-string $resultsToken
-     * @param ?non-empty-string $serializedSuiteState
-     * @param ?non-empty-string $serializedSuiteId
+     * @param non-empty-string $jobId
      */
-    private function createJob(
-        string $jobId,
-        ?string $resultsToken = null,
-        ?string $serializedSuiteState = null,
-        ?string $serializedSuiteId = null,
-    ): Job {
+    private function createJob(string $jobId): Job
+    {
         $job = new Job(
             $jobId,
             md5((string) rand()),
             md5((string) rand()),
             600
         );
-
-        if (is_string($resultsToken)) {
-            $job = $job->setResultsToken($resultsToken);
-        }
-
-        if (is_string($serializedSuiteState)) {
-            $job = $job->setSerializedSuiteState($serializedSuiteState);
-        }
-
-        if (is_string($serializedSuiteId)) {
-            $job = $job->setSerializedSuiteId($serializedSuiteId);
-        }
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
