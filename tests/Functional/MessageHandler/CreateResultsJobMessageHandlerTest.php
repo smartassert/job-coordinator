@@ -10,6 +10,7 @@ use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -177,6 +178,9 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             \assert($resultsClient instanceof ResultsClient);
         }
 
-        return new CreateResultsJobMessageHandler($jobRepository, $resultsClient);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        return new CreateResultsJobMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
     }
 }
