@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Message\CreateResultsJobMessage;
+use App\Message\CreateSerializedSuiteMessage;
 use App\Message\GetSerializedSuiteStateMessage;
 use App\Message\MachineStateChangeCheckMessage;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -32,13 +33,13 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
 
     public function testDispatchedMessageCount(): void
     {
-        self::assertCount(3, self::$envelopes);
+        self::assertCount(4, self::$envelopes);
     }
 
     /**
      * @dataProvider messageIsDispatchedDataProvider
      */
-    public function testMessageIsDispatchedFoo(callable $expectedMessageCreator): void
+    public function testMessageIsDispatched(callable $expectedMessageCreator): void
     {
         $expectedMessage = $expectedMessageCreator();
 
@@ -92,6 +93,15 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
                     \assert('' !== $jobId);
 
                     return new CreateResultsJobMessage(self::$apiToken, $jobId);
+                },
+            ],
+            CreateSerializedSuiteMessage::class => [
+                'expectedMessageCreator' => function () {
+                    $suiteId = self::$createResponseData['suite_id'] ?? null;
+                    \assert(is_string($suiteId));
+                    \assert('' !== $suiteId);
+
+                    return new CreateSerializedSuiteMessage(self::$apiToken, $suiteId, []);
                 },
             ],
         ];
