@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\RequestState;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetSerializedSuiteStateMessage;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class CreateSerializedSuiteMessageHandler
@@ -21,7 +19,7 @@ final class CreateSerializedSuiteMessageHandler
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly MessageBusInterface $messageBus,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -44,13 +42,10 @@ final class CreateSerializedSuiteMessageHandler
                 $message->parameters,
             );
 
-            $job = $job->setSerializedSuiteRequestState(null);
-            $job->setSerializedSuiteId($serializedSuite->getId());
-
-            $this->jobRepository->add($job);
-            $this->messageBus->dispatch(new Envelope(
-                new GetSerializedSuiteStateMessage($message->authenticationToken, $serializedSuite->getId()),
-                [new NonDelayedStamp()]
+            $this->eventDispatcher->dispatch(new SerializedSuiteCreatedEvent(
+                $message->authenticationToken,
+                $job->id,
+                $serializedSuite
             ));
         } catch (\Throwable $e) {
             $job->setSerializedSuiteRequestState(RequestState::HALTED);
