@@ -71,7 +71,13 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $this->assertNoMessagesDispatched();
         }
 
-        self::assertSame(RequestState::HALTED, $job->getResultsJobRequestState());
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $retrievedJob = $jobRepository->find($job->id);
+        \assert($retrievedJob instanceof Job);
+
+        self::assertSame(RequestState::HALTED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testInvokeSuccess(): void
