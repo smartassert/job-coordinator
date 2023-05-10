@@ -49,6 +49,7 @@ final class CreateSerializedSuiteMessageHandler
             ));
         } catch (\Throwable $e) {
             $job->setSerializedSuiteRequestState(RequestState::HALTED);
+            $this->jobRepository->add($job);
 
             throw new SerializedSuiteCreationException($job, $e);
         }

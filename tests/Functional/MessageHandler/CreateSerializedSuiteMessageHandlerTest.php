@@ -71,7 +71,13 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $this->assertNoMessagesDispatched();
         }
 
-        self::assertSame(RequestState::HALTED, $job->getSerializedSuiteRequestState());
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $retrievedJob = $jobRepository->find($job->id);
+        \assert($retrievedJob instanceof Job);
+
+        self::assertSame(RequestState::HALTED, $retrievedJob->getSerializedSuiteRequestState());
     }
 
     public function testInvokeSuccess(): void
