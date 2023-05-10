@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Enum\ResultsJobCreationState;
+use App\Enum\RequestState;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\Repository\JobRepository;
@@ -30,15 +30,15 @@ final class CreateResultsJobMessageHandler
             return;
         }
 
-        $job->setResultsJobCreationState(ResultsJobCreationState::REQUESTING);
+        $job->setResultsJobRequestState(RequestState::REQUESTING);
 
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->jobId);
-            $job = $job->setResultsJobCreationState(null);
+            $job = $job->setResultsJobRequestState(null);
             $job = $job->setResultsToken($resultsJob->token);
             $this->jobRepository->add($job);
         } catch (\Throwable $e) {
-            $job->setResultsJobCreationState(ResultsJobCreationState::HALTED);
+            $job->setResultsJobRequestState(RequestState::HALTED);
 
             throw new ResultsJobCreationException($job, $e);
         }
