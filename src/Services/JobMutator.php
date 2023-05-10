@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\ResultsJobCreatedEvent;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,6 +33,9 @@ class JobMutator implements EventSubscriberInterface
             ],
             ResultsJobCreatedEvent::class => [
                 ['setResultsJobOnResultsJobCreatedEvent', 1000],
+            ],
+            SerializedSuiteCreatedEvent::class => [
+                ['setSerializedSuiteOnSerializedSuiteCreatedEvent', 1000],
             ],
         ];
     }
@@ -74,6 +78,19 @@ class JobMutator implements EventSubscriberInterface
 
         $job = $job->setResultsJobRequestState(null);
         $job = $job->setResultsToken($event->resultsJob->token);
+        $this->jobRepository->add($job);
+    }
+
+    public function setSerializedSuiteOnSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $job = $job->setSerializedSuiteRequestState(null);
+        $job->setSerializedSuiteId($event->serializedSuite->getId());
+
         $this->jobRepository->add($job);
     }
 }

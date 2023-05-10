@@ -12,10 +12,10 @@ use App\Message\GetSerializedSuiteStateMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -157,8 +157,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         ?JobRepository $jobRepository = null,
         ?SerializedSuiteClient $serializedSuiteClient = null,
     ): CreateSerializedSuiteMessageHandler {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         if (null === $jobRepository) {
             $jobRepository = self::getContainer()->get(JobRepository::class);
@@ -170,9 +170,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             \assert($serializedSuiteClient instanceof SerializedSuiteClient);
         }
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        return new CreateSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $messageBus);
+        return new CreateSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
     }
 }
