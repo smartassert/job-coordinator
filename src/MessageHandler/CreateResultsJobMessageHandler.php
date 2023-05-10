@@ -39,6 +39,7 @@ final class CreateResultsJobMessageHandler
             $this->jobRepository->add($job);
         } catch (\Throwable $e) {
             $job->setResultsJobRequestState(RequestState::HALTED);
+            $this->jobRepository->add($job);
 
             throw new ResultsJobCreationException($job, $e);
         }
