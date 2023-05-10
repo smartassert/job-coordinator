@@ -6,7 +6,6 @@ namespace App\Tests\Application;
 
 use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetSerializedSuiteStateMessage;
 use App\Message\MachineStateChangeCheckMessage;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\Envelope;
@@ -33,7 +32,7 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
 
     public function testDispatchedMessageCount(): void
     {
-        self::assertCount(4, self::$envelopes);
+        self::assertCount(3, self::$envelopes);
     }
 
     /**
@@ -74,18 +73,6 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
                     );
                 },
             ],
-            GetSerializedSuiteStateMessage::class => [
-                'expectedMessageCreator' => function () {
-                    $serializedSuitedData = self::$createResponseData['serialized_suite'];
-                    \assert(is_array($serializedSuitedData));
-
-                    $serializedSuiteId = $serializedSuitedData['id'] ?? null;
-                    \assert(is_string($serializedSuiteId));
-                    \assert('' !== $serializedSuiteId);
-
-                    return new GetSerializedSuiteStateMessage(self::$apiToken, $serializedSuiteId);
-                },
-            ],
             CreateResultsJobMessage::class => [
                 'expectedMessageCreator' => function () {
                     $jobId = self::$createResponseData['id'] ?? null;
@@ -97,11 +84,11 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
             ],
             CreateSerializedSuiteMessage::class => [
                 'expectedMessageCreator' => function () {
-                    $suiteId = self::$createResponseData['suite_id'] ?? null;
-                    \assert(is_string($suiteId));
-                    \assert('' !== $suiteId);
+                    $jobId = self::$createResponseData['id'] ?? null;
+                    \assert(is_string($jobId));
+                    \assert('' !== $jobId);
 
-                    return new CreateSerializedSuiteMessage(self::$apiToken, $suiteId, []);
+                    return new CreateSerializedSuiteMessage(self::$apiToken, $jobId, []);
                 },
             ],
         ];
