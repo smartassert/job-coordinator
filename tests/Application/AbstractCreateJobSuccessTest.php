@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Repository\JobRepository;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetup
@@ -50,13 +49,14 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 'serialized_suite' => [
                     'id' => $job->getSerializedSuiteId(),
                     'state' => $job->getSerializedSuiteState(),
+                    'request_state' => $job->getSerializedSuiteRequestState()->value,
                 ],
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
                 ],
                 'results_job' => [
-                    'request_state' => RequestState::UNKNOWN->value,
+                    'request_state' => $job->getResultsJobRequestState()->value,
                 ],
             ],
             self::$createResponseData,
