@@ -37,6 +37,7 @@ class JobTest extends TestCase
                 'serialized_suite' => [
                     'id' => null,
                     'state' => null,
+                    'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'machine' => [
                     'state_category' => null,
