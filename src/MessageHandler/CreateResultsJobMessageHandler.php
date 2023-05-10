@@ -37,7 +37,11 @@ final class CreateResultsJobMessageHandler
 
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->jobId);
-            $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent($resultsJob));
+            $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
+                $message->authenticationToken,
+                $message->jobId,
+                $resultsJob
+            ));
         } catch (\Throwable $e) {
             $job->setResultsJobRequestState(RequestState::HALTED);
             $this->jobRepository->add($job);
