@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Event\ResultsJobCreatedEvent;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -28,6 +29,9 @@ class JobMutator implements EventSubscriberInterface
             ],
             MachineStateChangeEvent::class => [
                 ['setMachineStateCategoryOnMachineStateChangeEvent', 1000],
+            ],
+            ResultsJobCreatedEvent::class => [
+                ['setResultsJobOnResultsJobCreatedEvent', 1000],
             ],
         ];
     }
@@ -58,6 +62,18 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $job->setMachineStateCategory($machineStateCategory);
+        $this->jobRepository->add($job);
+    }
+
+    public function setResultsJobOnResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->resultsJob->label);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $job = $job->setResultsJobRequestState(null);
+        $job = $job->setResultsToken($event->resultsJob->token);
         $this->jobRepository->add($job);
     }
 }

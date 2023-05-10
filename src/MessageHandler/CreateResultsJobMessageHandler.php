@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\RequestState;
+use App\Event\ResultsJobCreatedEvent;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\Repository\JobRepository;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -17,6 +19,7 @@ final class CreateResultsJobMessageHandler
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly ResultsClient $resultsClient,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -34,9 +37,7 @@ final class CreateResultsJobMessageHandler
 
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->jobId);
-            $job = $job->setResultsJobRequestState(null);
-            $job = $job->setResultsToken($resultsJob->token);
-            $this->jobRepository->add($job);
+            $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent($resultsJob));
         } catch (\Throwable $e) {
             $job->setResultsJobRequestState(RequestState::HALTED);
 
