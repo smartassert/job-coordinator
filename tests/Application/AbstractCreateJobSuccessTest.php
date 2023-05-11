@@ -28,12 +28,12 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
         self::assertSame($job->userId, self::$user->id);
     }
 
-    public function testJobResultsTokenIsSet(): void
+    public function testJobResultsTokenIsNotSet(): void
     {
         $job = $this->getJob();
         \assert($job instanceof Job);
 
-        self::assertNotNull($job->resultsToken);
+        self::assertNull($job->resultsToken);
     }
 
     public function testJobResponseData(): void
@@ -47,12 +47,17 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 'suite_id' => $job->suiteId,
                 'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                 'serialized_suite' => [
-                    'id' => $job->serializedSuiteId,
+                    'id' => $job->getSerializedSuiteId(),
                     'state' => $job->getSerializedSuiteState(),
+                    'request_state' => $job->getSerializedSuiteRequestState()->value,
                 ],
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
+                    'request_state' => $job->getMachineRequestState()->value,
+                ],
+                'results_job' => [
+                    'request_state' => $job->getResultsJobRequestState()->value,
                 ],
             ],
             self::$createResponseData,

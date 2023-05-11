@@ -7,8 +7,6 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\FileClient;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -129,11 +127,6 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($workerManagerClient instanceof WorkerManagerClient);
         $machine = $workerManagerClient->getMachine($apiToken, $jobId);
         \assert($machine instanceof Machine);
-
-        $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
-        \assert($serializedSuiteClient instanceof SerializedSuiteClient);
-        $serializedSuite = $serializedSuiteClient->get($apiToken, $job->serializedSuiteId);
-        \assert($serializedSuite instanceof SerializedSuite);
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 

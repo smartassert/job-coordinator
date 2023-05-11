@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Job;
+use App\Enum\RequestState;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -24,12 +25,9 @@ class JobTest extends TestCase
         $resultToken = (string) new Ulid();
         \assert('' !== $resultToken);
 
-        $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
-
         $maximumDurationInSeconds = rand(1, 1000);
 
-        $job = (new Job($id, $userId, $suiteId, $resultToken, $serializedSuiteId, $maximumDurationInSeconds));
+        $job = (new Job($id, $userId, $suiteId, $maximumDurationInSeconds));
 
         self::assertEquals(
             [
@@ -37,12 +35,17 @@ class JobTest extends TestCase
                 'suite_id' => $suiteId,
                 'maximum_duration_in_seconds' => $maximumDurationInSeconds,
                 'serialized_suite' => [
-                    'id' => $serializedSuiteId,
+                    'id' => null,
                     'state' => null,
+                    'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
+                    'request_state' => RequestState::UNKNOWN->value,
+                ],
+                'results_job' => [
+                    'request_state' => RequestState::UNKNOWN->value,
                 ],
             ],
             $job->jsonSerialize()

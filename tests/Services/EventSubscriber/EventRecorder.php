@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\EventSubscriber;
 
+use App\Event\JobCreatedEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Event\SerializedSuiteSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EventRecorder implements EventSubscriberInterface
+class EventRecorder implements EventSubscriberInterface, \Countable
 {
     /**
      * @var Event[]
@@ -28,6 +31,15 @@ class EventRecorder implements EventSubscriberInterface
             MachineIsActiveEvent::class => [
                 ['addEvent', 1000],
             ],
+            JobCreatedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            SerializedSuiteSerializedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineRequestedEvent::class => [
+                ['addEvent', 1000],
+            ],
         ];
     }
 
@@ -41,5 +53,10 @@ class EventRecorder implements EventSubscriberInterface
         $latest = $this->events[0] ?? null;
 
         return $latest instanceof Event ? $latest : null;
+    }
+
+    public function count(): int
+    {
+        return count($this->events);
     }
 }

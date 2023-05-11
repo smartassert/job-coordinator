@@ -39,7 +39,13 @@ final class StartWorkerJobMessageHandler
             return;
         }
 
-        if (in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
+        $resultsToken = $job->getResultsToken();
+        $serializedSuiteId = $job->getSerializedSuiteId();
+        if (
+            null === $resultsToken
+            || null === $serializedSuiteId
+            || in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])
+        ) {
             $this->messageBus->dispatch($message);
 
             return;
@@ -48,14 +54,11 @@ final class StartWorkerJobMessageHandler
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
 
         try {
-            $serializedSuite = $this->serializedSuiteClient->read(
-                $message->authenticationToken,
-                $job->serializedSuiteId,
-            );
+            $serializedSuite = $this->serializedSuiteClient->read($message->authenticationToken, $serializedSuiteId);
 
             $workerClient->createJob(
                 $job->id,
-                $job->resultsToken,
+                $resultsToken,
                 $job->maximumDurationInSeconds,
                 $serializedSuite
             );

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
-use App\Event\MachineIsActiveEvent;
-use App\Message\StartWorkerJobMessage;
-use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
+use App\Event\JobCreatedEvent;
+use App\Message\CreateSerializedSuiteMessage;
+use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,17 +15,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class StartWorkerJobMessageDispatcherTest extends WebTestCase
+class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 {
-    private StartWorkerJobMessageDispatcher $dispatcher;
+    private CreateSerializedSuiteMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
-        \assert($dispatcher instanceof StartWorkerJobMessageDispatcher);
+        $dispatcher = self::getContainer()->get(CreateSerializedSuiteMessageDispatcher::class);
+        \assert($dispatcher instanceof CreateSerializedSuiteMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -36,10 +36,10 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(JobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
-    public function testDispatchForMachineIsActiveEventSuccess(): void
+    public function testDispatchForJobCreatedEventSuccess(): void
     {
         $jobId = md5((string) rand());
         $job = new Job($jobId, 'user id', 'suite id', 600);
@@ -47,18 +47,22 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
-        $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
+        $parameters = [
+            md5((string) rand()) => md5((string) rand()),
+            md5((string) rand()) => md5((string) rand()),
+            md5((string) rand()) => md5((string) rand()),
+        ];
 
-        $event = new MachineIsActiveEvent($authenticationToken, $jobId, $machineIpAddress);
+        $event = new JobCreatedEvent($authenticationToken, $jobId, $parameters);
 
-        $this->dispatcher->dispatchForMachineIsActiveEvent($event);
+        $this->dispatcher->dispatchForJobCreatedEvent($event);
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $jobId, $parameters);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
