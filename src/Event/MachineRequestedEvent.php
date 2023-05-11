@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Message;
+namespace App\Event;
 
-class CreateWorkerMachineMessage
+use SmartAssert\WorkerManagerClient\Model\Machine;
+use Symfony\Contracts\EventDispatcher\Event;
+
+class MachineRequestedEvent extends Event
 {
     /**
      * @param non-empty-string $authenticationToken
-     * @param non-empty-string $jobId
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        public readonly Machine $machine,
     ) {
     }
 }

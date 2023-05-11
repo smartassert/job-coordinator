@@ -7,14 +7,14 @@ namespace App\MessageDispatcher;
 use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
-use App\Message\CreateWorkerMachineMessage;
+use App\Message\CreateMachineMessage;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class CreateWorkerMachineMessageDispatcher implements EventSubscriberInterface
+class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
@@ -49,7 +49,7 @@ class CreateWorkerMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $this->messageBus->dispatch(new Envelope(
-            new CreateWorkerMachineMessage($event->authenticationToken, $event->jobId),
+            new CreateMachineMessage($event->authenticationToken, $event->jobId),
             [new NonDelayedStamp()]
         ));
     }
