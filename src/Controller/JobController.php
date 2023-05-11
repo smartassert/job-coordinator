@@ -8,7 +8,6 @@ use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
-use App\Message\CreateSerializedSuiteMessage;
 use App\Message\MachineStateChangeCheckMessage;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
@@ -85,19 +84,12 @@ class JobController
             $request->maximumDurationInSeconds,
         );
 
-        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id));
+        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
         $repository->add($job);
 
         $job = $job->setSerializedSuiteId($serializedSuite->getId());
         $repository->add($job);
 
-        $messageBus->dispatch(
-            new CreateSerializedSuiteMessage(
-                $user->getSecurityToken(),
-                $job->id,
-                $request->parameters
-            )
-        );
         $messageBus->dispatch(new MachineStateChangeCheckMessage($user->getSecurityToken(), $machine));
 
         return new JsonResponse($job);
