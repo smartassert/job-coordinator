@@ -30,6 +30,7 @@ final class Version20220920083238 extends AbstractMigration
                 machine_state_category VARCHAR(128) DEFAULT NULL,
                 results_job_request_state VARCHAR(128) DEFAULT NULL,
                 serialized_suite_request_state VARCHAR(128) DEFAULT NULL,
+                machine_request_state VARCHAR(128) DEFAULT NULL,
                 PRIMARY KEY(id)
             )
         ');
