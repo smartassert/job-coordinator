@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Enum\RequestState;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
@@ -53,6 +54,7 @@ class JobMutatorTest extends WebTestCase
         self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(ResultsJobCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(SerializedSuiteCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
+        self::assertArrayHasKey(MachineRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
     }
 
     public function testSetMachineIpAddressOnMachineIsActiveEventNoJob(): void
@@ -214,5 +216,46 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
         self::assertSame(RequestState::SUCCEEDED, $job->getSerializedSuiteRequestState());
+    }
+
+    public function testSetMachineOnMachineRequestedEventNoJob(): void
+    {
+        self::assertSame(0, $this->jobRepository->count([]));
+
+        $machine = new Machine(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
+
+        $event = new MachineRequestedEvent(md5((string) rand()), $machine);
+
+        $this->jobMutator->setMachineOnMachineRequestedEvent($event);
+
+        self::assertSame(0, $this->jobRepository->count([]));
+    }
+
+    public function testSetMachineOnMachineRequestedEventSuccess(): void
+    {
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $job = new Job($jobId, md5((string) rand()), md5((string) rand()), 600);
+        $job->setMachineRequestState(RequestState::REQUESTING);
+        self::assertNull($job->getMachineStateCategory());
+        self::assertSame(RequestState::REQUESTING, $job->getMachineRequestState());
+
+        $this->jobRepository->add($job);
+        self::assertSame(1, $this->jobRepository->count([]));
+
+        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()), []);
+
+        $event = new MachineRequestedEvent(md5((string) rand()), $machine);
+
+        $this->jobMutator->setMachineOnMachineRequestedEvent($event);
+
+        self::assertSame(1, $this->jobRepository->count([]));
+
+        $retrievedJob = $this->jobRepository->find($jobId);
+        self::assertInstanceOf(Job::class, $retrievedJob);
+
+        self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
+        self::assertSame(RequestState::SUCCEEDED, $job->getMachineRequestState());
     }
 }

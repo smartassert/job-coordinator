@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
@@ -36,6 +37,9 @@ class JobMutator implements EventSubscriberInterface
             ],
             SerializedSuiteCreatedEvent::class => [
                 ['setSerializedSuiteOnSerializedSuiteCreatedEvent', 1000],
+            ],
+            MachineRequestedEvent::class => [
+                ['setMachineOnMachineRequestedEvent', 1000],
             ],
         ];
     }
@@ -90,6 +94,24 @@ class JobMutator implements EventSubscriberInterface
 
         $job = $job->setSerializedSuiteRequestState(null);
         $job->setSerializedSuiteId($event->serializedSuite->getId());
+
+        $this->jobRepository->add($job);
+    }
+
+    public function setMachineOnMachineRequestedEvent(MachineRequestedEvent $event): void
+    {
+        $machine = $event->machine;
+        $jobId = $machine->id;
+
+        $job = $this->jobRepository->find($jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $job = $job->setMachineRequestState(null);
+        if ('' !== $machine->stateCategory) {
+            $job = $job->setMachineStateCategory($machine->stateCategory);
+        }
 
         $this->jobRepository->add($job);
     }

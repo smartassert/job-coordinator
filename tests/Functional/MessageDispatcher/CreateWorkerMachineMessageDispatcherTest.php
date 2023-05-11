@@ -8,8 +8,8 @@ use App\Entity\Job;
 use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
-use App\Message\CreateWorkerMachineMessage;
-use App\MessageDispatcher\CreateWorkerMachineMessageDispatcher;
+use App\Message\CreateMachineMessage;
+use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,15 +22,15 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
 {
-    private CreateWorkerMachineMessageDispatcher $dispatcher;
+    private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(CreateWorkerMachineMessageDispatcher::class);
-        \assert($dispatcher instanceof CreateWorkerMachineMessageDispatcher);
+        $dispatcher = self::getContainer()->get(CreateMachineMessageDispatcher::class);
+        \assert($dispatcher instanceof CreateMachineMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -66,7 +66,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
             ->andReturn($job)
         ;
 
-        (new CreateWorkerMachineMessageDispatcher($mockJobRepository, $messageBus))->dispatch($event);
+        (new CreateMachineMessageDispatcher($mockJobRepository, $messageBus))->dispatch($event);
 
         $this->assertNoMessagesDispatched();
     }
@@ -222,7 +222,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new CreateWorkerMachineMessage($authenticationToken, $jobId),
+            new CreateMachineMessage($authenticationToken, $jobId),
             $envelope->getMessage()
         );
 

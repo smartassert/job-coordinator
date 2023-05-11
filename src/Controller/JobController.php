@@ -8,58 +8,30 @@ use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
-use App\Message\MachineStateChangeCheckMessage;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
-use App\Services\ErrorResponseFactory;
 use App\Services\UlidFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Http\Client\ClientExceptionInterface;
-use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class JobController
 {
-    /**
-     * @throws ClientExceptionInterface
-     */
     #[Route('/' . JobRoutes::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
     public function create(
         CreateJobRequest $request,
         User $user,
         JobRepository $repository,
         UlidFactory $ulidFactory,
-        ErrorResponseFactory $errorResponseFactory,
-        WorkerManagerClient $workerManagerClient,
-        MessageBusInterface $messageBus,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
         try {
             $id = $ulidFactory->create();
         } catch (EmptyUlidException) {
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
-        }
-
-        try {
-            $machine = $workerManagerClient->createMachine($user->getSecurityToken(), $id);
-        } catch (HttpResponseExceptionInterface $httpResponseException) {
-            return $errorResponseFactory->createFromHttpResponseException(
-                $httpResponseException,
-                'Failed requesting worker machine creation.'
-            );
-        } catch (CreateMachineException $createMachineException) {
-            return $errorResponseFactory->createFromThrowable(
-                ErrorResponseType::SERVER_ERROR,
-                'Failed requesting worker machine creation.',
-                $createMachineException
-            );
         }
 
         $job = new Job(
@@ -71,8 +43,6 @@ class JobController
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
         $repository->add($job);
-
-        $messageBus->dispatch(new MachineStateChangeCheckMessage($user->getSecurityToken(), $machine));
 
         return new JsonResponse($job);
     }

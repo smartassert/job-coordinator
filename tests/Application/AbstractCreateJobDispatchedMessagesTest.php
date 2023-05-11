@@ -6,8 +6,6 @@ namespace App\Tests\Application;
 
 use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\MachineStateChangeCheckMessage;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
@@ -32,7 +30,7 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
 
     public function testDispatchedMessageCount(): void
     {
-        self::assertCount(3, self::$envelopes);
+        self::assertCount(2, self::$envelopes);
     }
 
     /**
@@ -61,18 +59,6 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
     public function messageIsDispatchedDataProvider(): array
     {
         return [
-            MachineStateChangeCheckMessage::class => [
-                'expectedMessageCreator' => function () {
-                    $jobId = self::$createResponseData['id'] ?? null;
-                    \assert(is_string($jobId));
-                    \assert('' !== $jobId);
-
-                    return new MachineStateChangeCheckMessage(
-                        self::$apiToken,
-                        new Machine($jobId, 'create/received', 'pre_active', [])
-                    );
-                },
-            ],
             CreateResultsJobMessage::class => [
                 'expectedMessageCreator' => function () {
                     $jobId = self::$createResponseData['id'] ?? null;

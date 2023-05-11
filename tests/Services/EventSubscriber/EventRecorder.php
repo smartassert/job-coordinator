@@ -6,6 +6,7 @@ namespace App\Tests\Services\EventSubscriber;
 
 use App\Event\JobCreatedEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,6 +35,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             SerializedSuiteSerializedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];
