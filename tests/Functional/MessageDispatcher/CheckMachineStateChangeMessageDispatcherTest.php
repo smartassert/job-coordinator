@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\MachineRequestedEvent;
-use App\Message\MachineStateChangeCheckMessage;
-use App\MessageDispatcher\MachineStateChangeCheckMessageDispatcher;
+use App\Message\CheckMachineStateChangeMessage;
+use App\MessageDispatcher\CheckMachineStateChangeMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -16,17 +16,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
+class CheckMachineStateChangeMessageDispatcherTest extends WebTestCase
 {
-    private MachineStateChangeCheckMessageDispatcher $dispatcher;
+    private CheckMachineStateChangeMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(MachineStateChangeCheckMessageDispatcher::class);
-        \assert($dispatcher instanceof MachineStateChangeCheckMessageDispatcher);
+        $dispatcher = self::getContainer()->get(CheckMachineStateChangeMessageDispatcher::class);
+        \assert($dispatcher instanceof CheckMachineStateChangeMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -60,7 +60,7 @@ class MachineStateChangeCheckMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new MachineStateChangeCheckMessage($authenticationToken, $machine);
+        $expectedMessage = new CheckMachineStateChangeMessage($authenticationToken, $machine);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

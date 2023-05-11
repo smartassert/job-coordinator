@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\MessageHandler;
 
-use App\Message\MachineStateChangeCheckMessage;
-use App\MessageHandler\MachineStateChangeCheckMessageHandler;
+use App\Message\CheckMachineStateChangeMessage;
+use App\MessageHandler\CheckMachineStateChangeMessageHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -38,14 +38,14 @@ class MachineStateChangeCheckMessageHandlerTest extends WebTestCase
             ->shouldReceive('dispatch')
         ;
 
-        $handler = new MachineStateChangeCheckMessageHandler(
+        $handler = new CheckMachineStateChangeMessageHandler(
             $messageBus,
             $workerManagerClient,
             $eventDispatcher,
         );
 
         $authenticationToken = md5((string) rand());
-        $message = new MachineStateChangeCheckMessage($authenticationToken, $machine);
+        $message = new CheckMachineStateChangeMessage($authenticationToken, $machine);
 
         ($handler)($message);
     }
