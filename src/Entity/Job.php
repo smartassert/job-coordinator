@@ -75,6 +75,9 @@ class Job implements \JsonSerializable
     #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
     private ?RequestState $serializedSuiteRequestState = null;
 
+    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
+    private ?RequestState $machineRequestState = null;
+
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
@@ -215,6 +218,22 @@ class Job implements \JsonSerializable
         return is_string($this->serializedSuiteId) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
     }
 
+    public function setMachineRequestState(?RequestState $state): self
+    {
+        $this->machineRequestState = $state;
+
+        return $this;
+    }
+
+    public function getMachineRequestState(): RequestState
+    {
+        if (null !== $this->machineRequestState) {
+            return $this->machineRequestState;
+        }
+
+        return is_string($this->machineStateCategory) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
+    }
+
     /**
      * @return array{
      *   id: non-empty-string,
@@ -239,6 +258,7 @@ class Job implements \JsonSerializable
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
+                'request_state' => $this->getMachineRequestState()->value,
             ],
             'results_job' => [
                 'request_state' => $this->getResultsJobRequestState()->value,

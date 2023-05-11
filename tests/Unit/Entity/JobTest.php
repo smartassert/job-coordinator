@@ -42,6 +42,7 @@ class JobTest extends TestCase
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
+                    'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'results_job' => [
                     'request_state' => RequestState::UNKNOWN->value,
