@@ -32,6 +32,6 @@ abstract class AbstractCreateJobDispatchedEventsTest extends AbstractCreateJobSu
 
         $jobId = self::$createResponseData['id'] ?? null;
         \assert(is_string($jobId) && '' !== $jobId);
-        self::assertEquals(new JobCreatedEvent(self::$apiToken, $jobId), $event);
+        self::assertEquals(new JobCreatedEvent(self::$apiToken, $jobId, []), $event);
     }
 }

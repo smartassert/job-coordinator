@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\JobCreatedEvent;
-use App\Message\CreateResultsJobMessage;
-use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
+use App\Message\CreateSerializedSuiteMessage;
+use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,17 +15,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class CreateResultsJobMessageDispatcherTest extends WebTestCase
+class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 {
-    private CreateResultsJobMessageDispatcher $dispatcher;
+    private CreateSerializedSuiteMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(CreateResultsJobMessageDispatcher::class);
-        \assert($dispatcher instanceof CreateResultsJobMessageDispatcher);
+        $dispatcher = self::getContainer()->get(CreateSerializedSuiteMessageDispatcher::class);
+        \assert($dispatcher instanceof CreateSerializedSuiteMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -48,8 +48,13 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $jobRepository->add($job);
 
         $authenticationToken = md5((string) rand());
+        $parameters = [
+            md5((string) rand()) => md5((string) rand()),
+            md5((string) rand()) => md5((string) rand()),
+            md5((string) rand()) => md5((string) rand()),
+        ];
 
-        $event = new JobCreatedEvent($authenticationToken, $jobId, []);
+        $event = new JobCreatedEvent($authenticationToken, $jobId, $parameters);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -57,7 +62,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $jobId);
+        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $jobId, $parameters);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
