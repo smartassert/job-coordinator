@@ -17,7 +17,6 @@ use App\Services\UlidFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\HttpResponseExceptionInterface;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
@@ -39,7 +38,6 @@ class JobController
         UlidFactory $ulidFactory,
         ErrorResponseFactory $errorResponseFactory,
         WorkerManagerClient $workerManagerClient,
-        SerializedSuiteClient $serializedSuiteClient,
         MessageBusInterface $messageBus,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
@@ -64,19 +62,6 @@ class JobController
             );
         }
 
-        try {
-            $serializedSuite = $serializedSuiteClient->create(
-                $user->getSecurityToken(),
-                $request->suiteId,
-                $request->parameters,
-            );
-        } catch (HttpResponseExceptionInterface $exception) {
-            return $errorResponseFactory->createFromHttpResponseException(
-                $exception,
-                'Failed requesting suite serialization in sources service.'
-            );
-        }
-
         $job = new Job(
             $id,
             $user->getUserIdentifier(),
@@ -85,9 +70,6 @@ class JobController
         );
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
-        $repository->add($job);
-
-        $job = $job->setSerializedSuiteId($serializedSuite->getId());
         $repository->add($job);
 
         $messageBus->dispatch(new MachineStateChangeCheckMessage($user->getSecurityToken(), $machine));

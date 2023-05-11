@@ -18,7 +18,6 @@ use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Exception\CreateMachineException;
@@ -52,7 +51,6 @@ class JobControllerTest extends TestCase
             $ulidFactory,
             new ErrorResponseFactory(),
             \Mockery::mock(WorkerManagerClient::class),
-            \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MessageBusInterface::class),
             \Mockery::mock(EventDispatcherInterface::class),
         );
@@ -115,7 +113,6 @@ class JobControllerTest extends TestCase
             $ulidFactory,
             new ErrorResponseFactory(),
             $workerManagerClient,
-            \Mockery::mock(SerializedSuiteClient::class),
             \Mockery::mock(MessageBusInterface::class),
             \Mockery::mock(EventDispatcherInterface::class),
         );
