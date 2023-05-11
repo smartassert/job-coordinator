@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Message\MachineStateChangeCheckMessage;
+use App\Message\CheckMachineStateChangeMessage;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final class MachineStateChangeCheckMessageHandler
+final class CheckMachineStateChangeMessageHandler
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
@@ -34,7 +34,7 @@ final class MachineStateChangeCheckMessageHandler
      * @throws NonSuccessResponseException
      * @throws InvalidResponseTypeException
      */
-    public function __invoke(MachineStateChangeCheckMessage $message): void
+    public function __invoke(CheckMachineStateChangeMessage $message): void
     {
         $previousMachine = $message->machine;
 
@@ -65,7 +65,7 @@ final class MachineStateChangeCheckMessageHandler
         }
 
         if ('end' !== $machine->stateCategory) {
-            $this->messageBus->dispatch(new MachineStateChangeCheckMessage($message->authenticationToken, $machine));
+            $this->messageBus->dispatch(new CheckMachineStateChangeMessage($message->authenticationToken, $machine));
         }
     }
 }

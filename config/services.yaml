@@ -11,7 +11,7 @@ parameters:
     message_delays:
         App\Message\StartWorkerJobMessage: '%env(int:START_WORKER_JOB_DELAY_MS)%'
         App\Message\GetSerializedSuiteStateMessage: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
-        App\Message\MachineStateChangeCheckMessage: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
+        App\Message\CheckMachineStateChangeMessage: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\CreateResultsJobMessage: '%env(int:CREATE_RESULTS_JOB_DISPATCH_DELAY_MS)%'
 
 services:

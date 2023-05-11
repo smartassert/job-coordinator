@@ -7,8 +7,8 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Enum\RequestState;
 use App\Exception\MachineCreationException;
+use App\Message\CheckMachineStateChangeMessage;
 use App\Message\CreateMachineMessage;
-use App\Message\MachineStateChangeCheckMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
@@ -131,7 +131,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new MachineStateChangeCheckMessage($authenticationToken, $machine),
+            new CheckMachineStateChangeMessage($authenticationToken, $machine),
             $envelope->getMessage()
         );
 
