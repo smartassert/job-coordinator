@@ -9,4 +9,5 @@ return [
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     SmartAssert\TestAuthenticationProviderBundle\TestAuthenticationProviderBundle::class => ['test' => true],
+    SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventBundle::class => ['all' => true],
 ];
