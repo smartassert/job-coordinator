@@ -16,7 +16,7 @@
         "smartassert/users-security-bundle": "~6.0",
         "smartassert/worker-client": ">=0.5,<1",
         "smartassert/worker-manager-client": ">=3.0,<4",
-        "smartassert/worker-message-failed-event-bundle": ">=0.3,<1",
+        "smartassert/worker-message-failed-event-bundle": ">=0.4,<1",
         "symfony/console": "6.2.*",
         "symfony/doctrine-messenger": "6.2.*",
         "symfony/dotenv": "6.2.*",
