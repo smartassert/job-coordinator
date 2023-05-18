@@ -46,7 +46,7 @@ final class GetSerializedSuiteStateMessageHandler
                 $message->serializedSuiteId,
             );
         } catch (\Throwable $e) {
-            throw new SerializedSuiteRetrievalException($message->serializedSuiteId, $e);
+            throw new SerializedSuiteRetrievalException($job, $e);
         }
 
         $serializedSuiteState = $serializedSuite->getState();
