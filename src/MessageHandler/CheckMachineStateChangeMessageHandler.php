@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Message\CheckMachineStateChangeMessage;
+use App\Message\GetMachineMessage;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
@@ -34,7 +34,7 @@ final class CheckMachineStateChangeMessageHandler
      * @throws NonSuccessResponseException
      * @throws InvalidResponseTypeException
      */
-    public function __invoke(CheckMachineStateChangeMessage $message): void
+    public function __invoke(GetMachineMessage $message): void
     {
         $previousMachine = $message->machine;
 
@@ -65,7 +65,7 @@ final class CheckMachineStateChangeMessageHandler
         }
 
         if ('end' !== $machine->stateCategory) {
-            $this->messageBus->dispatch(new CheckMachineStateChangeMessage($message->authenticationToken, $machine));
+            $this->messageBus->dispatch(new GetMachineMessage($message->authenticationToken, $machine));
         }
     }
 }

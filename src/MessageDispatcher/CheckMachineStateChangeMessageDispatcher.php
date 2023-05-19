@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\MachineRequestedEvent;
-use App\Message\CheckMachineStateChangeMessage;
+use App\Message\GetMachineMessage;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,7 +43,7 @@ class CheckMachineStateChangeMessageDispatcher implements EventSubscriberInterfa
         }
 
         $this->messageBus->dispatch(new Envelope(
-            new CheckMachineStateChangeMessage($event->authenticationToken, $machine),
+            new GetMachineMessage($event->authenticationToken, $machine),
             [new NonDelayedStamp()]
         ));
     }

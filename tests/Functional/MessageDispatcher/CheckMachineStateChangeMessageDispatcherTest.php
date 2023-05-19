@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\MachineRequestedEvent;
-use App\Message\CheckMachineStateChangeMessage;
+use App\Message\GetMachineMessage;
 use App\MessageDispatcher\CheckMachineStateChangeMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -60,7 +60,7 @@ class CheckMachineStateChangeMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CheckMachineStateChangeMessage($authenticationToken, $machine);
+        $expectedMessage = new GetMachineMessage($authenticationToken, $machine);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Message\CheckMachineStateChangeMessage;
+use App\Message\GetMachineMessage;
 use App\MessageHandler\CheckMachineStateChangeMessageHandler;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -179,7 +179,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandledMessageClass(): string
     {
-        return CheckMachineStateChangeMessage::class;
+        return GetMachineMessage::class;
     }
 
     /**
@@ -209,7 +209,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
             $eventDispatcher
         );
 
-        $message = new CheckMachineStateChangeMessage($authenticationToken, $previous);
+        $message = new GetMachineMessage($authenticationToken, $previous);
 
         ($handler)($message);
     }
@@ -230,7 +230,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
                 $message = $envelope->getMessage();
                 $foundMessageClasses[] = $message::class;
 
-                if (CheckMachineStateChangeMessage::class === $message::class) {
+                if (GetMachineMessage::class === $message::class) {
                     $machineStateChangeCheckMessage = $message;
                     $machineStateChangeCheckMessageDelayStamps = $envelope->all(DelayStamp::class);
                 }
@@ -240,20 +240,20 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
         if (null === $machineStateChangeCheckMessage) {
             self::fail(sprintf(
                 '%s message not dispatched, found: %s',
-                CheckMachineStateChangeMessage::class,
+                GetMachineMessage::class,
                 implode(', ', $foundMessageClasses)
             ));
         }
 
         self::assertEquals(
-            new CheckMachineStateChangeMessage($authenticationToken, $current),
+            new GetMachineMessage($authenticationToken, $current),
             $machineStateChangeCheckMessage
         );
 
         $messageDelays = self::getContainer()->getParameter('message_delays');
         \assert(is_array($messageDelays));
 
-        $expectedDelayStampValue = $messageDelays[CheckMachineStateChangeMessage::class] ?? null;
+        $expectedDelayStampValue = $messageDelays[GetMachineMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);

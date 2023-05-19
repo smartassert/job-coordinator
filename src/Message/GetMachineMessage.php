@@ -6,7 +6,7 @@ namespace App\Message;
 
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class CheckMachineStateChangeMessage
+class GetMachineMessage
 {
     /**
      * @param non-empty-string $authenticationToken
