@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class CheckMachineStateChangeMessageDispatcher implements EventSubscriberInterface
+class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,

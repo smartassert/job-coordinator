@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Job;
 use App\Event\MachineRequestedEvent;
 use App\Message\GetMachineMessage;
-use App\MessageDispatcher\CheckMachineStateChangeMessageDispatcher;
+use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -16,17 +16,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class CheckMachineStateChangeMessageDispatcherTest extends WebTestCase
+class GetMachineMessageDispatcherTest extends WebTestCase
 {
-    private CheckMachineStateChangeMessageDispatcher $dispatcher;
+    private GetMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(CheckMachineStateChangeMessageDispatcher::class);
-        \assert($dispatcher instanceof CheckMachineStateChangeMessageDispatcher);
+        $dispatcher = self::getContainer()->get(GetMachineMessageDispatcher::class);
+        \assert($dispatcher instanceof GetMachineMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
