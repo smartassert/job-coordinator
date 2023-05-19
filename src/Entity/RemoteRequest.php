@@ -33,6 +33,9 @@ class RemoteRequest
     #[ORM\Column(type: Types::STRING, length: 64, nullable: true, enumType: RequestState::class)]
     private ?RequestState $state = null;
 
+    #[ORM\ManyToOne(cascade: ['persist'])]
+    private ?RemoteRequestFailure $failure = null;
+
     /**
      * @param non-empty-string $id
      * @param non-empty-string $jobId
@@ -42,5 +45,12 @@ class RemoteRequest
         $this->id = $id;
         $this->jobId = $jobId;
         $this->type = $type;
+    }
+
+    public function setFailure(?RemoteRequestFailure $failure): self
+    {
+        $this->failure = $failure;
+
+        return $this;
     }
 }
