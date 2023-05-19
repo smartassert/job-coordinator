@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\MachineRequestedEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
@@ -29,7 +30,17 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
             MachineRequestedEvent::class => [
                 ['dispatch', 100],
             ],
+            MachineRetrievedEvent::class => [
+                ['dispatchIfMachineNotInEndState', 100],
+            ],
         ];
+    }
+
+    public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
+    {
+        if ('end' !== $event->current->stateCategory) {
+            $this->messageBus->dispatch(new GetMachineMessage($event->authenticationToken, $event->current));
+        }
     }
 
     public function dispatch(MachineRequestedEvent $event): void

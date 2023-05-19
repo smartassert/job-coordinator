@@ -14,13 +14,11 @@ use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class GetMachineMessageHandler
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
         private readonly WorkerManagerClient $workerManagerClient,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -44,9 +42,5 @@ final class GetMachineMessageHandler
             $previousMachine,
             $machine
         ));
-
-        if ('end' !== $machine->stateCategory) {
-            $this->messageBus->dispatch(new GetMachineMessage($message->authenticationToken, $machine));
-        }
     }
 }

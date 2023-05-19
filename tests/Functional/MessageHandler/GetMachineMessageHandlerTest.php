@@ -15,7 +15,6 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -211,9 +210,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         Machine $current,
         string $authenticationToken,
     ): void {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -224,12 +220,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($current)
         ;
 
-        $handler = new GetMachineMessageHandler(
-            $messageBus,
-            $workerManagerClient,
-            $eventDispatcher
-        );
-
+        $handler = new GetMachineMessageHandler($workerManagerClient, $eventDispatcher);
         $message = new GetMachineMessage($authenticationToken, $previous);
 
         ($handler)($message);
