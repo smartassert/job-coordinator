@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineRetrievedEvent;
+use App\Exception\MachineRetrievalException;
 use App\Message\GetMachineMessage;
-use Psr\Http\Client\ClientExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -25,22 +21,22 @@ final class GetMachineMessageHandler
     }
 
     /**
-     * @throws ClientExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
+     * @throws MachineRetrievalException
      */
     public function __invoke(GetMachineMessage $message): void
     {
         $previousMachine = $message->machine;
 
-        $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
+        try {
+            $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
 
-        $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
-            $message->authenticationToken,
-            $previousMachine,
-            $machine
-        ));
+            $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
+                $message->authenticationToken,
+                $previousMachine,
+                $machine
+            ));
+        } catch (\Throwable $e) {
+            throw new MachineRetrievalException($previousMachine, $e);
+        }
     }
 }
