@@ -7,6 +7,7 @@ namespace App\Tests\Services\EventSubscriber;
 use App\Event\JobCreatedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRequestedEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -40,6 +41,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
             MachineRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
+            MachineRetrievedEvent::class => [
+                ['addEvent', 1000],
+            ],
         ];
     }
 
@@ -50,7 +54,7 @@ class EventRecorder implements EventSubscriberInterface, \Countable
 
     public function getLatest(): ?Event
     {
-        $latest = $this->events[0] ?? null;
+        $latest = $this->events[count($this->events) - 1] ?? null;
 
         return $latest instanceof Event ? $latest : null;
     }
@@ -58,5 +62,24 @@ class EventRecorder implements EventSubscriberInterface, \Countable
     public function count(): int
     {
         return count($this->events);
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function all(?string $eventName = null): array
+    {
+        if (null === $eventName) {
+            return $this->events;
+        }
+
+        $events = [];
+        foreach ($this->events as $event) {
+            if ($event instanceof $eventName) {
+                $events[] = $event;
+            }
+        }
+
+        return $events;
     }
 }

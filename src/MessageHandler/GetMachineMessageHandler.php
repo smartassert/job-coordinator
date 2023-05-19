@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -39,6 +40,12 @@ final class GetMachineMessageHandler
         $previousMachine = $message->machine;
 
         $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
+
+        $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
+            $message->authenticationToken,
+            $previousMachine,
+            $machine
+        ));
 
         if (
             in_array($previousMachine->stateCategory, ['unknown', 'finding', 'pre_active'])

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
@@ -38,6 +39,21 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
     }
 
+    public function testEventsAreDispatched(): void
+    {
+        $machineId = md5((string) rand());
+
+        $previous = new Machine($machineId, 'find/received', 'finding', []);
+        $current = new Machine($machineId, 'find/received', 'finding', []);
+
+        $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
+
+        self::assertEquals(
+            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
+            $this->eventRecorder->getLatest()
+        );
+    }
+
     /**
      * @dataProvider invokeNoStateChangeDataProvider
      */
@@ -45,7 +61,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
-        self::assertNull($this->eventRecorder->getLatest());
+        self::assertEquals(
+            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
+            $this->eventRecorder->getLatest()
+        );
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
@@ -89,9 +108,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $expectedEvent = $expectedEventCreator(self::$apiToken);
 
-        $latestEvent = $this->eventRecorder->getLatest();
-        self::assertNotNull($latestEvent);
-        self::assertEquals($expectedEvent, $latestEvent);
+        $events = $this->eventRecorder->all($expectedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertNotNull($event);
+        self::assertEquals($expectedEvent, $event);
 
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
