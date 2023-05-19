@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
-use App\MessageHandler\CheckMachineStateChangeMessageHandler;
+use App\MessageHandler\GetMachineMessageHandler;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     private EventRecorder $eventRecorder;
 
@@ -33,8 +33,8 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void
     {
-        $handler = self::getContainer()->get(CheckMachineStateChangeMessageHandler::class);
-        self::assertInstanceOf(CheckMachineStateChangeMessageHandler::class, $handler);
+        $handler = self::getContainer()->get(GetMachineMessageHandler::class);
+        self::assertInstanceOf(GetMachineMessageHandler::class, $handler);
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
     }
 
@@ -174,7 +174,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandlerClass(): string
     {
-        return CheckMachineStateChangeMessageHandler::class;
+        return GetMachineMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
@@ -203,7 +203,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
             ->andReturn($current)
         ;
 
-        $handler = new CheckMachineStateChangeMessageHandler(
+        $handler = new GetMachineMessageHandler(
             $messageBus,
             $workerManagerClient,
             $eventDispatcher

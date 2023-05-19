@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final class CheckMachineStateChangeMessageHandler
+final class GetMachineMessageHandler
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
