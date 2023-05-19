@@ -9,6 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MachineRetrievedEvent extends Event
 {
+    /**
+     * @param non-empty-string $authenticationToken
+     */
     public function __construct(
         public readonly string $authenticationToken,
         public readonly Machine $previous,

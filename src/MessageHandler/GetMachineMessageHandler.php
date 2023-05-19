@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
-use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
@@ -46,30 +44,6 @@ final class GetMachineMessageHandler
             $previousMachine,
             $machine
         ));
-
-        if (
-            in_array($previousMachine->stateCategory, ['unknown', 'finding', 'pre_active'])
-            && 'active' === $machine->stateCategory
-        ) {
-            $primaryIpAddress = $machine->ipAddresses[0] ?? null;
-            if (!is_string($primaryIpAddress)) {
-                return;
-            }
-
-            $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
-                $message->authenticationToken,
-                $machine->id,
-                $primaryIpAddress
-            ));
-        }
-
-        if ($previousMachine->state !== $machine->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $message->authenticationToken,
-                $previousMachine,
-                $machine
-            ));
-        }
 
         if ('end' !== $machine->stateCategory) {
             $this->messageBus->dispatch(new GetMachineMessage($message->authenticationToken, $machine));
