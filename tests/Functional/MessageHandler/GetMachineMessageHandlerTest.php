@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Message\CheckMachineStateChangeMessage;
-use App\MessageHandler\CheckMachineStateChangeMessageHandler;
+use App\Message\GetMachineMessage;
+use App\MessageHandler\GetMachineMessageHandler;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     private EventRecorder $eventRecorder;
 
@@ -33,9 +33,24 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void
     {
-        $handler = self::getContainer()->get(CheckMachineStateChangeMessageHandler::class);
-        self::assertInstanceOf(CheckMachineStateChangeMessageHandler::class, $handler);
+        $handler = self::getContainer()->get(GetMachineMessageHandler::class);
+        self::assertInstanceOf(GetMachineMessageHandler::class, $handler);
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
+    }
+
+    public function testEventsAreDispatched(): void
+    {
+        $machineId = md5((string) rand());
+
+        $previous = new Machine($machineId, 'find/received', 'finding', []);
+        $current = new Machine($machineId, 'find/received', 'finding', []);
+
+        $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
+
+        self::assertEquals(
+            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
+            $this->eventRecorder->getLatest()
+        );
     }
 
     /**
@@ -45,7 +60,10 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
     {
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
-        self::assertNull($this->eventRecorder->getLatest());
+        self::assertEquals(
+            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
+            $this->eventRecorder->getLatest()
+        );
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
@@ -89,9 +107,11 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
         $expectedEvent = $expectedEventCreator(self::$apiToken);
 
-        $latestEvent = $this->eventRecorder->getLatest();
-        self::assertNotNull($latestEvent);
-        self::assertEquals($expectedEvent, $latestEvent);
+        $events = $this->eventRecorder->all($expectedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertNotNull($event);
+        self::assertEquals($expectedEvent, $event);
 
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
@@ -174,12 +194,12 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandlerClass(): string
     {
-        return CheckMachineStateChangeMessageHandler::class;
+        return GetMachineMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return CheckMachineStateChangeMessage::class;
+        return GetMachineMessage::class;
     }
 
     /**
@@ -190,9 +210,6 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
         Machine $current,
         string $authenticationToken,
     ): void {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -203,13 +220,8 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
             ->andReturn($current)
         ;
 
-        $handler = new CheckMachineStateChangeMessageHandler(
-            $messageBus,
-            $workerManagerClient,
-            $eventDispatcher
-        );
-
-        $message = new CheckMachineStateChangeMessage($authenticationToken, $previous);
+        $handler = new GetMachineMessageHandler($workerManagerClient, $eventDispatcher);
+        $message = new GetMachineMessage($authenticationToken, $previous);
 
         ($handler)($message);
     }
@@ -230,7 +242,7 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
                 $message = $envelope->getMessage();
                 $foundMessageClasses[] = $message::class;
 
-                if (CheckMachineStateChangeMessage::class === $message::class) {
+                if (GetMachineMessage::class === $message::class) {
                     $machineStateChangeCheckMessage = $message;
                     $machineStateChangeCheckMessageDelayStamps = $envelope->all(DelayStamp::class);
                 }
@@ -240,20 +252,20 @@ class CheckMachineStateChangeMessageHandlerTest extends AbstractMessageHandlerTe
         if (null === $machineStateChangeCheckMessage) {
             self::fail(sprintf(
                 '%s message not dispatched, found: %s',
-                CheckMachineStateChangeMessage::class,
+                GetMachineMessage::class,
                 implode(', ', $foundMessageClasses)
             ));
         }
 
         self::assertEquals(
-            new CheckMachineStateChangeMessage($authenticationToken, $current),
+            new GetMachineMessage($authenticationToken, $current),
             $machineStateChangeCheckMessage
         );
 
         $messageDelays = self::getContainer()->getParameter('message_delays');
         \assert(is_array($messageDelays));
 
-        $expectedDelayStampValue = $messageDelays[CheckMachineStateChangeMessage::class] ?? null;
+        $expectedDelayStampValue = $messageDelays[GetMachineMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);
