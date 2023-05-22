@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
@@ -45,6 +46,12 @@ final class GetSerializedSuiteMessageHandler
                 $message->authenticationToken,
                 $message->serializedSuiteId,
             );
+
+            $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
+                $message->authenticationToken,
+                $job->id,
+                $serializedSuite
+            ));
         } catch (\Throwable $e) {
             throw new SerializedSuiteRetrievalException($job, $e);
         }

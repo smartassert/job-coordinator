@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Event;
+
+use SmartAssert\SourcesClient\Model\SerializedSuite;
+use Symfony\Contracts\EventDispatcher\Event;
+
+class SerializedSuiteRetrievedEvent extends Event
+{
+    /**
+     * @param non-empty-string $authenticationToken
+     */
+    public function __construct(
+        public readonly string $authenticationToken,
+        public readonly string $jobId,
+        public readonly SerializedSuite $serializedSuite,
+    ) {
+    }
+}
