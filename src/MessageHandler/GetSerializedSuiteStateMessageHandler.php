@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Message\GetSerializedSuiteMessage;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -29,7 +29,7 @@ final class GetSerializedSuiteStateMessageHandler
     /**
      * @throws SerializedSuiteRetrievalException
      */
-    public function __invoke(GetSerializedSuiteStateMessage $message): void
+    public function __invoke(GetSerializedSuiteMessage $message): void
     {
         $job = $this->jobRepository->findOneBy(['serializedSuiteId' => $message->serializedSuiteId]);
         if (null === $job) {

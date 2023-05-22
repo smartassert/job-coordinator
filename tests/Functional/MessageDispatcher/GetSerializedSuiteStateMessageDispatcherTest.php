@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteStateMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
@@ -65,7 +65,7 @@ class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId);
+        $expectedMessage = new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

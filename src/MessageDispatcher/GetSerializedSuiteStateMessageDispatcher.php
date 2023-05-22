@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Message\GetSerializedSuiteMessage;
 use App\Messenger\NonDelayedStamp;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -33,7 +33,7 @@ class GetSerializedSuiteStateMessageDispatcher implements EventSubscriberInterfa
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
         $this->messageBus->dispatch(new Envelope(
-            new GetSerializedSuiteStateMessage($event->authenticationToken, $event->serializedSuite->getId()),
+            new GetSerializedSuiteMessage($event->authenticationToken, $event->serializedSuite->getId()),
             [new NonDelayedStamp()]
         ));
     }

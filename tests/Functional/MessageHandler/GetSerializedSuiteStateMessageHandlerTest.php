@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
@@ -141,7 +141,7 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandledMessageClass(): string
     {
-        return GetSerializedSuiteStateMessage::class;
+        return GetSerializedSuiteMessage::class;
     }
 
     /**
@@ -206,7 +206,7 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
             $eventDispatcher,
         );
 
-        $message = new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId);
 
         ($handler)($message);
     }
@@ -224,14 +224,14 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
 
         $messageDelays = self::getContainer()->getParameter('message_delays');
         \assert(is_array($messageDelays));
 
-        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteStateMessage::class] ?? null;
+        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
