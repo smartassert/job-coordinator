@@ -57,11 +57,6 @@ final class GetSerializedSuiteMessageHandler
         }
 
         $serializedSuiteState = $serializedSuite->getState();
-        if ('' !== $serializedSuiteState && $serializedSuiteState !== $job->getSerializedSuiteState()) {
-            $job->setSerializedSuiteState($serializedSuiteState);
-            $this->jobRepository->add($job);
-        }
-
         if ('prepared' === $serializedSuiteState) {
             $this->eventDispatcher->dispatch(new SerializedSuiteSerializedEvent(
                 $message->authenticationToken,
