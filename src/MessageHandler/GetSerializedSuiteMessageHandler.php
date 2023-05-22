@@ -14,7 +14,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final class GetSerializedSuiteStateMessageHandler
+final class GetSerializedSuiteMessageHandler
 {
     private const SERIALIZED_SUITE_END_STATES = ['prepared', 'failed'];
 

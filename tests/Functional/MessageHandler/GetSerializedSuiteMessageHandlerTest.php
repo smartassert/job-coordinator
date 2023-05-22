@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
-use App\MessageHandler\GetSerializedSuiteStateMessageHandler;
+use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
@@ -136,7 +136,7 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandlerClass(): string
     {
-        return GetSerializedSuiteStateMessageHandler::class;
+        return GetSerializedSuiteMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
@@ -199,7 +199,7 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
             ? $serializedSuiteClient
             : \Mockery::mock(SerializedSuiteClient::class);
 
-        $handler = new GetSerializedSuiteStateMessageHandler(
+        $handler = new GetSerializedSuiteMessageHandler(
             $jobRepository,
             $serializedSuiteClient,
             $messageBus,
