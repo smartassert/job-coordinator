@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Enum\RequestState;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
@@ -141,7 +141,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
 

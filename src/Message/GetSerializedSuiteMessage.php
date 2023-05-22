@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class GetSerializedSuiteStateMessage
+class GetSerializedSuiteMessage
 {
     /**
      * @param non-empty-string $authenticationToken

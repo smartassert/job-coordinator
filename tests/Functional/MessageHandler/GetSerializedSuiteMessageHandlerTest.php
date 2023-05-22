@@ -7,18 +7,17 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
-use App\Message\GetSerializedSuiteStateMessage;
-use App\MessageHandler\GetSerializedSuiteStateMessageHandler;
+use App\Message\GetSerializedSuiteMessage;
+use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
@@ -136,12 +135,12 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
 
     protected function getHandlerClass(): string
     {
-        return GetSerializedSuiteStateMessageHandler::class;
+        return GetSerializedSuiteMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return GetSerializedSuiteStateMessage::class;
+        return GetSerializedSuiteMessage::class;
     }
 
     /**
@@ -189,9 +188,6 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -199,14 +195,8 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
             ? $serializedSuiteClient
             : \Mockery::mock(SerializedSuiteClient::class);
 
-        $handler = new GetSerializedSuiteStateMessageHandler(
-            $jobRepository,
-            $serializedSuiteClient,
-            $messageBus,
-            $eventDispatcher,
-        );
-
-        $message = new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId);
+        $handler = new GetSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
+        $message = new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId);
 
         ($handler)($message);
     }
@@ -224,14 +214,14 @@ class GetSerializedSuiteStateMessageHandlerTest extends AbstractMessageHandlerTe
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId),
             $envelope->getMessage()
         );
 
         $messageDelays = self::getContainer()->getParameter('message_delays');
         \assert(is_array($messageDelays));
 
-        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteStateMessage::class] ?? null;
+        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteMessage::class] ?? null;
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));

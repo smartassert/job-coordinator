@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Message\GetSerializedSuiteStateMessage;
+use App\Event\SerializedSuiteRetrievedEvent;
+use App\Message\GetSerializedSuiteMessage;
 use App\Messenger\NonDelayedStamp;
+use App\Model\SerializedSuiteEndStates;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class GetSerializedSuiteStateMessageDispatcher implements EventSubscriberInterface
+class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
@@ -27,14 +29,31 @@ class GetSerializedSuiteStateMessageDispatcher implements EventSubscriberInterfa
             SerializedSuiteCreatedEvent::class => [
                 ['dispatchForSerializedSuiteCreatedEvent', 100],
             ],
+            SerializedSuiteRetrievedEvent::class => [
+                ['dispatchForSerializedSuiteRetrievedEvent', 100],
+            ],
         ];
     }
 
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
         $this->messageBus->dispatch(new Envelope(
-            new GetSerializedSuiteStateMessage($event->authenticationToken, $event->serializedSuite->getId()),
+            new GetSerializedSuiteMessage($event->authenticationToken, $event->serializedSuite->getId()),
             [new NonDelayedStamp()]
+        ));
+    }
+
+    public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
+    {
+        $serializedSuiteState = $event->serializedSuite->getState();
+
+        if (in_array($serializedSuiteState, SerializedSuiteEndStates::END_STATES)) {
+            return;
+        }
+
+        $this->messageBus->dispatch(new GetSerializedSuiteMessage(
+            $event->authenticationToken,
+            $event->serializedSuite->getId(),
         ));
     }
 }

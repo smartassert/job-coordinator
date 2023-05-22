@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Message\GetSerializedSuiteStateMessage;
-use App\MessageDispatcher\GetSerializedSuiteStateMessageDispatcher;
+use App\Message\GetSerializedSuiteMessage;
+use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -18,15 +18,15 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
 {
-    private GetSerializedSuiteStateMessageDispatcher $dispatcher;
+    private GetSerializedSuiteMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(GetSerializedSuiteStateMessageDispatcher::class);
-        \assert($dispatcher instanceof GetSerializedSuiteStateMessageDispatcher);
+        $dispatcher = self::getContainer()->get(GetSerializedSuiteMessageDispatcher::class);
+        \assert($dispatcher instanceof GetSerializedSuiteMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -65,7 +65,7 @@ class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetSerializedSuiteStateMessage($authenticationToken, $serializedSuiteId);
+        $expectedMessage = new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
