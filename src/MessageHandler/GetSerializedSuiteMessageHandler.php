@@ -7,21 +7,18 @@ namespace App\MessageHandler;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
+use App\Model\SerializedSuiteEndStates;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class GetSerializedSuiteMessageHandler
 {
-    private const SERIALIZED_SUITE_END_STATES = ['prepared', 'failed'];
-
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly MessageBusInterface $messageBus,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
@@ -36,7 +33,7 @@ final class GetSerializedSuiteMessageHandler
             return;
         }
 
-        if (in_array($job->getSerializedSuiteState(), self::SERIALIZED_SUITE_END_STATES)) {
+        if (in_array($job->getSerializedSuiteState(), SerializedSuiteEndStates::END_STATES)) {
             return;
         }
 
@@ -53,11 +50,6 @@ final class GetSerializedSuiteMessageHandler
             ));
         } catch (\Throwable $e) {
             throw new SerializedSuiteRetrievalException($job, $e);
-        }
-
-        $serializedSuiteState = $serializedSuite->getState();
-        if (!in_array($serializedSuiteState, self::SERIALIZED_SUITE_END_STATES)) {
-            $this->messageBus->dispatch($message);
         }
     }
 }
