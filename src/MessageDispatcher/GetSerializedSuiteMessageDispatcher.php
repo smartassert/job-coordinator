@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class GetSerializedSuiteStateMessageDispatcher implements EventSubscriberInterface
+class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
