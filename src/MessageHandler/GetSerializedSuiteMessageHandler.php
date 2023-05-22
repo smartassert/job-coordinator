@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
 use App\Repository\JobRepository;
@@ -57,14 +56,6 @@ final class GetSerializedSuiteMessageHandler
         }
 
         $serializedSuiteState = $serializedSuite->getState();
-        if ('prepared' === $serializedSuiteState) {
-            $this->eventDispatcher->dispatch(new SerializedSuiteSerializedEvent(
-                $message->authenticationToken,
-                $job->id,
-                $serializedSuite->getId()
-            ));
-        }
-
         if (!in_array($serializedSuiteState, self::SERIALIZED_SUITE_END_STATES)) {
             $this->messageBus->dispatch($message);
         }

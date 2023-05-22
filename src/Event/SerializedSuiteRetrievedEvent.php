@@ -11,6 +11,7 @@ class SerializedSuiteRetrievedEvent extends Event
 {
     /**
      * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
      */
     public function __construct(
         public readonly string $authenticationToken,
