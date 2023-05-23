@@ -22,7 +22,7 @@ final class Version20230519103636 extends AbstractMigration
                 id VARCHAR(128) NOT NULL, 
                 job_id VARCHAR(32) NOT NULL,
                 type VARCHAR(64) NOT NULL, 
-                state VARCHAR(64) DEFAULT NULL, 
+                state VARCHAR(64) NOT NULL, 
                 PRIMARY KEY(id))
         ');
         $this->addSql('CREATE INDEX type_idx ON remote_request (type)');

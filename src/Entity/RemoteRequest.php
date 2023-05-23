@@ -30,8 +30,8 @@ class RemoteRequest
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestType::class)]
     private readonly RemoteRequestType $type;
 
-    #[ORM\Column(type: Types::STRING, length: 64, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $state = null;
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RequestState::class)]
+    private RequestState $state;
 
     #[ORM\ManyToOne(cascade: ['persist'])]
     private ?RemoteRequestFailure $failure = null;
@@ -44,6 +44,14 @@ class RemoteRequest
         $this->id = self::generateId($jobId, $type);
         $this->jobId = $jobId;
         $this->type = $type;
+        $this->state = RequestState::REQUESTING;
+    }
+
+    public function setState(RequestState $state): self
+    {
+        $this->state = $state;
+
+        return $this;
     }
 
     /**
