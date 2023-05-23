@@ -46,12 +46,7 @@ class RemoteRequestFactoryTest extends WebTestCase
 
         $remoteRequest = $this->remoteRequestFactory->create($jobId, $type);
 
-        $remoteRequestReflector = new \ReflectionClass($remoteRequest);
-        $idProperty = $remoteRequestReflector->getProperty('id');
-        $remoteRequestId = $idProperty->getValue($remoteRequest);
-        \assert(is_string($remoteRequestId) && '' !== $remoteRequestId);
-
-        self::assertEquals(new RemoteRequest($remoteRequestId, $jobId, $type), $remoteRequest);
+        self::assertEquals(new RemoteRequest($jobId, $type), $remoteRequest);
         self::assertSame(1, $this->remoteRequestRepository->count([]));
     }
 
