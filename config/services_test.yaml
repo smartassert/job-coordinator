@@ -40,3 +40,6 @@ services:
 
     SmartAssert\SourcesClient\SuiteClient:
         public: true
+
+    App\Services\RemoteRequestFactory:
+        public: true
