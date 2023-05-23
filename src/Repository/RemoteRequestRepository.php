@@ -23,21 +23,15 @@ class RemoteRequestRepository extends ServiceEntityRepository
         parent::__construct($registry, RemoteRequest::class);
     }
 
-    public function save(RemoteRequest $entity, bool $flush = false): void
+    public function save(RemoteRequest $entity): void
     {
         $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->getEntityManager()->flush();
     }
 
-    public function remove(RemoteRequest $entity, bool $flush = false): void
+    public function remove(RemoteRequest $entity): void
     {
         $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->getEntityManager()->flush();
     }
 }
