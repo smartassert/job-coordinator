@@ -18,7 +18,7 @@ class RemoteRequest
      * @var non-empty-string
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 32, unique: true)]
+    #[ORM\Column(type: 'string', length: 128, unique: true)]
     private readonly string $id;
 
     /**
@@ -37,14 +37,23 @@ class RemoteRequest
     private ?RemoteRequestFailure $failure = null;
 
     /**
-     * @param non-empty-string $id
      * @param non-empty-string $jobId
      */
-    public function __construct(string $id, string $jobId, RemoteRequestType $type)
+    public function __construct(string $jobId, RemoteRequestType $type)
     {
-        $this->id = $id;
+        $this->id = self::generateId($jobId, $type);
         $this->jobId = $jobId;
         $this->type = $type;
+    }
+
+    /**
+     * @param non-empty-string $jobId
+     *
+     * @return non-empty-string
+     */
+    public static function generateId(string $jobId, RemoteRequestType $type): string
+    {
+        return $jobId . $type->value;
     }
 
     public function setFailure(?RemoteRequestFailure $failure): self
