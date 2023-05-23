@@ -19,7 +19,7 @@ final class Version20230519103636 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE remote_request (
-                id VARCHAR(32) NOT NULL, 
+                id VARCHAR(128) NOT NULL, 
                 job_id VARCHAR(32) NOT NULL,
                 type VARCHAR(64) NOT NULL, 
                 state VARCHAR(64) DEFAULT NULL, 
