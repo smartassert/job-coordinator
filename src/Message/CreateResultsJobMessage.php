@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateResultsJobMessage
+class CreateResultsJobMessage implements JobMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -12,7 +12,12 @@ class CreateResultsJobMessage
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }
