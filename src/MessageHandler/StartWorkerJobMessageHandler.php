@@ -28,7 +28,7 @@ final class StartWorkerJobMessageHandler
      */
     public function __invoke(StartWorkerJobMessage $message): void
     {
-        $job = $this->jobRepository->find($message->jobId);
+        $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             return;
         }
