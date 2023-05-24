@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-interface JobMessageInterface
+use App\Enum\RemoteRequestType;
+
+interface JobRemoteRequestMessageInterface
 {
     /**
      * @return non-empty-string
      */
     public function getJobId(): string;
+
+    public function getRemoteRequestType(): RemoteRequestType;
 }

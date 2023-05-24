@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class CreateMachineMessage implements JobMessageInterface, RemoteRequestMessageInterface
+class CreateMachineMessage implements JobRemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken
