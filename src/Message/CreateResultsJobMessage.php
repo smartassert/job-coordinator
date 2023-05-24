@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateResultsJobMessage implements JobMessageInterface
+use App\Enum\RemoteRequestType;
+
+class CreateResultsJobMessage implements JobMessageInterface, RemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -19,5 +21,10 @@ class CreateResultsJobMessage implements JobMessageInterface
     public function getJobId(): string
     {
         return $this->jobId;
+    }
+
+    public function getRemoteRequestType(): RemoteRequestType
+    {
+        return RemoteRequestType::RESULTS_CREATE;
     }
 }
