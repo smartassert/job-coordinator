@@ -7,7 +7,7 @@ namespace App\Message;
 use App\Enum\RemoteRequestType;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class GetMachineMessage implements JobMessageInterface, RemoteRequestMessageInterface
+class GetMachineMessage implements JobRemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken

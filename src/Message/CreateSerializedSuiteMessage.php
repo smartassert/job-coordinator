@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class CreateSerializedSuiteMessage implements JobMessageInterface, RemoteRequestMessageInterface
+class CreateSerializedSuiteMessage implements JobRemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string                          $authenticationToken
