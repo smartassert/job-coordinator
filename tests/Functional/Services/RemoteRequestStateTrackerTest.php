@@ -9,7 +9,6 @@ use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
-use App\Services\RemoteRequestFactory;
 use App\Services\RemoteRequestStateTracker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -91,9 +90,6 @@ class RemoteRequestStateTrackerTest extends WebTestCase
     public function testSetRemoteRequestState(callable $eventCreator, callable $expectedRemoteRequestCreator): void
     {
         self::assertSame(0, $this->remoteRequestRepository->count([]));
-
-        $remoteRequestFactory = self::getContainer()->get(RemoteRequestFactory::class);
-        \assert($remoteRequestFactory instanceof RemoteRequestFactory);
 
         $event = $eventCreator();
         $message = $event->getEnvelope()->getMessage();
@@ -177,9 +173,6 @@ class RemoteRequestStateTrackerTest extends WebTestCase
     public function testSetRemoteRequestStateForMultipleStateChanges(): void
     {
         self::assertSame(0, $this->remoteRequestRepository->count([]));
-
-        $remoteRequestFactory = self::getContainer()->get(RemoteRequestFactory::class);
-        \assert($remoteRequestFactory instanceof RemoteRequestFactory);
 
         $message = $this->createMessage();
 
