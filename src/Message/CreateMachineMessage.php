@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateMachineMessage implements JobMessageInterface
+use App\Enum\RemoteRequestType;
+
+class CreateMachineMessage implements JobMessageInterface, RemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -19,5 +21,10 @@ class CreateMachineMessage implements JobMessageInterface
     public function getJobId(): string
     {
         return $this->jobId;
+    }
+
+    public function getRemoteRequestType(): RemoteRequestType
+    {
+        return RemoteRequestType::MACHINE_CREATE;
     }
 }

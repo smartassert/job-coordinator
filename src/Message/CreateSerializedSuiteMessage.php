@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateSerializedSuiteMessage implements JobMessageInterface
+use App\Enum\RemoteRequestType;
+
+class CreateSerializedSuiteMessage implements JobMessageInterface, RemoteRequestMessageInterface
 {
     /**
      * @param non-empty-string                          $authenticationToken
@@ -21,5 +23,10 @@ class CreateSerializedSuiteMessage implements JobMessageInterface
     public function getJobId(): string
     {
         return $this->jobId;
+    }
+
+    public function getRemoteRequestType(): RemoteRequestType
+    {
+        return RemoteRequestType::SERIALIZED_SUITE_CREATE;
     }
 }
