@@ -21,7 +21,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 {
     public function testInvokeNoJob(): void
     {
-        $this->createMessageAndHandleMessage(self::$apiToken, md5((string) rand()));
+        $this->createMessageAndHandleMessage(self::$apiToken, md5((string) rand()), md5((string) rand()));
 
         $this->assertNoMessagesDispatched();
     }
@@ -38,7 +38,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteId = $job->getSerializedSuiteId();
         \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $serializedSuiteId);
+        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId);
 
         $this->assertNoMessagesDispatched();
     }
@@ -81,7 +81,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClientException->getMessage()
         ));
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId, $serializedSuiteClient);
     }
 
     public function testInvokeNoStateChangeNotEndState(): void
@@ -94,7 +94,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteId = $job->getSerializedSuiteId();
         \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
 
-        self::assertDispatchedMessage(self::$apiToken, $serializedSuiteId);
+        self::assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuiteId);
     }
 
     public function testInvokeHasStateChangeNotEndState(): void
@@ -106,7 +106,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
 
         self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
-        self::assertDispatchedMessage(self::$apiToken, $serializedSuiteId);
+        self::assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuiteId);
     }
 
     public function testInvokeHasStateChangeIsPrepared(): void
@@ -171,17 +171,19 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             ->andReturn($serializedSuite)
         ;
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $serializedSuiteId, $serializedSuiteClient);
+        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId, $serializedSuiteClient);
 
         return $job;
     }
 
     /**
      * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
      */
     private function createMessageAndHandleMessage(
         string $authenticationToken,
+        string $jobId,
         string $serializedSuiteId,
         ?SerializedSuiteClient $serializedSuiteClient = null,
     ): void {
@@ -196,17 +198,21 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             : \Mockery::mock(SerializedSuiteClient::class);
 
         $handler = new GetSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
-        $message = new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId);
 
         ($handler)($message);
     }
 
     /**
      * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
      */
-    private function assertDispatchedMessage(string $authenticationToken, string $serializedSuiteId): void
-    {
+    private function assertDispatchedMessage(
+        string $authenticationToken,
+        string $jobId,
+        string $serializedSuiteId
+    ): void {
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
@@ -214,7 +220,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteMessage($authenticationToken, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId),
             $envelope->getMessage()
         );
 
