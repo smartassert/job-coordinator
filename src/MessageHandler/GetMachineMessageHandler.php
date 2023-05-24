@@ -28,7 +28,7 @@ final class GetMachineMessageHandler
         $previousMachine = $message->machine;
 
         try {
-            $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $previousMachine->id);
+            $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
                 $message->authenticationToken,
