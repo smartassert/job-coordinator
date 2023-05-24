@@ -28,7 +28,7 @@ final class CreateMachineMessageHandler
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        $job = $this->jobRepository->find($message->jobId);
+        $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             return;
         }
@@ -37,7 +37,7 @@ final class CreateMachineMessageHandler
         $this->jobRepository->add($job);
 
         try {
-            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $message->jobId);
+            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $job->id);
 
             $this->eventDispatcher->dispatch(new MachineRequestedEvent($message->authenticationToken, $machine));
         } catch (\Throwable $e) {

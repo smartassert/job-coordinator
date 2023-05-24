@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateMachineMessage
+class CreateMachineMessage implements JobMessageInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -14,5 +14,10 @@ class CreateMachineMessage
         public readonly string $authenticationToken,
         public readonly string $jobId,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }

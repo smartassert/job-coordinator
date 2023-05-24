@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-class CreateSerializedSuiteMessage
+class CreateSerializedSuiteMessage implements JobMessageInterface
 {
     /**
      * @param non-empty-string                          $authenticationToken
@@ -13,8 +13,13 @@ class CreateSerializedSuiteMessage
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
         public readonly array $parameters,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }

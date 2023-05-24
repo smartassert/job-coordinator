@@ -38,7 +38,11 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
         $this->messageBus->dispatch(new Envelope(
-            new GetSerializedSuiteMessage($event->authenticationToken, $event->serializedSuite->getId()),
+            new GetSerializedSuiteMessage(
+                $event->authenticationToken,
+                $event->jobId,
+                $event->serializedSuite->getId()
+            ),
             [new NonDelayedStamp()]
         ));
     }
@@ -53,6 +57,7 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 
         $this->messageBus->dispatch(new GetSerializedSuiteMessage(
             $event->authenticationToken,
+            $event->jobId,
             $event->serializedSuite->getId(),
         ));
     }

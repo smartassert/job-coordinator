@@ -28,7 +28,7 @@ final class CreateResultsJobMessageHandler
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        $job = $this->jobRepository->find($message->jobId);
+        $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             return;
         }
@@ -36,10 +36,10 @@ final class CreateResultsJobMessageHandler
         $job->setResultsJobRequestState(RequestState::REQUESTING);
 
         try {
-            $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->jobId);
+            $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $job->id);
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
                 $message->authenticationToken,
-                $message->jobId,
+                $job->id,
                 $resultsJob
             ));
         } catch (\Throwable $e) {
