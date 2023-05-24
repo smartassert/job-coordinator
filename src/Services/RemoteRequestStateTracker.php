@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\RemoteRequest;
+use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
@@ -16,7 +18,6 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RemoteRequestRepository $remoteRequestRepository,
-        private readonly RemoteRequestFactory $remoteRequestFactory,
     ) {
     }
 
@@ -49,7 +50,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         $remoteRequestType = $message->getRemoteRequestType();
         $requestState = $this->getRequestStateFromEvent($event);
 
-        $remoteRequest = $this->remoteRequestFactory->create($jobId, $remoteRequestType);
+        $remoteRequest = $this->createRemoteRequest($jobId, $remoteRequestType);
         $remoteRequest->setState($requestState);
         $this->remoteRequestRepository->save($remoteRequest);
     }
@@ -69,5 +70,20 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         }
 
         return RequestState::UNKNOWN;
+    }
+
+    /**
+     * @param non-empty-string $jobId
+     */
+    private function createRemoteRequest(string $jobId, RemoteRequestType $type): RemoteRequest
+    {
+        $remoteRequest = $this->remoteRequestRepository->find(RemoteRequest::generateId($jobId, $type));
+
+        if (null === $remoteRequest) {
+            $remoteRequest = new RemoteRequest($jobId, $type);
+            $this->remoteRequestRepository->save($remoteRequest);
+        }
+
+        return $remoteRequest;
     }
 }
