@@ -9,10 +9,6 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\RemoteRequestCancelledEvent;
-use App\Event\RemoteRequestCompletedEvent;
-use App\Event\RemoteRequestFailedEvent;
-use App\Event\RemoteRequestStartedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,18 +46,6 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             SerializedSuiteRetrievedEvent::class => [
-                ['addEvent', 1000],
-            ],
-            RemoteRequestCancelledEvent::class => [
-                ['addEvent', 1000],
-            ],
-            RemoteRequestCompletedEvent::class => [
-                ['addEvent', 1000],
-            ],
-            RemoteRequestFailedEvent::class => [
-                ['addEvent', 1000],
-            ],
-            RemoteRequestStartedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];

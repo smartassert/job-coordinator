@@ -11,13 +11,10 @@ use App\Enum\RequestState;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\RemoteRequestCompletedEvent;
-use App\Event\RemoteRequestStartedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Services\RemoteRequestFactory;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -77,7 +74,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
-        $this->assertRemoteRequestEventsAreDispatched($previous, $current);
+        self::assertEquals(
+            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            $this->eventRecorder->all(MachineRetrievedEvent::class)
+        );
 
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
@@ -193,7 +193,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals($current, $latestEvent->current);
         self::assertEquals(self::$apiToken, $latestEvent->authenticationToken);
 
-        $this->assertRemoteRequestEventsAreDispatched($previous, $current);
+        self::assertEquals(
+            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            $this->eventRecorder->all(MachineRetrievedEvent::class)
+        );
 
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
@@ -249,10 +252,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $remoteRequestFactory = self::getContainer()->get(RemoteRequestFactory::class);
-        \assert($remoteRequestFactory instanceof RemoteRequestFactory);
-
-        $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher, $remoteRequestFactory);
+        $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
         $message = new GetMachineMessage($authenticationToken, $previous);
 
         ($handler)($message);
@@ -301,27 +301,5 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert(is_int($expectedDelayStampValue));
 
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);
-    }
-
-    private function assertRemoteRequestEventsAreDispatched(Machine $previous, Machine $current): void
-    {
-        $completedRemoteRequest = (new RemoteRequest($previous->id, RemoteRequestType::MACHINE_GET))
-            ->setState(RequestState::SUCCEEDED)
-        ;
-
-        self::assertEquals(
-            [new RemoteRequestStartedEvent($completedRemoteRequest)],
-            $this->eventRecorder->all(RemoteRequestStartedEvent::class)
-        );
-
-        self::assertEquals(
-            [new RemoteRequestCompletedEvent($completedRemoteRequest)],
-            $this->eventRecorder->all(RemoteRequestCompletedEvent::class)
-        );
-
-        self::assertEquals(
-            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
-            $this->eventRecorder->all(MachineRetrievedEvent::class)
-        );
     }
 }
