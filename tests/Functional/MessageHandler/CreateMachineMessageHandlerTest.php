@@ -131,7 +131,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetMachineMessage($authenticationToken, $machine),
+            new GetMachineMessage($authenticationToken, $machine->id, $machine),
             $envelope->getMessage()
         );
 

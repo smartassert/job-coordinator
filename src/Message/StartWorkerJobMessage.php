@@ -6,22 +6,18 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class StartWorkerJobMessage implements JobRemoteRequestMessageInterface
+class StartWorkerJobMessage extends AbstractRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      */
     public function __construct(
-        public readonly string $authenticationToken,
-        private readonly string $jobId,
+        string $authenticationToken,
+        string $jobId,
         public readonly string $machineIpAddress,
     ) {
-    }
-
-    public function getJobId(): string
-    {
-        return $this->jobId;
+        parent::__construct($authenticationToken, $jobId);
     }
 
     public function getRemoteRequestType(): RemoteRequestType
