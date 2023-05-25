@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
+use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,29 +28,41 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
     {
         return [
             FailedEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
             ],
             HandledEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
             ],
             ReceivedEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
+            ],
+            JobRemoteRequestMessageCreatedEvent::class => [
+                ['setRemoteRequestStateForJobRemoteRequestMessageCreatedEvent', 10000],
             ],
         ];
     }
 
-    public function setRemoteRequestState(FailedEvent|HandledEvent|ReceivedEvent $event): void
+    public function setRemoteRequestStateForMessengerEvent(FailedEvent|HandledEvent|ReceivedEvent $event): void
     {
         $message = $event->getEnvelope()->getMessage();
         if (!$message instanceof JobRemoteRequestMessageInterface) {
             return;
         }
 
-        $jobId = $message->getJobId();
-        $remoteRequestType = $message->getRemoteRequestType();
-        $requestState = $this->getRequestStateFromEvent($event);
+        $this->setRemoteRequestForMessage($message, $this->getRequestStateFromEvent($event));
+    }
 
-        $remoteRequest = $this->createRemoteRequest($jobId, $remoteRequestType);
+    public function setRemoteRequestStateForJobRemoteRequestMessageCreatedEvent(
+        JobRemoteRequestMessageCreatedEvent $event
+    ): void {
+        $this->setRemoteRequestForMessage($event->message, RequestState::UNKNOWN);
+    }
+
+    private function setRemoteRequestForMessage(
+        JobRemoteRequestMessageInterface $message,
+        RequestState $requestState
+    ): void {
+        $remoteRequest = $this->createRemoteRequest($message);
         $remoteRequest->setState($requestState);
         $this->remoteRequestRepository->save($remoteRequest);
     }
@@ -72,11 +84,11 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         return RequestState::UNKNOWN;
     }
 
-    /**
-     * @param non-empty-string $jobId
-     */
-    private function createRemoteRequest(string $jobId, RemoteRequestType $type): RemoteRequest
+    private function createRemoteRequest(JobRemoteRequestMessageInterface $message): RemoteRequest
     {
+        $jobId = $message->getJobId();
+        $type = $message->getRemoteRequestType();
+
         $remoteRequest = $this->remoteRequestRepository->find(RemoteRequest::generateId($jobId, $type));
 
         if (null === $remoteRequest) {
