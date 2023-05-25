@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use App\Messenger\NonDelayedStamp;
 use App\Model\SerializedSuiteEndStates;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -17,6 +19,7 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -37,15 +40,15 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
-        $this->messageBus->dispatch(new Envelope(
-            new GetSerializedSuiteMessage(
-                $event->authenticationToken,
-                $event->jobId,
-                0,
-                $event->serializedSuite->getId()
-            ),
-            [new NonDelayedStamp()]
-        ));
+        $message = new GetSerializedSuiteMessage(
+            $event->authenticationToken,
+            $event->jobId,
+            0,
+            $event->serializedSuite->getId()
+        );
+
+        $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
+        $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
     }
 
     public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
@@ -56,11 +59,14 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        $this->messageBus->dispatch(new GetSerializedSuiteMessage(
+        $message = new GetSerializedSuiteMessage(
             $event->authenticationToken,
             $event->jobId,
             0,
             $event->serializedSuite->getId(),
-        ));
+        );
+
+        $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
+        $this->messageBus->dispatch($message);
     }
 }
