@@ -198,7 +198,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             : \Mockery::mock(SerializedSuiteClient::class);
 
         $handler = new GetSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
-        $message = new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage($authenticationToken, $jobId, 0, $serializedSuiteId);
 
         ($handler)($message);
     }
@@ -220,7 +220,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $jobId, 0, $serializedSuiteId),
             $envelope->getMessage()
         );
 
