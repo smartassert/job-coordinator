@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RemoteRequest;
+use App\Enum\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -33,5 +34,41 @@ class RemoteRequestRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->remove($entity);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @return int<0, max>
+     */
+    public function getNextIndex(string $jobId, RemoteRequestType $type): int
+    {
+        $queryBuilder = $this->createQueryBuilder('RemoteRequest');
+        $queryBuilder
+            ->select('RemoteRequest.index')
+            ->where('RemoteRequest.jobId = :JobId')
+            ->andWhere('RemoteRequest.type = :RequestType')
+            ->orderBy('RemoteRequest.index', 'DESC')
+            ->setParameter('JobId', $jobId)
+            ->setParameter('RequestType', $type)
+            ->setMaxResults(1)
+        ;
+
+        $query = $queryBuilder->getQuery();
+
+        $results = $query->getArrayResult();
+        $result = $results[0] ?? null;
+        if (!is_array($result)) {
+            return 0;
+        }
+
+        $largestIndex = $result['index'] ?? null;
+        if (null === $largestIndex) {
+            return 0;
+        }
+
+        if (!(is_int($largestIndex) && $largestIndex >= 0)) {
+            return 0;
+        }
+
+        return $largestIndex + 1;
     }
 }
