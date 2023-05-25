@@ -42,6 +42,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
             $this->messageBus->dispatch(new GetMachineMessage(
                 $event->authenticationToken,
                 $event->current->id,
+                0,
                 $event->current
             ));
         }
@@ -58,7 +59,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $this->messageBus->dispatch(new Envelope(
-            new GetMachineMessage($event->authenticationToken, $machine->id, $machine),
+            new GetMachineMessage($event->authenticationToken, $machine->id, 0, $machine),
             [new NonDelayedStamp()]
         ));
     }

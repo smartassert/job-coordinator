@@ -57,7 +57,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $jobId);
+        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $jobId, 0);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
