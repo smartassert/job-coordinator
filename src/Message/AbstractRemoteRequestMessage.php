@@ -14,14 +14,11 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
-     * @param int<0, max>      $index
      */
     public function __construct(
         public readonly string $authenticationToken,
         private readonly string $jobId,
-        int $index,
     ) {
-        $this->index = $index;
     }
 
     public function getJobId(): string
