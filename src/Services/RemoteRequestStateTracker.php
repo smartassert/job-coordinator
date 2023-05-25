@@ -28,18 +28,18 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
     {
         return [
             FailedEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
             ],
             HandledEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
             ],
             ReceivedEvent::class => [
-                ['setRemoteRequestState', 10000],
+                ['setRemoteRequestStateForMessengerEvent', 10000],
             ],
         ];
     }
 
-    public function setRemoteRequestState(FailedEvent|HandledEvent|ReceivedEvent $event): void
+    public function setRemoteRequestStateForMessengerEvent(FailedEvent|HandledEvent|ReceivedEvent $event): void
     {
         $message = $event->getEnvelope()->getMessage();
         if (!$message instanceof JobRemoteRequestMessageInterface) {
