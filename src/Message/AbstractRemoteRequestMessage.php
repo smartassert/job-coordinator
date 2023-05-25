@@ -7,6 +7,11 @@ namespace App\Message;
 abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageInterface
 {
     /**
+     * @var int<0, max>
+     */
+    private int $index;
+
+    /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      * @param int<0, max>      $index
@@ -14,8 +19,9 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
     public function __construct(
         public readonly string $authenticationToken,
         private readonly string $jobId,
-        private readonly int $index,
+        int $index,
     ) {
+        $this->index = $index;
     }
 
     public function getJobId(): string
@@ -26,5 +32,12 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
     public function getIndex(): int
     {
         return $this->index;
+    }
+
+    public function setIndex(int $index): static
+    {
+        $this->index = $index;
+
+        return $this;
     }
 }
