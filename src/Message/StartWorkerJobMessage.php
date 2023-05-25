@@ -11,13 +11,15 @@ class StartWorkerJobMessage extends AbstractRemoteRequestMessage
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
+     * @param int<0, max>      $index
      */
     public function __construct(
         string $authenticationToken,
         string $jobId,
+        int $index,
         public readonly string $machineIpAddress,
     ) {
-        parent::__construct($authenticationToken, $jobId);
+        parent::__construct($authenticationToken, $jobId, $index);
     }
 
     public function getRemoteRequestType(): RemoteRequestType

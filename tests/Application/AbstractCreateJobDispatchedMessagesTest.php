@@ -65,7 +65,7 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
                     \assert(is_string($jobId));
                     \assert('' !== $jobId);
 
-                    return new CreateResultsJobMessage(self::$apiToken, $jobId);
+                    return new CreateResultsJobMessage(self::$apiToken, $jobId, 0);
                 },
             ],
             CreateSerializedSuiteMessage::class => [
@@ -74,7 +74,7 @@ abstract class AbstractCreateJobDispatchedMessagesTest extends AbstractCreateJob
                     \assert(is_string($jobId));
                     \assert('' !== $jobId);
 
-                    return new CreateSerializedSuiteMessage(self::$apiToken, $jobId, []);
+                    return new CreateSerializedSuiteMessage(self::$apiToken, $jobId, 0, []);
                 },
             ],
         ];

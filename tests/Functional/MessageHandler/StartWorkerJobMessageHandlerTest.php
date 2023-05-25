@@ -33,7 +33,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             jobRepository: $jobRepository,
         );
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, md5((string) rand()));
 
         $handler($message);
 
@@ -52,7 +52,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, md5((string) rand()));
 
         $handler($message);
 
@@ -70,7 +70,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, md5((string) rand()));
 
         $handler($message);
 
@@ -96,7 +96,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, $machineIpAddress);
 
         $handler($message);
 
@@ -134,7 +134,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, $machineIpAddress);
 
         $handler($message);
 
@@ -166,7 +166,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, $machineIpAddress);
 
         try {
             $handler($message);
@@ -216,7 +216,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, 0, $machineIpAddress);
 
         $handler($message);
 

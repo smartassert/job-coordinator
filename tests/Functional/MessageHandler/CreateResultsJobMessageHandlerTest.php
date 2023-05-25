@@ -32,7 +32,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             jobRepository: $jobRepository,
         );
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new CreateResultsJobMessage(self::$apiToken, $jobId, 0);
 
         $handler($message);
 
@@ -58,7 +58,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             resultsClient: $resultsClient,
         );
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new CreateResultsJobMessage(self::$apiToken, $jobId, 0);
 
         try {
             $handler($message);
@@ -98,7 +98,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($job->getResultsToken());
 
-        $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
+        $handler(new CreateResultsJobMessage(self::$apiToken, $jobId, 0));
 
         self::assertSame(RequestState::SUCCEEDED, $job->getResultsJobRequestState());
         self::assertSame($resultsJob->token, $job->getResultsToken());

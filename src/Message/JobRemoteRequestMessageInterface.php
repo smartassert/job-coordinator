@@ -14,4 +14,9 @@ interface JobRemoteRequestMessageInterface
     public function getJobId(): string;
 
     public function getRemoteRequestType(): RemoteRequestType;
+
+    /**
+     * @return int<0, max>
+     */
+    public function getIndex(): int;
 }
