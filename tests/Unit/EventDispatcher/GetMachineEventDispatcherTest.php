@@ -8,6 +8,7 @@ use App\Event\MachineRetrievedEvent;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Repository\JobRepository;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -26,7 +27,11 @@ class GetMachineEventDispatcherTest extends WebTestCase
             ->shouldNotHaveReceived('dispatch')
         ;
 
-        $dispatcher = new GetMachineMessageDispatcher(\Mockery::mock(JobRepository::class), $messageBus);
+        $dispatcher = new GetMachineMessageDispatcher(
+            \Mockery::mock(JobRepository::class),
+            $messageBus,
+            \Mockery::mock(EventDispatcherInterface::class)
+        );
         $event = new MachineRetrievedEvent(md5((string) rand()), $machine, $machine);
 
         $dispatcher->dispatchIfMachineNotInEndState($event);
