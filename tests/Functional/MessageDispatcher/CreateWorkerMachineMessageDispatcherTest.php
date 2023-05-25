@@ -13,6 +13,7 @@ use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,6 +56,9 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
         if ($job instanceof Job) {
             $this->persistJob($job);
         }
@@ -66,7 +70,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
             ->andReturn($job)
         ;
 
-        (new CreateMachineMessageDispatcher($mockJobRepository, $messageBus))->dispatch($event);
+        (new CreateMachineMessageDispatcher($mockJobRepository, $messageBus, $eventDispatcher))->dispatch($event);
 
         $this->assertNoMessagesDispatched();
     }
