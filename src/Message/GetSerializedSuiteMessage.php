@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class GetSerializedSuiteMessage implements JobRemoteRequestMessageInterface
+class GetSerializedSuiteMessage extends AbstractRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -14,15 +14,11 @@ class GetSerializedSuiteMessage implements JobRemoteRequestMessageInterface
      * @param non-empty-string $serializedSuiteId
      */
     public function __construct(
-        public readonly string $authenticationToken,
-        private readonly string $jobId,
+        string $authenticationToken,
+        string $jobId,
         public readonly string $serializedSuiteId,
     ) {
-    }
-
-    public function getJobId(): string
-    {
-        return $this->jobId;
+        parent::__construct($authenticationToken, $jobId);
     }
 
     public function getRemoteRequestType(): RemoteRequestType
