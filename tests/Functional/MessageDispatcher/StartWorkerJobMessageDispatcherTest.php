@@ -58,7 +58,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $jobId, 0, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

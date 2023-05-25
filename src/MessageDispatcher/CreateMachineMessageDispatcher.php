@@ -49,7 +49,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $this->messageBus->dispatch(new Envelope(
-            new CreateMachineMessage($event->authenticationToken, $event->jobId),
+            new CreateMachineMessage($event->authenticationToken, $event->jobId, 0),
             [new NonDelayedStamp()]
         ));
     }

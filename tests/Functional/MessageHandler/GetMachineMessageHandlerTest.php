@@ -253,7 +253,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
-        $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
+        $message = new GetMachineMessage($authenticationToken, $previous->id, 0, $previous);
 
         ($handler)($message);
     }
@@ -290,7 +290,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         self::assertEquals(
-            new GetMachineMessage($authenticationToken, $current->id, $current),
+            new GetMachineMessage($authenticationToken, $current->id, 0, $current),
             $machineStateChangeCheckMessage
         );
 
