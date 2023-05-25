@@ -44,14 +44,15 @@ class RemoteRequest
 
     /**
      * @param non-empty-string $jobId
+     * @param int<0, max>      $index
      */
-    public function __construct(string $jobId, RemoteRequestType $type)
+    public function __construct(string $jobId, RemoteRequestType $type, int $index = 0)
     {
         $this->id = self::generateId($jobId, $type);
         $this->jobId = $jobId;
         $this->type = $type;
         $this->state = RequestState::REQUESTING;
-        $this->index = 0;
+        $this->index = $index;
     }
 
     public function setState(RequestState $state): self
