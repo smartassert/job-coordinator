@@ -12,6 +12,7 @@ use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
@@ -37,6 +38,17 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);
         $this->messengerTransport = $messengerTransport;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
+            $entityManager->remove($remoteRequest);
+        }
+        $entityManager->flush();
     }
 
     public function testIsEventSubscriber(): void

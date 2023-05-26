@@ -9,7 +9,9 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
+use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
+use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,6 +31,17 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
+            $entityManager->remove($remoteRequest);
+        }
+        $entityManager->flush();
     }
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void
