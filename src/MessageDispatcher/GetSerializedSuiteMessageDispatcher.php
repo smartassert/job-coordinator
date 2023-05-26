@@ -43,7 +43,6 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         $message = new GetSerializedSuiteMessage(
             $event->authenticationToken,
             $event->jobId,
-            0,
             $event->serializedSuite->getId()
         );
 
@@ -62,7 +61,6 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         $message = new GetSerializedSuiteMessage(
             $event->authenticationToken,
             $event->jobId,
-            0,
             $event->serializedSuite->getId(),
         );
 

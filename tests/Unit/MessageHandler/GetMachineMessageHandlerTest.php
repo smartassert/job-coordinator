@@ -34,7 +34,7 @@ class GetMachineMessageHandlerTest extends TestCase
 
         $authenticationToken = md5((string) rand());
 
-        $message = new GetMachineMessage($authenticationToken, $machine->id, 0, $machine);
+        $message = new GetMachineMessage($authenticationToken, $machine->id, $machine);
 
         self::expectException(MachineRetrievalException::class);
 
