@@ -34,7 +34,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             jobRepository: $jobRepository,
         );
 
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, 0, []);
+        $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, []);
 
         $handler($message);
 
@@ -61,7 +61,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             serializedSuiteClient: $serializedSuiteClient,
         );
 
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->id, 0, $serializedSuiteCreateParameters);
+        $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteCreateParameters);
 
         try {
             $handler($message);
@@ -111,7 +111,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         self::assertNull($job->getResultsToken());
 
-        $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, 0, $serializedSuiteParameters));
+        $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
 
         self::assertSame(RequestState::SUCCEEDED, $job->getSerializedSuiteRequestState());
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
@@ -145,7 +145,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetSerializedSuiteMessage($authenticationToken, $jobId, 0, $serializedSuiteId),
+            new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId),
             $envelope->getMessage()
         );
 
