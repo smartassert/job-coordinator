@@ -9,7 +9,7 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
     /**
      * @var int<0, max>
      */
-    private int $index;
+    private int $index = 0;
 
     /**
      * @param non-empty-string $authenticationToken
