@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Message\StartWorkerJobMessage;
-use App\Messenger\NonDelayedStamp;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -35,9 +29,8 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $message = new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress);
-
-        $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
-        $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(
+            new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress)
+        );
     }
 }
