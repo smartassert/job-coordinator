@@ -12,15 +12,13 @@ class GetMachineMessage extends AbstractRemoteRequestMessage
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
-     * @param int<0, max>      $index
      */
     public function __construct(
         string $authenticationToken,
         string $jobId,
-        int $index,
         public readonly Machine $machine,
     ) {
-        parent::__construct($authenticationToken, $jobId, $index);
+        parent::__construct($authenticationToken, $jobId);
     }
 
     public function getRemoteRequestType(): RemoteRequestType

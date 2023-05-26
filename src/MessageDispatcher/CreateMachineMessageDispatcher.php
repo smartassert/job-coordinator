@@ -51,7 +51,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        $message = new CreateMachineMessage($event->authenticationToken, $event->jobId, 0);
+        $message = new CreateMachineMessage($event->authenticationToken, $event->jobId);
         $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
 
         $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
