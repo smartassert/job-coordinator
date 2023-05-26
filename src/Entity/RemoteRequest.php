@@ -48,7 +48,7 @@ class RemoteRequest
      */
     public function __construct(string $jobId, RemoteRequestType $type, int $index = 0)
     {
-        $this->id = self::generateId($jobId, $type);
+        $this->id = self::generateId($jobId, $type, $index);
         $this->jobId = $jobId;
         $this->type = $type;
         $this->state = RequestState::REQUESTING;
@@ -64,12 +64,13 @@ class RemoteRequest
 
     /**
      * @param non-empty-string $jobId
+     * @param int<0, max>      $index
      *
      * @return non-empty-string
      */
-    public static function generateId(string $jobId, RemoteRequestType $type): string
+    public static function generateId(string $jobId, RemoteRequestType $type, int $index): string
     {
-        return $jobId . $type->value;
+        return $jobId . $type->value . $index;
     }
 
     public function setFailure(?RemoteRequestFailure $failure): self
