@@ -10,6 +10,7 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
@@ -22,7 +23,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
+class CreateMachineMessageDispatcherTest extends WebTestCase
 {
     private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
@@ -68,6 +69,9 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -82,7 +86,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
             ->andReturn($job)
         ;
 
-        (new CreateMachineMessageDispatcher($mockJobRepository, $messageBus, $eventDispatcher))->dispatch($event);
+        (new CreateMachineMessageDispatcher($mockJobRepository, $messageDispatcher))->dispatch($event);
 
         $this->assertNoMessagesDispatched();
     }

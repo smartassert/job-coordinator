@@ -5,19 +5,13 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\JobCreatedEvent;
-use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\CreateResultsJobMessage;
-use App\Messenger\NonDelayedStamp;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -35,9 +29,8 @@ class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
-        $message = new CreateResultsJobMessage($event->authenticationToken, $event->jobId);
-
-        $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
-        $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(
+            new CreateResultsJobMessage($event->authenticationToken, $event->jobId)
+        );
     }
 }
