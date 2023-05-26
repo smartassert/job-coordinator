@@ -67,6 +67,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
 
         $message = new GetMachineMessage($event->authenticationToken, $machine->id, $machine);
 
+        $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
         $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
     }
 }
