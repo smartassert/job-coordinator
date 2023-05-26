@@ -18,6 +18,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RemoteRequestRepository $remoteRequestRepository,
+        private readonly RemoteRequestIndexGenerator $remoteRequestIndexGenerator,
     ) {
     }
 
@@ -57,7 +58,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
     ): void {
         $message = $event->message;
         $message = $message->setIndex(
-            $this->remoteRequestRepository->getNextIndex($message->getJobId(), $message->getRemoteRequestType())
+            $this->remoteRequestIndexGenerator->generate($message->getJobId(), $message->getRemoteRequestType())
         );
 
         $this->setRemoteRequestForMessage($message, RequestState::UNKNOWN);
