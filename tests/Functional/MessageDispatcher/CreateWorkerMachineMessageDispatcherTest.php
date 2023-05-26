@@ -226,7 +226,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new CreateMachineMessage($authenticationToken, $jobId, 0),
+            new CreateMachineMessage($authenticationToken, $jobId),
             $envelope->getMessage()
         );
 

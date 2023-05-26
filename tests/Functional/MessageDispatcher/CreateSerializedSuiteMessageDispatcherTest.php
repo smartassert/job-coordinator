@@ -62,7 +62,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $jobId, 0, $parameters);
+        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $jobId, $parameters);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

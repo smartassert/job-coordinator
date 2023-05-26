@@ -35,7 +35,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             jobRepository: $jobRepository,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $jobId, 0);
+        $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $handler($message);
 
@@ -61,7 +61,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $jobId, 0);
+        $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         try {
             $handler($message);
@@ -101,7 +101,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($job->getResultsToken());
 
-        $handler(new CreateMachineMessage(self::$apiToken, $jobId, 0));
+        $handler(new CreateMachineMessage(self::$apiToken, $jobId));
 
         self::assertSame(RequestState::SUCCEEDED, $job->getMachineRequestState());
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
@@ -131,7 +131,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $envelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
-            new GetMachineMessage($authenticationToken, $machine->id, 0, $machine),
+            new GetMachineMessage($authenticationToken, $machine->id, $machine),
             $envelope->getMessage()
         );
 
