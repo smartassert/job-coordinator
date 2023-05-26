@@ -19,4 +19,9 @@ interface JobRemoteRequestMessageInterface
      * @return int<0, max>
      */
     public function getIndex(): int;
+
+    /**
+     * @param int<0, max> $index
+     */
+    public function setIndex(int $index): self;
 }

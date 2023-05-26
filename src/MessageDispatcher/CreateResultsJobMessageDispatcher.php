@@ -35,7 +35,7 @@ class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
-        $message = new CreateResultsJobMessage($event->authenticationToken, $event->jobId, 0);
+        $message = new CreateResultsJobMessage($event->authenticationToken, $event->jobId);
 
         $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
         $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));

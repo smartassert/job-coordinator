@@ -35,7 +35,7 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $message = new StartWorkerJobMessage($event->authenticationToken, $event->jobId, 0, $event->ipAddress);
+        $message = new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress);
 
         $this->eventDispatcher->dispatch(new JobRemoteRequestMessageCreatedEvent($message));
         $this->messageBus->dispatch(new Envelope($message, [new NonDelayedStamp()]));
