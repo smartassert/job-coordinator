@@ -37,9 +37,9 @@ class RemoteRequestRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return int<0, max>
+     * @return null|int<0, max>
      */
-    public function getNextIndex(string $jobId, RemoteRequestType $type): int
+    public function getLargestIndex(string $jobId, RemoteRequestType $type): ?int
     {
         $queryBuilder = $this->createQueryBuilder('RemoteRequest');
         $queryBuilder
@@ -57,18 +57,18 @@ class RemoteRequestRepository extends ServiceEntityRepository
         $results = $query->getArrayResult();
         $result = $results[0] ?? null;
         if (!is_array($result)) {
-            return 0;
+            return null;
         }
 
         $largestIndex = $result['index'] ?? null;
         if (null === $largestIndex) {
-            return 0;
+            return null;
         }
 
         if (!(is_int($largestIndex) && $largestIndex >= 0)) {
-            return 0;
+            return null;
         }
 
-        return $largestIndex + 1;
+        return $largestIndex;
     }
 }
