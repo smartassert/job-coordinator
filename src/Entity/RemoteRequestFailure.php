@@ -12,21 +12,21 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
 class RemoteRequestFailure
 {
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
+    public readonly RemoteRequestFailureType $type;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    public int $code;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    public ?string $message = null;
+
     /**
      * @var non-empty-string
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
     private readonly string $id;
-
-    #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
-    private readonly RemoteRequestFailureType $type;
-
-    #[ORM\Column(type: Types::SMALLINT)]
-    private int $code;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $message = null;
 
     /**
      * @param non-empty-string $id

@@ -23,13 +23,10 @@ class RemoteRequestFailureRepository extends ServiceEntityRepository
         parent::__construct($registry, RemoteRequestFailure::class);
     }
 
-    public function save(RemoteRequestFailure $entity, bool $flush = false): void
+    public function save(RemoteRequestFailure $entity): void
     {
         $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->getEntityManager()->flush();
     }
 
     public function remove(RemoteRequestFailure $entity, bool $flush = false): void
