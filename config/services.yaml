@@ -46,6 +46,8 @@ services:
     Psr\Http\Message\StreamFactoryInterface:
         alias: GuzzleHttp\Psr7\HttpFactory
 
+    SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory: ~
+
     SmartAssert\ResultsClient\ResourceReferenceFactory: ~
 
     SmartAssert\ResultsClient\EventFactory: ~
