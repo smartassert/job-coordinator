@@ -8,4 +8,5 @@ enum RemoteRequestFailureType: string
 {
     case HTTP = 'http';
     case NETWORK = 'network';
+    case UNKNOWN = 'unknown';
 }
