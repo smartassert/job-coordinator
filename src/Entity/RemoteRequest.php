@@ -19,7 +19,7 @@ class RemoteRequest
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 128, unique: true)]
-    private readonly string $id;
+    public readonly string $id;
 
     /**
      * @var non-empty-string

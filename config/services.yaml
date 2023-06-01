@@ -20,6 +20,10 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    _instanceof:
+        App\Services\RemoteRequestFailureFactory\ExceptionHandlerInterface:
+            tags: ['app.remote_request_failure_factory.exception_handler']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -83,3 +87,7 @@ services:
     App\Messenger\DelayMiddleware:
         arguments:
             $delays: '%message_delays%'
+
+    App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory:
+        arguments:
+            $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
