@@ -172,7 +172,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $handler($message);
             self::fail(WorkerJobStartException::class . ' not thrown');
         } catch (WorkerJobStartException $e) {
-            self::assertSame($serializedSuiteReadException, $e->previousException);
+            self::assertSame($serializedSuiteReadException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
     }
