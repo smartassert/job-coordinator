@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
+use App\Repository\JobRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -21,6 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     private EventRecorder $eventRecorder;
+    private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
@@ -29,6 +32,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+        $this->jobRepository = $jobRepository;
     }
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void
@@ -40,10 +47,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testEventsAreDispatched(): void
     {
-        $machineId = md5((string) rand());
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
 
-        $previous = new Machine($machineId, 'find/received', 'finding', []);
-        $current = new Machine($machineId, 'find/received', 'finding', []);
+        $previous = new Machine($job->id, 'find/received', 'finding', []);
+        $current = new Machine($job->id, 'find/received', 'finding', []);
 
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
@@ -53,11 +61,29 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
     }
 
+    public function testInvokeNoJob(): void
+    {
+        $machine = new Machine(md5((string) rand()), 'find/received', 'finding', []);
+
+        $this->createMessageAndHandleMessage($machine, $machine, self::$apiToken);
+
+        $this->assertNoMessagesDispatched();
+    }
+
     /**
      * @dataProvider invokeNoStateChangeDataProvider
+     *
+     * @param callable(Job): Machine $previousMachineCreator
+     * @param callable(Job): Machine $currentMachineCreator
      */
-    public function testInvokeNoStateChange(Machine $previous, Machine $current): void
+    public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
+
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
         self::assertEquals(
@@ -72,25 +98,13 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function invokeNoStateChangeDataProvider(): array
     {
-        $machineId = md5((string) rand());
-
         return [
             'find/received => find/received' => [
-                'previous' => new Machine($machineId, 'find/received', 'finding', []),
-                'current' => new Machine($machineId, 'find/received', 'finding', []),
-                'expectedEvent' => null,
-                'machineCreator' => function (string $machineId) {
-                    \assert('' !== $machineId);
-
-                    return new Machine($machineId, 'find/received', 'finding', []);
+                'previousMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'find/received', 'finding', []);
                 },
-                'expectedMachineCreator' => function (string $machineId) {
-                    \assert('' !== $machineId);
-
-                    return new Machine($machineId, 'find/received', 'finding', []);
-                },
-                'expectedEventCreator' => function () {
-                    return null;
+                'currentMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'find/received', 'finding', []);
                 },
             ],
         ];
@@ -99,13 +113,24 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @dataProvider invokeHasStateChangeDataProvider
      *
-     * @param callable(string): Event $expectedEventCreator
+     * @param callable(Job): Machine       $previousMachineCreator
+     * @param callable(Job): Machine       $currentMachineCreator
+     * @param callable(Job, string): Event $expectedEventCreator
      */
-    public function testInvokeHasStateChange(Machine $previous, Machine $current, callable $expectedEventCreator): void
-    {
+    public function testInvokeHasStateChange(
+        callable $previousMachineCreator,
+        callable $currentMachineCreator,
+        callable $expectedEventCreator
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
+
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
-        $expectedEvent = $expectedEventCreator(self::$apiToken);
+        $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
         $events = $this->eventRecorder->all($expectedEvent::class);
         $event = $events[0] ?? null;
@@ -121,34 +146,35 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function invokeHasStateChangeDataProvider(): array
     {
-        $machineId = md5((string) rand());
-        $machineUnknown = new Machine($machineId, 'unknown', 'unknown', []);
-        $machineFinding = new Machine($machineId, 'find/received', 'finding', []);
-        $machineIpAddress = '127.0.0.1';
-        $machineActive = new Machine($machineId, 'up/active', 'active', [$machineIpAddress]);
-
         return [
             'unknown => find/received' => [
-                'previous' => $machineUnknown,
-                'current' => new Machine($machineId, 'find/received', 'finding', []),
-                'expectedEventCreator' => function (
-                    string $authenticationToken
-                ) use (
-                    $machineUnknown,
-                    $machineFinding
-                ) {
+                'previousMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'unknown', 'unknown', []);
+                },
+                'currentMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'find/received', 'finding', []);
+                },
+                'expectedEventCreator' => function (Job $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);
 
-                    return new MachineStateChangeEvent($authenticationToken, $machineUnknown, $machineFinding);
+                    return new MachineStateChangeEvent(
+                        $authenticationToken,
+                        new Machine($job->id, 'unknown', 'unknown', []),
+                        new Machine($job->id, 'find/received', 'finding', [])
+                    );
                 },
             ],
             'unknown => active' => [
-                'previous' => $machineUnknown,
-                'current' => $machineActive,
-                'expectedEventCreator' => function (string $authenticationToken) use ($machineId, $machineIpAddress) {
+                'previousMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'unknown', 'unknown', []);
+                },
+                'currentMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'up/active', 'active', ['127.0.0.1']);
+                },
+                'expectedEventCreator' => function (Job $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);
 
-                    return new MachineIsActiveEvent($authenticationToken, $machineId, $machineIpAddress);
+                    return new MachineIsActiveEvent($authenticationToken, $job->id, '127.0.0.1');
                 },
             ],
         ];
@@ -157,10 +183,21 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @dataProvider invokeHasEndStateChangeDataProvider
      *
-     * @param class-string $expectedEventClass
+     * @param callable(Job): Machine $previousMachineCreator
+     * @param callable(Job): Machine $currentMachineCreator
+     * @param class-string           $expectedEventClass
      */
-    public function testInvokeHasEndStateChange(Machine $previous, Machine $current, string $expectedEventClass): void
-    {
+    public function testInvokeHasEndStateChange(
+        callable $previousMachineCreator,
+        callable $currentMachineCreator,
+        string $expectedEventClass
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
+
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
         $latestEvent = $this->eventRecorder->getLatest();
@@ -181,12 +218,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function invokeHasEndStateChangeDataProvider(): array
     {
-        $machineId = md5((string) rand());
-
         return [
             'up/active => delete/deleted' => [
-                'previous' => new Machine($machineId, 'up/active', 'active', []),
-                'current' => new Machine($machineId, 'delete/deleted', 'end', []),
+                'previousMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'up/active', 'active', []);
+                },
+                'currentMachineCreator' => function (Job $job) {
+                    return new Machine($job->id, 'delete/deleted', 'end', []);
+                },
                 'expectedEventClass' => MachineStateChangeEvent::class,
             ],
         ];
@@ -210,8 +249,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         Machine $current,
         string $authenticationToken,
     ): void {
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
@@ -220,7 +259,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($current)
         ;
 
-        $handler = new GetMachineMessageHandler($workerManagerClient, $eventDispatcher);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
         $message = new GetMachineMessage($authenticationToken, $previous);
 
         ($handler)($message);
