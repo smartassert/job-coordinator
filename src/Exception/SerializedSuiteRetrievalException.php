@@ -6,20 +6,18 @@ namespace App\Exception;
 
 use App\Entity\Job;
 
-class SerializedSuiteRetrievalException extends \Exception
+class SerializedSuiteRetrievalException extends AbstractRemoteRequestException
 {
-    public function __construct(
-        public readonly Job $job,
-        public readonly \Throwable $previousException
-    ) {
+    public function __construct(Job $job, \Throwable $previousException)
+    {
         parent::__construct(
+            $job,
+            $previousException,
             sprintf(
                 'Failed to retrieve serialized suite "%s": %s',
                 $job->getSerializedSuiteId() ?? '',
-                $this->previousException->getMessage()
+                $previousException->getMessage()
             ),
-            0,
-            $previousException
         );
     }
 }
