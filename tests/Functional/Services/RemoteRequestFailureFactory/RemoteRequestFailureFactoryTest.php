@@ -8,16 +8,16 @@ use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory;
+use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RemoteRequestFailureFactoryTest extends WebTestCase
 {
+    use RemoteRequestFailureCreationDataProviderTrait;
+
     private RemoteRequestFailureFactory $remoteRequestFailureFactory;
     private RemoteRequestFailureRepository $remoteRequestFailureRepository;
 
@@ -43,7 +43,7 @@ class RemoteRequestFailureFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
+     * @dataProvider remoteRequestFailureCreationDataProvider
      */
     public function testCreate(
         \Throwable $throwable,
@@ -61,43 +61,6 @@ class RemoteRequestFailureFactoryTest extends WebTestCase
         self::assertSame($expectedType->value, $remoteRequestFailureData['type']);
         self::assertSame($expectedCode, $remoteRequestFailureData['code']);
         self::assertSame($expectedMessage, $remoteRequestFailureData['message']);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function createDataProvider(): array
-    {
-        $request = \Mockery::mock(RequestInterface::class);
-
-        return [
-            CurlException::class => [
-                'throwable' => new CurlException($request, 28, 'timed out'),
-                'expectedType' => RemoteRequestFailureType::NETWORK,
-                'expectedCode' => 28,
-                'expectedMessage' => 'timed out',
-            ],
-            NonSuccessResponseException::class => [
-                'throwable' => new NonSuccessResponseException(
-                    new Response(status: 503, reason: 'service unavailable'),
-                ),
-                'expectedType' => RemoteRequestFailureType::HTTP,
-                'expectedCode' => 503,
-                'expectedMessage' => 'service unavailable',
-            ],
-            ConnectException::class => [
-                'throwable' => new ConnectException('network exception message', $request),
-                'expectedType' => RemoteRequestFailureType::NETWORK,
-                'expectedCode' => 0,
-                'expectedMessage' => 'network exception message',
-            ],
-            \Exception::class => [
-                'throwable' => new \Exception('generic exception message', 123),
-                'expectedType' => RemoteRequestFailureType::UNKNOWN,
-                'expectedCode' => 123,
-                'expectedMessage' => 'generic exception message',
-            ],
-        ];
     }
 
     public function testExistingEntityIsReturned(): void
