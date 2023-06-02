@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RemoteRequestRepository::class)]
 #[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
-class RemoteRequest
+class RemoteRequest implements \JsonSerializable
 {
     /**
      * @var non-empty-string
@@ -55,6 +55,11 @@ class RemoteRequest
         $this->index = $index;
     }
 
+    public function getType(): RemoteRequestType
+    {
+        return $this->type;
+    }
+
     public function setState(RequestState $state): self
     {
         $this->state = $state;
@@ -83,5 +88,21 @@ class RemoteRequest
     public function getFailure(): ?RemoteRequestFailure
     {
         return $this->failure;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $data = [
+            'state' => $this->state->value,
+        ];
+
+        if ($this->failure instanceof RemoteRequestFailure) {
+            $data['failure'] = $this->failure;
+        }
+
+        return $data;
     }
 }
