@@ -22,7 +22,7 @@ class ResultsJobCreationExceptionHandler implements ExceptionHandlerInterface
             return;
         }
 
-        $throwable->job->setResultsJobRequestState(RequestState::FAILED);
-        $this->jobRepository->add($throwable->job);
+        $throwable->getJob()->setResultsJobRequestState(RequestState::FAILED);
+        $this->jobRepository->add($throwable->getJob());
     }
 }

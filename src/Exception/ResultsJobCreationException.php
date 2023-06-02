@@ -6,20 +6,18 @@ namespace App\Exception;
 
 use App\Entity\Job;
 
-class ResultsJobCreationException extends \Exception
+class ResultsJobCreationException extends AbstractRemoteRequestException
 {
-    public function __construct(
-        public readonly Job $job,
-        public readonly \Throwable $previousException
-    ) {
+    public function __construct(Job $job, \Throwable $previousException)
+    {
         parent::__construct(
+            $job,
+            $previousException,
             sprintf(
                 'Failed to create results job "%s": %s',
                 $job->id,
                 $previousException->getMessage()
             ),
-            0,
-            $previousException
         );
     }
 }

@@ -64,7 +64,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $handler($message);
             self::fail(ResultsJobCreationException::class . ' not thrown');
         } catch (ResultsJobCreationException $e) {
-            self::assertSame($resultsClientException, $e->previousException);
+            self::assertSame($resultsClientException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
 

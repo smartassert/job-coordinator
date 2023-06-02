@@ -67,7 +67,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $handler($message);
             self::fail(SerializedSuiteCreationException::class . ' not thrown');
         } catch (SerializedSuiteCreationException $e) {
-            self::assertSame($serializedSuiteClientException, $e->previousException);
+            self::assertSame($serializedSuiteClientException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
 
