@@ -8,7 +8,9 @@ use App\Entity\Job;
 use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
+use App\Model\RemoteRequestCollection;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
 use App\Services\UlidFactory;
@@ -48,8 +50,12 @@ class JobController
     }
 
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
-    public function get(string $jobId, User $user, JobRepository $repository): Response
-    {
+    public function get(
+        string $jobId,
+        User $user,
+        JobRepository $repository,
+        RemoteRequestRepository $remoteRequestRepository,
+    ): Response {
         $job = $repository->find($jobId);
         if (null === $job) {
             return new Response(null, 404);
@@ -59,6 +65,11 @@ class JobController
             return new Response(null, 401);
         }
 
-        return new JsonResponse($job);
+        $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);
+
+        return new JsonResponse(array_merge(
+            $job->jsonSerialize(),
+            ['service_requests' => new RemoteRequestCollection($remoteRequests)],
+        ));
     }
 }
