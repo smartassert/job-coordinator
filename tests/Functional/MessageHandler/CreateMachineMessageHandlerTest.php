@@ -67,7 +67,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $handler($message);
             self::fail(MachineCreationException::class . ' not thrown');
         } catch (MachineCreationException $e) {
-            self::assertSame($workerManagerException, $e->previousException);
+            self::assertSame($workerManagerException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
 
