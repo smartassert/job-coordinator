@@ -28,11 +28,11 @@ class SerializedSuiteCreationExceptionHandler implements ExceptionHandlerInterfa
         }
 
         $remoteRequest = $this->remoteRequestRepository->findOneBy([
-            'jobId' => $throwable->job->id,
+            'jobId' => $throwable->getJob()->id,
         ]);
 
         if ($remoteRequest instanceof RemoteRequest) {
-            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->previousException);
+            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->getPreviousException());
 
             if (null !== $remoteRequestFailure) {
                 $remoteRequest->setFailure($remoteRequestFailure);
@@ -40,7 +40,7 @@ class SerializedSuiteCreationExceptionHandler implements ExceptionHandlerInterfa
             }
         }
 
-        $throwable->job->setSerializedSuiteRequestState(RequestState::FAILED);
-        $this->jobRepository->add($throwable->job);
+        $throwable->getJob()->setSerializedSuiteRequestState(RequestState::FAILED);
+        $this->jobRepository->add($throwable->getJob());
     }
 }
