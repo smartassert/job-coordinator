@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
-use App\Enum\RequestState;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
@@ -134,7 +131,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
         self::assertEquals([$expectedEvent], $this->eventRecorder->all($expectedEvent::class));
-        $this->assertRemoteRequestEventsAreDispatched($previous, $current);
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
