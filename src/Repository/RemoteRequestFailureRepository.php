@@ -29,12 +29,9 @@ class RemoteRequestFailureRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function remove(RemoteRequestFailure $entity, bool $flush = false): void
+    public function remove(RemoteRequestFailure $entity): void
     {
         $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->getEntityManager()->flush();
     }
 }
