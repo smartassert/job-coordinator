@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageFailureHandler;
 
+use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Exception\MachineRetrievalException;
 use App\MessageFailureHandler\MachineRetrievalExceptionHandler;
+use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
@@ -23,6 +25,7 @@ class MachineRetrievalExceptionHandlerTest extends WebTestCase
     use MockeryPHPUnitIntegration;
 
     private MachineRetrievalExceptionHandler $handler;
+    private Job $job;
     private RemoteRequestRepository $remoteRequestRepository;
     private RemoteRequestFailureRepository $remoteRequestFailureRepository;
 
@@ -33,6 +36,12 @@ class MachineRetrievalExceptionHandlerTest extends WebTestCase
         $handler = self::getContainer()->get(MachineRetrievalExceptionHandler::class);
         \assert($handler instanceof MachineRetrievalExceptionHandler);
         $this->handler = $handler;
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $this->job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $jobRepository->add($this->job);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -69,7 +78,7 @@ class MachineRetrievalExceptionHandlerTest extends WebTestCase
 
         self::assertNull($remoteRequest->getFailure());
 
-        $this->handler->handle(new MachineRetrievalException($machine, $throwable));
+        $this->handler->handle(new MachineRetrievalException($this->job, $machine, $throwable));
 
         self::assertSame(1, $this->remoteRequestFailureRepository->count([]));
 
