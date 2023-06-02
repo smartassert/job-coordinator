@@ -40,8 +40,3 @@ services:
 
     SmartAssert\SourcesClient\SuiteClient:
         public: true
-
-    App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory:
-        public: true
-        arguments:
-            $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
