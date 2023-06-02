@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Exception\SerializedSuiteCreationException;
 use App\Repository\JobRepository;
-use App\Repository\RemoteRequestRepository;
-use App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory;
+use App\Services\RemoteRequestFailureRecorder;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
 class SerializedSuiteCreationExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
-        private readonly RemoteRequestRepository $remoteRequestRepository,
-        private readonly RemoteRequestFailureFactory $remoteRequestFailureFactory,
+        private readonly RemoteRequestFailureRecorder $remoteRequestFailureRecorder,
     ) {
     }
 
@@ -27,18 +24,7 @@ class SerializedSuiteCreationExceptionHandler implements ExceptionHandlerInterfa
             return;
         }
 
-        $remoteRequest = $this->remoteRequestRepository->findOneBy([
-            'jobId' => $throwable->getJob()->id,
-        ]);
-
-        if ($remoteRequest instanceof RemoteRequest) {
-            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->getPreviousException());
-
-            if (null !== $remoteRequestFailure) {
-                $remoteRequest->setFailure($remoteRequestFailure);
-                $this->remoteRequestRepository->save($remoteRequest);
-            }
-        }
+        $this->remoteRequestFailureRecorder->record($throwable);
 
         $throwable->getJob()->setSerializedSuiteRequestState(RequestState::FAILED);
         $this->jobRepository->add($throwable->getJob());

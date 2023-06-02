@@ -71,7 +71,7 @@ class MachineRetrievalExceptionHandlerTest extends WebTestCase
     ): void {
         self::assertSame(0, $this->remoteRequestFailureRepository->count([]));
 
-        $machine = new Machine(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
+        $machine = new Machine($this->job->id, md5((string) rand()), md5((string) rand()), []);
 
         $remoteRequest = new RemoteRequest($machine->id, RemoteRequestType::RESULTS_CREATE, 1);
         $this->remoteRequestRepository->save($remoteRequest);
