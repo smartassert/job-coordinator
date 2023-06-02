@@ -13,13 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
 class RemoteRequestFailure implements \JsonSerializable
 {
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
-    public readonly RemoteRequestFailureType $type;
+    private readonly RemoteRequestFailureType $type;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    public int $code;
+    private readonly int $code;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    public ?string $message = null;
+    private readonly ?string $message;
 
     /**
      * @var non-empty-string
