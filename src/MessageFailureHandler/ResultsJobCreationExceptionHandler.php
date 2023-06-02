@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
+use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Exception\ResultsJobCreationException;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
+use App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
 class ResultsJobCreationExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
+        private readonly RemoteRequestRepository $remoteRequestRepository,
+        private readonly RemoteRequestFailureFactory $remoteRequestFailureFactory,
     ) {
     }
 
@@ -20,6 +25,19 @@ class ResultsJobCreationExceptionHandler implements ExceptionHandlerInterface
     {
         if (!$throwable instanceof ResultsJobCreationException) {
             return;
+        }
+
+        $remoteRequest = $this->remoteRequestRepository->findOneBy([
+            'jobId' => $throwable->job->id,
+        ]);
+
+        if ($remoteRequest instanceof RemoteRequest) {
+            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->previousException);
+
+            if (null !== $remoteRequestFailure) {
+                $remoteRequest->setFailure($remoteRequestFailure);
+                $this->remoteRequestRepository->save($remoteRequest);
+            }
         }
 
         $throwable->job->setResultsJobRequestState(RequestState::FAILED);
