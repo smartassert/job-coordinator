@@ -79,4 +79,9 @@ class RemoteRequest
 
         return $this;
     }
+
+    public function getFailure(): ?RemoteRequestFailure
+    {
+        return $this->failure;
+    }
 }
