@@ -29,7 +29,7 @@ class MachineRetrievalExceptionHandler implements ExceptionHandlerInterface
         ]);
 
         if ($remoteRequest instanceof RemoteRequest) {
-            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->previousException);
+            $remoteRequestFailure = $this->remoteRequestFailureFactory->create($throwable->getPreviousException());
 
             if (null !== $remoteRequestFailure) {
                 $remoteRequest->setFailure($remoteRequestFailure);
