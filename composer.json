@@ -105,26 +105,23 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker-compose -f ./tests/build/docker-compose.yml up -d",
-        "functional-status": "docker-compose -f ./tests/build/docker-compose.yml ps",
+        "functional-start": "docker-compose -f ./tests/build/docker-compose-functional.yml up -d",
+        "functional-status": "docker-compose -f ./tests/build/docker-compose-functional.yml ps",
         "functional-teardown": [
-            "docker-compose -f ./tests/build/docker-compose.yml down"
+            "docker-compose -f ./tests/build/docker-compose-functional.yml down"
         ],
         "functional-setup": [
             "@functional-start",
             "sleep 2",
             "@db-setup",
             "@messenger-setup",
-            "@users-setup",
-            "@results-setup",
-            "@worker-manager-setup",
-            "@sources-setup"
+            "@users-setup"
         ],
         "users-db-setup": [
-            "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f tests/build/docker-compose-functional.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f tests/build/docker-compose-functional.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ],
-        "users-generate-jwt-keys": "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction",
+        "users-generate-jwt-keys": "docker-compose -f tests/build/docker-compose-functional.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction",
         "users-create-user": [
             "curl --header 'Authorization: primary_admin_token' --data 'email=user@example.com&password=password' http://localhost:9080/admin/user/create",
             ""
@@ -135,16 +132,16 @@
             "@users-create-user"
         ],
         "results-setup": [
-            "docker-compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f tests/build/docker-compose-functional.yml exec -T results-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f tests/build/docker-compose-functional.yml exec -T results-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ],
         "worker-manager-setup": [
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T worker-manager-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f ./tests/build/docker-compose-functional.yml exec -T worker-manager-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f ./tests/build/docker-compose-functional.yml exec -T worker-manager-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ],
         "sources-setup": [
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f ./tests/build/docker-compose-functional.yml exec -T sources-service php bin/console doctrine:database:create --if-not-exists",
+            "docker-compose -f ./tests/build/docker-compose-functional.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ],
         "messenger-setup": "php bin/console messenger:setup-transports",
         "messenger-listen": "php bin/console messenger:consume async -vv"
