@@ -304,8 +304,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         if (null === $serializedSuiteClient) {
-            $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
-            \assert($serializedSuiteClient instanceof SerializedSuiteClient);
+            $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         }
 
         if (null === $workerClientFactory) {
