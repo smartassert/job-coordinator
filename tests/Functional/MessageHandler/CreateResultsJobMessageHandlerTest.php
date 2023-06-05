@@ -147,8 +147,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         if (null === $resultsClient) {
-            $resultsClient = self::getContainer()->get(ResultsClient::class);
-            \assert($resultsClient instanceof ResultsClient);
+            $resultsClient = \Mockery::mock(ResultsClient::class);
         }
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
