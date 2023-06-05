@@ -176,8 +176,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         }
 
         if (null === $serializedSuiteClient) {
-            $serializedSuiteClient = self::getContainer()->get(SerializedSuiteClient::class);
-            \assert($serializedSuiteClient instanceof SerializedSuiteClient);
+            $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         }
 
         return new CreateSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
