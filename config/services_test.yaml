@@ -33,9 +33,6 @@ services:
     SmartAssert\SourcesClient\SourceClient:
         public: true
 
-    SmartAssert\SourcesClient\FileClient:
-        public: true
-
     SmartAssert\SourcesClient\SuiteFactory: ~
 
     SmartAssert\SourcesClient\SuiteClient:

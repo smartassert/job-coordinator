@@ -6,7 +6,6 @@ namespace App\Tests\Application;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
-use SmartAssert\SourcesClient\FileClient;
 use SmartAssert\SourcesClient\SourceClient;
 use SmartAssert\SourcesClient\SuiteClient;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -91,10 +90,6 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         $sourceClient = self::getContainer()->get(SourceClient::class);
         \assert($sourceClient instanceof SourceClient);
         $source = $sourceClient->createFileSource($apiToken, md5((string) rand()));
-
-        $fileClient = self::getContainer()->get(FileClient::class);
-        \assert($fileClient instanceof FileClient);
-        $fileClient->add($apiToken, $source->getId(), 'test1.yaml', 'test 1 contents');
 
         $suiteClient = self::getContainer()->get(SuiteClient::class);
         \assert($suiteClient instanceof SuiteClient);
