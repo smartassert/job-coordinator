@@ -115,10 +115,7 @@
             "sleep 2",
             "@db-setup",
             "@messenger-setup",
-            "@users-setup",
-            "@results-setup",
-            "@worker-manager-setup",
-            "@sources-setup"
+            "@users-setup"
         ],
         "users-db-setup": [
             "docker-compose -f tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
