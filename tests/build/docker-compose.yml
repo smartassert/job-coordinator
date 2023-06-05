@@ -120,3 +120,38 @@ services:
     volumes:
       - ./http-config/caddy/index.php:/app/public/index.php
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  app:
+    profiles: ["integration"]
+    env_file: .env
+    build:
+      context: ../..
+      args:
+        DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/job-coordinator?serverVersion=12&charset=utf8
+        AUTHENTICATION_BASE_URL: http://users-http
+        RESULTS_BASE_URL: http://results-http
+        WORKER_MANAGER_BASE_URL: http://worker-manager-http
+        SOURCES_BASE_URL: http://sources-http
+    container_name: app
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - users-http
+      - results-http
+      - sources-http
+
+  app-http:
+    image: caddy:2.4.5-alpine
+    profiles: ["integration"]
+    container_name: app-http
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${CADDY_DOMAIN:-localhost}
+      TLS_INTERNAL: ${CADDY_TLS_INTERNAL:-internal}
+    ports:
+      - "443:443"
+    links:
+      - app:app
+    volumes:
+      - ./http-config/caddy-app/index.php:/app/public/index.php
+      - ./http-config/caddy-app/Caddyfile:/etc/caddy/Caddyfile

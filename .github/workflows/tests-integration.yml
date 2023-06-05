@@ -1,0 +1,52 @@
+name: Integration tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  integration:
+    name: Integration tests - PHP ${{ matrix.php }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php: ['8.1']
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Pull images
+        run: composer integration-pull
+
+      - name: Setup integration environment
+        env:
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/job-coordinator?charset=UTF-8
+        run: composer integration-setup
+
+      - name: Verify integration environment state
+        env:
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/job-coordinator?charset=UTF-8
+        run: |
+          composer integration-status
+          sudo netstat -nlp | grep 9090
+          netcat -vz localhost 9090
+          sleep 10
+
+      - name: Run tests
+        run: composer test-integration
+
+      - name: Dump docker-compose logs
+        if: always()
+        run: composer integration-logs
