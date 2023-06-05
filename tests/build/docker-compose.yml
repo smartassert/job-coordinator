@@ -1,8 +1,41 @@
-version: "3"
-
 services:
+  postgres:
+    env_file: .env
+    image: postgres:12.5-alpine
+    profiles: ["functional"]
+    container_name: postgres
+    ports:
+      - "5432:5432"
+
+  users-service:
+    image: ghcr.io/smartassert/users:0.8
+    profiles: ["functional"]
+    container_name: users-service
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
+      JWT_PASSPHRASE: non-empty-string
+      PRIMARY_ADMIN_TOKEN: primary_admin_token
+      SECONDARY_ADMIN_TOKEN: secondary_admin_token
+      IS_READY: 1
+    depends_on:
+      - postgres
+
+  users-http:
+    image: caddy:2.4.5-alpine
+    profiles: ["functional"]
+    container_name: users-http
+    restart: unless-stopped
+    ports:
+      - "9080:80"
+    links:
+      - users-service:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
   results-service:
     image: ghcr.io/smartassert/results:1.2
+    profiles: ["integration"]
     container_name: results-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/results?serverVersion=12&charset=utf8
@@ -14,6 +47,7 @@ services:
 
   results-http:
     image: caddy:2.4.5-alpine
+    profiles: ["integration"]
     container_name: results-http
     restart: unless-stopped
     ports:
@@ -26,6 +60,7 @@ services:
 
   worker-manager-service:
     image: ghcr.io/smartassert/worker-manager:0.27
+    profiles: ["integration"]
     container_name: worker-manager-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/worker_manager?serverVersion=12&charset=utf8
@@ -38,6 +73,7 @@ services:
 
   worker-manager-http:
     image: caddy:2.4.5-alpine
+    profiles: ["integration"]
     container_name: worker-manager-http
     restart: unless-stopped
     ports:
@@ -50,6 +86,7 @@ services:
 
   s3-mock:
     image: adobe/s3mock:2.4.14
+    profiles: ["integration"]
     container_name: s3-mock
     ports:
       - "9090:9090"
@@ -60,6 +97,7 @@ services:
 
   sources-service:
     image: ghcr.io/smartassert/sources:1.8
+    profiles: ["integration"]
     container_name: sources-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
@@ -72,6 +110,7 @@ services:
 
   sources-http:
     image: caddy:2.4.5-alpine
+    profiles: ["integration"]
     container_name: sources-http
     restart: unless-stopped
     ports:
