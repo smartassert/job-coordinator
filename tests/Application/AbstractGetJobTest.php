@@ -8,8 +8,6 @@ use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Services\UlidFactory;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractGetJobTest extends AbstractApplicationTest
@@ -113,11 +111,6 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
 
         $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
-
-        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
-        \assert($workerManagerClient instanceof WorkerManagerClient);
-        $machine = $workerManagerClient->getMachine($apiToken, $jobId);
-        \assert($machine instanceof Machine);
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 

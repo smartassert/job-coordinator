@@ -170,8 +170,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         if (null === $workerManagerClient) {
-            $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
-            \assert($workerManagerClient instanceof WorkerManagerClient);
+            $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         }
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
