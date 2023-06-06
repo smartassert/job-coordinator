@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
@@ -33,8 +32,6 @@ final class CreateResultsJobMessageHandler
             return;
         }
 
-        $job->setResultsJobRequestState(RequestState::REQUESTING);
-
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $job->id);
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
@@ -43,9 +40,6 @@ final class CreateResultsJobMessageHandler
                 $resultsJob
             ));
         } catch (\Throwable $e) {
-            $job->setResultsJobRequestState(RequestState::HALTED);
-            $this->jobRepository->add($job);
-
             throw new ResultsJobCreationException($job, $e);
         }
     }

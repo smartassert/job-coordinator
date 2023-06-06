@@ -45,9 +45,6 @@ class Job implements \JsonSerializable
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
 
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $resultsJobRequestState = null;
-
     /**
      * @var ?non-empty-string
      */
@@ -186,22 +183,6 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function setResultsJobRequestState(?RequestState $state): self
-    {
-        $this->resultsJobRequestState = $state;
-
-        return $this;
-    }
-
-    public function getResultsJobRequestState(): RequestState
-    {
-        if (null !== $this->resultsJobRequestState) {
-            return $this->resultsJobRequestState;
-        }
-
-        return is_string($this->resultsToken) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     public function setSerializedSuiteRequestState(?RequestState $state): self
     {
         $this->serializedSuiteRequestState = $state;
@@ -241,7 +222,7 @@ class Job implements \JsonSerializable
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string, request_state: non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{request_state: non-empty-string}
+     *   results_job: array{has_token: bool}
      *  }
      */
     public function jsonSerialize(): array
@@ -262,7 +243,6 @@ class Job implements \JsonSerializable
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),
-                'request_state' => $this->getResultsJobRequestState()->value,
             ],
         ];
     }

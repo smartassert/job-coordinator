@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
@@ -39,7 +38,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         $job = $this->jobRepository->find($event->jobId);
         if (
             null === $job
-            || RequestState::SUCCEEDED !== $job->getResultsJobRequestState()
+            || null === $job->getResultsToken()
             || 'prepared' !== $job->getSerializedSuiteState()
         ) {
             return;

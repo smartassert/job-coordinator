@@ -87,7 +87,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertSame(
             [
                 'has_token' => false,
-                'request_state' => 'unknown',
             ],
             $responseData['results_job']
         );

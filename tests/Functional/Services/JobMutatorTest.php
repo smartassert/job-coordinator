@@ -147,9 +147,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, 'user id', 'suite id', 600);
-        $job->setResultsJobRequestState(RequestState::REQUESTING);
         self::assertNull($job->getResultsToken());
-        self::assertSame(RequestState::REQUESTING, $job->getResultsJobRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
@@ -166,7 +164,6 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame($jobId, $retrievedJob->id);
         self::assertSame($resultsJob->token, $retrievedJob->getResultsToken());
-        self::assertSame(RequestState::SUCCEEDED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testSetSerializedSuiteOnSerializedSuiteCreatedEventNoJob(): void

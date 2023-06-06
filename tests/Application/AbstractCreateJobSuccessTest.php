@@ -58,7 +58,6 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 ],
                 'results_job' => [
                     'has_token' => false,
-                    'request_state' => $job->getResultsJobRequestState()->value,
                 ],
             ],
             self::$createResponseData,
