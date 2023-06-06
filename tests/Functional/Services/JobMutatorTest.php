@@ -147,9 +147,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, 'user id', 'suite id', 600);
-        $job->setResultsJobRequestState(RequestState::REQUESTING);
         self::assertNull($job->getResultsToken());
-        self::assertSame(RequestState::REQUESTING, $job->getResultsJobRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
