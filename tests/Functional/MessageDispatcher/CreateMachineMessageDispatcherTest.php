@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
@@ -98,13 +97,10 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = md5((string) rand());
 
-        $jobResultsJobRequesting = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
-            ->setResultsJobRequestState(RequestState::REQUESTING)
-        ;
+        $jobNoResultsToken = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
 
         $jobSerializedSuitePreparing = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
             ->setResultsToken('results token')
-            ->setResultsJobRequestState(null)
             ->setSerializedSuiteState('preparing/running')
         ;
 
@@ -129,12 +125,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'job' => null,
                 'event' => $serializedSuiteSerializedEvent,
             ],
-            'ResultsJobCreatedEvent, results job request state not "succeeded"' => [
-                'job' => $jobResultsJobRequesting,
+            'ResultsJobCreatedEvent, no job results token' => [
+                'job' => $jobNoResultsToken,
                 'event' => $resultsJobCreatedEvent,
             ],
-            'SerializedSuiteSerializedEvent, results job request state not "succeeded"' => [
-                'job' => $jobResultsJobRequesting,
+            'SerializedSuiteSerializedEvent, no job results token' => [
+                'job' => $jobNoResultsToken,
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
@@ -173,7 +169,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
             ->setResultsToken('results token')
-            ->setResultsJobRequestState(null)
             ->setSerializedSuiteState('prepared')
         ;
 
