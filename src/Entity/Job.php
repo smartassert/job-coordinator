@@ -70,9 +70,6 @@ class Job implements \JsonSerializable
     private ?string $machineStateCategory = null;
 
     #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $serializedSuiteRequestState = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
     private ?RequestState $machineRequestState = null;
 
     /**
