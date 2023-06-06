@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Application;
+namespace App\Tests\Integration;
 
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
