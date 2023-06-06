@@ -261,6 +261,7 @@ class Job implements \JsonSerializable
                 'request_state' => $this->getMachineRequestState()->value,
             ],
             'results_job' => [
+                'has_token' => is_string($this->resultsToken),
                 'request_state' => $this->getResultsJobRequestState()->value,
             ],
         ];

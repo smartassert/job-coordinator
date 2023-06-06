@@ -45,6 +45,7 @@ class JobTest extends TestCase
                     'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'results_job' => [
+                    'has_token' => false,
                     'request_state' => RequestState::UNKNOWN->value,
                 ],
             ],
