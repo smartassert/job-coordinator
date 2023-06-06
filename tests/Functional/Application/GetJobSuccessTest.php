@@ -105,7 +105,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'serialized_suite' => [
                             'id' => null,
                             'state' => null,
-                            'request_state' => 'unknown',
                         ],
                         'machine' => [
                             'state_category' => null,
@@ -134,7 +133,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'serialized_suite' => [
                             'id' => null,
                             'state' => null,
-                            'request_state' => 'unknown',
                         ],
                         'machine' => [
                             'state_category' => null,
@@ -192,7 +190,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'serialized_suite' => [
                             'id' => null,
                             'state' => null,
-                            'request_state' => 'unknown',
                         ],
                         'machine' => [
                             'state_category' => null,

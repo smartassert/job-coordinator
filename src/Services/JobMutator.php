@@ -95,7 +95,6 @@ class JobMutator implements EventSubscriberInterface
             return;
         }
 
-        $job = $job->setSerializedSuiteRequestState(null);
         $job->setSerializedSuiteId($event->serializedSuite->getId());
 
         $this->jobRepository->add($job);

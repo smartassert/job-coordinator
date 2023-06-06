@@ -70,9 +70,6 @@ class Job implements \JsonSerializable
     private ?string $machineStateCategory = null;
 
     #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $serializedSuiteRequestState = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
     private ?RequestState $machineRequestState = null;
 
     /**
@@ -183,22 +180,6 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function setSerializedSuiteRequestState(?RequestState $state): self
-    {
-        $this->serializedSuiteRequestState = $state;
-
-        return $this;
-    }
-
-    public function getSerializedSuiteRequestState(): RequestState
-    {
-        if (null !== $this->serializedSuiteRequestState) {
-            return $this->serializedSuiteRequestState;
-        }
-
-        return is_string($this->serializedSuiteId) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     public function setMachineRequestState(?RequestState $state): self
     {
         $this->machineRequestState = $state;
@@ -220,7 +201,7 @@ class Job implements \JsonSerializable
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string, request_state: non-empty-string},
+     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
      *   results_job: array{has_token: bool}
      *  }
@@ -234,7 +215,6 @@ class Job implements \JsonSerializable
             'serialized_suite' => [
                 'id' => $this->serializedSuiteId,
                 'state' => $this->serializedSuiteState,
-                'request_state' => $this->getSerializedSuiteRequestState()->value,
             ],
             'machine' => [
                 'state_category' => $this->machineStateCategory,
