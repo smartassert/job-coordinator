@@ -84,7 +84,6 @@ class JobMutator implements EventSubscriberInterface
             return;
         }
 
-        $job = $job->setResultsJobRequestState(null);
         $job = $job->setResultsToken($event->resultsJob->token);
         $this->jobRepository->add($job);
     }

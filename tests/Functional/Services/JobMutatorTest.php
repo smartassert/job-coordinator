@@ -166,7 +166,6 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame($jobId, $retrievedJob->id);
         self::assertSame($resultsJob->token, $retrievedJob->getResultsToken());
-        self::assertSame(RequestState::SUCCEEDED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testSetSerializedSuiteOnSerializedSuiteCreatedEventNoJob(): void
