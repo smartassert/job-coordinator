@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Enum\RequestState;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
@@ -33,8 +32,6 @@ final class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $job->setSerializedSuiteRequestState(RequestState::REQUESTING);
-
         try {
             $serializedSuite = $this->serializedSuiteClient->create(
                 $message->authenticationToken,
@@ -48,9 +45,6 @@ final class CreateSerializedSuiteMessageHandler
                 $serializedSuite
             ));
         } catch (\Throwable $e) {
-            $job->setSerializedSuiteRequestState(RequestState::HALTED);
-            $this->jobRepository->add($job);
-
             throw new SerializedSuiteCreationException($job, $e);
         }
     }
