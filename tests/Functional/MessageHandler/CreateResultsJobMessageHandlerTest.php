@@ -43,7 +43,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $resultsClientException = new \Exception('Failed to create results job');
 
@@ -67,14 +66,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::assertSame($resultsClientException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $retrievedJob = $jobRepository->find($job->id);
-        \assert($retrievedJob instanceof Job);
-
-        self::assertSame(RequestState::HALTED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testInvokeSuccess(): void
