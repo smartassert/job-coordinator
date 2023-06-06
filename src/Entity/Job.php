@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RequestState;
 use App\Repository\JobRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
@@ -68,9 +66,6 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineStateCategory = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $machineRequestState = null;
 
     /**
      * @param non-empty-string $userId
