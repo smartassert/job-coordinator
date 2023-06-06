@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RequestState;
 use App\Repository\JobRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
@@ -68,9 +66,6 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineStateCategory = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $machineRequestState = null;
 
     /**
      * @param non-empty-string $userId
@@ -180,22 +175,6 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function setMachineRequestState(?RequestState $state): self
-    {
-        $this->machineRequestState = $state;
-
-        return $this;
-    }
-
-    public function getMachineRequestState(): RequestState
-    {
-        if (null !== $this->machineRequestState) {
-            return $this->machineRequestState;
-        }
-
-        return is_string($this->machineStateCategory) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     /**
      * @return array{
      *   id: non-empty-string,
@@ -219,7 +198,6 @@ class Job implements \JsonSerializable
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
-                'request_state' => $this->getMachineRequestState()->value,
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),

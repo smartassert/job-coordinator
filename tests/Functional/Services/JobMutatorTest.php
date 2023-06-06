@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
@@ -231,9 +230,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, md5((string) rand()), md5((string) rand()), 600);
-        $job->setMachineRequestState(RequestState::REQUESTING);
         self::assertNull($job->getMachineStateCategory());
-        self::assertSame(RequestState::REQUESTING, $job->getMachineRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
@@ -250,6 +247,5 @@ class JobMutatorTest extends WebTestCase
         self::assertInstanceOf(Job::class, $retrievedJob);
 
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
-        self::assertSame(RequestState::SUCCEEDED, $job->getMachineRequestState());
     }
 }
