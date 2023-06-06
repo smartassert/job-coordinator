@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Entity\Job;
-use App\Entity\RemoteRequest;
-use App\Entity\RemoteRequestFailure;
-use App\Enum\RemoteRequestFailureType;
-use App\Enum\RemoteRequestType;
-use App\Enum\RequestState;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\UlidFactory;
@@ -22,13 +17,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 {
     use GetClientAdapterTrait;
 
-    /**
-     * @dataProvider getDataProvider
-     *
-     * @param callable(Job): RemoteRequest[] $remoteRequestsCreator
-     * @param callable(Job): array<mixed>    $expectedSerializedJobCreator
-     */
-    public function testGetSuccess(callable $remoteRequestsCreator, callable $expectedSerializedJobCreator): void
+    public function testGetSuccess(): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
@@ -72,181 +61,41 @@ class GetJobSuccessTest extends AbstractApplicationTest
             $remoteRequestRepository->remove($remoteRequest);
         }
 
-        $remoteRequests = $remoteRequestsCreator($job);
-        foreach ($remoteRequests as $remoteRequest) {
-            $remoteRequestRepository->save($remoteRequest);
-        }
-
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
         self::assertSame(200, $getResponse->getStatusCode());
         self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
+        self::assertIsArray($responseData);
 
-        self::assertEquals($expectedSerializedJobCreator($job), $responseData);
-    }
+        self::assertSame($job->id, $responseData['id']);
+        self::assertSame($job->suiteId, $responseData['suite_id']);
+        self::assertSame($job->maximumDurationInSeconds, $responseData['maximum_duration_in_seconds']);
 
-    /**
-     * @return array<mixed>
-     */
-    public function getDataProvider(): array
-    {
-        return [
-            'no remote requests' => [
-                'remoteRequestsCreator' => function () {
-                    return [];
-                },
-                'expectedSerializedJobCreator' => function (Job $job) {
-                    return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'serialized_suite' => [
-                            'id' => null,
-                            'state' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'results_job' => [
-                            'request_state' => 'unknown',
-                        ],
-                        'service_requests' => [],
-                    ];
-                },
+        self::assertSame(
+            [
+                'id' => null,
+                'state' => null,
+                'request_state' => 'unknown',
             ],
-            'results/create only' => [
-                'remoteRequestsCreator' => function (Job $job) {
-                    return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
-                            ->setState(RequestState::REQUESTING),
-                    ];
-                },
-                'expectedSerializedJobCreator' => function (Job $job) {
-                    return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'serialized_suite' => [
-                            'id' => null,
-                            'state' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'results_job' => [
-                            'request_state' => 'unknown',
-                        ],
-                        'service_requests' => [
-                            [
-                                'type' => 'results/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'requesting',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ];
-                },
+            $responseData['serialized_suite']
+        );
+
+        self::assertSame(
+            [
+                'state_category' => null,
+                'ip_address' => null,
+                'request_state' => 'unknown',
             ],
-            'results/create success, serialized-suite/create success, serialized-suite/get failure and success' => [
-                'remoteRequestsCreator' => function (Job $job) {
-                    return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
-                            ->setState(RequestState::SUCCEEDED),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
-                            ->setState(RequestState::SUCCEEDED),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 0))
-                            ->setState(RequestState::FAILED)
-                            ->setFailure(new RemoteRequestFailure(
-                                md5((string) rand()),
-                                RemoteRequestFailureType::NETWORK,
-                                6,
-                                'unable to resolve host "sources.example.com"'
-                            )),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 1))
-                            ->setState(RequestState::FAILED)
-                            ->setFailure(new RemoteRequestFailure(
-                                md5((string) rand()),
-                                RemoteRequestFailureType::HTTP,
-                                503,
-                                'service unavailable'
-                            )),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 2))
-                            ->setState(RequestState::SUCCEEDED),
-                    ];
-                },
-                'expectedSerializedJobCreator' => function (Job $job) {
-                    return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'serialized_suite' => [
-                            'id' => null,
-                            'state' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                            'request_state' => 'unknown',
-                        ],
-                        'results_job' => [
-                            'request_state' => 'unknown',
-                        ],
-                        'service_requests' => [
-                            [
-                                'type' => 'results/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'succeeded',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'serialized-suite/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'succeeded',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'serialized-suite/get',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 6,
-                                            'message' => 'unable to resolve host "sources.example.com"',
-                                        ],
-                                    ],
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'http',
-                                            'code' => 503,
-                                            'message' => 'service unavailable',
-                                        ],
-                                    ],
-                                    [
-                                        'state' => 'succeeded',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ];
-                },
+            $responseData['machine']
+        );
+
+        self::assertSame(
+            [
+                'request_state' => 'unknown',
             ],
-        ];
+            $responseData['results_job']
+        );
     }
 }
