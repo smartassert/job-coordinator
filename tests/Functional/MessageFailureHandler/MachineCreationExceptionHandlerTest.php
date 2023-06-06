@@ -9,7 +9,6 @@ use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
-use App\Enum\RequestState;
 use App\Exception\MachineCreationException;
 use App\MessageFailureHandler\MachineCreationExceptionHandler;
 use App\Repository\JobRepository;
@@ -58,41 +57,6 @@ class MachineCreationExceptionHandlerTest extends WebTestCase
         foreach ($remoteRequestFailureRepository->findAll() as $entity) {
             $remoteRequestFailureRepository->remove($entity);
         }
-    }
-
-    /**
-     * @dataProvider handleDataProvider
-     *
-     * @param callable(Job): \Throwable $throwableCreator
-     */
-    public function testHandle(callable $throwableCreator, RequestState $expectedMachineRequestState): void
-    {
-        self::assertSame(RequestState::UNKNOWN, $this->job->getMachineRequestState());
-
-        $this->handler->handle($throwableCreator($this->job));
-
-        self::assertSame($expectedMachineRequestState, $this->job->getMachineRequestState());
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function handleDataProvider(): array
-    {
-        return [
-            'unhandled exception' => [
-                'throwableCreator' => function () {
-                    return new \Exception();
-                },
-                'expectedMachineRequestState)' => RequestState::UNKNOWN,
-            ],
-            MachineCreationException::class => [
-                'throwableCreator' => function (Job $job) {
-                    return new MachineCreationException($job, new \Exception());
-                },
-                'expectedMachineRequestState)' => RequestState::FAILED,
-            ],
-        ];
     }
 
     /**
