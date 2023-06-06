@@ -114,7 +114,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
-                            'request_state' => 'unknown',
                         ],
                         'service_requests' => [],
                     ];
@@ -144,7 +143,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
-                            'request_state' => 'unknown',
                         ],
                         'service_requests' => [
                             [
@@ -203,7 +201,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
-                            'request_state' => 'unknown',
                         ],
                         'service_requests' => [
                             [

@@ -241,7 +241,7 @@ class Job implements \JsonSerializable
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string, request_state: non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{request_state: non-empty-string}
+     *   results_job: array{has_token: bool}
      *  }
      */
     public function jsonSerialize(): array
@@ -262,7 +262,6 @@ class Job implements \JsonSerializable
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),
-                'request_state' => $this->getResultsJobRequestState()->value,
             ],
         ];
     }

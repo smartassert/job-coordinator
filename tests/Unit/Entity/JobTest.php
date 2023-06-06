@@ -46,7 +46,6 @@ class JobTest extends TestCase
                 ],
                 'results_job' => [
                     'has_token' => false,
-                    'request_state' => RequestState::UNKNOWN->value,
                 ],
             ],
             $job->jsonSerialize()
