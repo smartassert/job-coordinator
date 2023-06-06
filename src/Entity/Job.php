@@ -45,9 +45,6 @@ class Job implements \JsonSerializable
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
 
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $resultsJobRequestState = null;
-
     /**
      * @var ?non-empty-string
      */
