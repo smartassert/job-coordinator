@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Message\GetSerializedSuiteMessage;
@@ -74,7 +73,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     public function testInvokeSuccess(): void
     {
         $job = $this->createJob();
-        self::assertSame(RequestState::UNKNOWN, $job->getSerializedSuiteRequestState());
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),
@@ -104,7 +102,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
 
-        self::assertSame(RequestState::SUCCEEDED, $job->getSerializedSuiteRequestState());
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
         $this->assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuite->getId());
     }

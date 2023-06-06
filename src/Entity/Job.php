@@ -183,15 +183,6 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function getSerializedSuiteRequestState(): RequestState
-    {
-        if (null !== $this->serializedSuiteRequestState) {
-            return $this->serializedSuiteRequestState;
-        }
-
-        return is_string($this->serializedSuiteId) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     public function setMachineRequestState(?RequestState $state): self
     {
         $this->machineRequestState = $state;
