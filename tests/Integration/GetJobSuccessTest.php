@@ -70,7 +70,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
             [
                 'id' => null,
                 'state' => null,
-                'request_state' => 'unknown',
             ],
             $responseData['serialized_suite']
         );
