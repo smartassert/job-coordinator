@@ -53,7 +53,6 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
-                    'request_state' => $job->getMachineRequestState()->value,
                 ],
                 'results_job' => [
                     'has_token' => false,

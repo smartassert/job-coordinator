@@ -78,7 +78,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
             [
                 'state_category' => null,
                 'ip_address' => null,
-                'request_state' => 'unknown',
             ],
             $responseData['machine']
         );

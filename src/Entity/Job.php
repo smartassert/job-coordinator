@@ -212,7 +212,6 @@ class Job implements \JsonSerializable
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
-                'request_state' => $this->getMachineRequestState()->value,
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),
