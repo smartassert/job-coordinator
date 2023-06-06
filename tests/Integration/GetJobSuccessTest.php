@@ -6,7 +6,6 @@ namespace App\Tests\Integration;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
-use App\Repository\RemoteRequestRepository;
 use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,12 +53,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
-
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
-            $remoteRequestRepository->remove($remoteRequest);
-        }
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
