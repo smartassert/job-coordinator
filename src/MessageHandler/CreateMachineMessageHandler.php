@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Enum\RequestState;
 use App\Event\MachineRequestedEvent;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
@@ -33,17 +32,11 @@ final class CreateMachineMessageHandler
             return;
         }
 
-        $job->setMachineRequestState(RequestState::REQUESTING);
-        $this->jobRepository->add($job);
-
         try {
             $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $job->id);
 
             $this->eventDispatcher->dispatch(new MachineRequestedEvent($message->authenticationToken, $machine));
         } catch (\Throwable $e) {
-            $job->setMachineRequestState(RequestState::HALTED);
-            $this->jobRepository->add($job);
-
             throw new MachineCreationException($job, $e);
         }
     }

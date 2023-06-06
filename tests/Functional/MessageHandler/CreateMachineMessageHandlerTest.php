@@ -69,14 +69,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::assertSame($workerManagerException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $retrievedJob = $jobRepository->find($job->id);
-        \assert($retrievedJob instanceof Job);
-
-        self::assertSame(RequestState::HALTED, $retrievedJob->getMachineRequestState());
     }
 
     public function testInvokeSuccess(): void
