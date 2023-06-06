@@ -46,7 +46,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $workerManagerException = new \Exception('Failed to create machine');
 
