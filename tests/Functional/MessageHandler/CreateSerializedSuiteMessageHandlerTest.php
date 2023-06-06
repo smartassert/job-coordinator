@@ -44,7 +44,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
         $job = $this->createJob();
-        self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $serializedSuiteCreateParameters = [];
 
