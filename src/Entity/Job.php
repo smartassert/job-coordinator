@@ -180,15 +180,6 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function getMachineRequestState(): RequestState
-    {
-        if (null !== $this->machineRequestState) {
-            return $this->machineRequestState;
-        }
-
-        return is_string($this->machineStateCategory) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     /**
      * @return array{
      *   id: non-empty-string,

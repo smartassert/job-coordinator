@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
 use App\Message\GetMachineMessage;
@@ -75,7 +74,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        self::assertSame(RequestState::UNKNOWN, $job->getMachineRequestState());
 
         $machine = new Machine($jobId, 'create/requested', 'pre_active', []);
 
@@ -94,7 +92,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler(new CreateMachineMessage(self::$apiToken, $jobId));
 
-        self::assertSame(RequestState::SUCCEEDED, $job->getMachineRequestState());
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
 
         $this->assertDispatchedMessage(self::$apiToken, $machine);
