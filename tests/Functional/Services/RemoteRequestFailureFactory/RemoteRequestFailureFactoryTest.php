@@ -7,9 +7,9 @@ namespace App\Tests\Functional\Services\RemoteRequestFailureFactory;
 use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Repository\RemoteRequestFailureRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,14 +29,16 @@ class RemoteRequestFailureFactoryTest extends WebTestCase
         \assert($remoteRequestFailureFactory instanceof RemoteRequestFailureFactory);
         $this->remoteRequestFailureFactory = $remoteRequestFailureFactory;
 
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+        foreach ($remoteRequestRepository->findAll() as $entity) {
+            $remoteRequestRepository->remove($entity);
+        }
+
         $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
         \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
         foreach ($remoteRequestFailureRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
+            $remoteRequestFailureRepository->remove($entity);
         }
 
         $this->remoteRequestFailureRepository = $remoteRequestFailureRepository;

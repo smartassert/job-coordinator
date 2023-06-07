@@ -18,8 +18,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RemoteRequestFailureRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly RemoteRequestRepository $remoteRequestRepository,
+    ) {
         parent::__construct($registry, RemoteRequestFailure::class);
     }
 
@@ -31,6 +33,10 @@ class RemoteRequestFailureRepository extends ServiceEntityRepository
 
     public function remove(RemoteRequestFailure $entity): void
     {
+        if ($this->remoteRequestRepository->hasAnyWithFailure($entity)) {
+            return;
+        }
+
         $this->getEntityManager()->remove($entity);
         $this->getEntityManager()->flush();
     }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RemoteRequest;
+use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -70,5 +73,28 @@ class RemoteRequestRepository extends ServiceEntityRepository
         }
 
         return $largestIndex;
+    }
+
+    public function hasAnyWithFailure(RemoteRequestFailure $remoteRequestFailure): bool
+    {
+        $queryBuilder = $this->createQueryBuilder('RemoteRequest');
+        $queryBuilder
+            ->select('COUNT(RemoteRequest.id)')
+            ->where('RemoteRequest.failure = :RemoteRequestFailure')
+            ->setParameter('RemoteRequestFailure', $remoteRequestFailure)
+            ->setMaxResults(1)
+        ;
+
+        $query = $queryBuilder->getQuery();
+
+        try {
+            $result = $query->getSingleScalarResult();
+        } catch (NoResultException) {
+            return false;
+        } catch (NonUniqueResultException) {
+            return true;
+        }
+
+        return $result > 0;
     }
 }
