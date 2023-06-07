@@ -7,11 +7,13 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Enum\RemoteRequestType;
+use App\Event\MachineIsActiveEvent;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RemoteRequestRemoverTest extends WebTestCase
 {
@@ -47,14 +49,54 @@ class RemoteRequestRemoverTest extends WebTestCase
         $this->jobRepository = $jobRepository;
     }
 
-    /**
-     * @dataProvider removeForJobAndTypeNoJobDataProvider
-     *
-     * @param callable(): RemoteRequest[] $remoteRequestCreator
-     */
-    public function testRemoveForJobAndTypeNoJob(callable $remoteRequestCreator, RemoteRequestType $type): void
+    public function testIsEventSubscriber(): void
     {
-        $remoteRequests = $remoteRequestCreator();
+        self::assertInstanceOf(EventSubscriberInterface::class, $this->remoteRequestRemover);
+    }
+
+    /**
+     * @dataProvider eventSubscriptionsDataProvider
+     */
+    public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
+    {
+        $subscribedEvents = $this->remoteRequestRemover::getSubscribedEvents();
+        self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
+
+        $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
+        self::assertIsArray($eventSubscriptions);
+        self::assertIsArray($eventSubscriptions[0]);
+
+        $eventSubscription = $eventSubscriptions[0];
+        self::assertSame($expectedMethod, $eventSubscription[0]);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function eventSubscriptionsDataProvider(): array
+    {
+        return [
+            MachineIsActiveEvent::class => [
+                'expectedListenedForEvent' => MachineIsActiveEvent::class,
+                'expectedMethod' => 'removeMachineCreateRemoteRequestsForMachineIsActiveEvent',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider noRemoteRequestsDataProvider
+     *
+     * @param callable(string): RemoteRequest[] $remoteRequestCreator
+     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
+     */
+    public function testRemoveForJobAndTypeNoJob(
+        callable $remoteRequestCreator,
+        RemoteRequestType $type,
+        callable $expectedRemoteRequestCreator,
+    ): void {
+        $jobId = md5((string) rand());
+
+        $remoteRequests = $remoteRequestCreator($jobId);
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->save($remoteRequest);
         }
@@ -63,36 +105,16 @@ class RemoteRequestRemoverTest extends WebTestCase
 
         $this->remoteRequestRemover->removeForJobAndType($jobId, $type);
 
-        self::assertSame(count($remoteRequests), $this->remoteRequestRepository->count([]));
+        $expectedRemoteRequests = $expectedRemoteRequestCreator($jobId);
+
+        self::assertEquals($expectedRemoteRequests, $this->remoteRequestRepository->findAll());
     }
 
     /**
-     * @return array<mixed>
-     */
-    public function removeForJobAndTypeNoJobDataProvider(): array
-    {
-        return [
-            'no remote requests' => [
-                'remoteRequestCreator' => function () {
-                    return [];
-                },
-                'type' => RemoteRequestType::MACHINE_CREATE,
-            ],
-            'has matching remote requests for type' => [
-                'remoteRequestCreator' => function () {
-                    return [
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::RESULTS_CREATE, 0),
-                    ];
-                },
-                'type' => RemoteRequestType::MACHINE_CREATE,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider removeForJobAndTypeDataProvider
+     * @dataProvider noRemoteRequestsDataProvider
+     * @dataProvider noRemoteRequestsForMachineCreateDataProvider
+     * @dataProvider singleRequestForMachineCreateDataProvider
+     * @dataProvider multipleRequestsForMachineCreateDataProvider
      *
      * @param callable(string): RemoteRequest[] $remoteRequestCreator
      * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
@@ -117,9 +139,39 @@ class RemoteRequestRemoverTest extends WebTestCase
     }
 
     /**
+     * @dataProvider noRemoteRequestsDataProvider
+     * @dataProvider noRemoteRequestsForMachineCreateDataProvider
+     * @dataProvider singleRequestForMachineCreateDataProvider
+     * @dataProvider multipleRequestsForMachineCreateDataProvider
+     *
+     * @param callable(string): RemoteRequest[] $remoteRequestCreator
+     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
+     */
+    public function testRemoveMachineCreateRemoteRequestsForMachineIsActiveEvent(
+        callable $remoteRequestCreator,
+        RemoteRequestType $type,
+        callable $expectedRemoteRequestCreator,
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $remoteRequests = $remoteRequestCreator($job->id);
+        foreach ($remoteRequests as $remoteRequest) {
+            $this->remoteRequestRepository->save($remoteRequest);
+        }
+
+        $event = new MachineIsActiveEvent('authentication token', $job->id, '127.0.0.1');
+
+        $this->remoteRequestRemover->removeMachineCreateRemoteRequestsForMachineIsActiveEvent($event);
+        $expectedRemoteRequests = $expectedRemoteRequestCreator($job->id);
+
+        self::assertEquals($expectedRemoteRequests, $this->remoteRequestRepository->findAll());
+    }
+
+    /**
      * @return array<mixed>
      */
-    public function removeForJobAndTypeDataProvider(): array
+    public function noRemoteRequestsDataProvider(): array
     {
         return [
             'no remote requests' => [
@@ -131,7 +183,16 @@ class RemoteRequestRemoverTest extends WebTestCase
                     return [];
                 },
             ],
-            'no remote requests for type' => [
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function noRemoteRequestsForMachineCreateDataProvider(): array
+    {
+        return [
+            'no remote requests for machine/create' => [
                 'remoteRequestCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
@@ -152,7 +213,16 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
             ],
-            'single remote request for type' => [
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function singleRequestForMachineCreateDataProvider(): array
+    {
+        return [
+            'single remote request for machine/create' => [
                 'remoteRequestCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
@@ -174,7 +244,16 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
             ],
-            'multiple remote requests for type' => [
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function multipleRequestsForMachineCreateDataProvider(): array
+    {
+        return [
+            'multiple remote requests for machine/create' => [
                 'remoteRequestCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
