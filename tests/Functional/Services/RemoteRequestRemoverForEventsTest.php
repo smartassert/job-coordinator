@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\ResultsJobCreatedEvent;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -57,6 +58,10 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
             ResultsJobCreatedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobCreatedEvent::class,
                 'expectedMethod' => 'removeResultsCreateRemoteRequestsForResultsJobCreatedEvent',
+            ],
+            SerializedSuiteCreatedEvent::class => [
+                'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
+                'expectedMethod' => 'removeSerializedSuiteCreateRequestsForSerializedSuiteCreatedEvent',
             ],
         ];
     }
