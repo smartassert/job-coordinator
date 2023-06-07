@@ -61,9 +61,8 @@ class RemoteRequestRemoverTest extends WebTestCase
 
         $jobId = md5((string) rand());
 
-        $removedRemoteRequests = $this->remoteRequestRemover->removeForJobAndType($jobId, $type);
+        $this->remoteRequestRemover->removeForJobAndType($jobId, $type);
 
-        self::assertSame([], $removedRemoteRequests);
         self::assertSame(count($remoteRequests), $this->remoteRequestRepository->count([]));
     }
 
@@ -96,12 +95,12 @@ class RemoteRequestRemoverTest extends WebTestCase
      * @dataProvider removeForJobAndTypeDataProvider
      *
      * @param callable(string): RemoteRequest[] $remoteRequestCreator
-     * @param callable(string): RemoteRequest[] $expectedRemovedRemoteRequestCreator
+     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
      */
     public function testRemoveForJobAndType(
         callable $remoteRequestCreator,
         RemoteRequestType $type,
-        callable $expectedRemovedRemoteRequestCreator,
+        callable $expectedRemoteRequestCreator,
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
@@ -111,14 +110,10 @@ class RemoteRequestRemoverTest extends WebTestCase
             $this->remoteRequestRepository->save($remoteRequest);
         }
 
-        $removedRemoteRequests = $this->remoteRequestRemover->removeForJobAndType($job->id, $type);
-        $expectedRemovedRemoteRequests = $expectedRemovedRemoteRequestCreator($job->id);
+        $this->remoteRequestRemover->removeForJobAndType($job->id, $type);
+        $expectedRemoteRequests = $expectedRemoteRequestCreator($job->id);
 
-        self::assertEquals($expectedRemovedRemoteRequests, $removedRemoteRequests);
-        self::assertSame(
-            count($remoteRequests) - count($expectedRemovedRemoteRequests),
-            $this->remoteRequestRepository->count([])
-        );
+        self::assertEquals($expectedRemoteRequests, $this->remoteRequestRepository->findAll());
     }
 
     /**
@@ -132,7 +127,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                     return [];
                 },
                 'type' => RemoteRequestType::MACHINE_CREATE,
-                'expectedRemovedRemoteRequests' => function () {
+                'expectedRemoteRequestsCreator' => function () {
                     return [];
                 },
             ],
@@ -147,8 +142,14 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
                 'type' => RemoteRequestType::MACHINE_CREATE,
-                'expectedRemovedRemoteRequests' => function () {
-                    return [];
+                'expectedRemoteRequestsCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return [
+                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                    ];
                 },
             ],
             'single remote request for type' => [
@@ -163,11 +164,13 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
                 'type' => RemoteRequestType::MACHINE_CREATE,
-                'expectedRemovedRemoteRequests' => function (string $jobId) {
+                'expectedRemoteRequestsCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
                     ];
                 },
             ],
@@ -185,13 +188,13 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
                 'type' => RemoteRequestType::MACHINE_CREATE,
-                'expectedRemovedRemoteRequests' => function (string $jobId) {
+                'expectedRemoteRequestsCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 2),
+                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
+                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
                     ];
                 },
             ],

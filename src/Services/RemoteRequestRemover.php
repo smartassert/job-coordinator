@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\RemoteRequest;
 use App\Enum\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
@@ -17,14 +16,11 @@ class RemoteRequestRemover
     ) {
     }
 
-    /**
-     * @return RemoteRequest[]
-     */
-    public function removeForJobAndType(string $jobId, RemoteRequestType $type): array
+    public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
     {
         $job = $this->jobRepository->find($jobId);
         if (null === $job) {
-            return [];
+            return;
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy([
@@ -35,7 +31,5 @@ class RemoteRequestRemover
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->remove($remoteRequest);
         }
-
-        return $remoteRequests;
     }
 }
