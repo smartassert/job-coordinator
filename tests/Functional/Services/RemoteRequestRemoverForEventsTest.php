@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
@@ -62,6 +63,10 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
             SerializedSuiteCreatedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
                 'expectedMethod' => 'removeSerializedSuiteCreateRequestsForSerializedSuiteCreatedEvent',
+            ],
+            MachineRetrievedEvent::class => [
+                'expectedListenedForEvent' => MachineRetrievedEvent::class,
+                'expectedMethod' => 'removeMachineGetRemoteRequestsForMachineRetrievedEvent',
             ],
         ];
     }
