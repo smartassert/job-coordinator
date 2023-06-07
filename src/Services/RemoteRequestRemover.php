@@ -6,45 +6,17 @@ namespace App\Services;
 
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
-use App\Event\MachineIsActiveEvent;
-use App\Event\ResultsJobCreatedEvent;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class RemoteRequestRemover implements EventSubscriberInterface
+class RemoteRequestRemover
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestFailureRepository $remoteRequestFailureRepository,
     ) {
-    }
-
-    /**
-     * @return array<class-string, array<mixed>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MachineIsActiveEvent::class => [
-                ['removeMachineCreateRemoteRequestsForMachineIsActiveEvent', 0],
-            ],
-            ResultsJobCreatedEvent::class => [
-                ['removeResultsCreateRemoteRequestsForResultsJobCreatedEvent', 0],
-            ],
-        ];
-    }
-
-    public function removeMachineCreateRemoteRequestsForMachineIsActiveEvent(MachineIsActiveEvent $event): void
-    {
-        $this->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_CREATE);
-    }
-
-    public function removeResultsCreateRemoteRequestsForResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
-    {
-        $this->removeForJobAndType($event->jobId, RemoteRequestType::RESULTS_CREATE);
     }
 
     public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
