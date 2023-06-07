@@ -40,6 +40,3 @@ services:
         public: true
         arguments:
             $httpClient: '@app.tests.integration.http.client'
-
-    App\Services\RemoteRequestRemover:
-        public: true
