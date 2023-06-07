@@ -6,9 +6,11 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
+use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
 use App\Event\MachineIsActiveEvent;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +21,7 @@ class RemoteRequestRemoverTest extends WebTestCase
 {
     private RemoteRequestRemover $remoteRequestRemover;
     private RemoteRequestRepository $remoteRequestRepository;
+    private RemoteRequestFailureRepository $remoteRequestFailureRepository;
     private JobRepository $jobRepository;
 
     protected function setUp(): void
@@ -35,6 +38,13 @@ class RemoteRequestRemoverTest extends WebTestCase
             $remoteRequestRepository->remove($entity);
         }
         $this->remoteRequestRepository = $remoteRequestRepository;
+
+        $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
+        \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
+        foreach ($remoteRequestFailureRepository->findAll() as $entity) {
+            $remoteRequestFailureRepository->remove($entity);
+        }
+        $this->remoteRequestFailureRepository = $remoteRequestFailureRepository;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -86,22 +96,27 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @dataProvider noRemoteRequestsDataProvider
      *
-     * @param callable(string): RemoteRequest[] $remoteRequestCreator
-     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
+     * @param callable(): RemoteRequestFailure[]                        $remoteRequestFailuresCreator
+     * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
+     * @param callable(string): RemoteRequest[]                         $expectedRemoteRequestCreator
      */
     public function testRemoveForJobAndTypeNoJob(
-        callable $remoteRequestCreator,
+        callable $remoteRequestFailuresCreator,
+        callable $remoteRequestsCreator,
         RemoteRequestType $type,
         callable $expectedRemoteRequestCreator,
     ): void {
         $jobId = md5((string) rand());
 
-        $remoteRequests = $remoteRequestCreator($jobId);
+        $remoteRequestFailures = $remoteRequestFailuresCreator();
+        foreach ($remoteRequestFailures as $remoteRequestFailure) {
+            $this->remoteRequestFailureRepository->save($remoteRequestFailure);
+        }
+
+        $remoteRequests = $remoteRequestsCreator($jobId, $remoteRequestFailures);
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->save($remoteRequest);
         }
-
-        $jobId = md5((string) rand());
 
         $this->remoteRequestRemover->removeForJobAndType($jobId, $type);
 
@@ -116,18 +131,25 @@ class RemoteRequestRemoverTest extends WebTestCase
      * @dataProvider singleRequestForMachineCreateDataProvider
      * @dataProvider multipleRequestsForMachineCreateDataProvider
      *
-     * @param callable(string): RemoteRequest[] $remoteRequestCreator
-     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
+     * @param callable(): RemoteRequestFailure[]                        $remoteRequestFailuresCreator
+     * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
+     * @param callable(string): RemoteRequest[]                         $expectedRemoteRequestCreator
      */
     public function testRemoveForJobAndType(
-        callable $remoteRequestCreator,
+        callable $remoteRequestFailuresCreator,
+        callable $remoteRequestsCreator,
         RemoteRequestType $type,
         callable $expectedRemoteRequestCreator,
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
-        $remoteRequests = $remoteRequestCreator($job->id);
+        $remoteRequestFailures = $remoteRequestFailuresCreator();
+        foreach ($remoteRequestFailures as $remoteRequestFailure) {
+            $this->remoteRequestFailureRepository->save($remoteRequestFailure);
+        }
+
+        $remoteRequests = $remoteRequestsCreator($job->id, $remoteRequestFailures);
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->save($remoteRequest);
         }
@@ -144,18 +166,25 @@ class RemoteRequestRemoverTest extends WebTestCase
      * @dataProvider singleRequestForMachineCreateDataProvider
      * @dataProvider multipleRequestsForMachineCreateDataProvider
      *
-     * @param callable(string): RemoteRequest[] $remoteRequestCreator
-     * @param callable(string): RemoteRequest[] $expectedRemoteRequestCreator
+     * @param callable(): RemoteRequestFailure[]                        $remoteRequestFailuresCreator
+     * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
+     * @param callable(string): RemoteRequest[]                         $expectedRemoteRequestCreator
      */
     public function testRemoveMachineCreateRemoteRequestsForMachineIsActiveEvent(
-        callable $remoteRequestCreator,
+        callable $remoteRequestFailuresCreator,
+        callable $remoteRequestsCreator,
         RemoteRequestType $type,
         callable $expectedRemoteRequestCreator,
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
-        $remoteRequests = $remoteRequestCreator($job->id);
+        $remoteRequestFailures = $remoteRequestFailuresCreator();
+        foreach ($remoteRequestFailures as $remoteRequestFailure) {
+            $this->remoteRequestFailureRepository->save($remoteRequestFailure);
+        }
+
+        $remoteRequests = $remoteRequestsCreator($job->id, $remoteRequestFailures);
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->save($remoteRequest);
         }
@@ -175,7 +204,10 @@ class RemoteRequestRemoverTest extends WebTestCase
     {
         return [
             'no remote requests' => [
-                'remoteRequestCreator' => function () {
+                'remoteRequestFailuresCreator' => function () {
+                    return [];
+                },
+                'remoteRequestsCreator' => function () {
                     return [];
                 },
                 'type' => RemoteRequestType::MACHINE_CREATE,
@@ -193,7 +225,10 @@ class RemoteRequestRemoverTest extends WebTestCase
     {
         return [
             'no remote requests for machine/create' => [
-                'remoteRequestCreator' => function (string $jobId) {
+                'remoteRequestFailuresCreator' => function () {
+                    return [];
+                },
+                'remoteRequestsCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return [
@@ -223,7 +258,10 @@ class RemoteRequestRemoverTest extends WebTestCase
     {
         return [
             'single remote request for machine/create' => [
-                'remoteRequestCreator' => function (string $jobId) {
+                'remoteRequestFailuresCreator' => function () {
+                    return [];
+                },
+                'remoteRequestsCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return [
@@ -254,7 +292,10 @@ class RemoteRequestRemoverTest extends WebTestCase
     {
         return [
             'multiple remote requests for machine/create' => [
-                'remoteRequestCreator' => function (string $jobId) {
+                'remoteRequestFailuresCreator' => function () {
+                    return [];
+                },
+                'remoteRequestsCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return [

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
 use App\Event\MachineIsActiveEvent;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -15,6 +17,7 @@ class RemoteRequestRemover implements EventSubscriberInterface
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly RemoteRequestRepository $remoteRequestRepository,
+        private readonly RemoteRequestFailureRepository $remoteRequestFailureRepository,
     ) {
     }
 
@@ -49,6 +52,11 @@ class RemoteRequestRemover implements EventSubscriberInterface
 
         foreach ($remoteRequests as $remoteRequest) {
             $this->remoteRequestRepository->remove($remoteRequest);
+
+            $remoteRequestFailure = $remoteRequest->getFailure();
+            if ($remoteRequestFailure instanceof RemoteRequestFailure) {
+                $this->remoteRequestFailureRepository->remove($remoteRequestFailure);
+            }
         }
     }
 }
