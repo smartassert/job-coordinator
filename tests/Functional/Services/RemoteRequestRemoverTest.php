@@ -98,7 +98,7 @@ class RemoteRequestRemoverTest extends WebTestCase
      * @param callable(string): RemoteRequest[] $remoteRequestCreator
      * @param callable(string): RemoteRequest[] $expectedRemovedRemoteRequestCreator
      */
-    public function testRemoveForJobAndTypeFoo(
+    public function testRemoveForJobAndType(
         callable $remoteRequestCreator,
         RemoteRequestType $type,
         callable $expectedRemovedRemoteRequestCreator,
