@@ -9,6 +9,7 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Event\WorkerJobStartRequestedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -72,6 +73,10 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
             SerializedSuiteRetrievedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
                 'expectedMethod' => 'removeSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent',
+            ],
+            WorkerJobStartRequestedEvent::class => [
+                'expectedListenedForEvent' => WorkerJobStartRequestedEvent::class,
+                'expectedMethod' => 'removeWorkerJobStartRemoteRequestsForWorkerJobStartRequestedEvent',
             ],
         ];
     }

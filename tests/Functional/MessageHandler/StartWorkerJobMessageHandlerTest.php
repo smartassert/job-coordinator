@@ -10,6 +10,7 @@ use App\Message\StartWorkerJobMessage;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\WorkerClient\Client as WorkerClient;
 use Symfony\Component\Messenger\Envelope;
@@ -312,11 +313,15 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             \assert($workerClientFactory instanceof WorkerClientFactory);
         }
 
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
         return new StartWorkerJobMessageHandler(
             $messageBus,
             $jobRepository,
             $serializedSuiteClient,
             $workerClientFactory,
+            $eventDispatcher,
         );
     }
 }
