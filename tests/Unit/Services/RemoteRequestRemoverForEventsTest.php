@@ -9,6 +9,7 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Event\SerializedSuiteRetrievedEvent;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
 use PHPUnit\Framework\TestCase;
@@ -99,6 +100,28 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 \Mockery::mock(Machine::class),
                 $currentMachine,
             )
+        );
+
+        self::assertTrue(true);
+    }
+
+    public function testRemoveSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent(): void
+    {
+        $jobId = md5((string) rand());
+
+        $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
+        $remoteRequestRemover
+            ->shouldReceive('removeForJobAndType')
+            ->with($jobId, RemoteRequestType::SERIALIZED_SUITE_GET)
+            ->andReturn([])
+        ;
+
+        $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
+
+        $currentMachine = new Machine($jobId, 'state', 'state-category', []);
+
+        $remoteRequestRemoverForEvents->removeSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent(
+            new SerializedSuiteRetrievedEvent('authentication token', $jobId, \Mockery::mock(SerializedSuite::class))
         );
 
         self::assertTrue(true);
