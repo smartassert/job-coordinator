@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Exception\ResultsJobCreationException;
+use App\Exception\RemoteRequestExceptionInterface;
 use App\Services\RemoteRequestFailureRecorder;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
 
-class ResultsJobCreationExceptionHandler implements ExceptionHandlerInterface
+class RemoteRequestExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly RemoteRequestFailureRecorder $remoteRequestFailureRecorder,
@@ -17,7 +17,7 @@ class ResultsJobCreationExceptionHandler implements ExceptionHandlerInterface
 
     public function handle(\Throwable $throwable): void
     {
-        if (!$throwable instanceof ResultsJobCreationException) {
+        if (!$throwable instanceof RemoteRequestExceptionInterface) {
             return;
         }
 

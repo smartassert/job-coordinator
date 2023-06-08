@@ -14,7 +14,12 @@ use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 trait RemoteRequestFailureCreationDataProviderTrait
 {
     /**
-     * @return array<mixed>
+     * @return array<class-string, array{
+     *     throwable: \Throwable,
+     *     expectedType: RemoteRequestFailureType,
+     *     expectedCode: int,
+     *     expectedMessage: string
+     * }>
      */
     public function remoteRequestFailureCreationDataProvider(): array
     {
