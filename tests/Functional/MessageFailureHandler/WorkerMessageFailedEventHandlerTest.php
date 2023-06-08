@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageFailureHandler;
 
-use App\MessageFailureHandler\ResultsJobCreationExceptionHandler;
+use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerMessageFailedEventBundle\HandlerFailedExceptionHandler;
 use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
@@ -83,8 +83,8 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     public function hasExpectedHandlerFailedExceptionHandlerHandlersDataProvider(): array
     {
         return [
-            ResultsJobCreationExceptionHandler::class => [
-                'expectedHandlerClass' => ResultsJobCreationExceptionHandler::class,
+            RemoteRequestExceptionHandler::class => [
+                'expectedHandlerClass' => RemoteRequestExceptionHandler::class,
             ],
         ];
     }
