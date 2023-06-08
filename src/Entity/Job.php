@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RequestState;
 use App\Repository\JobRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
@@ -45,9 +43,6 @@ class Job implements \JsonSerializable
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
 
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $resultsJobRequestState = null;
-
     /**
      * @var ?non-empty-string
      */
@@ -71,12 +66,6 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineStateCategory = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $serializedSuiteRequestState = null;
-
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true, enumType: RequestState::class)]
-    private ?RequestState $machineRequestState = null;
 
     /**
      * @param non-empty-string $userId
@@ -186,62 +175,14 @@ class Job implements \JsonSerializable
         return $this->machineStateCategory;
     }
 
-    public function setResultsJobRequestState(?RequestState $state): self
-    {
-        $this->resultsJobRequestState = $state;
-
-        return $this;
-    }
-
-    public function getResultsJobRequestState(): RequestState
-    {
-        if (null !== $this->resultsJobRequestState) {
-            return $this->resultsJobRequestState;
-        }
-
-        return is_string($this->resultsToken) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
-    public function setSerializedSuiteRequestState(?RequestState $state): self
-    {
-        $this->serializedSuiteRequestState = $state;
-
-        return $this;
-    }
-
-    public function getSerializedSuiteRequestState(): RequestState
-    {
-        if (null !== $this->serializedSuiteRequestState) {
-            return $this->serializedSuiteRequestState;
-        }
-
-        return is_string($this->serializedSuiteId) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
-    public function setMachineRequestState(?RequestState $state): self
-    {
-        $this->machineRequestState = $state;
-
-        return $this;
-    }
-
-    public function getMachineRequestState(): RequestState
-    {
-        if (null !== $this->machineRequestState) {
-            return $this->machineRequestState;
-        }
-
-        return is_string($this->machineStateCategory) ? RequestState::SUCCEEDED : RequestState::UNKNOWN;
-    }
-
     /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string, request_state: non-empty-string},
+     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{request_state: non-empty-string}
+     *   results_job: array{has_token: bool}
      *  }
      */
     public function jsonSerialize(): array
@@ -253,16 +194,13 @@ class Job implements \JsonSerializable
             'serialized_suite' => [
                 'id' => $this->serializedSuiteId,
                 'state' => $this->serializedSuiteState,
-                'request_state' => $this->getSerializedSuiteRequestState()->value,
             ],
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
-                'request_state' => $this->getMachineRequestState()->value,
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),
-                'request_state' => $this->getResultsJobRequestState()->value,
             ],
         ];
     }

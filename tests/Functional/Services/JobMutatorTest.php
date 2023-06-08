@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
@@ -147,9 +146,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, 'user id', 'suite id', 600);
-        $job->setResultsJobRequestState(RequestState::REQUESTING);
         self::assertNull($job->getResultsToken());
-        self::assertSame(RequestState::REQUESTING, $job->getResultsJobRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
@@ -166,7 +163,6 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame($jobId, $retrievedJob->id);
         self::assertSame($resultsJob->token, $retrievedJob->getResultsToken());
-        self::assertSame(RequestState::SUCCEEDED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testSetSerializedSuiteOnSerializedSuiteCreatedEventNoJob(): void
@@ -190,9 +186,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, 'user id', 'suite id', 600);
-        $job->setSerializedSuiteRequestState(RequestState::REQUESTING);
         self::assertNull($job->getSerializedSuiteId());
-        self::assertSame(RequestState::REQUESTING, $job->getSerializedSuiteRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
@@ -215,7 +209,6 @@ class JobMutatorTest extends WebTestCase
         self::assertInstanceOf(Job::class, $retrievedJob);
 
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
-        self::assertSame(RequestState::SUCCEEDED, $job->getSerializedSuiteRequestState());
     }
 
     public function testSetMachineOnMachineRequestedEventNoJob(): void
@@ -237,9 +230,7 @@ class JobMutatorTest extends WebTestCase
         \assert('' !== $jobId);
 
         $job = new Job($jobId, md5((string) rand()), md5((string) rand()), 600);
-        $job->setMachineRequestState(RequestState::REQUESTING);
         self::assertNull($job->getMachineStateCategory());
-        self::assertSame(RequestState::REQUESTING, $job->getMachineRequestState());
 
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
@@ -256,6 +247,5 @@ class JobMutatorTest extends WebTestCase
         self::assertInstanceOf(Job::class, $retrievedJob);
 
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
-        self::assertSame(RequestState::SUCCEEDED, $job->getMachineRequestState());
     }
 }

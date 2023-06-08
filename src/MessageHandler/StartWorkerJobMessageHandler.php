@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -20,6 +22,7 @@ final class StartWorkerJobMessageHandler
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly WorkerClientFactory $workerClientFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -56,12 +59,18 @@ final class StartWorkerJobMessageHandler
         try {
             $serializedSuite = $this->serializedSuiteClient->read($message->authenticationToken, $serializedSuiteId);
 
-            $workerClient->createJob(
+            $workerJob = $workerClient->createJob(
                 $job->id,
                 $resultsToken,
                 $job->maximumDurationInSeconds,
                 $serializedSuite
             );
+
+            $this->eventDispatcher->dispatch(new WorkerJobStartRequestedEvent(
+                $message->authenticationToken,
+                $job->id,
+                $workerJob
+            ));
         } catch (\Throwable $e) {
             throw new WorkerJobStartException($job, $e);
         }

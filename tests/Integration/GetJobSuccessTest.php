@@ -8,10 +8,11 @@ use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
+use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
-class GetJobTestSuccessTest extends AbstractApplicationTest
+class GetJobSuccessTest extends AbstractApplicationTest
 {
     use GetClientAdapterTrait;
 
@@ -28,6 +29,15 @@ class GetJobTestSuccessTest extends AbstractApplicationTest
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($jobRepository->findAll() as $job) {
+            $entityManager->remove($job);
+            $entityManager->flush();
+        }
+
         self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
@@ -41,16 +51,42 @@ class GetJobTestSuccessTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($createResponseData['id']));
         $jobId = $createResponseData['id'];
 
+        $job = $jobRepository->find($jobId);
+        self::assertInstanceOf(Job::class, $job);
+
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
         self::assertSame(200, $getResponse->getStatusCode());
         self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));
 
-        $job = $jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $job);
-
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
+        self::assertIsArray($responseData);
 
-        self::assertEquals($job->jsonSerialize(), $responseData);
+        self::assertSame($job->id, $responseData['id']);
+        self::assertSame($job->suiteId, $responseData['suite_id']);
+        self::assertSame($job->maximumDurationInSeconds, $responseData['maximum_duration_in_seconds']);
+
+        self::assertSame(
+            [
+                'id' => null,
+                'state' => null,
+            ],
+            $responseData['serialized_suite']
+        );
+
+        self::assertSame(
+            [
+                'state_category' => null,
+                'ip_address' => null,
+            ],
+            $responseData['machine']
+        );
+
+        self::assertSame(
+            [
+                'has_token' => false,
+            ],
+            $responseData['results_job']
+        );
     }
 }

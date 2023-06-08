@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -37,16 +36,13 @@ class JobTest extends TestCase
                 'serialized_suite' => [
                     'id' => null,
                     'state' => null,
-                    'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
-                    'request_state' => RequestState::UNKNOWN->value,
                 ],
                 'results_job' => [
                     'has_token' => false,
-                    'request_state' => RequestState::UNKNOWN->value,
                 ],
             ],
             $job->jsonSerialize()

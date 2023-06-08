@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
@@ -43,7 +42,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $resultsClientException = new \Exception('Failed to create results job');
 
@@ -67,21 +65,12 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::assertSame($resultsClientException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $retrievedJob = $jobRepository->find($job->id);
-        \assert($retrievedJob instanceof Job);
-
-        self::assertSame(RequestState::HALTED, $retrievedJob->getResultsJobRequestState());
     }
 
     public function testInvokeSuccess(): void
     {
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        self::assertSame(RequestState::UNKNOWN, $job->getResultsJobRequestState());
 
         $resultsJob = new ResultsJob($jobId, md5((string) rand()));
 
@@ -100,7 +89,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
 
-        self::assertSame(RequestState::SUCCEEDED, $job->getResultsJobRequestState());
         self::assertSame($resultsJob->token, $job->getResultsToken());
         $this->assertNoMessagesDispatched();
     }

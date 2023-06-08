@@ -11,7 +11,9 @@ use App\Event\MachineStateChangeEvent;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
+use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,6 +38,17 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $this->jobRepository = $jobRepository;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
+            $entityManager->remove($remoteRequest);
+        }
+        $entityManager->flush();
     }
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void
@@ -43,22 +56,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(GetMachineMessageHandler::class);
         self::assertInstanceOf(GetMachineMessageHandler::class, $handler);
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
-    }
-
-    public function testEventsAreDispatched(): void
-    {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
-        $this->jobRepository->add($job);
-
-        $previous = new Machine($job->id, 'find/received', 'finding', []);
-        $current = new Machine($job->id, 'find/received', 'finding', []);
-
-        $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
-
-        self::assertEquals(
-            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
-            $this->eventRecorder->getLatest()
-        );
     }
 
     public function testInvokeNoJob(): void
@@ -87,9 +84,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->createMessageAndHandleMessage($previous, $current, self::$apiToken);
 
         self::assertEquals(
-            new MachineRetrievedEvent(self::$apiToken, $previous, $current),
-            $this->eventRecorder->getLatest()
+            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
+
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
@@ -132,12 +130,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
-        $events = $this->eventRecorder->all($expectedEvent::class);
-        $event = $events[0] ?? null;
-
-        self::assertNotNull($event);
-        self::assertEquals($expectedEvent, $event);
-
+        self::assertEquals([$expectedEvent], $this->eventRecorder->all($expectedEvent::class));
         $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
@@ -208,6 +201,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals($current, $latestEvent->current);
         self::assertEquals(self::$apiToken, $latestEvent->authenticationToken);
 
+        self::assertEquals(
+            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            $this->eventRecorder->all(MachineRetrievedEvent::class)
+        );
+
         $envelopes = $this->messengerTransport->get();
         self::assertIsArray($envelopes);
         self::assertCount(0, $envelopes);
@@ -263,7 +261,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
-        $message = new GetMachineMessage($authenticationToken, $previous);
+        $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);
     }
@@ -300,7 +298,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         self::assertEquals(
-            new GetMachineMessage($authenticationToken, $current),
+            new GetMachineMessage($authenticationToken, $current->id, $current),
             $machineStateChangeCheckMessage
         );
 

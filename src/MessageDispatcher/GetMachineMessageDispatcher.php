@@ -7,17 +7,14 @@ namespace App\MessageDispatcher;
 use App\Event\MachineRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
-        private readonly MessageBusInterface $messageBus,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -38,9 +35,15 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
     {
-        if ('end' !== $event->current->stateCategory) {
-            $this->messageBus->dispatch(new GetMachineMessage($event->authenticationToken, $event->current));
+        if ('end' === $event->current->stateCategory) {
+            return;
         }
+
+        $this->messageDispatcher->dispatch(new GetMachineMessage(
+            $event->authenticationToken,
+            $event->current->id,
+            $event->current
+        ));
     }
 
     public function dispatch(MachineRequestedEvent $event): void
@@ -53,9 +56,8 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        $this->messageBus->dispatch(new Envelope(
-            new GetMachineMessage($event->authenticationToken, $machine),
-            [new NonDelayedStamp()]
-        ));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(
+            new GetMachineMessage($event->authenticationToken, $machine->id, $machine)
+        );
     }
 }

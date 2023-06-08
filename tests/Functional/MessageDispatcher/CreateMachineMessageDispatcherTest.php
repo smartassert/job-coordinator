@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
-use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,7 +22,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
+class CreateMachineMessageDispatcherTest extends WebTestCase
 {
     private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
@@ -36,6 +38,17 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);
         $this->messengerTransport = $messengerTransport;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
+            $entityManager->remove($remoteRequest);
+        }
+        $entityManager->flush();
     }
 
     public function testIsEventSubscriber(): void
@@ -55,6 +68,12 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
         if ($job instanceof Job) {
             $this->persistJob($job);
         }
@@ -66,7 +85,7 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
             ->andReturn($job)
         ;
 
-        (new CreateMachineMessageDispatcher($mockJobRepository, $messageBus))->dispatch($event);
+        (new CreateMachineMessageDispatcher($mockJobRepository, $messageDispatcher))->dispatch($event);
 
         $this->assertNoMessagesDispatched();
     }
@@ -78,13 +97,10 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = md5((string) rand());
 
-        $jobResultsJobRequesting = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
-            ->setResultsJobRequestState(RequestState::REQUESTING)
-        ;
+        $jobNoResultsToken = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
 
         $jobSerializedSuitePreparing = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
             ->setResultsToken('results token')
-            ->setResultsJobRequestState(null)
             ->setSerializedSuiteState('preparing/running')
         ;
 
@@ -109,12 +125,12 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
                 'job' => null,
                 'event' => $serializedSuiteSerializedEvent,
             ],
-            'ResultsJobCreatedEvent, results job request state not "succeeded"' => [
-                'job' => $jobResultsJobRequesting,
+            'ResultsJobCreatedEvent, no job results token' => [
+                'job' => $jobNoResultsToken,
                 'event' => $resultsJobCreatedEvent,
             ],
-            'SerializedSuiteSerializedEvent, results job request state not "succeeded"' => [
-                'job' => $jobResultsJobRequesting,
+            'SerializedSuiteSerializedEvent, no job results token' => [
+                'job' => $jobNoResultsToken,
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
@@ -153,7 +169,6 @@ class CreateWorkerMachineMessageDispatcherTest extends WebTestCase
 
         $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
             ->setResultsToken('results token')
-            ->setResultsJobRequestState(null)
             ->setSerializedSuiteState('prepared')
         ;
 

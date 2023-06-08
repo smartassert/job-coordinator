@@ -6,11 +6,11 @@ namespace App\Tests\Unit\EventDispatcher;
 
 use App\Event\MachineRetrievedEvent;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Repository\JobRepository;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetMachineEventDispatcherTest extends WebTestCase
 {
@@ -21,12 +21,15 @@ class GetMachineEventDispatcherTest extends WebTestCase
         $machineId = md5((string) rand());
         $machine = new Machine($machineId, 'an_end_state', 'end', []);
 
-        $messageBus = \Mockery::mock(MessageBusInterface::class);
-        $messageBus
-            ->shouldNotHaveReceived('dispatch')
+        $messageDispatcher = \Mockery::mock(JobRemoteRequestMessageDispatcher::class);
+        $messageDispatcher
+            ->shouldNotReceive('dispatch')
+        ;
+        $messageDispatcher
+            ->shouldNotReceive('dispatchWithNonDelayedStamp')
         ;
 
-        $dispatcher = new GetMachineMessageDispatcher(\Mockery::mock(JobRepository::class), $messageBus);
+        $dispatcher = new GetMachineMessageDispatcher(\Mockery::mock(JobRepository::class), $messageDispatcher);
         $event = new MachineRetrievedEvent(md5((string) rand()), $machine, $machine);
 
         $dispatcher->dispatchIfMachineNotInEndState($event);

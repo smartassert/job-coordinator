@@ -49,16 +49,13 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                 'serialized_suite' => [
                     'id' => $job->getSerializedSuiteId(),
                     'state' => $job->getSerializedSuiteState(),
-                    'request_state' => $job->getSerializedSuiteRequestState()->value,
                 ],
                 'machine' => [
                     'state_category' => null,
                     'ip_address' => null,
-                    'request_state' => $job->getMachineRequestState()->value,
                 ],
                 'results_job' => [
                     'has_token' => false,
-                    'request_state' => $job->getResultsJobRequestState()->value,
                 ],
             ],
             self::$createResponseData,

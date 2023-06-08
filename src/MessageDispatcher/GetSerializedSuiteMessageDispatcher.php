@@ -7,16 +7,13 @@ namespace App\MessageDispatcher;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
-use App\Messenger\NonDelayedStamp;
 use App\Model\SerializedSuiteEndStates;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -37,25 +34,21 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
-        $this->messageBus->dispatch(new Envelope(
-            new GetSerializedSuiteMessage(
-                $event->authenticationToken,
-                $event->jobId,
-                $event->serializedSuite->getId()
-            ),
-            [new NonDelayedStamp()]
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(new GetSerializedSuiteMessage(
+            $event->authenticationToken,
+            $event->jobId,
+            $event->serializedSuite->getId()
         ));
     }
 
     public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
     {
         $serializedSuiteState = $event->serializedSuite->getState();
-
         if (in_array($serializedSuiteState, SerializedSuiteEndStates::END_STATES)) {
             return;
         }
 
-        $this->messageBus->dispatch(new GetSerializedSuiteMessage(
+        $this->messageDispatcher->dispatch(new GetSerializedSuiteMessage(
             $event->authenticationToken,
             $event->jobId,
             $event->serializedSuite->getId(),

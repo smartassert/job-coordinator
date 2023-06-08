@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Enum\RequestState;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
-        private readonly MessageBusInterface $messageBus,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -42,15 +38,14 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         $job = $this->jobRepository->find($event->jobId);
         if (
             null === $job
-            || RequestState::SUCCEEDED !== $job->getResultsJobRequestState()
+            || null === $job->getResultsToken()
             || 'prepared' !== $job->getSerializedSuiteState()
         ) {
             return;
         }
 
-        $this->messageBus->dispatch(new Envelope(
-            new CreateMachineMessage($event->authenticationToken, $event->jobId),
-            [new NonDelayedStamp()]
-        ));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(
+            new CreateMachineMessage($event->authenticationToken, $event->jobId)
+        );
     }
 }

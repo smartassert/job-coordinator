@@ -6,15 +6,12 @@ namespace App\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
 use App\Message\StartWorkerJobMessage;
-use App\Messenger\NonDelayedStamp;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
+        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -32,9 +29,8 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $this->messageBus->dispatch(new Envelope(
-            new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress),
-            [new NonDelayedStamp()]
-        ));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp(
+            new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress)
+        );
     }
 }
