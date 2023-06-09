@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
+use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
-use App\Event\MachineRequestedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
@@ -53,7 +53,7 @@ class JobMutatorTest extends WebTestCase
         self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(ResultsJobCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(SerializedSuiteCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
-        self::assertArrayHasKey(MachineRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
+        self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
     }
 
     public function testSetMachineIpAddressOnMachineIsActiveEventNoJob(): void
@@ -217,9 +217,9 @@ class JobMutatorTest extends WebTestCase
 
         $machine = new Machine(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
 
-        $event = new MachineRequestedEvent(md5((string) rand()), $machine);
+        $event = new MachineCreationRequestedEvent(md5((string) rand()), $machine);
 
-        $this->jobMutator->setMachineOnMachineRequestedEvent($event);
+        $this->jobMutator->setMachineOnMachineCreationRequestedEvent($event);
 
         self::assertSame(0, $this->jobRepository->count([]));
     }
@@ -237,9 +237,9 @@ class JobMutatorTest extends WebTestCase
 
         $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()), []);
 
-        $event = new MachineRequestedEvent(md5((string) rand()), $machine);
+        $event = new MachineCreationRequestedEvent(md5((string) rand()), $machine);
 
-        $this->jobMutator->setMachineOnMachineRequestedEvent($event);
+        $this->jobMutator->setMachineOnMachineCreationRequestedEvent($event);
 
         self::assertSame(1, $this->jobRepository->count([]));
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Services\EventSubscriber;
 
 use App\Event\JobCreatedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
-use App\Event\MachineRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
@@ -39,7 +39,7 @@ class EventRecorder implements EventSubscriberInterface, \Countable
             SerializedSuiteSerializedEvent::class => [
                 ['addEvent', 1000],
             ],
-            MachineRequestedEvent::class => [
+            MachineCreationRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
             MachineRetrievedEvent::class => [

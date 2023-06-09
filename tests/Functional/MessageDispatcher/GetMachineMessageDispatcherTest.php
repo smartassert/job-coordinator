@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
-use App\Event\MachineRequestedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Repository\JobRepository;
@@ -37,7 +37,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(MachineRequestedEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchSuccess(): void
@@ -52,7 +52,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
 
-        $event = new MachineRequestedEvent($authenticationToken, $machine);
+        $event = new MachineCreationRequestedEvent($authenticationToken, $machine);
 
         $this->dispatcher->dispatch($event);
 
