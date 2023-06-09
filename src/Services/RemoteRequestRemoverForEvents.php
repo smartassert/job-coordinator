@@ -8,6 +8,7 @@ use App\Enum\RemoteRequestType;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\ResultsJobCreatedEvent;
+use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
@@ -44,6 +45,9 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
             WorkerJobStartRequestedEvent::class => [
                 ['removeWorkerJobStartRemoteRequestsForWorkerJobStartRequestedEvent', 0],
             ],
+            ResultsJobStateRetrievedEvent::class => [
+                ['removeResultsStateGetRemoteRequestsForResultsJobStateRetrievedEvent', 0],
+            ],
         ];
     }
 
@@ -78,5 +82,11 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         WorkerJobStartRequestedEvent $event
     ): void {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_START_JOB);
+    }
+
+    public function removeResultsStateGetRemoteRequestsForResultsJobStateRetrievedEvent(
+        ResultsJobStateRetrievedEvent $event
+    ): void {
+        $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::RESULTS_STATE_GET);
     }
 }
