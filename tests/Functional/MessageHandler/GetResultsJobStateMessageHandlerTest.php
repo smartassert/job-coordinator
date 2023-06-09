@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Exception\ResultsJobCreationException;
-use App\Message\CreateResultsJobMessage;
+use App\Exception\ResultsJobStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
-use App\MessageHandler\CreateResultsJobMessageHandler;
+use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
-use Symfony\Component\Messenger\Envelope;
+use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
@@ -33,7 +31,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             jobRepository: $jobRepository,
         );
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
 
         $handler($message);
 
@@ -45,11 +43,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
 
-        $resultsClientException = new \Exception('Failed to create results job');
+        $resultsClientException = new \Exception('Failed to get results job status');
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
-            ->shouldReceive('createJob')
+            ->shouldReceive('getJobStatus')
             ->with(self::$apiToken, $job->id)
             ->andThrow($resultsClientException)
         ;
@@ -58,12 +56,12 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             resultsClient: $resultsClient,
         );
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
 
         try {
             $handler($message);
-            self::fail(ResultsJobCreationException::class . ' not thrown');
-        } catch (ResultsJobCreationException $e) {
+            self::fail(ResultsJobStateRetrievalException::class . ' not thrown');
+        } catch (ResultsJobStateRetrievalException $e) {
             self::assertSame($resultsClientException, $e->getPreviousException());
             $this->assertNoMessagesDispatched();
         }
@@ -74,13 +72,13 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
 
-        $resultsJob = new ResultsJob($jobId, md5((string) rand()));
+        $resultsJobState = new ResultsJobState('complete', 'ended');
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
-            ->shouldReceive('createJob')
-            ->with(self::$apiToken, $jobId)
-            ->andReturn($resultsJob)
+            ->shouldReceive('getJobStatus')
+            ->with(self::$apiToken, $job->id)
+            ->andReturn($resultsJobState)
         ;
 
         $handler = $this->createHandler(
@@ -89,20 +87,19 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($job->getResultsToken());
 
-        $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
+        $handler(new GetResultsJobStateMessage(self::$apiToken, $jobId));
 
-        self::assertSame($resultsJob->token, $job->getResultsToken());
-        $this->assertDispatchedMessage(self::$apiToken, $jobId);
+        $this->assertNoMessagesDispatched();
     }
 
     protected function getHandlerClass(): string
     {
-        return CreateResultsJobMessageHandler::class;
+        return GetResultsJobStateMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return CreateResultsJobMessage::class;
+        return GetResultsJobStateMessage::class;
     }
 
     /**
@@ -127,7 +124,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         ?JobRepository $jobRepository = null,
         ?ResultsClient $resultsClient = null,
-    ): CreateResultsJobMessageHandler {
+    ): GetResultsJobStateMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
@@ -143,24 +140,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateResultsJobMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
-    }
-
-    /**
-     * @param non-empty-string $authenticationToken
-     * @param non-empty-string $jobId
-     */
-    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
-    {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals(
-            new GetResultsJobStateMessage($authenticationToken, $jobId),
-            $envelope->getMessage()
-        );
+        return new GetResultsJobStateMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
     }
 }

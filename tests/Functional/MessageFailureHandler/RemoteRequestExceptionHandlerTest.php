@@ -13,6 +13,7 @@ use App\Exception\MachineCreationException;
 use App\Exception\MachineRetrievalException;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Exception\ResultsJobCreationException;
+use App\Exception\ResultsJobStateRetrievalException;
 use App\Exception\SerializedSuiteCreationException;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Exception\WorkerJobStartException;
@@ -138,6 +139,11 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             WorkerJobStartException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
                     return new WorkerJobStartException($job, $inner);
+                };
+            },
+            ResultsJobStateRetrievalException::class => function (\Throwable $inner) {
+                return function (Job $job) use ($inner) {
+                    return new ResultsJobStateRetrievalException($job, $inner);
                 };
             },
         ];
