@@ -10,6 +10,6 @@ class GetResultsJobStateMessage extends AbstractRemoteRequestMessage
 {
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestType::RESULTS_CREATE;
+        return RemoteRequestType::RESULTS_STATE_GET;
     }
 }
