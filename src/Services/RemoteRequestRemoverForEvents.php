@@ -28,65 +28,61 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         return [
             MachineIsActiveEvent::class => [
-                ['removeMachineCreateRemoteRequestsForMachineIsActiveEvent', 0],
+                ['removeMachineCreateRequests', 0],
             ],
             ResultsJobCreatedEvent::class => [
-                ['removeResultsCreateRemoteRequestsForResultsJobCreatedEvent', 0],
+                ['removeResultsCreateRequests', 0],
             ],
             SerializedSuiteCreatedEvent::class => [
-                ['removeSerializedSuiteCreateRequestsForSerializedSuiteCreatedEvent', 0],
+                ['removeSerializedSuiteCreateRequests', 0],
             ],
             MachineRetrievedEvent::class => [
-                ['removeMachineGetRemoteRequestsForMachineRetrievedEvent', 0],
+                ['removeMachineGetRequests', 0],
             ],
             SerializedSuiteRetrievedEvent::class => [
-                ['removeSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent', 0],
+                ['removeSerializedSuiteGetRequests', 0],
             ],
             WorkerJobStartRequestedEvent::class => [
-                ['removeWorkerJobStartRemoteRequestsForWorkerJobStartRequestedEvent', 0],
+                ['removeWorkerJobStartRequests', 0],
             ],
             ResultsJobStateRetrievedEvent::class => [
-                ['removeResultsStateGetRemoteRequestsForResultsJobStateRetrievedEvent', 0],
+                ['removeResultsStateGetRequests', 0],
             ],
         ];
     }
 
-    public function removeMachineCreateRemoteRequestsForMachineIsActiveEvent(MachineIsActiveEvent $event): void
+    public function removeMachineCreateRequests(MachineIsActiveEvent $event): void
     {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_CREATE);
     }
 
-    public function removeResultsCreateRemoteRequestsForResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
+    public function removeResultsCreateRequests(ResultsJobCreatedEvent $event): void
     {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::RESULTS_CREATE);
     }
 
-    public function removeSerializedSuiteCreateRequestsForSerializedSuiteCreatedEvent(
-        SerializedSuiteCreatedEvent $event
-    ): void {
+    public function removeSerializedSuiteCreateRequests(SerializedSuiteCreatedEvent $event): void
+    {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE);
     }
 
-    public function removeMachineGetRemoteRequestsForMachineRetrievedEvent(MachineRetrievedEvent $event): void
+    public function removeMachineGetRequests(MachineRetrievedEvent $event): void
     {
         $this->remoteRequestRemover->removeForJobAndType($event->current->id, RemoteRequestType::MACHINE_GET);
     }
 
-    public function removeSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent(
-        SerializedSuiteRetrievedEvent $event
-    ): void {
+    public function removeSerializedSuiteGetRequests(SerializedSuiteRetrievedEvent $event): void
+    {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::SERIALIZED_SUITE_GET);
     }
 
-    public function removeWorkerJobStartRemoteRequestsForWorkerJobStartRequestedEvent(
-        WorkerJobStartRequestedEvent $event
-    ): void {
+    public function removeWorkerJobStartRequests(WorkerJobStartRequestedEvent $event): void
+    {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_START_JOB);
     }
 
-    public function removeResultsStateGetRemoteRequestsForResultsJobStateRetrievedEvent(
-        ResultsJobStateRetrievedEvent $event
-    ): void {
+    public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
+    {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::RESULTS_STATE_GET);
     }
 }
