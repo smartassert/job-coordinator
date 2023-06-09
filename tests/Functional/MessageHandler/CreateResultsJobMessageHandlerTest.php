@@ -7,11 +7,13 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
+use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -77,7 +79,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
             ->shouldReceive('createJob')
-            ->with(self::$apiToken, $job->id)
+            ->with(self::$apiToken, $jobId)
             ->andReturn($resultsJob)
         ;
 
@@ -90,7 +92,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
 
         self::assertSame($resultsJob->token, $job->getResultsToken());
-        $this->assertNoMessagesDispatched();
+        $this->assertDispatchedMessage(self::$apiToken, $jobId);
     }
 
     protected function getHandlerClass(): string
@@ -142,5 +144,23 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateResultsJobMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
+    }
+
+    /**
+     * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
+     */
+    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
+    {
+        $envelopes = $this->messengerTransport->get();
+        self::assertIsArray($envelopes);
+        self::assertCount(1, $envelopes);
+
+        $envelope = $envelopes[0];
+        self::assertInstanceOf(Envelope::class, $envelope);
+        self::assertEquals(
+            new GetResultsJobStateMessage($authenticationToken, $jobId),
+            $envelope->getMessage()
+        );
     }
 }
