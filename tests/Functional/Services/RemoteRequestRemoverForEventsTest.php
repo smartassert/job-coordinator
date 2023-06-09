@@ -57,31 +57,31 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
         return [
             MachineIsActiveEvent::class => [
                 'expectedListenedForEvent' => MachineIsActiveEvent::class,
-                'expectedMethod' => 'removeMachineCreateRemoteRequestsForMachineIsActiveEvent',
+                'expectedMethod' => 'removeMachineCreateRequests',
             ],
             ResultsJobCreatedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobCreatedEvent::class,
-                'expectedMethod' => 'removeResultsCreateRemoteRequestsForResultsJobCreatedEvent',
+                'expectedMethod' => 'removeResultsCreateRequests',
             ],
             SerializedSuiteCreatedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
-                'expectedMethod' => 'removeSerializedSuiteCreateRequestsForSerializedSuiteCreatedEvent',
+                'expectedMethod' => 'removeSerializedSuiteCreateRequests',
             ],
             MachineRetrievedEvent::class => [
                 'expectedListenedForEvent' => MachineRetrievedEvent::class,
-                'expectedMethod' => 'removeMachineGetRemoteRequestsForMachineRetrievedEvent',
+                'expectedMethod' => 'removeMachineGetRequests',
             ],
             SerializedSuiteRetrievedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
-                'expectedMethod' => 'removeSerializedSuiteGetRemoteRequestsForSerializedSuiteRetrievedEvent',
+                'expectedMethod' => 'removeSerializedSuiteGetRequests',
             ],
             WorkerJobStartRequestedEvent::class => [
                 'expectedListenedForEvent' => WorkerJobStartRequestedEvent::class,
-                'expectedMethod' => 'removeWorkerJobStartRemoteRequestsForWorkerJobStartRequestedEvent',
+                'expectedMethod' => 'removeWorkerJobStartRequests',
             ],
             ResultsJobStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
-                'expectedMethod' => 'removeResultsStateGetRemoteRequestsForResultsJobStateRetrievedEvent',
+                'expectedMethod' => 'removeResultsStateGetRequests',
             ],
         ];
     }
