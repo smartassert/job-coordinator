@@ -9,6 +9,7 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Event\MachineTerminationRequestedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -46,6 +47,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             SerializedSuiteRetrievedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineTerminationRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];

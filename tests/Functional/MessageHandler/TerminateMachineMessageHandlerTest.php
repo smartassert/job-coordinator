@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
+use App\Tests\Services\EventSubscriber\EventRecorder;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -87,6 +90,16 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler(new TerminateMachineMessage(self::$apiToken, $jobId));
 
         $this->assertNoMessagesDispatched();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+
+        $events = $eventRecorder->all(MachineTerminationRequestedEvent::class);
+        $event = $events[0] ?? null;
+        self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
+
+        self::assertSame($job->id, $event->jobId);
+        self::assertSame(self::$apiToken, $event->authenticationToken);
     }
 
     protected function getHandlerClass(): string
@@ -134,6 +147,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         }
 
-        return new TerminateMachineMessageHandler($jobRepository, $workerManagerClient);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        return new TerminateMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
     }
 }

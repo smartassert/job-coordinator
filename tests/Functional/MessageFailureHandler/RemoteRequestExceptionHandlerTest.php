@@ -11,6 +11,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Exception\MachineCreationException;
 use App\Exception\MachineRetrievalException;
+use App\Exception\MachineTerminationException;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Exception\ResultsJobCreationException;
 use App\Exception\ResultsJobStateRetrievalException;
@@ -144,6 +145,11 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             ResultsJobStateRetrievalException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
                     return new ResultsJobStateRetrievalException($job, $inner);
+                };
+            },
+            MachineTerminationException::class => function (\Throwable $inner) {
+                return function (Job $job) use ($inner) {
+                    return new MachineTerminationException($job, $inner);
                 };
             },
         ];
