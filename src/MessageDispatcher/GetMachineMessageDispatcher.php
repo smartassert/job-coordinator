@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Event\MachineRequestedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\Repository\JobRepository;
@@ -24,7 +24,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MachineRequestedEvent::class => [
+            MachineCreationRequestedEvent::class => [
                 ['dispatch', 100],
             ],
             MachineRetrievedEvent::class => [
@@ -46,7 +46,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         ));
     }
 
-    public function dispatch(MachineRequestedEvent $event): void
+    public function dispatch(MachineCreationRequestedEvent $event): void
     {
         $machine = $event->machine;
         $jobId = $machine->id;

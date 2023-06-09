@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\MachineRequestedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
@@ -35,7 +35,9 @@ final class CreateMachineMessageHandler
         try {
             $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $job->id);
 
-            $this->eventDispatcher->dispatch(new MachineRequestedEvent($message->authenticationToken, $machine));
+            $this->eventDispatcher->dispatch(
+                new MachineCreationRequestedEvent($message->authenticationToken, $machine)
+            );
         } catch (\Throwable $e) {
             throw new MachineCreationException($job, $e);
         }

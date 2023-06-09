@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineRequestedEvent extends Event
+class MachineCreationRequestedEvent extends Event
 {
     /**
      * @param non-empty-string $authenticationToken
