@@ -14,4 +14,5 @@ enum RemoteRequestType: string
     case SERIALIZED_SUITE_READ = 'serialized-suite/read';
     case SERIALIZED_SUITE_GET = 'serialized-suite/get';
     case RESULTS_STATE_GET = 'results/state/get';
+    case MACHINE_TERMINATE = 'machine/terminate';
 }
