@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enum\RemoteRequestType;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
+use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
@@ -48,6 +49,9 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
             ResultsJobStateRetrievedEvent::class => [
                 ['removeResultsStateGetRequests', 0],
             ],
+            MachineTerminationRequestedEvent::class => [
+                ['removeMachineTerminationRequests', 0],
+            ],
         ];
     }
 
@@ -84,5 +88,10 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
     {
         $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::RESULTS_STATE_GET);
+    }
+
+    public function removeMachineTerminationRequests(MachineTerminationRequestedEvent $event): void
+    {
+        $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_TERMINATE);
     }
 }

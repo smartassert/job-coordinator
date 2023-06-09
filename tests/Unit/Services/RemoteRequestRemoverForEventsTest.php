@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Services;
 use App\Enum\RemoteRequestType;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
+use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
@@ -163,6 +164,26 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeResultsStateGetRequests(
             new ResultsJobStateRetrievedEvent('authentication token', $jobId, \Mockery::mock(ResultsJobState::class))
+        );
+
+        self::assertTrue(true);
+    }
+
+    public function testRemoveMachineTerminationRequests(): void
+    {
+        $jobId = md5((string) rand());
+
+        $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
+        $remoteRequestRemover
+            ->shouldReceive('removeForJobAndType')
+            ->with($jobId, RemoteRequestType::MACHINE_TERMINATE)
+            ->andReturn([])
+        ;
+
+        $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
+
+        $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
+            new MachineTerminationRequestedEvent('authentication token', $jobId)
         );
 
         self::assertTrue(true);
