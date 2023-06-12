@@ -48,6 +48,7 @@ class JobMutator implements EventSubscriberInterface
             ],
             ResultsJobStateRetrievedEvent::class => [
                 ['setResultsJobState', 1000],
+                ['setResultsJobEndState', 1000],
             ],
         ];
     }
@@ -149,6 +150,26 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $job->setResultsJobState($event->resultsJobState->state);
+        $this->jobRepository->add($job);
+    }
+
+    public function setResultsJobEndState(ResultsJobStateRetrievedEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $endState = $event->resultsJobState->endState;
+        if (null === $endState) {
+            return;
+        }
+
+        if ($endState === $job->getResultsJobEndState()) {
+            return;
+        }
+
+        $job->setResultsJobEndState($endState);
         $this->jobRepository->add($job);
     }
 }

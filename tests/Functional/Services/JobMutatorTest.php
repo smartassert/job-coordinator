@@ -295,4 +295,48 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame($resultsJobState, $job->getResultsJobState());
     }
+
+    public function testSetResultsJobEndStateNoJob(): void
+    {
+        self::assertSame(0, $this->jobRepository->count([]));
+
+        $event = new ResultsJobStateRetrievedEvent(
+            md5((string) rand()),
+            md5((string) rand()),
+            \Mockery::mock(ResultsJobState::class)
+        );
+
+        $this->jobMutator->setResultsJobEndState($event);
+
+        self::assertSame(0, $this->jobRepository->count([]));
+    }
+
+    public function testSetResultsJobEndStateSuccess(): void
+    {
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $job = new Job($jobId, md5((string) rand()), md5((string) rand()), 600);
+        self::assertNull($job->getResultsJobEndState());
+
+        $this->jobRepository->add($job);
+        self::assertSame(1, $this->jobRepository->count([]));
+
+        $resultsJobEndState = md5((string) rand());
+
+        $event = new ResultsJobStateRetrievedEvent(
+            md5((string) rand()),
+            $jobId,
+            new ResultsJobState(md5((string) rand()), $resultsJobEndState),
+        );
+
+        $this->jobMutator->setResultsJobEndState($event);
+
+        self::assertSame(1, $this->jobRepository->count([]));
+
+        $retrievedJob = $this->jobRepository->find($jobId);
+        self::assertInstanceOf(Job::class, $retrievedJob);
+
+        self::assertSame($resultsJobEndState, $job->getResultsJobEndState());
+    }
 }
