@@ -74,6 +74,12 @@ class Job implements \JsonSerializable
     private ?string $resultsJobState = null;
 
     /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $resultsJobEndState = null;
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
@@ -187,6 +193,16 @@ class Job implements \JsonSerializable
     public function setResultsJobState(string $state): self
     {
         $this->resultsJobState = $state;
+
+        return $this;
+    }
+
+    /**
+     * @param non-empty-string $state
+     */
+    public function setResultsJobEndState(string $state): self
+    {
+        $this->resultsJobEndState = $state;
 
         return $this;
     }
