@@ -11,6 +11,7 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -52,7 +53,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
         $resultsToken = md5((string) rand());
-        $resultsJob = new ResultsJob($jobId, $resultsToken);
+        $resultsJob = new ResultsJob($jobId, $resultsToken, new JobState('awaiting-events', null));
 
         $event = new ResultsJobCreatedEvent($authenticationToken, $jobId, $resultsJob);
 
