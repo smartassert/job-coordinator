@@ -135,7 +135,11 @@ class JobMutatorTest extends WebTestCase
     {
         self::assertSame(0, $this->jobRepository->count([]));
 
-        $resultsJob = new ResultsJob(md5((string) rand()), md5((string) rand()));
+        $resultsJob = new ResultsJob(
+            md5((string) rand()),
+            md5((string) rand()),
+            new ResultsJobState('awaiting-events', null)
+        );
         $event = new ResultsJobCreatedEvent('authentication token', $resultsJob->label, $resultsJob);
 
         $this->jobMutator->setResultsJobOnResultsJobCreatedEvent($event);
@@ -154,7 +158,7 @@ class JobMutatorTest extends WebTestCase
         $this->jobRepository->add($job);
         self::assertSame(1, $this->jobRepository->count([]));
 
-        $resultsJob = new ResultsJob($jobId, md5((string) rand()));
+        $resultsJob = new ResultsJob($jobId, md5((string) rand()), new ResultsJobState('awaiting-events', null));
         $event = new ResultsJobCreatedEvent('authentication token', $resultsJob->label, $resultsJob);
 
         $this->jobMutator->setResultsJobOnResultsJobCreatedEvent($event);

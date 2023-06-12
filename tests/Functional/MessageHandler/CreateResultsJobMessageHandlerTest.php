@@ -13,6 +13,7 @@ use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ResultsClient\Model\JobState;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -74,7 +75,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
 
-        $resultsJob = new ResultsJob($jobId, md5((string) rand()));
+        $resultsJob = new ResultsJob($jobId, md5((string) rand()), new JobState('awaiting-events', null));
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
