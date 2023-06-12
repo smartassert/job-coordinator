@@ -6,13 +6,44 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\ResultsJob;
+use App\Event\ResultsJobCreatedEvent;
+use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ResultsJobFactory
+class ResultsJobFactory implements EventSubscriberInterface
 {
     public function __construct(
+        private readonly JobRepository $jobRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
     ) {
+    }
+
+    /**
+     * @return array<class-string, array<mixed>>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ResultsJobCreatedEvent::class => [
+                ['createOnResultsJobCreatedEvent', 1000],
+            ],
+        ];
+    }
+
+    public function createOnResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $this->create(
+            $job,
+            $event->resultsJob->token,
+            $event->resultsJob->state->state,
+            $event->resultsJob->state->endState
+        );
     }
 
     /**
