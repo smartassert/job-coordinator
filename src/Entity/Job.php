@@ -68,6 +68,12 @@ class Job implements \JsonSerializable
     private ?string $machineStateCategory = null;
 
     /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $resultsJobState = null;
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
@@ -173,6 +179,16 @@ class Job implements \JsonSerializable
     public function getMachineStateCategory(): ?string
     {
         return $this->machineStateCategory;
+    }
+
+    /**
+     * @param non-empty-string $state
+     */
+    public function setResultsJobState(string $state): self
+    {
+        $this->resultsJobState = $state;
+
+        return $this;
     }
 
     /**
