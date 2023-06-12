@@ -26,10 +26,14 @@ class GetJobSuccessTest extends AbstractApplicationTest
      * @dataProvider getDataProvider
      *
      * @param callable(Job): RemoteRequest[] $remoteRequestsCreator
+     * @param callable(Job): Job             $jobMutator
      * @param callable(Job): array<mixed>    $expectedSerializedJobCreator
      */
-    public function testGetSuccess(callable $remoteRequestsCreator, callable $expectedSerializedJobCreator): void
-    {
+    public function testGetSuccess(
+        callable $remoteRequestsCreator,
+        callable $jobMutator,
+        callable $expectedSerializedJobCreator
+    ): void {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user@example.com');
@@ -66,6 +70,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
 
+        $job = $jobMutator($job);
+        $jobRepository->add($job);
+
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
         foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
@@ -93,9 +100,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
     public function getDataProvider(): array
     {
         return [
-            'no remote requests' => [
+            'no remote requests, no results state' => [
                 'remoteRequestsCreator' => function () {
                     return [];
+                },
+                'jobMutator' => function (Job $job) {
+                    return $job;
                 },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
@@ -112,18 +122,23 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
+                            'state' => null,
+                            'end_state' => null,
                         ],
                         'service_requests' => [],
                     ];
                 },
             ],
-            'results/create only' => [
+            'results/create only, no results state' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
+                'jobMutator' => function (Job $job) {
+                    return $job;
+                },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -139,6 +154,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
+                            'state' => null,
+                            'end_state' => null,
                         ],
                         'service_requests' => [
                             [
@@ -153,7 +170,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'results/create success, serialized-suite/create success, serialized-suite/get failure and success' => [
+            'r/c success, s-s/c success, s-s/g failure and success, no results state' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
@@ -180,6 +197,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setState(RequestState::SUCCEEDED),
                     ];
                 },
+                'jobMutator' => function (Job $job) {
+                    return $job;
+                },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -195,6 +215,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => [
                             'has_token' => false,
+                            'state' => null,
+                            'end_state' => null,
                         ],
                         'service_requests' => [
                             [
@@ -238,6 +260,69 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                         ],
+                    ];
+                },
+            ],
+            'no remote requests, has results state, no results end state' => [
+                'remoteRequestsCreator' => function () {
+                    return [];
+                },
+                'jobMutator' => function (Job $job) {
+                    $job->setResultsJobState(md5((string) rand()));
+
+                    return $job;
+                },
+                'expectedSerializedJobCreator' => function (Job $job) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'serialized_suite' => [
+                            'id' => null,
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
+                        'results_job' => [
+                            'has_token' => false,
+                            'state' => $job->getResultsJobState(),
+                            'end_state' => null,
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'no remote requests, has results state, has results end state' => [
+                'remoteRequestsCreator' => function () {
+                    return [];
+                },
+                'jobMutator' => function (Job $job) {
+                    $job->setResultsJobState(md5((string) rand()));
+                    $job->setResultsJobEndState(md5((string) rand()));
+
+                    return $job;
+                },
+                'expectedSerializedJobCreator' => function (Job $job) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'serialized_suite' => [
+                            'id' => null,
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
+                        'results_job' => [
+                            'has_token' => false,
+                            'state' => $job->getResultsJobState(),
+                            'end_state' => $job->getResultsJobEndState(),
+                        ],
+                        'service_requests' => [],
                     ];
                 },
             ],

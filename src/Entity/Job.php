@@ -68,6 +68,18 @@ class Job implements \JsonSerializable
     private ?string $machineStateCategory = null;
 
     /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $resultsJobState = null;
+
+    /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $resultsJobEndState = null;
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
@@ -176,13 +188,49 @@ class Job implements \JsonSerializable
     }
 
     /**
+     * @param non-empty-string $state
+     */
+    public function setResultsJobState(string $state): self
+    {
+        $this->resultsJobState = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getResultsJobState(): ?string
+    {
+        return $this->resultsJobState;
+    }
+
+    /**
+     * @param non-empty-string $state
+     */
+    public function setResultsJobEndState(string $state): self
+    {
+        $this->resultsJobEndState = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getResultsJobEndState(): ?string
+    {
+        return $this->resultsJobEndState;
+    }
+
+    /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{has_token: bool}
+     *   results_job: array{has_token: bool, state: ?non-empty-string, end_state: ?non-empty-string}
      *  }
      */
     public function jsonSerialize(): array
@@ -201,6 +249,8 @@ class Job implements \JsonSerializable
             ],
             'results_job' => [
                 'has_token' => is_string($this->resultsToken),
+                'state' => $this->resultsJobState,
+                'end_state' => $this->resultsJobEndState,
             ],
         ];
     }
