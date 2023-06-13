@@ -81,4 +81,16 @@ class ResultsJob
 
         return $this;
     }
+
+    /**
+     * @return array{has_token: bool, state: ?non-empty-string, end_state: ?non-empty-string}
+     */
+    public function toArray(): array
+    {
+        return [
+            'has_token' => is_string($this->token),
+            'state' => $this->state,
+            'end_state' => $this->endState,
+        ];
+    }
 }
