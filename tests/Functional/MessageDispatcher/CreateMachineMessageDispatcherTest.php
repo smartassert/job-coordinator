@@ -9,12 +9,10 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
-use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,6 +24,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 {
     private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
+    private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
@@ -39,11 +38,19 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($messengerTransport instanceof InMemoryTransport);
         $this->messengerTransport = $messengerTransport;
 
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+        foreach ($jobRepository->findAll() as $job) {
+            $entityManager->remove($job);
+        }
+
+        $this->jobRepository = $jobRepository;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
         foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
             $entityManager->remove($remoteRequest);
@@ -60,32 +67,16 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     /**
      * @dataProvider dispatchMessageNotDispatchedDataProvider
+     *
+     * @param callable(JobRepository): ?Job $jobCreator
      */
     public function testDispatchMessageNotDispatched(
-        ?Job $job,
+        callable $jobCreator,
         ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event
     ): void {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
+        $jobCreator($this->jobRepository);
 
-        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
-        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
-
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
-
-        if ($job instanceof Job) {
-            $this->persistJob($job);
-        }
-
-        $mockJobRepository = \Mockery::mock(JobRepository::class);
-        $mockJobRepository
-            ->shouldReceive('find')
-            ->with($event->jobId)
-            ->andReturn($job)
-        ;
-
-        (new CreateMachineMessageDispatcher($mockJobRepository, $messageDispatcher))->dispatch($event);
+        $this->dispatcher->dispatch($event);
 
         $this->assertNoMessagesDispatched();
     }
@@ -118,27 +109,47 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         return [
             'ResultsJobCreatedEvent, no job' => [
-                'job' => null,
+                'jobCreator' => function () {
+                    return null;
+                },
                 'event' => $resultsJobCreatedEvent,
             ],
             'SerializedSuiteSerializedEvent, no job' => [
-                'job' => null,
+                'jobCreator' => function () {
+                    return null;
+                },
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, no job results token' => [
-                'job' => $jobNoResultsToken,
+                'jobCreator' => function (JobRepository $jobRepository) use ($jobNoResultsToken) {
+                    $jobRepository->add($jobNoResultsToken);
+
+                    return $jobNoResultsToken;
+                },
                 'event' => $resultsJobCreatedEvent,
             ],
             'SerializedSuiteSerializedEvent, no job results token' => [
-                'job' => $jobNoResultsToken,
+                'jobCreator' => function (JobRepository $jobRepository) use ($jobNoResultsToken) {
+                    $jobRepository->add($jobNoResultsToken);
+
+                    return $jobNoResultsToken;
+                },
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
-                'job' => $jobSerializedSuitePreparing,
+                'jobCreator' => function (JobRepository $jobRepository) use ($jobSerializedSuitePreparing) {
+                    $jobRepository->add($jobSerializedSuitePreparing);
+
+                    return $jobSerializedSuitePreparing;
+                },
                 'event' => $resultsJobCreatedEvent,
             ],
             'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
-                'job' => $jobSerializedSuitePreparing,
+                'jobCreator' => function (JobRepository $jobRepository) use ($jobSerializedSuitePreparing) {
+                    $jobRepository->add($jobSerializedSuitePreparing);
+
+                    return $jobSerializedSuitePreparing;
+                },
                 'event' => $serializedSuiteSerializedEvent,
             ],
         ];
@@ -154,7 +165,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
-        $this->persistJob($job);
+        $this->jobRepository->add($job);
         $this->dispatcher->dispatch($event);
 
         $this->assertDispatchedMessage($event->authenticationToken, $job->id);
@@ -194,27 +205,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'event' => $serializedSuiteSerializedEvent,
             ],
         ];
-    }
-
-    private function persistJob(Job $job): void
-    {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        if (!$jobRepository instanceof JobRepository) {
-            return;
-        }
-
-        $existingJob = $jobRepository->find($job->id);
-        if ($existingJob instanceof Job) {
-            $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-            if (!$entityManager instanceof EntityManagerInterface) {
-                return;
-            }
-
-            $entityManager->remove($existingJob);
-            $entityManager->flush();
-        }
-
-        $jobRepository->add($job);
     }
 
     private function assertNoMessagesDispatched(): void
