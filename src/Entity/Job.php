@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-class Job implements \JsonSerializable
+class Job
 {
     /**
      * @var non-empty-string
@@ -233,7 +233,7 @@ class Job implements \JsonSerializable
      *   results_job: array{has_token: bool, state: ?non-empty-string, end_state: ?non-empty-string}
      *  }
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

@@ -10,7 +10,7 @@ use Symfony\Component\Uid\Ulid;
 
 class JobTest extends TestCase
 {
-    public function testJsonSerialize(): void
+    public function testToArray(): void
     {
         $id = (string) new Ulid();
         \assert('' !== $id);
@@ -47,7 +47,7 @@ class JobTest extends TestCase
                     'end_state' => null,
                 ],
             ],
-            $job->jsonSerialize()
+            $job->toArray()
         );
     }
 }

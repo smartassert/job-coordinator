@@ -46,7 +46,7 @@ class JobController
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
         $repository->add($job);
 
-        return new JsonResponse($job);
+        return new JsonResponse($job->toArray());
     }
 
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
@@ -68,7 +68,7 @@ class JobController
         $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);
 
         return new JsonResponse(array_merge(
-            $job->jsonSerialize(),
+            $job->toArray(),
             ['service_requests' => new RemoteRequestCollection($remoteRequests)],
         ));
     }
