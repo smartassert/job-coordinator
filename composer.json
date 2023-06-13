@@ -28,7 +28,7 @@
         "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
         "symfony/uid": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/yaml": "6.3.*"
     },
     "require-dev": {
         "mockery/mockery": "^1.5",
