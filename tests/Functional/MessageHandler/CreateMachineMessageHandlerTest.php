@@ -5,20 +5,30 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
-use App\Message\GetMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -38,7 +48,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
@@ -66,7 +76,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(MachineCreationException::class . ' not thrown');
         } catch (MachineCreationException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
         }
     }
 
@@ -94,7 +104,13 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
 
-        $this->assertDispatchedMessage(self::$apiToken, $machine);
+        $events = $this->eventRecorder->all(MachineCreationRequestedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(
+            new MachineCreationRequestedEvent(self::$apiToken, $machine),
+            $event
+        );
     }
 
     protected function getHandlerClass(): string
@@ -105,25 +121,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     protected function getHandledMessageClass(): string
     {
         return CreateMachineMessage::class;
-    }
-
-    /**
-     * @param non-empty-string $authenticationToken
-     */
-    private function assertDispatchedMessage(string $authenticationToken, Machine $machine): void
-    {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals(
-            new GetMachineMessage($authenticationToken, $machine->id, $machine),
-            $envelope->getMessage()
-        );
-
-        self::assertEquals([new NonDelayedStamp()], $envelope->all(NonDelayedStamp::class));
     }
 
     /**

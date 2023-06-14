@@ -6,12 +6,12 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Repository\JobRepository;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
@@ -34,10 +34,37 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testIsEventSubscriber(): void
+    /**
+     * @dataProvider eventSubscriptionsDataProvider
+     */
+    public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->dispatcher::getSubscribedEvents());
+        $subscribedEvents = $this->dispatcher::getSubscribedEvents();
+        self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
+
+        $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
+        self::assertIsArray($eventSubscriptions);
+        self::assertIsArray($eventSubscriptions[0]);
+
+        $eventSubscription = $eventSubscriptions[0];
+        self::assertSame($expectedMethod, $eventSubscription[0]);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function eventSubscriptionsDataProvider(): array
+    {
+        return [
+            MachineCreationRequestedEvent::class => [
+                'expectedListenedForEvent' => MachineCreationRequestedEvent::class,
+                'expectedMethod' => 'dispatch',
+            ],
+            MachineRetrievedEvent::class => [
+                'expectedListenedForEvent' => MachineRetrievedEvent::class,
+                'expectedMethod' => 'dispatchIfMachineNotInEndState',
+            ],
+        ];
     }
 
     public function testDispatchSuccess(): void
