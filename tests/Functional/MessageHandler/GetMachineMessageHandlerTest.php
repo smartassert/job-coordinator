@@ -18,8 +18,6 @@ use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -64,7 +62,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $this->createMessageAndHandleMessage($machine, $machine, self::$apiToken);
 
-        $this->assertNoMessagesDispatched();
+        self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
     }
 
     /**
@@ -88,7 +86,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
 
-        $this->assertDispatchedMessage(self::$apiToken, $current);
+        $events = $this->eventRecorder->all(MachineRetrievedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new MachineRetrievedEvent(self::$apiToken, $previous, $current), $event);
     }
 
     /**
@@ -131,7 +132,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
         self::assertEquals([$expectedEvent], $this->eventRecorder->all($expectedEvent::class));
-        $this->assertDispatchedMessage(self::$apiToken, $current);
     }
 
     /**
@@ -205,10 +205,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
-
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
     }
 
     /**
@@ -264,50 +260,5 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);
-    }
-
-    /**
-     * @param non-empty-string $authenticationToken
-     */
-    private function assertDispatchedMessage(string $authenticationToken, Machine $current): void
-    {
-        $envelopes = $this->messengerTransport->get();
-
-        $machineStateChangeCheckMessage = null;
-        $machineStateChangeCheckMessageDelayStamps = [];
-        $foundMessageClasses = [];
-
-        foreach ($envelopes as $envelope) {
-            if ($envelope instanceof Envelope) {
-                $message = $envelope->getMessage();
-                $foundMessageClasses[] = $message::class;
-
-                if (GetMachineMessage::class === $message::class) {
-                    $machineStateChangeCheckMessage = $message;
-                    $machineStateChangeCheckMessageDelayStamps = $envelope->all(DelayStamp::class);
-                }
-            }
-        }
-
-        if (null === $machineStateChangeCheckMessage) {
-            self::fail(sprintf(
-                '%s message not dispatched, found: %s',
-                GetMachineMessage::class,
-                implode(', ', $foundMessageClasses)
-            ));
-        }
-
-        self::assertEquals(
-            new GetMachineMessage($authenticationToken, $current->id, $current),
-            $machineStateChangeCheckMessage
-        );
-
-        $messageDelays = self::getContainer()->getParameter('message_delays');
-        \assert(is_array($messageDelays));
-
-        $expectedDelayStampValue = $messageDelays[GetMachineMessage::class] ?? null;
-        \assert(is_int($expectedDelayStampValue));
-
-        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $machineStateChangeCheckMessageDelayStamps);
     }
 }
