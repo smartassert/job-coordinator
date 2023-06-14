@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -16,6 +18,17 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -35,7 +48,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        self::assertCount(0, $this->eventRecorder);
     }
 
     public function testInvokeResultsClientThrowsException(): void
@@ -63,7 +76,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             self::fail(ResultsJobStateRetrievalException::class . ' not thrown');
         } catch (ResultsJobStateRetrievalException $e) {
             self::assertSame($resultsClientException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            self::assertCount(0, $this->eventRecorder);
         }
     }
 
@@ -89,7 +102,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler(new GetResultsJobStateMessage(self::$apiToken, $jobId));
 
-        $this->assertNoMessagesDispatched();
+        $events = $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new ResultsJobStateRetrievedEvent(self::$apiToken, $jobId, $resultsJobState), $event);
     }
 
     protected function getHandlerClass(): string

@@ -43,6 +43,39 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey(ResultsJobStateRetrievedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
+    /**
+     * @dataProvider eventSubscriptionsDataProvider
+     */
+    public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
+    {
+        $subscribedEvents = $this->dispatcher::getSubscribedEvents();
+        self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
+
+        $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
+        self::assertIsArray($eventSubscriptions);
+        self::assertIsArray($eventSubscriptions[0]);
+
+        $eventSubscription = $eventSubscriptions[0];
+        self::assertSame($expectedMethod, $eventSubscription[0]);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function eventSubscriptionsDataProvider(): array
+    {
+        return [
+            ResultsJobCreatedEvent::class => [
+                'expectedListenedForEvent' => ResultsJobCreatedEvent::class,
+                'expectedMethod' => 'dispatchForResultsJobCreatedEvent',
+            ],
+            ResultsJobStateRetrievedEvent::class => [
+                'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
+                'expectedMethod' => 'dispatchForResultsJobStateRetrievedEvent',
+            ],
+        ];
+    }
+
     public function testDispatchForResultsJobCreatedEventSuccess(): void
     {
         $jobId = md5((string) rand());
