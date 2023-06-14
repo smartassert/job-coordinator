@@ -5,19 +5,29 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
-use Symfony\Component\Messenger\Envelope;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -37,7 +47,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        self::assertSame([], $this->eventRecorder->all(SerializedSuiteCreatedEvent::class));
     }
 
     public function testInvokeSerializedSuiteClientThrowsException(): void
@@ -66,7 +76,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             self::fail(SerializedSuiteCreationException::class . ' not thrown');
         } catch (SerializedSuiteCreationException $e) {
             self::assertSame($serializedSuiteClientException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            self::assertSame([], $this->eventRecorder->all(SerializedSuiteCreatedEvent::class));
         }
     }
 
@@ -103,7 +113,11 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
 
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
-        $this->assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuite->getId());
+
+        $events = $this->eventRecorder->all(SerializedSuiteCreatedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new SerializedSuiteCreatedEvent(self::$apiToken, $job->id, $serializedSuite), $event);
     }
 
     protected function getHandlerClass(): string
@@ -114,30 +128,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     protected function getHandledMessageClass(): string
     {
         return CreateSerializedSuiteMessage::class;
-    }
-
-    /**
-     * @param non-empty-string $authenticationToken
-     * @param non-empty-string $jobId
-     * @param non-empty-string $serializedSuiteId
-     */
-    private function assertDispatchedMessage(
-        string $authenticationToken,
-        string $jobId,
-        string $serializedSuiteId
-    ): void {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals(
-            new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId),
-            $envelope->getMessage()
-        );
-
-        self::assertEquals([new NonDelayedStamp()], $envelope->all(NonDelayedStamp::class));
     }
 
     private function createJob(): Job
