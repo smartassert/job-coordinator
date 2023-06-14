@@ -39,8 +39,6 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(ResultsJobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(ResultsJobStateRetrievedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     /**

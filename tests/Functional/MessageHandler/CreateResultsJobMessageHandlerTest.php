@@ -5,20 +5,31 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\ResultsJobCreatedEvent;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
-use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -38,7 +49,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
     }
 
     public function testInvokeResultsClientThrowsException(): void
@@ -66,7 +77,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(ResultsJobCreationException::class . ' not thrown');
         } catch (ResultsJobCreationException $e) {
             self::assertSame($resultsClientException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
         }
     }
 
@@ -93,7 +104,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
 
         self::assertSame($resultsJob->token, $job->getResultsToken());
-        $this->assertDispatchedMessage(self::$apiToken, $jobId);
+
+        $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $jobId, $resultsJob), $event);
     }
 
     protected function getHandlerClass(): string
@@ -145,23 +160,5 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateResultsJobMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
-    }
-
-    /**
-     * @param non-empty-string $authenticationToken
-     * @param non-empty-string $jobId
-     */
-    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
-    {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals(
-            new GetResultsJobStateMessage($authenticationToken, $jobId),
-            $envelope->getMessage()
-        );
     }
 }
