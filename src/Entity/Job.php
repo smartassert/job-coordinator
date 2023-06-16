@@ -134,16 +134,6 @@ class Job
     }
 
     /**
-     * @param non-empty-string $resultsToken
-     */
-    public function setResultsToken(string $resultsToken): self
-    {
-        $this->resultsToken = $resultsToken;
-
-        return $this;
-    }
-
-    /**
      * @param non-empty-string $serializedSuiteState
      */
     public function setSerializedSuiteState(string $serializedSuiteState): self
