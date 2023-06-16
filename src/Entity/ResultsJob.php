@@ -69,7 +69,7 @@ class ResultsJob
      */
     public function getEndState(): ?string
     {
-        return $this->state;
+        return $this->endState;
     }
 
     /**

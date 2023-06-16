@@ -40,12 +40,6 @@ class Job
     /**
      * @var ?non-empty-string
      */
-    #[ORM\Column(length: 32, nullable: true)]
-    private ?string $resultsToken = null;
-
-    /**
-     * @var ?non-empty-string
-     */
     #[ORM\Column(length: 32, unique: true, nullable: true)]
     private ?string $serializedSuiteId = null;
 
@@ -212,7 +206,7 @@ class Job
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{has_token: bool, state: ?non-empty-string, end_state: ?non-empty-string}
+     *   results_job: array{state: ?non-empty-string, end_state: ?non-empty-string}
      *  }
      */
     public function toArray(): array
@@ -230,7 +224,6 @@ class Job
                 'ip_address' => $this->machineIpAddress,
             ],
             'results_job' => [
-                'has_token' => is_string($this->resultsToken),
                 'state' => $this->resultsJobState,
                 'end_state' => $this->resultsJobEndState,
             ],

@@ -21,9 +21,6 @@ class JobTest extends TestCase
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
-        $resultToken = (string) new Ulid();
-        \assert('' !== $resultToken);
-
         $maximumDurationInSeconds = rand(1, 1000);
 
         $job = (new Job($id, $userId, $suiteId, $maximumDurationInSeconds));
@@ -42,7 +39,6 @@ class JobTest extends TestCase
                     'ip_address' => null,
                 ],
                 'results_job' => [
-                    'has_token' => false,
                     'state' => null,
                     'end_state' => null,
                 ],

@@ -7,11 +7,13 @@ namespace App\Tests\Functional\Application;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Entity\ResultsJob;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Repository\ResultsJobRepository;
 use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,13 +27,15 @@ class GetJobSuccessTest extends AbstractApplicationTest
     /**
      * @dataProvider getDataProvider
      *
-     * @param callable(Job): RemoteRequest[] $remoteRequestsCreator
-     * @param callable(Job): Job             $jobMutator
-     * @param callable(Job): array<mixed>    $expectedSerializedJobCreator
+     * @param callable(Job): RemoteRequest[]                   $remoteRequestsCreator
+     * @param callable(Job): Job                               $jobMutator
+     * @param callable(Job, ResultsJobRepository): ?ResultsJob $resultsJobCreator
+     * @param callable(Job, ?ResultsJob): array<mixed>         $expectedSerializedJobCreator
      */
     public function testGetSuccess(
         callable $remoteRequestsCreator,
         callable $jobMutator,
+        callable $resultsJobCreator,
         callable $expectedSerializedJobCreator
     ): void {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -54,6 +58,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
             $entityManager->flush();
         }
 
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        foreach ($resultsJobRepository->findAll() as $resultsJobEntity) {
+            $resultsJobRepository->remove($resultsJobEntity);
+        }
+
         self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
@@ -73,6 +83,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $job = $jobMutator($job);
         $jobRepository->add($job);
 
+        $resultsJob = $resultsJobCreator($job, $resultsJobRepository);
+
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
         foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
@@ -91,7 +103,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 
-        self::assertEquals($expectedSerializedJobCreator($job), $responseData);
+        self::assertEquals($expectedSerializedJobCreator($job, $resultsJob), $responseData);
     }
 
     /**
@@ -107,6 +119,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'jobMutator' => function (Job $job) {
                     return $job;
                 },
+                'resultsJobCreator' => function () {
+                    return null;
+                },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -121,7 +136,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => false,
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -139,6 +153,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'jobMutator' => function (Job $job) {
                     return $job;
                 },
+                'resultsJobCreator' => function () {
+                    return null;
+                },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -153,7 +170,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => false,
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -200,6 +216,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'jobMutator' => function (Job $job) {
                     return $job;
                 },
+                'resultsJobCreator' => function () {
+                    return null;
+                },
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -214,7 +233,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => false,
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -272,7 +290,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                     return $job;
                 },
-                'expectedSerializedJobCreator' => function (Job $job) {
+                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
+                    $resultsJob = new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), null);
+                    $resultsJobRepository->save($resultsJob);
+
+                    return $resultsJob;
+                },
+                'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
@@ -286,8 +310,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => false,
-                            'state' => $job->getResultsJobState(),
+                            'has_token' => true,
+                            'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
                         'service_requests' => [],
@@ -304,7 +328,18 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                     return $job;
                 },
-                'expectedSerializedJobCreator' => function (Job $job) {
+                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
+                    $resultsJob = new ResultsJob(
+                        $job->id,
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        md5((string) rand())
+                    );
+                    $resultsJobRepository->save($resultsJob);
+
+                    return $resultsJob;
+                },
+                'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
@@ -318,9 +353,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => false,
-                            'state' => $job->getResultsJobState(),
-                            'end_state' => $job->getResultsJobEndState(),
+                            'has_token' => true,
+                            'state' => $resultsJob->getState(),
+                            'end_state' => $resultsJob->getEndState(),
                         ],
                         'service_requests' => [],
                     ];
