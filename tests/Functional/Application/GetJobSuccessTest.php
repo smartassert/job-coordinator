@@ -28,13 +28,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
      * @dataProvider getDataProvider
      *
      * @param callable(Job): RemoteRequest[]                   $remoteRequestsCreator
-     * @param callable(Job): Job                               $jobMutator
      * @param callable(Job, ResultsJobRepository): ?ResultsJob $resultsJobCreator
      * @param callable(Job, ?ResultsJob): array<mixed>         $expectedSerializedJobCreator
      */
     public function testGetSuccess(
         callable $remoteRequestsCreator,
-        callable $jobMutator,
         callable $resultsJobCreator,
         callable $expectedSerializedJobCreator
     ): void {
@@ -80,9 +78,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
 
-        $job = $jobMutator($job);
-        $jobRepository->add($job);
-
         $resultsJob = $resultsJobCreator($job, $resultsJobRepository);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
@@ -116,9 +111,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'jobMutator' => function (Job $job) {
-                    return $job;
-                },
                 'resultsJobCreator' => function () {
                     return null;
                 },
@@ -148,9 +140,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
-                },
-                'jobMutator' => function (Job $job) {
-                    return $job;
                 },
                 'resultsJobCreator' => function () {
                     return null;
@@ -210,9 +199,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 2))
                             ->setState(RequestState::SUCCEEDED),
                     ];
-                },
-                'jobMutator' => function (Job $job) {
-                    return $job;
                 },
                 'resultsJobCreator' => function () {
                     return null;
@@ -282,9 +268,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'jobMutator' => function (Job $job) {
-                    return $job;
-                },
                 'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
                     $resultsJob = new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), null);
                     $resultsJobRepository->save($resultsJob);
@@ -316,11 +299,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
             'no remote requests, has results state, has results end state' => [
                 'remoteRequestsCreator' => function () {
                     return [];
-                },
-                'jobMutator' => function (Job $job) {
-                    $job->setResultsJobEndState(md5((string) rand()));
-
-                    return $job;
                 },
                 'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
                     $resultsJob = new ResultsJob(

@@ -158,16 +158,6 @@ class Job
     }
 
     /**
-     * @param non-empty-string $state
-     */
-    public function setResultsJobEndState(string $state): self
-    {
-        $this->resultsJobEndState = $state;
-
-        return $this;
-    }
-
-    /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
