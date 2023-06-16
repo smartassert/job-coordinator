@@ -38,9 +38,6 @@ class JobTest extends TestCase
                     'state_category' => null,
                     'ip_address' => null,
                 ],
-                'results_job' => [
-                    'end_state' => null,
-                ],
             ],
             $job->toArray()
         );

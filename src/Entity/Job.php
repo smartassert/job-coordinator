@@ -62,12 +62,6 @@ class Job
     private ?string $machineStateCategory = null;
 
     /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
-    private ?string $resultsJobEndState = null;
-
-    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
@@ -163,8 +157,7 @@ class Job
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
-     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{end_state: ?non-empty-string}
+     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
      *  }
      */
     public function toArray(): array
@@ -180,9 +173,6 @@ class Job
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
-            ],
-            'results_job' => [
-                'end_state' => $this->resultsJobEndState,
             ],
         ];
     }

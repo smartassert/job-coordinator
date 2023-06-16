@@ -127,9 +127,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'results_job' => [
-                            'end_state' => null,
-                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -156,9 +153,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
-                        ],
-                        'results_job' => [
-                            'end_state' => null,
                         ],
                         'service_requests' => [
                             [
@@ -215,9 +209,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
-                        ],
-                        'results_job' => [
-                            'end_state' => null,
                         ],
                         'service_requests' => [
                             [
