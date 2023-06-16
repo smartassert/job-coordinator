@@ -174,14 +174,6 @@ class Job
     }
 
     /**
-     * @return ?non-empty-string
-     */
-    public function getResultsJobState(): ?string
-    {
-        return $this->resultsJobState;
-    }
-
-    /**
      * @param non-empty-string $state
      */
     public function setResultsJobEndState(string $state): self
