@@ -5,20 +5,34 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\WorkerClient\Client as WorkerClient;
+use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -38,6 +52,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
         $this->assertNoMessagesDispatched();
     }
 
@@ -57,6 +72,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
         $this->assertNoMessagesDispatched();
     }
 
@@ -75,6 +91,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
         $this->assertNoMessagesDispatched();
     }
 
@@ -101,6 +118,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
         $this->assertDispatchedMessage($message);
     }
 
@@ -140,6 +158,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler($message);
 
         $this->assertDispatchedMessage($message);
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
     }
 
     public function testInvokeReadSerializedSuiteThrowsException(): void
@@ -174,6 +193,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(WorkerJobStartException::class . ' not thrown');
         } catch (WorkerJobStartException $e) {
             self::assertSame($serializedSuiteReadException, $e->getPreviousException());
+            self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
             $this->assertNoMessagesDispatched();
         }
     }
@@ -199,10 +219,13 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
+        $workerJob = \Mockery::mock(WorkerJob::class);
+
         $workerClient = \Mockery::mock(WorkerClient::class);
         $workerClient
             ->shouldReceive('createJob')
             ->with($job->id, $job->resultsToken, $job->maximumDurationInSeconds, $serializedSuiteContent)
+            ->andReturn($workerJob)
         ;
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
@@ -221,6 +244,11 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
+        $events = $this->eventRecorder->all(WorkerJobStartRequestedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new WorkerJobStartRequestedEvent(self::$apiToken, $job->id, $workerJob), $event);
+
         $this->assertNoMessagesDispatched();
     }
 
@@ -236,7 +264,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function assertDispatchedMessage(StartWorkerJobMessage $message): void
     {
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
