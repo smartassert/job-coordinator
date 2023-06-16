@@ -32,16 +32,16 @@ class Job
     public readonly string $suiteId;
 
     /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 32, nullable: true)]
-    public ?string $resultsToken = null;
-
-    /**
      * @var positive-int
      */
     #[ORM\Column]
     public readonly int $maximumDurationInSeconds;
+
+    /**
+     * @var ?non-empty-string
+     */
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $resultsToken = null;
 
     /**
      * @var ?non-empty-string

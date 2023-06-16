@@ -33,7 +33,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
         $job = $this->getJob();
         \assert($job instanceof Job);
 
-        self::assertNull($job->resultsToken);
+        self::assertNull($job->getResultsToken());
     }
 
     public function testJobResponseData(): void
