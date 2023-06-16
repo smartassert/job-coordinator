@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -74,29 +76,42 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
 
-        $resultsJob = new ResultsJob($jobId, md5((string) rand()), new JobState('awaiting-events', null));
+        $resultsJobModel = new ResultsJobModel($jobId, md5((string) rand()), new JobState('awaiting-events', null));
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
             ->shouldReceive('createJob')
             ->with(self::$apiToken, $jobId)
-            ->andReturn($resultsJob)
+            ->andReturn($resultsJobModel)
         ;
 
         $handler = $this->createHandler(
             resultsClient: $resultsClient,
         );
 
-        self::assertNull($job->getResultsToken());
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $resultsJob = $resultsJobRepository->find($job->id);
+
+        self::assertNull($resultsJob);
 
         $handler(new CreateResultsJobMessage(self::$apiToken, $jobId));
 
-        self::assertSame($resultsJob->token, $job->getResultsToken());
+        $resultsJob = $resultsJobRepository->find($job->id);
+        self::assertEquals(
+            new ResultsJobEntity(
+                $jobId,
+                $resultsJobModel->token,
+                $resultsJobModel->state->state,
+                $resultsJobModel->state->endState
+            ),
+            $resultsJob
+        );
 
         $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $jobId, $resultsJob), $event);
+        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $jobId, $resultsJobModel), $event);
     }
 
     protected function getHandlerClass(): string
