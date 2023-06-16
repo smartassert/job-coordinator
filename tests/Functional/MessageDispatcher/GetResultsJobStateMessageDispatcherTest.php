@@ -126,12 +126,12 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
 
-        self::assertSame([], $this->messengerTransport->get());
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void
     {
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 

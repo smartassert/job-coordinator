@@ -128,7 +128,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
     private function assertNoMessagesDispatched(): void
     {
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(0, $envelopes);
     }
@@ -139,7 +139,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
      */
     private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
     {
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 

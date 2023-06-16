@@ -83,7 +83,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatch($event);
 
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
