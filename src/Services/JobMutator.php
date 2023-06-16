@@ -8,7 +8,6 @@ use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
@@ -33,9 +32,6 @@ class JobMutator implements EventSubscriberInterface
             ],
             MachineStateChangeEvent::class => [
                 ['setMachineStateCategoryOnMachineStateChangeEvent', 1000],
-            ],
-            ResultsJobCreatedEvent::class => [
-                ['setResultsJobOnResultsJobCreatedEvent', 1000],
             ],
             SerializedSuiteCreatedEvent::class => [
                 ['setSerializedSuiteOnSerializedSuiteCreatedEvent', 1000],
@@ -79,17 +75,6 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $job->setMachineStateCategory($machineStateCategory);
-        $this->jobRepository->add($job);
-    }
-
-    public function setResultsJobOnResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
-    {
-        $job = $this->jobRepository->find($event->resultsJob->label);
-        if (!$job instanceof Job) {
-            return;
-        }
-
-        $job = $job->setResultsToken($event->resultsJob->token);
         $this->jobRepository->add($job);
     }
 
