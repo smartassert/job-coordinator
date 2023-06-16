@@ -43,7 +43,6 @@ class JobMutator implements EventSubscriberInterface
                 ['setSerializedSuiteStateOnSerializedSuiteRetrievedEvent', 1000],
             ],
             ResultsJobStateRetrievedEvent::class => [
-                ['setResultsJobState', 1000],
                 ['setResultsJobEndState', 1000],
             ],
         ];
@@ -120,21 +119,6 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $job->setSerializedSuiteState($serializedSuiteState);
-        $this->jobRepository->add($job);
-    }
-
-    public function setResultsJobState(ResultsJobStateRetrievedEvent $event): void
-    {
-        $job = $this->jobRepository->find($event->jobId);
-        if (!$job instanceof Job) {
-            return;
-        }
-
-        if ($event->resultsJobState->state === $job->getResultsJobState()) {
-            return;
-        }
-
-        $job->setResultsJobState($event->resultsJobState->state);
         $this->jobRepository->add($job);
     }
 
