@@ -18,6 +18,17 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    private EventRecorder $eventRecorder;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
+    }
+
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
@@ -37,7 +48,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        $this->assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
@@ -65,7 +76,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(MachineTerminationException::class . ' not thrown');
         } catch (MachineTerminationException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            $this->assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
         }
     }
 
@@ -89,12 +100,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler(new TerminateMachineMessage(self::$apiToken, $jobId));
 
-        $this->assertNoMessagesDispatched();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-
-        $events = $eventRecorder->all(MachineTerminationRequestedEvent::class);
+        $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 
