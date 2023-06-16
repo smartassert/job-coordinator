@@ -286,8 +286,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [];
                 },
                 'jobMutator' => function (Job $job) {
-                    $job->setResultsJobState(md5((string) rand()));
-
                     return $job;
                 },
                 'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
@@ -323,7 +321,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [];
                 },
                 'jobMutator' => function (Job $job) {
-                    $job->setResultsJobState(md5((string) rand()));
                     $job->setResultsJobEndState(md5((string) rand()));
 
                     return $job;

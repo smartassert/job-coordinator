@@ -166,16 +166,6 @@ class Job
     /**
      * @param non-empty-string $state
      */
-    public function setResultsJobState(string $state): self
-    {
-        $this->resultsJobState = $state;
-
-        return $this;
-    }
-
-    /**
-     * @param non-empty-string $state
-     */
     public function setResultsJobEndState(string $state): self
     {
         $this->resultsJobEndState = $state;
