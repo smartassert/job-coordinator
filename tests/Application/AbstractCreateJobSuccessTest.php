@@ -59,7 +59,6 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
                     'ip_address' => null,
                 ],
                 'results_job' => [
-                    'state' => null,
                     'end_state' => null,
                 ],
             ],

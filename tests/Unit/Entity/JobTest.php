@@ -39,7 +39,6 @@ class JobTest extends TestCase
                     'ip_address' => null,
                 ],
                 'results_job' => [
-                    'state' => null,
                     'end_state' => null,
                 ],
             ],

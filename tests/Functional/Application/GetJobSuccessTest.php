@@ -136,7 +136,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'state' => null,
                             'end_state' => null,
                         ],
                         'service_requests' => [],
@@ -170,7 +169,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'state' => null,
                             'end_state' => null,
                         ],
                         'service_requests' => [
@@ -233,7 +231,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'state' => null,
                             'end_state' => null,
                         ],
                         'service_requests' => [
