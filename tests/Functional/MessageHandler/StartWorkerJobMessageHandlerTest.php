@@ -18,11 +18,11 @@ use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    protected InMemoryTransport $messengerTransport;
+    private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {

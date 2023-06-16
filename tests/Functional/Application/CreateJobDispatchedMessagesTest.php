@@ -8,7 +8,7 @@ use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class CreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
 {
