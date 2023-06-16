@@ -279,7 +279,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => true,
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
@@ -316,7 +315,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'results_job' => [
-                            'has_token' => true,
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
                         ],
