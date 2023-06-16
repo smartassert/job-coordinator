@@ -11,7 +11,6 @@ use App\Message\StartWorkerJobMessage;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use SmartAssert\WorkerClient\Client as WorkerClient;
@@ -24,15 +23,10 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     protected InMemoryTransport $messengerTransport;
-    private EventRecorder $eventRecorder;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-        $this->eventRecorder = $eventRecorder;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);

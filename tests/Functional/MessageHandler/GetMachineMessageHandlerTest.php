@@ -12,7 +12,6 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -22,16 +21,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private EventRecorder $eventRecorder;
     private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-        $this->eventRecorder = $eventRecorder;
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

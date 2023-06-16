@@ -10,7 +10,6 @@ use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -18,17 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private EventRecorder $eventRecorder;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-        $this->eventRecorder = $eventRecorder;
-    }
-
     public function testInvokeNoJob(): void
     {
         $this->createMessageAndHandleMessage(self::$apiToken, md5((string) rand()), md5((string) rand()));

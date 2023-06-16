@@ -10,7 +10,6 @@ use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
@@ -19,17 +18,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private EventRecorder $eventRecorder;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-        $this->eventRecorder = $eventRecorder;
-    }
-
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());

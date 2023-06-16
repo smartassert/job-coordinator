@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -15,6 +16,8 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
      */
     protected static string $apiToken;
 
+    protected EventRecorder $eventRecorder;
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
@@ -22,6 +25,15 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         self::$apiToken = $apiTokenProvider->get('user@example.com');
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $eventRecorder = self::getContainer()->get(EventRecorder::class);
+        \assert($eventRecorder instanceof EventRecorder);
+        $this->eventRecorder = $eventRecorder;
     }
 
     public function testHandlerExistsInContainerAndIsAMessageHandler(): void

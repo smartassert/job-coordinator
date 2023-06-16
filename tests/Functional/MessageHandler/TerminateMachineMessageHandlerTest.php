@@ -10,7 +10,6 @@ use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -18,17 +17,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private EventRecorder $eventRecorder;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-        $this->eventRecorder = $eventRecorder;
-    }
-
     public function testInvokeNoJob(): void
     {
         $jobId = md5((string) rand());
