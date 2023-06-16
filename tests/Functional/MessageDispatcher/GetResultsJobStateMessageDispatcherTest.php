@@ -39,8 +39,6 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(ResultsJobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(ResultsJobStateRetrievedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     /**
@@ -128,12 +126,12 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
 
-        self::assertSame([], $this->messengerTransport->get());
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void
     {
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 

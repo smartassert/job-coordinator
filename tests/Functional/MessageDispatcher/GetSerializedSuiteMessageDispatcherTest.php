@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
 use App\Repository\JobRepository;
@@ -16,7 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
-class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
+class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 {
     private GetSerializedSuiteMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
@@ -37,7 +38,39 @@ class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-        self::assertArrayHasKey(SerializedSuiteCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
+    }
+
+    /**
+     * @dataProvider eventSubscriptionsDataProvider
+     */
+    public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
+    {
+        $subscribedEvents = $this->dispatcher::getSubscribedEvents();
+        self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
+
+        $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
+        self::assertIsArray($eventSubscriptions);
+        self::assertIsArray($eventSubscriptions[0]);
+
+        $eventSubscription = $eventSubscriptions[0];
+        self::assertSame($expectedMethod, $eventSubscription[0]);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function eventSubscriptionsDataProvider(): array
+    {
+        return [
+            SerializedSuiteCreatedEvent::class => [
+                'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
+                'expectedMethod' => 'dispatchForSerializedSuiteCreatedEvent',
+            ],
+            SerializedSuiteRetrievedEvent::class => [
+                'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
+                'expectedMethod' => 'dispatchForSerializedSuiteRetrievedEvent',
+            ],
+        ];
     }
 
     public function testDispatchForSerializedSuiteCreatedEventSuccess(): void
@@ -61,7 +94,7 @@ class GetSerializedSuiteStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForSerializedSuiteCreatedEvent($event);
 
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 

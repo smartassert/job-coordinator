@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Event\SerializedSuiteSerializedEvent;
+use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
+use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -23,7 +21,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $this->createMessageAndHandleMessage(self::$apiToken, md5((string) rand()), md5((string) rand()));
 
-        $this->assertNoMessagesDispatched();
+        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
 
     /**
@@ -40,7 +38,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId);
 
-        $this->assertNoMessagesDispatched();
+        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
 
     /**
@@ -82,75 +80,18 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         ));
 
         $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId, $serializedSuiteClient);
-    }
 
-    public function testInvokeNoStateChangeNotEndState(): void
-    {
-        $serializedSuiteState = md5((string) rand());
-        $job = $this->invokeHandlerSuccessfully($serializedSuiteState, $serializedSuiteState);
-
-        self::assertSame($serializedSuiteState, $job->getSerializedSuiteState());
-
-        $serializedSuiteId = $job->getSerializedSuiteId();
-        \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
-
-        self::assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuiteId);
-    }
-
-    public function testInvokeHasStateChangeNotEndState(): void
-    {
-        $newSerializedSuiteState = md5((string) rand());
-        $job = $this->invokeHandlerSuccessfully(md5((string) rand()), $newSerializedSuiteState);
-
-        $serializedSuiteId = $job->getSerializedSuiteId();
-        \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
-
-        self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
-        self::assertDispatchedMessage(self::$apiToken, $job->id, $serializedSuiteId);
-    }
-
-    public function testInvokeHasStateChangeIsPrepared(): void
-    {
-        $newSerializedSuiteState = 'prepared';
-        $job = $this->invokeHandlerSuccessfully(md5((string) rand()), $newSerializedSuiteState);
-
-        self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
-        self::assertNoMessagesDispatched();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-
-        $event = $eventRecorder->getLatest();
-        self::assertInstanceOf(SerializedSuiteSerializedEvent::class, $event);
-    }
-
-    public function testInvokeHasStateChangeIsFailed(): void
-    {
-        $newSerializedSuiteState = 'failed';
-        $job = $this->invokeHandlerSuccessfully(md5((string) rand()), $newSerializedSuiteState);
-
-        self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
-        self::assertNoMessagesDispatched();
-    }
-
-    protected function getHandlerClass(): string
-    {
-        return GetSerializedSuiteMessageHandler::class;
-    }
-
-    protected function getHandledMessageClass(): string
-    {
-        return GetSerializedSuiteMessage::class;
+        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
 
     /**
+     * @dataProvider invokeNotEndStateDataProvider
+     *
      * @param non-empty-string $currentSerializedSuiteState
      * @param non-empty-string $newSerializedSuiteState
      */
-    private function invokeHandlerSuccessfully(
-        string $currentSerializedSuiteState,
-        string $newSerializedSuiteState
-    ): Job {
+    public function testInvokeNotEndState(string $currentSerializedSuiteState, string $newSerializedSuiteState): void
+    {
         $job = $this->createJob($currentSerializedSuiteState, md5((string) rand()));
         $serializedSuiteId = $job->getSerializedSuiteId();
         \assert(is_string($serializedSuiteId) && '' !== $serializedSuiteId);
@@ -173,7 +114,41 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId, $serializedSuiteClient);
 
-        return $job;
+        self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
+
+        $events = $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(new SerializedSuiteRetrievedEvent(self::$apiToken, $job->id, $serializedSuite), $event);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function invokeNotEndStateDataProvider(): array
+    {
+        $state = md5((string) rand());
+
+        return [
+            'no state change not end state' => [
+                'currentSerializedSuiteState' => $state,
+                'newSerializedSuiteState' => $state,
+            ],
+            'has state change not end state' => [
+                'currentSerializedSuiteState' => md5((string) rand()),
+                'newSerializedSuiteState' => md5((string) rand()),
+            ],
+        ];
+    }
+
+    protected function getHandlerClass(): string
+    {
+        return GetSerializedSuiteMessageHandler::class;
+    }
+
+    protected function getHandledMessageClass(): string
+    {
+        return GetSerializedSuiteMessage::class;
     }
 
     /**
@@ -204,36 +179,6 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     /**
-     * @param non-empty-string $authenticationToken
-     * @param non-empty-string $jobId
-     * @param non-empty-string $serializedSuiteId
-     */
-    private function assertDispatchedMessage(
-        string $authenticationToken,
-        string $jobId,
-        string $serializedSuiteId
-    ): void {
-        $envelopes = $this->messengerTransport->get();
-        self::assertIsArray($envelopes);
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
-        self::assertEquals(
-            new GetSerializedSuiteMessage($authenticationToken, $jobId, $serializedSuiteId),
-            $envelope->getMessage()
-        );
-
-        $messageDelays = self::getContainer()->getParameter('message_delays');
-        \assert(is_array($messageDelays));
-
-        $expectedDelayStampValue = $messageDelays[GetSerializedSuiteMessage::class] ?? null;
-        \assert(is_int($expectedDelayStampValue));
-
-        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
-    }
-
-    /**
      * @param non-empty-string $serializedSuiteState
      * @param non-empty-string $serializedSuiteId
      */
@@ -252,6 +197,15 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+
+        foreach ($jobRepository->findAll() as $entity) {
+            $entityManager->remove($entity);
+            $entityManager->flush();
+        }
+
         $jobRepository->add($job);
 
         return $job;

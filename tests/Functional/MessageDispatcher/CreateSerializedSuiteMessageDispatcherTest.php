@@ -58,7 +58,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
-        $envelopes = $this->messengerTransport->get();
+        $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 

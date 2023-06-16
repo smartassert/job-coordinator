@@ -26,7 +26,7 @@ class CreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);
 
-        $envelopes = $messengerTransport->get();
+        $envelopes = $messengerTransport->getSent();
         \assert(is_array($envelopes));
         self::$envelopes = $envelopes;
     }

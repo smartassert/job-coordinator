@@ -10,7 +10,6 @@ use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -37,7 +36,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        $this->assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
@@ -65,7 +64,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(MachineTerminationException::class . ' not thrown');
         } catch (MachineTerminationException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
-            $this->assertNoMessagesDispatched();
+            $this->assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
         }
     }
 
@@ -89,12 +88,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler(new TerminateMachineMessage(self::$apiToken, $jobId));
 
-        $this->assertNoMessagesDispatched();
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
-
-        $events = $eventRecorder->all(MachineTerminationRequestedEvent::class);
+        $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 

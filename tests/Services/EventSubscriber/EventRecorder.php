@@ -10,9 +10,12 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\MachineTerminationRequestedEvent;
+use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
+use App\Event\WorkerJobStartRequestedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -54,6 +57,15 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             ResultsJobStateRetrievedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            ResultsJobCreatedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            SerializedSuiteCreatedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            WorkerJobStartRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];
