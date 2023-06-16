@@ -6,6 +6,7 @@ namespace App\Tests\Application;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetup
 {
@@ -33,7 +34,10 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
         $job = $this->getJob();
         \assert($job instanceof Job);
 
-        self::assertNull($job->getResultsToken());
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+
+        self::assertNull($resultsJobRepository->find($job->id));
     }
 
     public function testJobResponseData(): void
