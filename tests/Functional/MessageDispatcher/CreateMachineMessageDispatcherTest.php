@@ -55,8 +55,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
         foreach ($resultsJobRepository->findAll() as $resultsJob) {
-            $resultsJobRepository->remove($resultsJob);
+            $entityManager->remove($resultsJob);
         }
+        $entityManager->flush();
         $this->resultsJobRepository = $resultsJobRepository;
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);

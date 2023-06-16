@@ -58,9 +58,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
-        foreach ($resultsJobRepository->findAll() as $resultsJobEntity) {
-            $resultsJobRepository->remove($resultsJobEntity);
-        }
 
         self::assertCount(0, $jobRepository->findAll());
 

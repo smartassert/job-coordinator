@@ -39,7 +39,8 @@ class ResultsJobMutatorTest extends WebTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
         foreach ($resultsJobRepository->findAll() as $entity) {
-            $resultsJobRepository->remove($entity);
+            $entityManager->remove($entity);
+            $entityManager->flush();
         }
 
         $this->resultsJobRepository = $resultsJobRepository;
