@@ -168,14 +168,6 @@ class Job
     }
 
     /**
-     * @return ?non-empty-string
-     */
-    public function getResultsJobEndState(): ?string
-    {
-        return $this->resultsJobEndState;
-    }
-
-    /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
