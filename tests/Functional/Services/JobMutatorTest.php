@@ -8,12 +8,10 @@ use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -53,7 +51,6 @@ class JobMutatorTest extends WebTestCase
         self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(SerializedSuiteCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
-        self::assertArrayHasKey(ResultsJobStateRetrievedEvent::class, $this->jobMutator::getSubscribedEvents());
     }
 
     public function testSetMachineIpAddressOnMachineIsActiveEventNoJob(): void
@@ -210,49 +207,5 @@ class JobMutatorTest extends WebTestCase
         self::assertInstanceOf(Job::class, $retrievedJob);
 
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
-    }
-
-    public function testSetResultsJobEndStateNoJob(): void
-    {
-        self::assertSame(0, $this->jobRepository->count([]));
-
-        $event = new ResultsJobStateRetrievedEvent(
-            md5((string) rand()),
-            md5((string) rand()),
-            \Mockery::mock(ResultsJobState::class)
-        );
-
-        $this->jobMutator->setResultsJobEndState($event);
-
-        self::assertSame(0, $this->jobRepository->count([]));
-    }
-
-    public function testSetResultsJobEndStateSuccess(): void
-    {
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $job = new Job($jobId, md5((string) rand()), md5((string) rand()), 600);
-        self::assertNull($job->getResultsJobEndState());
-
-        $this->jobRepository->add($job);
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $resultsJobEndState = md5((string) rand());
-
-        $event = new ResultsJobStateRetrievedEvent(
-            md5((string) rand()),
-            $jobId,
-            new ResultsJobState(md5((string) rand()), $resultsJobEndState),
-        );
-
-        $this->jobMutator->setResultsJobEndState($event);
-
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $retrievedJob = $this->jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $retrievedJob);
-
-        self::assertSame($resultsJobEndState, $job->getResultsJobEndState());
     }
 }

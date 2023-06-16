@@ -8,7 +8,6 @@ use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Repository\JobRepository;
@@ -41,9 +40,6 @@ class JobMutator implements EventSubscriberInterface
             ],
             SerializedSuiteRetrievedEvent::class => [
                 ['setSerializedSuiteStateOnSerializedSuiteRetrievedEvent', 1000],
-            ],
-            ResultsJobStateRetrievedEvent::class => [
-                ['setResultsJobEndState', 1000],
             ],
         ];
     }
@@ -119,26 +115,6 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $job->setSerializedSuiteState($serializedSuiteState);
-        $this->jobRepository->add($job);
-    }
-
-    public function setResultsJobEndState(ResultsJobStateRetrievedEvent $event): void
-    {
-        $job = $this->jobRepository->find($event->jobId);
-        if (!$job instanceof Job) {
-            return;
-        }
-
-        $endState = $event->resultsJobState->endState;
-        if (null === $endState) {
-            return;
-        }
-
-        if ($endState === $job->getResultsJobEndState()) {
-            return;
-        }
-
-        $job->setResultsJobEndState($endState);
         $this->jobRepository->add($job);
     }
 }
