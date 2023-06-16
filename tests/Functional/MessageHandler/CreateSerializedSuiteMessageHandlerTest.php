@@ -96,8 +96,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             serializedSuiteClient: $serializedSuiteClient,
         );
 
-        self::assertNull($job->getResultsToken());
-
         $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
 
         self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());

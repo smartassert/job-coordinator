@@ -86,8 +86,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
-        self::assertNull($job->getResultsToken());
-
         $handler(new CreateMachineMessage(self::$apiToken, $jobId));
 
         self::assertSame($machine->stateCategory, $job->getMachineStateCategory());

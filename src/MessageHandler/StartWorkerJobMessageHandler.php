@@ -8,6 +8,7 @@ use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -20,6 +21,7 @@ final class StartWorkerJobMessageHandler
     public function __construct(
         private readonly MessageBusInterface $messageBus,
         private readonly JobRepository $jobRepository,
+        private readonly ResultsJobRepository $resultsJobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly WorkerClientFactory $workerClientFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -42,10 +44,10 @@ final class StartWorkerJobMessageHandler
             return;
         }
 
-        $resultsToken = $job->getResultsToken();
+        $resultsJob = $this->resultsJobRepository->find($job->id);
         $serializedSuiteId = $job->getSerializedSuiteId();
         if (
-            null === $resultsToken
+            null === $resultsJob
             || null === $serializedSuiteId
             || in_array($jobSerializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])
         ) {
@@ -61,7 +63,7 @@ final class StartWorkerJobMessageHandler
 
             $workerJob = $workerClient->createJob(
                 $job->id,
-                $resultsToken,
+                $resultsJob->token,
                 $job->maximumDurationInSeconds,
                 $serializedSuite
             );

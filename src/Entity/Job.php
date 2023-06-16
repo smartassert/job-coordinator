@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-class Job implements \JsonSerializable
+class Job
 {
     /**
      * @var non-empty-string
@@ -30,12 +30,6 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column(length: 32)]
     public readonly string $suiteId;
-
-    /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 32, nullable: true)]
-    public ?string $resultsToken = null;
 
     /**
      * @var positive-int
@@ -66,18 +60,6 @@ class Job implements \JsonSerializable
      */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineStateCategory = null;
-
-    /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
-    private ?string $resultsJobState = null;
-
-    /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
-    private ?string $resultsJobEndState = null;
 
     /**
      * @param non-empty-string $userId
@@ -134,24 +116,6 @@ class Job implements \JsonSerializable
     }
 
     /**
-     * @param non-empty-string $resultsToken
-     */
-    public function setResultsToken(string $resultsToken): self
-    {
-        $this->resultsToken = $resultsToken;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getResultsToken(): ?string
-    {
-        return $this->resultsToken;
-    }
-
-    /**
      * @param non-empty-string $serializedSuiteState
      */
     public function setSerializedSuiteState(string $serializedSuiteState): self
@@ -188,52 +152,15 @@ class Job implements \JsonSerializable
     }
 
     /**
-     * @param non-empty-string $state
-     */
-    public function setResultsJobState(string $state): self
-    {
-        $this->resultsJobState = $state;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getResultsJobState(): ?string
-    {
-        return $this->resultsJobState;
-    }
-
-    /**
-     * @param non-empty-string $state
-     */
-    public function setResultsJobEndState(string $state): self
-    {
-        $this->resultsJobEndState = $state;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getResultsJobEndState(): ?string
-    {
-        return $this->resultsJobEndState;
-    }
-
-    /**
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
-     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string},
-     *   results_job: array{has_token: bool, state: ?non-empty-string, end_state: ?non-empty-string}
+     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
      *  }
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,
@@ -246,11 +173,6 @@ class Job implements \JsonSerializable
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,
-            ],
-            'results_job' => [
-                'has_token' => is_string($this->resultsToken),
-                'state' => $this->resultsJobState,
-                'end_state' => $this->resultsJobEndState,
             ],
         ];
     }

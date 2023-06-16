@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Job;
+use App\Entity\ResultsJob;
 use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
 use App\Model\RemoteRequestCollection;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Repository\ResultsJobRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
 use App\Services\UlidFactory;
@@ -27,6 +29,7 @@ class JobController
         CreateJobRequest $request,
         User $user,
         JobRepository $repository,
+        ResultsJobRepository $resultsJobRepository,
         UlidFactory $ulidFactory,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
@@ -46,7 +49,14 @@ class JobController
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
         $repository->add($job);
 
-        return new JsonResponse($job);
+        $responseData = $job->toArray();
+
+        $resultsJob = $resultsJobRepository->find($job->id);
+        if ($resultsJob instanceof ResultsJob) {
+            $responseData['results_job'] = $resultsJob->toArray();
+        }
+
+        return new JsonResponse($responseData);
     }
 
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
@@ -54,6 +64,7 @@ class JobController
         string $jobId,
         User $user,
         JobRepository $repository,
+        ResultsJobRepository $resultsJobRepository,
         RemoteRequestRepository $remoteRequestRepository,
     ): Response {
         $job = $repository->find($jobId);
@@ -65,11 +76,16 @@ class JobController
             return new Response(null, 401);
         }
 
-        $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);
+        $responseData = $job->toArray();
 
-        return new JsonResponse(array_merge(
-            $job->jsonSerialize(),
-            ['service_requests' => new RemoteRequestCollection($remoteRequests)],
-        ));
+        $resultsJob = $resultsJobRepository->find($job->id);
+        if ($resultsJob instanceof ResultsJob) {
+            $responseData['results_job'] = $resultsJob->toArray();
+        }
+
+        $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);
+        $responseData['service_requests'] = new RemoteRequestCollection($remoteRequests);
+
+        return new JsonResponse($responseData);
     }
 }

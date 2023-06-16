@@ -98,7 +98,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $jobId = md5((string) rand());
 
         $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
-            ->setResultsToken('results token')
             ->setSerializedSuiteState('prepared')
         ;
 

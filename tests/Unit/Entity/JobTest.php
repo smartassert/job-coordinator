@@ -10,7 +10,7 @@ use Symfony\Component\Uid\Ulid;
 
 class JobTest extends TestCase
 {
-    public function testJsonSerialize(): void
+    public function testToArray(): void
     {
         $id = (string) new Ulid();
         \assert('' !== $id);
@@ -20,9 +20,6 @@ class JobTest extends TestCase
 
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
-
-        $resultToken = (string) new Ulid();
-        \assert('' !== $resultToken);
 
         $maximumDurationInSeconds = rand(1, 1000);
 
@@ -41,13 +38,8 @@ class JobTest extends TestCase
                     'state_category' => null,
                     'ip_address' => null,
                 ],
-                'results_job' => [
-                    'has_token' => false,
-                    'state' => null,
-                    'end_state' => null,
-                ],
             ],
-            $job->jsonSerialize()
+            $job->toArray()
         );
     }
 }
