@@ -19,9 +19,11 @@ use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    protected InMemoryTransport $messengerTransport;
     private EventRecorder $eventRecorder;
 
     protected function setUp(): void
@@ -31,6 +33,10 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $messengerTransport = self::getContainer()->get('messenger.transport.async');
+        \assert($messengerTransport instanceof InMemoryTransport);
+        $this->messengerTransport = $messengerTransport;
     }
 
     public function testInvokeNoJob(): void
@@ -351,5 +357,12 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerClientFactory,
             $eventDispatcher,
         );
+    }
+
+    private function assertNoMessagesDispatched(): void
+    {
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertIsArray($envelopes);
+        self::assertCount(0, $envelopes);
     }
 }
