@@ -110,7 +110,7 @@ class JobMutator implements EventSubscriberInterface
         }
 
         $serializedSuiteState = $event->serializedSuite->getState();
-        if ('' === $serializedSuiteState || $serializedSuiteState === $job->getSerializedSuiteState()) {
+        if ($serializedSuiteState === $job->getSerializedSuiteState()) {
             return;
         }
 
