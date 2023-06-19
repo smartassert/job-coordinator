@@ -8,6 +8,7 @@ use App\Controller\JobController;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use App\Request\CreateJobRequest;
 use App\Services\UlidFactory;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +39,7 @@ class JobControllerTest extends TestCase
             new User((new UlidFactory())->create(), md5((string) rand())),
             \Mockery::mock(JobRepository::class),
             \Mockery::mock(ResultsJobRepository::class),
+            \Mockery::mock(SerializedSuiteRepository::class),
             $ulidFactory,
             \Mockery::mock(EventDispatcherInterface::class),
         );

@@ -156,7 +156,6 @@ class Job
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
      *  }
      */
@@ -166,10 +165,6 @@ class Job
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
-            'serialized_suite' => [
-                'id' => $this->serializedSuiteId,
-                'state' => $this->serializedSuiteState,
-            ],
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,

@@ -68,14 +68,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         self::assertSame(
             [
-                'id' => null,
-                'state' => null,
-            ],
-            $responseData['serialized_suite']
-        );
-
-        self::assertSame(
-            [
                 'state_category' => null,
                 'ip_address' => null,
             ],

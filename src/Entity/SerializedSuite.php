@@ -44,6 +44,17 @@ class SerializedSuite
         $this->state = $state;
     }
 
+    /**
+     * @return non-empty-string
+     */
+    public function getId(): string
+    {
+        return $this->serializedSuiteId;
+    }
+
+    /**
+     * @return non-empty-string
+     */
     public function getState(): ?string
     {
         return $this->state;
