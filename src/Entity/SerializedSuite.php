@@ -58,4 +58,15 @@ class SerializedSuite
 
         return $this;
     }
+
+    /**
+     * @return array{id: non-empty-string, state: non-empty-string}
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->serializedSuiteId,
+            'state' => $this->state,
+        ];
+    }
 }
