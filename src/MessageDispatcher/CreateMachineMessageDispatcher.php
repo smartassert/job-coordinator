@@ -9,6 +9,7 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface
@@ -17,6 +18,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         private readonly JobRepository $jobRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
@@ -44,9 +46,14 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
 
+        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        if (null === $serializedSuite) {
+            return;
+        }
+
         if (
             null === $resultsJob
-            || 'prepared' !== $job->getSerializedSuiteState()
+            || 'prepared' !== $serializedSuite->getState()
         ) {
             return;
         }

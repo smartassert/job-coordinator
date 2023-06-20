@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
 use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
@@ -14,6 +15,7 @@ use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -27,6 +29,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     private InMemoryTransport $messengerTransport;
     private JobRepository $jobRepository;
     private ResultsJobRepository $resultsJobRepository;
+    private SerializedSuiteRepository $serializedSuiteRepository;
 
     protected function setUp(): void
     {
@@ -65,6 +68,15 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
             $remoteRequestRepository->remove($remoteRequest);
         }
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+        foreach ($serializedSuiteRepository->findAll() as $serializedSuite) {
+            $entityManager->remove($serializedSuite);
+        }
+        $entityManager->flush();
+
+        $this->serializedSuiteRepository = $serializedSuiteRepository;
     }
 
     public function testIsEventSubscriber(): void
@@ -77,16 +89,19 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @dataProvider dispatchMessageNotDispatchedDataProvider
      *
-     * @param callable(JobRepository): ?Job              $jobCreator
-     * @param callable(?Job, ResultsJobRepository): void $resultsJobCreator
+     * @param callable(JobRepository): ?Job                   $jobCreator
+     * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
+     * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      */
     public function testDispatchMessageNotDispatched(
         callable $jobCreator,
         callable $resultsJobCreator,
+        callable $serializedSuiteCreator,
         ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event
     ): void {
         $job = $jobCreator($this->jobRepository);
         $resultsJobCreator($job, $this->resultsJobRepository);
+        $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
         $this->dispatcher->dispatch($event);
 
@@ -99,90 +114,98 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function dispatchMessageNotDispatchedDataProvider(): array
     {
         $jobId = md5((string) rand());
-
         $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
-
-        $jobSerializedSuitePreparing = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
-            ->setSerializedSuiteState('preparing/running')
-        ;
 
         $resultsJobCreatedEvent = new ResultsJobCreatedEvent(
             md5((string) rand()),
-            $jobId,
+            $job->id,
             \Mockery::mock(ResultsJobModel::class)
         );
 
         $serializedSuiteSerializedEvent = new SerializedSuiteSerializedEvent(
             md5((string) rand()),
-            $jobId,
+            $job->id,
             md5((string) rand())
         );
 
+        $nullCreator = function () {
+            return null;
+        };
+
+        $jobCreator = function (JobRepository $jobRepository) use ($job) {
+            $jobRepository->add($job);
+
+            return $job;
+        };
+
+        $resultsJobCreator = function (Job $job, ResultsJobRepository $resultsJobRepository) {
+            $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
+
+            $resultsJobRepository->save($resultsJob);
+        };
+
+        $serializedSuiteCreatorCreator = function (string $state) {
+            return function (Job $job, SerializedSuiteRepository $serializedSuiteRepository) use ($state) {
+                \assert('' !== $state);
+
+                $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state);
+                $serializedSuiteRepository->save($serializedSuite);
+
+                return $serializedSuite;
+            };
+        };
+
         return [
             'ResultsJobCreatedEvent, no job' => [
-                'jobCreator' => function () {
-                    return null;
-                },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
+                'jobCreator' => $nullCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
                 'event' => $resultsJobCreatedEvent,
             ],
             'SerializedSuiteSerializedEvent, no job' => [
-                'jobCreator' => function () {
-                    return null;
-                },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
+                'jobCreator' => $nullCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, no results job' => [
-                'jobCreator' => function (JobRepository $jobRepository) use ($job) {
-                    $jobRepository->add($job);
-
-                    return $job;
-                },
-                'resultsJobCreator' => function () {
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
+                'event' => $resultsJobCreatedEvent,
+            ],
+            'SerializedSuiteSerializedEvent, no results job' => [
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
+                'event' => $serializedSuiteSerializedEvent,
+            ],
+            'ResultsJobCreatedEvent, no serialized suite' => [
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $resultsJobCreator,
+                'serializedSuiteCreator' => function () {
                     return null;
                 },
                 'event' => $resultsJobCreatedEvent,
             ],
-            'SerializedSuiteSerializedEvent, no results job' => [
-                'jobCreator' => function (JobRepository $jobRepository) use ($job) {
-                    $jobRepository->add($job);
-
-                    return $job;
-                },
-                'resultsJobCreator' => function () {
+            'SerializedSuiteSerializedEvent, no serialized suite' => [
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $resultsJobCreator,
+                'serializedSuiteCreator' => function () {
                     return null;
                 },
                 'event' => $serializedSuiteSerializedEvent,
             ],
             'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
-                'jobCreator' => function (JobRepository $jobRepository) use ($jobSerializedSuitePreparing) {
-                    $jobRepository->add($jobSerializedSuitePreparing);
-
-                    return $jobSerializedSuitePreparing;
-                },
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
-                    $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
-
-                    $resultsJobRepository->save($resultsJob);
-                },
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $resultsJobCreator,
+                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
                 'event' => $resultsJobCreatedEvent,
             ],
             'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
-                'jobCreator' => function (JobRepository $jobRepository) use ($jobSerializedSuitePreparing) {
-                    $jobRepository->add($jobSerializedSuitePreparing);
-
-                    return $jobSerializedSuitePreparing;
-                },
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
-                    $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
-
-                    $resultsJobRepository->save($resultsJob);
-                },
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => $resultsJobCreator,
+                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
                 'event' => $serializedSuiteSerializedEvent,
             ],
         ];
@@ -199,6 +222,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
         $this->resultsJobRepository->save($resultsJob);
+
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+        $this->serializedSuiteRepository->save($serializedSuite);
 
         $this->dispatcher->dispatch($event);
 
