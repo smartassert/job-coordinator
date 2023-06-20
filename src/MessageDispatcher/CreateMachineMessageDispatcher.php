@@ -45,16 +45,16 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
+        if (null === $resultsJob) {
+            return;
+        }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuite) {
             return;
         }
 
-        if (
-            null === $resultsJob
-            || 'prepared' !== $serializedSuite->getState()
-        ) {
+        if ('prepared' !== $serializedSuite->getState()) {
             return;
         }
 
