@@ -90,14 +90,6 @@ class Job
     }
 
     /**
-     * @return ?non-empty-string
-     */
-    public function getSerializedSuiteId(): ?string
-    {
-        return $this->serializedSuiteId;
-    }
-
-    /**
      * @param non-empty-string $machineIpAddress
      */
     public function setMachineIpAddress(string $machineIpAddress): self
