@@ -131,7 +131,13 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClient
         );
 
-        self::assertSame($newSerializedSuiteState, $job->getSerializedSuiteState());
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $serializedSuiteEntity = $serializedSuiteRepository->find($job->id);
+        \assert($serializedSuiteEntity instanceof SerializedSuite);
+
+        self::assertSame($newSerializedSuiteState, $serializedSuiteEntity->getState());
 
         $events = $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class);
         $event = $events[0] ?? null;

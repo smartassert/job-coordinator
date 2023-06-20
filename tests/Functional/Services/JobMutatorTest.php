@@ -12,7 +12,6 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -123,52 +122,6 @@ class JobMutatorTest extends WebTestCase
 
         self::assertSame(1, $this->jobRepository->count([]));
         self::assertSame($machineStateCategory, $job->getMachineStateCategory());
-    }
-
-    public function testSetSerializedSuiteOnSerializedSuiteCreatedEventNoJob(): void
-    {
-        self::assertSame(0, $this->jobRepository->count([]));
-
-        $event = new SerializedSuiteCreatedEvent(
-            md5((string) rand()),
-            md5((string) rand()),
-            \Mockery::mock(SerializedSuite::class),
-        );
-
-        $this->jobMutator->setSerializedSuiteOnSerializedSuiteCreatedEvent($event);
-
-        self::assertSame(0, $this->jobRepository->count([]));
-    }
-
-    public function testSetSerializedSuiteOnSerializedSuiteCreatedEventSuccess(): void
-    {
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $job = new Job($jobId, 'user id', 'suite id', 600);
-        self::assertNull($job->getSerializedSuiteId());
-
-        $this->jobRepository->add($job);
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $serializedSuiteId = md5((string) rand());
-
-        $serializedSuite = \Mockery::mock(SerializedSuite::class);
-        $serializedSuite
-            ->shouldReceive('getId')
-            ->andReturn($serializedSuiteId)
-        ;
-
-        $event = new SerializedSuiteCreatedEvent(md5((string) rand()), $jobId, $serializedSuite);
-
-        $this->jobMutator->setSerializedSuiteOnSerializedSuiteCreatedEvent($event);
-
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $retrievedJob = $this->jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $retrievedJob);
-
-        self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
     }
 
     public function testSetMachineOnMachineRequestedEventNoJob(): void
