@@ -40,12 +40,6 @@ class Job
     /**
      * @var ?non-empty-string
      */
-    #[ORM\Column(length: 32, unique: true, nullable: true)]
-    private ?string $serializedSuiteId = null;
-
-    /**
-     * @var ?non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineIpAddress = null;
 

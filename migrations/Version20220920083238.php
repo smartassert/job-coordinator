@@ -22,7 +22,6 @@ final class Version20220920083238 extends AbstractMigration
                 id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
-                serialized_suite_id VARCHAR(32) DEFAULT NULL,
                 machine_ip_address VARCHAR(128) DEFAULT NULL,
                 serialized_suite_state VARCHAR(128) DEFAULT NULL,
                 maximum_duration_in_seconds INT NOT NULL,
@@ -32,7 +31,6 @@ final class Version20220920083238 extends AbstractMigration
         ');
         $this->addSql('CREATE INDEX user_idx ON job (user_id)');
         $this->addSql('CREATE INDEX user_suite_idx ON job (user_id, suite_id)');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_FBD8E0F8325FD920 ON job (serialized_suite_id)');
     }
 
     public function down(Schema $schema): void
