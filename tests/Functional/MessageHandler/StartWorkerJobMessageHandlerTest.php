@@ -53,7 +53,6 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $this->createJob(
             jobId: $jobId,
-            serializedSuiteState: 'failed',
         );
 
         $handler = $this->createHandler();
@@ -62,7 +61,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $this->assertNoMessagesDispatched();
+        $this->assertDispatchedMessage($message);
     }
 
     public function testInvokeJobSerializedSuiteStateIsFailed(): void
