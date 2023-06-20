@@ -6,12 +6,14 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
 use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -48,35 +50,44 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->assertNoMessagesDispatched();
     }
 
-    public function testInvokeNoResultsJob(): void
+    public function testInvokeNoSerializedSuite(): void
     {
-        $jobId = md5((string) rand());
-        $this->createJob(
-            jobId: $jobId,
-        );
+        $job = $this->createJob();
 
         $handler = $this->createHandler();
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, md5((string) rand()));
 
         $handler($message);
 
         $this->assertDispatchedMessage($message);
     }
 
-    public function testInvokeJobSerializedSuiteStateIsFailed(): void
+    public function testInvokeNoResultsJob(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'failed',
-        );
+        $job = $this->createJob();
+        $this->createSerializedSuite($job, 'requested');
+
+        $handler = $this->createHandler();
+
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, md5((string) rand()));
+
+        $handler($message);
+
+        $this->assertDispatchedMessage($message);
+        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+    }
+
+    public function testInvokeSerializedSuiteStateIsFailed(): void
+    {
+        $job = $this->createJob();
         $this->createResultsJob($job);
+        $this->createSerializedSuite($job, 'failed');
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
         \assert($handler instanceof StartWorkerJobMessageHandler);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, md5((string) rand()));
 
         $handler($message);
 
@@ -91,11 +102,8 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(string $serializedSuiteState): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: $serializedSuiteState,
-        );
+        $job = $this->createJob();
+        $this->createSerializedSuite($job, $serializedSuiteState);
         $this->createResultsJob($job);
 
         $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
@@ -103,7 +111,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, $machineIpAddress);
 
         $handler($message);
 
@@ -129,36 +137,11 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ];
     }
 
-    public function testInvokeMessageIsRedispatchedDueToNoJobResultsToken(): void
-    {
-        $jobId = md5((string) rand());
-        $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'prepared',
-        );
-
-        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
-        \assert($handler instanceof StartWorkerJobMessageHandler);
-
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
-
-        $handler($message);
-
-        $this->assertDispatchedMessage($message);
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
-    }
-
     public function testInvokeReadSerializedSuiteThrowsException(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'prepared',
-            serializedSuiteId: md5((string) rand()),
-        );
+        $job = $this->createJob();
 
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared');
         $this->createResultsJob($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -166,7 +149,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $job->getSerializedSuiteId())
+            ->with(self::$apiToken, $serializedSuite->getId())
             ->andThrow($serializedSuiteReadException)
         ;
 
@@ -176,7 +159,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, $machineIpAddress);
 
         try {
             $handler($message);
@@ -190,13 +173,9 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'prepared',
-            serializedSuiteId: md5((string) rand()),
-        );
+        $job = $this->createJob();
 
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared');
         $resultsJob = $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
@@ -204,7 +183,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $job->getSerializedSuiteId())
+            ->with(self::$apiToken, $serializedSuite->getId())
             ->andReturn($serializedSuiteContent)
         ;
 
@@ -231,7 +210,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new StartWorkerJobMessage(self::$apiToken, $job->id, $machineIpAddress);
 
         $handler($message);
 
@@ -272,30 +251,14 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
     }
 
-    /**
-     * @param non-empty-string  $jobId
-     * @param ?non-empty-string $serializedSuiteState
-     * @param ?non-empty-string $serializedSuiteId
-     */
-    private function createJob(
-        string $jobId,
-        ?string $serializedSuiteState = null,
-        ?string $serializedSuiteId = null,
-    ): Job {
+    private function createJob(): Job
+    {
         $job = new Job(
-            $jobId,
+            md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
             600
         );
-
-        if (is_string($serializedSuiteState)) {
-            $job = $job->setSerializedSuiteState($serializedSuiteState);
-        }
-
-        if (is_string($serializedSuiteId)) {
-            $job = $job->setSerializedSuiteId($serializedSuiteId);
-        }
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -315,6 +278,20 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return $resultsJob;
     }
 
+    /**
+     * @param non-empty-string $state
+     */
+    private function createSerializedSuite(Job $job, string $state): SerializedSuite
+    {
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state);
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+        $serializedSuiteRepository->save($serializedSuite);
+
+        return $serializedSuite;
+    }
+
     private function createHandler(
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
@@ -324,6 +301,9 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
         if (null === $serializedSuiteClient) {
             $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
@@ -343,6 +323,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return new StartWorkerJobMessageHandler(
             $messageBus,
             $jobRepository,
+            $serializedSuiteRepository,
             $resultsJobRepository,
             $serializedSuiteClient,
             $workerClientFactory,

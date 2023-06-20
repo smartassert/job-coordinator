@@ -40,20 +40,8 @@ class Job
     /**
      * @var ?non-empty-string
      */
-    #[ORM\Column(length: 32, unique: true, nullable: true)]
-    private ?string $serializedSuiteId = null;
-
-    /**
-     * @var ?non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineIpAddress = null;
-
-    /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
-    private ?string $serializedSuiteState = null;
 
     /**
      * @var ?non-empty-string
@@ -80,24 +68,6 @@ class Job
     }
 
     /**
-     * @param non-empty-string $serializedSuiteId
-     */
-    public function setSerializedSuiteId(string $serializedSuiteId): self
-    {
-        $this->serializedSuiteId = $serializedSuiteId;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getSerializedSuiteId(): ?string
-    {
-        return $this->serializedSuiteId;
-    }
-
-    /**
      * @param non-empty-string $machineIpAddress
      */
     public function setMachineIpAddress(string $machineIpAddress): self
@@ -113,24 +83,6 @@ class Job
     public function getMachineIpAddress(): ?string
     {
         return $this->machineIpAddress;
-    }
-
-    /**
-     * @param non-empty-string $serializedSuiteState
-     */
-    public function setSerializedSuiteState(string $serializedSuiteState): self
-    {
-        $this->serializedSuiteState = $serializedSuiteState;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getSerializedSuiteState(): ?string
-    {
-        return $this->serializedSuiteState;
     }
 
     /**
@@ -156,7 +108,6 @@ class Job
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   serialized_suite: array{id: ?non-empty-string, state: ?non-empty-string},
      *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
      *  }
      */
@@ -166,10 +117,6 @@ class Job
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
-            'serialized_suite' => [
-                'id' => $this->serializedSuiteId,
-                'state' => $this->serializedSuiteState,
-            ],
             'machine' => [
                 'state_category' => $this->machineStateCategory,
                 'ip_address' => $this->machineIpAddress,

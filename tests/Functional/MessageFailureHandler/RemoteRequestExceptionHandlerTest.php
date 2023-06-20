@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageFailureHandler;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Entity\SerializedSuite;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Exception\MachineCreationException;
@@ -134,7 +135,9 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             },
             SerializedSuiteRetrievalException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new SerializedSuiteRetrievalException($job, $inner);
+                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+
+                    return new SerializedSuiteRetrievalException($job, $serializedSuite, $inner);
                 };
             },
             WorkerJobStartException::class => function (\Throwable $inner) {

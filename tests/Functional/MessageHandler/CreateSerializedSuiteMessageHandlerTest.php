@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteCreationException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
+use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -76,7 +78,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             md5((string) rand()) => md5((string) rand()),
         ];
 
-        $serializedSuite = new SerializedSuite(
+        $serializedSuiteModel = new SerializedSuiteModel(
             md5((string) rand()),
             $job->suiteId,
             $serializedSuiteParameters,
@@ -89,7 +91,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteClient
             ->shouldReceive('create')
             ->with(self::$apiToken, $job->suiteId, $serializedSuiteParameters)
-            ->andReturn($serializedSuite)
+            ->andReturn($serializedSuiteModel)
         ;
 
         $handler = $this->createHandler(
@@ -98,12 +100,18 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
 
-        self::assertSame($serializedSuite->getId(), $job->getSerializedSuiteId());
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $serializedSuiteEntity = $serializedSuiteRepository->find($job->id);
+        self::assertInstanceOf(SerializedSuite::class, $serializedSuiteEntity);
+
+        self::assertSame($serializedSuiteModel->getId(), $serializedSuiteEntity->getId());
 
         $events = $this->eventRecorder->all(SerializedSuiteCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new SerializedSuiteCreatedEvent(self::$apiToken, $job->id, $serializedSuite), $event);
+        self::assertEquals(new SerializedSuiteCreatedEvent(self::$apiToken, $job->id, $serializedSuiteModel), $event);
     }
 
     protected function getHandlerClass(): string
