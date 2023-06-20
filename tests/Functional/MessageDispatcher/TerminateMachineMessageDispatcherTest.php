@@ -96,10 +96,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
     public function dispatchSuccessDataProvider(): array
     {
         $jobId = md5((string) rand());
-
-        $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600))
-            ->setSerializedSuiteState('prepared')
-        ;
+        $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
 
         $resultsJobCreatedEvent = new ResultsJobCreatedEvent(
             md5((string) rand()),

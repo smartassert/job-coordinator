@@ -92,16 +92,6 @@ class Job
     }
 
     /**
-     * @param non-empty-string $serializedSuiteState
-     */
-    public function setSerializedSuiteState(string $serializedSuiteState): self
-    {
-        $this->serializedSuiteState = $serializedSuiteState;
-
-        return $this;
-    }
-
-    /**
      * @param non-empty-string $machineStateCategory
      */
     public function setMachineStateCategory(string $machineStateCategory): self
