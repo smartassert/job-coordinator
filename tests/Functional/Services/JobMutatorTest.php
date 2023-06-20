@@ -8,7 +8,6 @@ use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,7 +47,6 @@ class JobMutatorTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->jobMutator);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
-        self::assertArrayHasKey(SerializedSuiteCreatedEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
     }
 
