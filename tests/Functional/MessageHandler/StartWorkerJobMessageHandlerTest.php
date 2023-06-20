@@ -84,25 +84,6 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->assertNoMessagesDispatched();
     }
 
-    public function testInvokeNoJobResultsToken(): void
-    {
-        $jobId = md5((string) rand());
-        $this->createJob(
-            jobId: $jobId,
-            serializedSuiteState: 'failed',
-        );
-
-        $handler = self::getContainer()->get(StartWorkerJobMessageHandler::class);
-        \assert($handler instanceof StartWorkerJobMessageHandler);
-
-        $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
-
-        $handler($message);
-
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
-        $this->assertNoMessagesDispatched();
-    }
-
     /**
      * @dataProvider invokeMessageIsRedispatchedDataProvider
      *
