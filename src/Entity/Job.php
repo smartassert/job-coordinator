@@ -80,16 +80,6 @@ class Job
     }
 
     /**
-     * @param non-empty-string $serializedSuiteId
-     */
-    public function setSerializedSuiteId(string $serializedSuiteId): self
-    {
-        $this->serializedSuiteId = $serializedSuiteId;
-
-        return $this;
-    }
-
-    /**
      * @param non-empty-string $machineIpAddress
      */
     public function setMachineIpAddress(string $machineIpAddress): self
