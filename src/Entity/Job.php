@@ -78,14 +78,6 @@ class Job
     }
 
     /**
-     * @return ?non-empty-string
-     */
-    public function getMachineIpAddress(): ?string
-    {
-        return $this->machineIpAddress;
-    }
-
-    /**
      * @param non-empty-string $machineStateCategory
      */
     public function setMachineStateCategory(string $machineStateCategory): self
