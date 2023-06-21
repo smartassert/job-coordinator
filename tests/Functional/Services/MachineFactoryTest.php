@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
-use App\Event\MachineRetrievedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
@@ -78,9 +78,9 @@ class MachineFactoryTest extends WebTestCase
     public function eventSubscriptionsDataProvider(): array
     {
         return [
-            MachineRetrievedEvent::class => [
-                'expectedListenedForEvent' => MachineRetrievedEvent::class,
-                'expectedMethod' => 'createOnMachineRetrievedEvent',
+            MachineCreationRequestedEvent::class => [
+                'expectedListenedForEvent' => MachineCreationRequestedEvent::class,
+                'expectedMethod' => 'createOnMachineCreationRequestedEvent',
             ],
         ];
     }
@@ -91,13 +91,9 @@ class MachineFactoryTest extends WebTestCase
 
         $machine = new WorkerManagerMachine(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
 
-        $event = new MachineRetrievedEvent(
-            'authentication token',
-            \Mockery::mock(WorkerManagerMachine::class),
-            $machine
-        );
+        $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
-        $this->machineFactory->createOnMachineRetrievedEvent($event);
+        $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
         self::assertSame(0, $this->machineRepository->count([]));
     }
@@ -111,13 +107,9 @@ class MachineFactoryTest extends WebTestCase
 
         $machine = new WorkerManagerMachine($job->id, md5((string) rand()), md5((string) rand()), []);
 
-        $event = new MachineRetrievedEvent(
-            'authentication token',
-            \Mockery::mock(WorkerManagerMachine::class),
-            $machine
-        );
+        $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
-        $this->machineFactory->createOnMachineRetrievedEvent($event);
+        $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
         $machineEntity = $this->machineRepository->find($job->id);
         self::assertEquals(new Machine($job->id, $machine->state, $machine->stateCategory), $machineEntity);

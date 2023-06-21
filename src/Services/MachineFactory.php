@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
-use App\Event\MachineRetrievedEvent;
+use App\Event\MachineCreationRequestedEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,15 +25,15 @@ class MachineFactory implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MachineRetrievedEvent::class => [
-                ['createOnMachineRetrievedEvent', 1000],
+            MachineCreationRequestedEvent::class => [
+                ['createOnMachineCreationRequestedEvent', 1000],
             ],
         ];
     }
 
-    public function createOnMachineRetrievedEvent(MachineRetrievedEvent $event): void
+    public function createOnMachineCreationRequestedEvent(MachineCreationRequestedEvent $event): void
     {
-        $machine = $event->current;
+        $machine = $event->machine;
 
         $job = $this->jobRepository->find($machine->id);
         if (!$job instanceof Job) {
