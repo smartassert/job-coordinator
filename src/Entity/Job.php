@@ -41,12 +41,6 @@ class Job
      * @var ?non-empty-string
      */
     #[ORM\Column(length: 128, nullable: true)]
-    private ?string $machineIpAddress = null;
-
-    /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
     private ?string $machineStateCategory = null;
 
     /**
