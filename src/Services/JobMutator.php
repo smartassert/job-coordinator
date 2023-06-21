@@ -56,12 +56,7 @@ class JobMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineStateCategory = $machine->stateCategory;
-        if ('' === $machineStateCategory) {
-            return;
-        }
-
-        $job->setMachineStateCategory($machineStateCategory);
+        $job->setMachineStateCategory($machine->stateCategory);
         $this->jobRepository->add($job);
     }
 
