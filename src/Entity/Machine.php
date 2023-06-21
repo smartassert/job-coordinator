@@ -86,7 +86,7 @@ class Machine
      */
     public function setStateCategory(string $stateCategory): static
     {
-        $this->state = $stateCategory;
+        $this->stateCategory = $stateCategory;
 
         return $this;
     }
