@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
-use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,9 +23,6 @@ class JobMutator implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MachineIsActiveEvent::class => [
-                ['setMachineIpAddressOnMachineIsActiveEvent', 1000],
-            ],
             MachineStateChangeEvent::class => [
                 ['setMachineStateCategoryOnMachineStateChangeEvent', 1000],
             ],
@@ -34,17 +30,6 @@ class JobMutator implements EventSubscriberInterface
                 ['setMachineOnMachineCreationRequestedEvent', 1000],
             ],
         ];
-    }
-
-    public function setMachineIpAddressOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
-    {
-        $job = $this->jobRepository->find($event->jobId);
-        if (!$job instanceof Job) {
-            return;
-        }
-
-        $job->setMachineIpAddress($event->ipAddress);
-        $this->jobRepository->add($job);
     }
 
     public function setMachineStateCategoryOnMachineStateChangeEvent(MachineStateChangeEvent $event): void

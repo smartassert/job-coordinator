@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Event\MachineCreationRequestedEvent;
-use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Services\JobMutator;
@@ -45,42 +44,8 @@ class JobMutatorTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->jobMutator);
-        self::assertArrayHasKey(MachineIsActiveEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(MachineStateChangeEvent::class, $this->jobMutator::getSubscribedEvents());
         self::assertArrayHasKey(MachineCreationRequestedEvent::class, $this->jobMutator::getSubscribedEvents());
-    }
-
-    public function testSetMachineIpAddressOnMachineIsActiveEventNoJob(): void
-    {
-        self::assertSame(0, $this->jobRepository->count([]));
-
-        $jobId = md5((string) rand());
-
-        $event = new MachineIsActiveEvent('authentication token', $jobId, '127.0.0.1');
-
-        $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
-
-        self::assertSame(0, $this->jobRepository->count([]));
-    }
-
-    public function testSetMachineIpAddressOnMachineIsActiveEventIpAddressIsSet(): void
-    {
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $job = new Job($jobId, 'user id', 'suite id', 600);
-        $this->jobRepository->add($job);
-        self::assertNull($job->getMachineIpAddress());
-        self::assertSame(1, $this->jobRepository->count([]));
-
-        $ipAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-
-        $event = new MachineIsActiveEvent('authentication token', $jobId, $ipAddress);
-
-        $this->jobMutator->setMachineIpAddressOnMachineIsActiveEvent($event);
-
-        self::assertSame(1, $this->jobRepository->count([]));
-        self::assertSame($ipAddress, $job->getMachineIpAddress());
     }
 
     public function testSetMachineStateCategoryOnMachineStateChangeEventNoJob(): void
