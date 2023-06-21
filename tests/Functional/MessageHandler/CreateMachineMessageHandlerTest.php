@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -73,7 +75,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
 
-        $machine = new Machine($jobId, 'create/requested', 'pre_active', []);
+        $machine = new MachineModel($jobId, 'create/requested', 'pre_active', []);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
@@ -86,9 +88,18 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        self::assertNull($machineRepository->find($job->id));
+
         $handler(new CreateMachineMessage(self::$apiToken, $jobId));
 
-        self::assertSame($machine->stateCategory, $job->getMachineStateCategory());
+        $createdMachine = $machineRepository->find($job->id);
+        self::assertEquals(
+            new Machine($job->id, 'create/requested', 'pre_active'),
+            $createdMachine
+        );
 
         $events = $this->eventRecorder->all(MachineCreationRequestedEvent::class);
         $event = $events[0] ?? null;

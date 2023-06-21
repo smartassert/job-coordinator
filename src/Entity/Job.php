@@ -38,45 +38,17 @@ class Job
     public readonly int $maximumDurationInSeconds;
 
     /**
-     * @var ?non-empty-string
-     */
-    #[ORM\Column(length: 128, nullable: true)]
-    private ?string $machineStateCategory = null;
-
-    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param non-empty-string $id
      * @param positive-int     $maximumDurationInSeconds
      */
-    public function __construct(
-        string $id,
-        string $userId,
-        string $suiteId,
-        int $maximumDurationInSeconds
-    ) {
+    public function __construct(string $id, string $userId, string $suiteId, int $maximumDurationInSeconds)
+    {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-    }
-
-    /**
-     * @param non-empty-string $machineStateCategory
-     */
-    public function setMachineStateCategory(string $machineStateCategory): self
-    {
-        $this->machineStateCategory = $machineStateCategory;
-
-        return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getMachineStateCategory(): ?string
-    {
-        return $this->machineStateCategory;
     }
 
     /**

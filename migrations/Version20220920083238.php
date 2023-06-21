@@ -23,7 +23,6 @@ final class Version20220920083238 extends AbstractMigration
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
                 maximum_duration_in_seconds INT NOT NULL,
-                machine_state_category VARCHAR(128) DEFAULT NULL,
                 PRIMARY KEY(id)
             )
         ');
