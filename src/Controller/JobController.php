@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Job;
+use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\ErrorResponseType;
@@ -12,6 +13,7 @@ use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
 use App\Model\RemoteRequestCollection;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -33,6 +35,7 @@ class JobController
         JobRepository $repository,
         ResultsJobRepository $resultsJobRepository,
         SerializedSuiteRepository $serializedSuiteRepository,
+        MachineRepository $machineRepository,
         UlidFactory $ulidFactory,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
@@ -64,6 +67,11 @@ class JobController
             $responseData['serialized_suite'] = $serializedSuite->toArray();
         }
 
+        $machine = $machineRepository->find($job->id);
+        if ($machine instanceof Machine) {
+            $responseData['machine'] = $machine->toArray();
+        }
+
         return new JsonResponse($responseData);
     }
 
@@ -74,6 +82,7 @@ class JobController
         JobRepository $repository,
         ResultsJobRepository $resultsJobRepository,
         SerializedSuiteRepository $serializedSuiteRepository,
+        MachineRepository $machineRepository,
         RemoteRequestRepository $remoteRequestRepository,
     ): Response {
         $job = $repository->find($jobId);
@@ -95,6 +104,11 @@ class JobController
         $serializedSuite = $serializedSuiteRepository->find($job->id);
         if ($serializedSuite instanceof SerializedSuite) {
             $responseData['serialized_suite'] = $serializedSuite->toArray();
+        }
+
+        $machine = $machineRepository->find($job->id);
+        if ($machine instanceof Machine) {
+            $responseData['machine'] = $machine->toArray();
         }
 
         $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);

@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Controller;
 use App\Controller\JobController;
 use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Request\CreateJobRequest;
@@ -40,6 +41,7 @@ class JobControllerTest extends TestCase
             \Mockery::mock(JobRepository::class),
             \Mockery::mock(ResultsJobRepository::class),
             \Mockery::mock(SerializedSuiteRepository::class),
+            \Mockery::mock(MachineRepository::class),
             $ulidFactory,
             \Mockery::mock(EventDispatcherInterface::class),
         );

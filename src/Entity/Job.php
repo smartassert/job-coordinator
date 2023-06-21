@@ -107,8 +107,7 @@ class Job
      * @return array{
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
-     *   maximum_duration_in_seconds: positive-int,
-     *   machine: array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
+     *   maximum_duration_in_seconds: positive-int
      *  }
      */
     public function toArray(): array
@@ -117,10 +116,6 @@ class Job
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
-            'machine' => [
-                'state_category' => $this->machineStateCategory,
-                'ip_address' => $this->machineIpAddress,
-            ],
         ];
     }
 }

@@ -108,4 +108,15 @@ class Machine
 
         return $this;
     }
+
+    /**
+     * @return array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
+     */
+    public function toArray(): array
+    {
+        return [
+            'state_category' => $this->stateCategory,
+            'ip_address' => $this->ip,
+        ];
+    }
 }
