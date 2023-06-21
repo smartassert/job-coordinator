@@ -7,6 +7,9 @@ namespace App\Entity;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedMachine array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
+ */
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
 class Machine
 {
