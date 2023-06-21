@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
+use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
@@ -28,6 +29,9 @@ class MachineMutator implements EventSubscriberInterface
             MachineStateChangeEvent::class => [
                 ['setStateOnMachineStateChangeEvent', 1000],
             ],
+            MachineIsActiveEvent::class => [
+                ['setIpOnMachineIsActiveEvent', 1000],
+            ],
         ];
     }
 
@@ -47,6 +51,23 @@ class MachineMutator implements EventSubscriberInterface
 
         $machineEntity->setState($machineModel->state);
         $machineEntity->setStateCategory($machineModel->stateCategory);
+
+        $this->machineRepository->save($machineEntity);
+    }
+
+    public function setIpOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $machineEntity = $this->machineRepository->find($job->id);
+        if (!$machineEntity instanceof Machine) {
+            return;
+        }
+
+        $machineEntity->setIp($event->ipAddress);
 
         $this->machineRepository->save($machineEntity);
     }

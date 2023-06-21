@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
+use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
@@ -81,6 +82,10 @@ class MachineMutatorTest extends WebTestCase
             MachineStateChangeEvent::class => [
                 'expectedListenedForEvent' => MachineStateChangeEvent::class,
                 'expectedMethod' => 'setStateOnMachineStateChangeEvent',
+            ],
+            MachineIsActiveEvent::class => [
+                'expectedListenedForEvent' => MachineIsActiveEvent::class,
+                'expectedMethod' => 'setIpOnMachineIsActiveEvent',
             ],
         ];
     }
@@ -196,6 +201,131 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'expectedMachineCreator' => function (Job $job) {
                     return new Machine($job->id, 'up/active', 'active');
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider setIpOnMachineIsActiveEventDataProvider
+     *
+     * @param callable(non-empty-string, JobRepository): ?Job $jobCreator
+     * @param callable(?Job, MachineRepository): void         $machineCreator
+     * @param callable(?Job): MachineIsActiveEvent            $eventCreator
+     * @param callable(?Job): ?Machine                        $expectedMachineCreator
+     */
+    public function testSetIpOnMachineIsActiveEvent(
+        callable $jobCreator,
+        callable $machineCreator,
+        callable $eventCreator,
+        callable $expectedMachineCreator,
+    ): void {
+        $jobId = md5((string) rand());
+
+        $job = $jobCreator($jobId, $this->jobRepository);
+        $machineCreator($job, $this->machineRepository);
+
+        $event = $eventCreator($job);
+
+        $this->machineMutator->setIpOnMachineIsActiveEvent($event);
+
+        $machine = $this->machineRepository->find($jobId);
+
+        self::assertEquals($expectedMachineCreator($job), $machine);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function setIpOnMachineIsActiveEventDataProvider(): array
+    {
+        $jobCreator = function (string $jobId, JobRepository $jobRepository) {
+            \assert('' !== $jobId);
+
+            $job = new Job($jobId, 'user id', 'suite id', 600);
+            $jobRepository->add($job);
+
+            return $job;
+        };
+
+        return [
+            'no job' => [
+                'jobCreator' => function () {
+                    return null;
+                },
+                'machineCreator' => function () {
+                },
+                'eventCreator' => function () {
+                    return new MachineIsActiveEvent(md5((string) rand()), md5((string) rand()), '127.0.0.1');
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'no machine' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function () {
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineIsActiveEvent(md5((string) rand()), $job->id, '127.0.0.1');
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'no ip change' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = (new Machine($job->id, 'up/started', 'pre_active'))
+                        ->setIp('127.0.0.1')
+                    ;
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineIsActiveEvent(md5((string) rand()), $job->id, '127.0.0.1');
+                },
+                'expectedMachineCreator' => function (Job $job) {
+                    return (new Machine($job->id, 'up/started', 'pre_active'))
+                        ->setIp('127.0.0.1')
+                    ;
+                },
+            ],
+            'has ip change, null to set' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, 'up/started', 'pre_active');
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineIsActiveEvent(md5((string) rand()), $job->id, '127.0.0.1');
+                },
+                'expectedMachineCreator' => function (Job $job) {
+                    return (new Machine($job->id, 'up/started', 'pre_active'))
+                        ->setIp('127.0.0.1')
+                    ;
+                },
+            ],
+            'has ip change' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = (new Machine($job->id, 'up/started', 'pre_active'))
+                        ->setIp('127.0.0.1')
+                    ;
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineIsActiveEvent(md5((string) rand()), $job->id, '127.0.0.2');
+                },
+                'expectedMachineCreator' => function (Job $job) {
+                    return (new Machine($job->id, 'up/started', 'pre_active'))
+                        ->setIp('127.0.0.2')
+                    ;
                 },
             ],
         ];
