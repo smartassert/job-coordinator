@@ -60,7 +60,7 @@ class JobSerializer
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
-        $data['service_requests'] = new RemoteRequestCollection($remoteRequests);
+        $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
 
         return $data;
     }

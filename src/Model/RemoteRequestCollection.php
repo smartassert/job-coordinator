@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Entity\RemoteRequest;
 
-class RemoteRequestCollection implements \JsonSerializable
+class RemoteRequestCollection
 {
     /**
      * @param iterable<RemoteRequest> $requests
@@ -19,7 +19,7 @@ class RemoteRequestCollection implements \JsonSerializable
     /**
      * @return array<mixed>
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $requestsByType = [];
         foreach ($this->requests as $request) {
