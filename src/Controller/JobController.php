@@ -5,18 +5,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Job;
-use App\Entity\ResultsJob;
-use App\Entity\SerializedSuite;
 use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
 use App\Exception\EmptyUlidException;
-use App\Model\RemoteRequestCollection;
 use App\Repository\JobRepository;
-use App\Repository\RemoteRequestRepository;
-use App\Repository\ResultsJobRepository;
-use App\Repository\SerializedSuiteRepository;
 use App\Request\CreateJobRequest;
 use App\Response\ErrorResponse;
+use App\Services\JobSerializer;
 use App\Services\UlidFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
@@ -31,8 +26,7 @@ class JobController
         CreateJobRequest $request,
         User $user,
         JobRepository $repository,
-        ResultsJobRepository $resultsJobRepository,
-        SerializedSuiteRepository $serializedSuiteRepository,
+        JobSerializer $jobSerializer,
         UlidFactory $ulidFactory,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
@@ -42,40 +36,17 @@ class JobController
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
         }
 
-        $job = new Job(
-            $id,
-            $user->getUserIdentifier(),
-            $request->suiteId,
-            $request->maximumDurationInSeconds,
-        );
+        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
         $repository->add($job);
 
-        $responseData = $job->toArray();
-
-        $resultsJob = $resultsJobRepository->find($job->id);
-        if ($resultsJob instanceof ResultsJob) {
-            $responseData['results_job'] = $resultsJob->toArray();
-        }
-
-        $serializedSuite = $serializedSuiteRepository->find($job->id);
-        if ($serializedSuite instanceof SerializedSuite) {
-            $responseData['serialized_suite'] = $serializedSuite->toArray();
-        }
-
-        return new JsonResponse($responseData);
+        return new JsonResponse($jobSerializer->serialize($job));
     }
 
     #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
-    public function get(
-        string $jobId,
-        User $user,
-        JobRepository $repository,
-        ResultsJobRepository $resultsJobRepository,
-        SerializedSuiteRepository $serializedSuiteRepository,
-        RemoteRequestRepository $remoteRequestRepository,
-    ): Response {
+    public function get(string $jobId, User $user, JobRepository $repository, JobSerializer $jobSerializer): Response
+    {
         $job = $repository->find($jobId);
         if (null === $job) {
             return new Response(null, 404);
@@ -85,21 +56,6 @@ class JobController
             return new Response(null, 401);
         }
 
-        $responseData = $job->toArray();
-
-        $resultsJob = $resultsJobRepository->find($job->id);
-        if ($resultsJob instanceof ResultsJob) {
-            $responseData['results_job'] = $resultsJob->toArray();
-        }
-
-        $serializedSuite = $serializedSuiteRepository->find($job->id);
-        if ($serializedSuite instanceof SerializedSuite) {
-            $responseData['serialized_suite'] = $serializedSuite->toArray();
-        }
-
-        $remoteRequests = $remoteRequestRepository->findBy(['jobId' => $jobId], ['id' => 'ASC']);
-        $responseData['service_requests'] = new RemoteRequestCollection($remoteRequests);
-
-        return new JsonResponse($responseData);
+        return new JsonResponse($jobSerializer->serialize($job));
     }
 }

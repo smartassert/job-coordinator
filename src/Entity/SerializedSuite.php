@@ -7,6 +7,9 @@ namespace App\Entity;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedSerializedSuite array{id: non-empty-string, state: non-empty-string}
+ */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
 class SerializedSuite
 {

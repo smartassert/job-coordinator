@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Application;
 
 use App\Entity\Job;
+use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
@@ -13,6 +14,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -29,15 +31,17 @@ class GetJobSuccessTest extends AbstractApplicationTest
     /**
      * @dataProvider getDataProvider
      *
-     * @param callable(Job): RemoteRequest[]                             $remoteRequestsCreator
-     * @param callable(Job, ResultsJobRepository): ?ResultsJob           $resultsJobCreator
-     * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite $serializedSuiteCreator
-     * @param callable(Job, ?ResultsJob, ?SerializedSuite): array<mixed> $expectedSerializedJobCreator
+     * @param callable(Job): RemoteRequest[]                                       $remoteRequestsCreator
+     * @param callable(Job, ResultsJobRepository): ?ResultsJob                     $resultsJobCreator
+     * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite           $serializedSuiteCreator
+     * @param callable(Job, MachineRepository): ?Machine                           $machineCreator
+     * @param callable(Job, ?ResultsJob, ?SerializedSuite, ?Machine): array<mixed> $expectedSerializedJobCreator
      */
     public function testGetSuccess(
         callable $remoteRequestsCreator,
         callable $resultsJobCreator,
         callable $serializedSuiteCreator,
+        callable $machineCreator,
         callable $expectedSerializedJobCreator
     ): void {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -66,6 +70,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
         self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
@@ -84,6 +91,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $resultsJob = $resultsJobCreator($job, $resultsJobRepository);
         $serializedSuite = $serializedSuiteCreator($job, $serializedSuiteRepository);
+        $machine = $machineCreator($job, $machineRepository);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -103,7 +111,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 
-        self::assertEquals($expectedSerializedJobCreator($job, $resultsJob, $serializedSuite), $responseData);
+        self::assertEquals($expectedSerializedJobCreator($job, $resultsJob, $serializedSuite, $machine), $responseData);
     }
 
     /**
@@ -113,52 +121,56 @@ class GetJobSuccessTest extends AbstractApplicationTest
     {
         $serializedSuiteId = md5((string) rand());
 
+        $nullCreator = function () {
+            return null;
+        };
+
+        $emptyRemoteRequestsCreator = function () {
+            return [];
+        };
+
+        $resultsJobCreatorCreator = function (string $state, ?string $endState) {
+            return function (Job $job, ResultsJobRepository $resultsJobRepository) use ($state, $endState) {
+                \assert('' !== $state);
+                \assert('' !== $endState);
+
+                $resultsJob = new ResultsJob($job->id, md5((string) rand()), $state, $endState);
+                $resultsJobRepository->save($resultsJob);
+
+                return $resultsJob;
+            };
+        };
+
         return [
-            'no remote requests, no results job, no serialized suite' => [
-                'remoteRequestsCreator' => function () {
-                    return [];
-                },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
+            'no remote requests, no results job, no serialized suite, no machine' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'service_requests' => [],
                     ];
                 },
             ],
-            'results/create only, no results job, no serialized suite' => [
+            'results/create only' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'service_requests' => [
                             [
                                 'type' => 'results/create',
@@ -172,7 +184,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'r/c success, s-s/c success, s-s/g failure and success, no results job, no serialized suite' => [
+            'results/create success, serialized-suite/create success, serialized-suite/g failure and success' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
@@ -199,21 +211,14 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setState(RequestState::SUCCEEDED),
                     ];
                 },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'service_requests' => [
                             [
                                 'type' => 'results/create',
@@ -259,28 +264,16 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'no remote requests, has results state, no results end state, no serialized suite' => [
-                'remoteRequestsCreator' => function () {
-                    return [];
-                },
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
-                    $resultsJob = new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), null);
-                    $resultsJobRepository->save($resultsJob);
-
-                    return $resultsJob;
-                },
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
+            'has results state, no results end state' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), null),
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'results_job' => [
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
@@ -289,33 +282,16 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'no remote requests, has results state, has results end state, no serialized suite' => [
-                'remoteRequestsCreator' => function () {
-                    return [];
-                },
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $resultsJobRepository) {
-                    $resultsJob = new ResultsJob(
-                        $job->id,
-                        md5((string) rand()),
-                        md5((string) rand()),
-                        md5((string) rand())
-                    );
-                    $resultsJobRepository->save($resultsJob);
-
-                    return $resultsJob;
-                },
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
+            'has results state, has results end state' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), md5((string) rand())),
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'results_job' => [
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
@@ -324,13 +300,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'no remote requests, no results job, has serialized suite' => [
-                'remoteRequestsCreator' => function () {
-                    return [];
-                },
-                'resultsJobCreator' => function () {
-                    return null;
-                },
+            'has serialized suite' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => function (
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
@@ -342,6 +314,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                     return $serializedSuite;
                 },
+                'machineCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     Job $job,
                     ?ResultsJob $resultsJob,
@@ -351,15 +324,41 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
                         'service_requests' => [],
                         'serialized_suite' => [
                             'id' => $serializedSuite->getId(),
                             'state' => 'prepared',
                         ],
+                    ];
+                },
+            ],
+            'has machine' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'expectedSerializedJobCreator' => function (
+                    Job $job,
+                    ?ResultsJob $resultsJob,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'machine' => [
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                        ],
+                        'service_requests' => [],
                     ];
                 },
             ],

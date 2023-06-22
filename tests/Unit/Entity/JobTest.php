@@ -30,10 +30,6 @@ class JobTest extends TestCase
                 'id' => $id,
                 'suite_id' => $suiteId,
                 'maximum_duration_in_seconds' => $maximumDurationInSeconds,
-                'machine' => [
-                    'state_category' => null,
-                    'ip_address' => null,
-                ],
             ],
             $job->toArray()
         );
