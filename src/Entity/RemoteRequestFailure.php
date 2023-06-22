@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
-class RemoteRequestFailure implements \JsonSerializable
+class RemoteRequestFailure
 {
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
     private readonly RemoteRequestFailureType $type;
@@ -42,7 +42,7 @@ class RemoteRequestFailure implements \JsonSerializable
     /**
      * @return array{type: non-empty-string, code: int, message: ?string}
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'type' => $this->type->value,

@@ -100,7 +100,7 @@ class RemoteRequest
         ];
 
         if ($this->failure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->failure;
+            $data['failure'] = $this->failure->toArray();
         }
 
         return $data;
