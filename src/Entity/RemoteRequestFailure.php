@@ -50,16 +50,4 @@ class RemoteRequestFailure
             'message' => $this->message,
         ];
     }
-
-    /*
-     * id
-     * job_id
-     * type
-     * state
-     * ?failure
-     * type
-     * code
-     * message
-     *
-     */
 }
