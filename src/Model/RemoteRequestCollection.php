@@ -27,7 +27,7 @@ class RemoteRequestCollection
                 $requestsByType[$request->getType()->value] = [];
             }
 
-            $requestsByType[$request->getType()->value][] = $request;
+            $requestsByType[$request->getType()->value][] = $request->toArray();
         }
 
         $data = [];

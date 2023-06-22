@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RemoteRequestRepository::class)]
 #[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
-class RemoteRequest implements \JsonSerializable
+class RemoteRequest
 {
     /**
      * @var non-empty-string
@@ -93,7 +93,7 @@ class RemoteRequest implements \JsonSerializable
     /**
      * @return array<mixed>
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $data = [
             'state' => $this->state->value,
