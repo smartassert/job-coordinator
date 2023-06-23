@@ -10,6 +10,14 @@ use App\Repository\RemoteRequestRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
+ *
+ * @phpstan-type SerializedRemoteRequest array{
+ *   state: value-of<RequestState>,
+ *   failure?: SerializedRemoteRequestFailure
+ * }
+ */
 #[ORM\Entity(repositoryClass: RemoteRequestRepository::class)]
 #[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
 class RemoteRequest
@@ -91,7 +99,7 @@ class RemoteRequest
     }
 
     /**
-     * @return array<mixed>
+     * @return SerializedRemoteRequest
      */
     public function toArray(): array
     {
