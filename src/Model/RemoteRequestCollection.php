@@ -7,9 +7,14 @@ namespace App\Model;
 use App\Entity\RemoteRequest;
 
 /**
- * @phpstan-import-type SerializedRemoteRequestTypeAttempts from RemoteRequestTypeAttempts
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequest
  *
- * @phpstan-type SerializedRemoteRequestCollection array<SerializedRemoteRequestTypeAttempts>
+ * @phpstan-type SerializedRemoteRequestCollection array<
+ *   array{
+ *     type: non-empty-string,
+ *     attempts: array<SerializedRemoteRequest>
+ *   }
+ * >
  */
 class RemoteRequestCollection
 {
@@ -22,7 +27,7 @@ class RemoteRequestCollection
     }
 
     /**
-     * @return array<mixed>
+     * @return SerializedRemoteRequestCollection
      */
     public function toArray(): array
     {
@@ -32,17 +37,17 @@ class RemoteRequestCollection
                 $requestsByType[$request->getType()->value] = [];
             }
 
-            $requestsByType[$request->getType()->value][] = $request;
+            $requestsByType[$request->getType()->value][] = $request->toArray();
         }
 
         $data = [];
-        foreach ($requestsByType as $typedRequests) {
-            $firstRequest = $typedRequests[0] ?? null;
-            if ($firstRequest instanceof RemoteRequest) {
-                $typeAttempts = new RemoteRequestTypeAttempts($firstRequest->getType(), $typedRequests);
+        foreach ($requestsByType as $type => $requestGroup) {
+            $groupData = [
+                'type' => $type,
+                'attempts' => $requestGroup,
+            ];
 
-                $data[] = $typeAttempts->toArray();
-            }
+            $data[] = $groupData;
         }
 
         return $data;
