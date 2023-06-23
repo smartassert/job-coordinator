@@ -9,6 +9,13 @@ use App\Repository\RemoteRequestFailureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedRemoteRequestFailure array{
+ *   type: value-of<RemoteRequestFailureType>,
+ *   code: int,
+ *   message: ?string
+ * }
+ */
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
 class RemoteRequestFailure
 {
@@ -40,7 +47,7 @@ class RemoteRequestFailure
     }
 
     /**
-     * @return array{type: non-empty-string, code: int, message: ?string}
+     * @return SerializedRemoteRequestFailure
      */
     public function toArray(): array
     {
