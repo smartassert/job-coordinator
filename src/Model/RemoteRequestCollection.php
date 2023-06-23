@@ -6,7 +6,17 @@ namespace App\Model;
 
 use App\Entity\RemoteRequest;
 
-class RemoteRequestCollection implements \JsonSerializable
+/**
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequest
+ *
+ * @phpstan-type SerializedRemoteRequestCollection array<
+ *   array{
+ *     type: non-empty-string,
+ *     attempts: array<SerializedRemoteRequest>
+ *   }
+ * >
+ */
+class RemoteRequestCollection
 {
     /**
      * @param iterable<RemoteRequest> $requests
@@ -17,9 +27,9 @@ class RemoteRequestCollection implements \JsonSerializable
     }
 
     /**
-     * @return array<mixed>
+     * @return SerializedRemoteRequestCollection
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $requestsByType = [];
         foreach ($this->requests as $request) {
@@ -27,7 +37,7 @@ class RemoteRequestCollection implements \JsonSerializable
                 $requestsByType[$request->getType()->value] = [];
             }
 
-            $requestsByType[$request->getType()->value][] = $request;
+            $requestsByType[$request->getType()->value][] = $request->toArray();
         }
 
         $data = [];
