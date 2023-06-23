@@ -18,6 +18,7 @@ use App\Repository\SerializedSuiteRepository;
  * @phpstan-import-type SerializedResultsJob from ResultsJob
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
  * @phpstan-import-type SerializedMachine from Machine
+ * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
 {
@@ -37,7 +38,7 @@ class JobSerializer
      *   results_job?: SerializedResultsJob,
      *   serialized_suite?: SerializedSerializedSuite,
      *   machine?: SerializedMachine,
-     *   remote_requests?: array<mixed>,
+     *   remote_requests?: SerializedRemoteRequestCollection
      *  }
      */
     public function serialize(Job $job): array
