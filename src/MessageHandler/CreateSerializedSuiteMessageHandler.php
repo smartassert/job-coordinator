@@ -35,6 +35,7 @@ final class CreateSerializedSuiteMessageHandler
         try {
             $serializedSuite = $this->serializedSuiteClient->create(
                 $message->authenticationToken,
+                $job->id,
                 $job->suiteId,
                 $message->parameters,
             );
