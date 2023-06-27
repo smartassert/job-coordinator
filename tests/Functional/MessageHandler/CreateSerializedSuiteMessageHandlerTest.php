@@ -51,7 +51,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->suiteId, $serializedSuiteCreateParameters)
+            ->with(self::$apiToken, $job->id, $job->suiteId, $serializedSuiteCreateParameters)
             ->andThrow($serializedSuiteClientException)
         ;
 
@@ -79,7 +79,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         ];
 
         $serializedSuiteModel = new SerializedSuiteModel(
-            md5((string) rand()),
+            $job->id,
             $job->suiteId,
             $serializedSuiteParameters,
             'requested',
@@ -90,7 +90,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->suiteId, $serializedSuiteParameters)
+            ->with(self::$apiToken, $job->id, $job->suiteId, $serializedSuiteParameters)
             ->andReturn($serializedSuiteModel)
         ;
 
