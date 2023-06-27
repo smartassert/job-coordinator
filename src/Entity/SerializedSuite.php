@@ -8,7 +8,7 @@ use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-type SerializedSerializedSuite array{id: non-empty-string, state: non-empty-string}
+ * @phpstan-type SerializedSerializedSuite array{state: non-empty-string}
  */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
 class SerializedSuite
@@ -74,12 +74,11 @@ class SerializedSuite
     }
 
     /**
-     * @return array{id: non-empty-string, state: non-empty-string}
+     * @return SerializedSerializedSuite
      */
     public function toArray(): array
     {
         return [
-            'id' => $this->serializedSuiteId,
             'state' => $this->state,
         ];
     }
