@@ -72,39 +72,42 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         return [
             WorkerMessageFailedEvent::class => [
                 'expectedListenedForEvent' => WorkerMessageFailedEvent::class,
-                'expectedMethod' => 'setRemoteRequestStateForMessengerEvent',
+                'expectedMethod' => 'setRemoteRequestStateForMessageFailedEvent',
             ],
             WorkerMessageHandledEvent::class => [
                 'expectedListenedForEvent' => WorkerMessageHandledEvent::class,
-                'expectedMethod' => 'setRemoteRequestStateForMessengerEvent',
+                'expectedMethod' => 'setRemoteRequestStateForMessageHandledEvent',
             ],
             WorkerMessageReceivedEvent::class => [
                 'expectedListenedForEvent' => WorkerMessageReceivedEvent::class,
-                'expectedMethod' => 'setRemoteRequestStateForMessengerEvent',
+                'expectedMethod' => 'setRemoteRequestStateForMessageReceivedEvent',
             ],
         ];
     }
 
     /**
-     * @dataProvider setRemoteRequestStateDataProvider
+     * @dataProvider setRemoteRequestStateForMessageFailedEventDataProvider
      *
-     * @param callable(JobRemoteRequestMessageInterface): RemoteRequest $expectedRemoteRequestCreator
+     * @param callable(): WorkerMessageFailedEvent $eventCreator
      */
-    public function testSetRemoteRequestState(callable $eventCreator, callable $expectedRemoteRequestCreator): void
-    {
+    public function testSetRemoteRequestStateForMessageFailedEvent(
+        callable $eventCreator,
+        RequestState $expectedRequestState
+    ): void {
         self::assertSame(0, $this->remoteRequestRepository->count([]));
 
         $event = $eventCreator();
         $message = $event->getEnvelope()->getMessage();
         \assert($message instanceof JobRemoteRequestMessageInterface);
 
-        $this->remoteRequestStateTracker->setRemoteRequestStateForMessengerEvent($event);
+        $this->remoteRequestStateTracker->setRemoteRequestStateForMessageFailedEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
             RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
         );
 
-        $expectedRemoteRequest = $expectedRemoteRequestCreator($message);
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest->setState($expectedRequestState);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
     }
@@ -112,7 +115,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setRemoteRequestStateDataProvider(): array
+    public function setRemoteRequestStateForMessageFailedEventDataProvider(): array
     {
         return [
             WorkerMessageFailedEvent::class . ', will not retry ' => [
@@ -123,12 +126,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
                         new \Exception()
                     );
                 },
-                'expectedRemoteRequestCreator' => function (JobRemoteRequestMessageInterface $message) {
-                    $remoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
-                    $remoteRequest->setState(RequestState::FAILED);
-
-                    return $remoteRequest;
-                },
+                'expectedRequestState' => RequestState::FAILED,
             ],
             WorkerMessageFailedEvent::class . ', will retry ' => [
                 'eventCreator' => function () {
@@ -141,36 +139,49 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
                     return $event;
                 },
-                'expectedRemoteRequestCreator' => function (JobRemoteRequestMessageInterface $message) {
-                    $remoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
-                    $remoteRequest->setState(RequestState::HALTED);
-
-                    return $remoteRequest;
-                },
-            ],
-            WorkerMessageHandledEvent::class => [
-                'eventCreator' => function () {
-                    return new WorkerMessageHandledEvent(new Envelope($this->createMessage()), 'async');
-                },
-                'expectedRemoteRequestCreator' => function (JobRemoteRequestMessageInterface $message) {
-                    $remoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
-                    $remoteRequest->setState(RequestState::SUCCEEDED);
-
-                    return $remoteRequest;
-                },
-            ],
-            WorkerMessageReceivedEvent::class => [
-                'eventCreator' => function () {
-                    return new WorkerMessageReceivedEvent(new Envelope($this->createMessage()), 'async');
-                },
-                'expectedRemoteRequestCreator' => function (JobRemoteRequestMessageInterface $message) {
-                    $remoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
-                    $remoteRequest->setState(RequestState::REQUESTING);
-
-                    return $remoteRequest;
-                },
+                'expectedRequestState' => RequestState::HALTED,
             ],
         ];
+    }
+
+    public function testSetRemoteRequestStateForMessageHandledEvent(): void
+    {
+        self::assertSame(0, $this->remoteRequestRepository->count([]));
+
+        $event = new WorkerMessageHandledEvent(new Envelope($this->createMessage()), 'async');
+        $message = $event->getEnvelope()->getMessage();
+        \assert($message instanceof JobRemoteRequestMessageInterface);
+
+        $this->remoteRequestStateTracker->setRemoteRequestStateForMessageHandledEvent($event);
+
+        $remoteRequest = $this->remoteRequestRepository->find(
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+        );
+
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest->setState(RequestState::SUCCEEDED);
+
+        self::assertEquals($expectedRemoteRequest, $remoteRequest);
+    }
+
+    public function testSetRemoteRequestStateForMessageReceivedEvent(): void
+    {
+        self::assertSame(0, $this->remoteRequestRepository->count([]));
+
+        $event = new WorkerMessageReceivedEvent(new Envelope($this->createMessage()), 'async');
+        $message = $event->getEnvelope()->getMessage();
+        \assert($message instanceof JobRemoteRequestMessageInterface);
+
+        $this->remoteRequestStateTracker->setRemoteRequestStateForMessageReceivedEvent($event);
+
+        $remoteRequest = $this->remoteRequestRepository->find(
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+        );
+
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest->setState(RequestState::REQUESTING);
+
+        self::assertEquals($expectedRemoteRequest, $remoteRequest);
     }
 
     public function testSetRemoteRequestStateForMultipleStateChanges(): void
@@ -181,7 +192,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
         $event = new WorkerMessageReceivedEvent(new Envelope($message), 'async');
 
-        $this->remoteRequestStateTracker->setRemoteRequestStateForMessengerEvent($event);
+        $this->remoteRequestStateTracker->setRemoteRequestStateForMessageReceivedEvent($event);
         self::assertSame(1, $this->remoteRequestRepository->count([]));
 
         $remoteRequest = $this->remoteRequestRepository->find(
@@ -196,7 +207,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
         $event = new WorkerMessageHandledEvent(new Envelope($message), 'async');
 
-        $this->remoteRequestStateTracker->setRemoteRequestStateForMessengerEvent($event);
+        $this->remoteRequestStateTracker->setRemoteRequestStateForMessageHandledEvent($event);
         self::assertSame(1, $this->remoteRequestRepository->count([]));
         self::assertSame(RequestState::SUCCEEDED, $stateProperty->getValue($remoteRequest));
     }
