@@ -17,7 +17,7 @@ class ResultsJob
     }
 
     /**
-     * @return array{state: ?non-empty-string, end_state: ?non-empty-string}
+     * @return SerializedResultsJob
      */
     public function toArray(): array
     {
