@@ -34,7 +34,7 @@ services:
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
 
   results-service:
-    image: ghcr.io/smartassert/results:1.5
+    image: ghcr.io/smartassert/results:1.6
     profiles: ["integration"]
     container_name: results-service
     environment:
