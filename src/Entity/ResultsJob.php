@@ -7,9 +7,6 @@ namespace App\Entity;
 use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @phpstan-type SerializedResultsJob array{state: ?non-empty-string, end_state: ?non-empty-string}
- */
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
 class ResultsJob
 {
@@ -83,16 +80,5 @@ class ResultsJob
         $this->endState = $state;
 
         return $this;
-    }
-
-    /**
-     * @return array{state: ?non-empty-string, end_state: ?non-empty-string}
-     */
-    public function toArray(): array
-    {
-        return [
-            'state' => $this->state,
-            'end_state' => $this->endState,
-        ];
     }
 }
