@@ -275,6 +275,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
@@ -293,6 +296,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
                         ],
@@ -326,6 +332,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'service_requests' => [],
                         'serialized_suite' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => 'prepared',
                         ],
                     ];
@@ -354,6 +363,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'machine' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
