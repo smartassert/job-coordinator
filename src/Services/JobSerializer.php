@@ -62,7 +62,12 @@ class JobSerializer
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
         if ($serializedSuite instanceof SerializedSuiteEntity) {
-            $data['serialized_suite'] = (new SerializedSuiteModel($serializedSuite))->toArray();
+            $serializedSuiteModel = new SerializedSuiteModel(
+                $serializedSuite,
+                new SerializableRemoteRequest(RequestState::SUCCEEDED),
+            );
+
+            $data['serialized_suite'] = $serializedSuiteModel->toArray();
         }
 
         $machine = $this->machineRepository->find($job->id);

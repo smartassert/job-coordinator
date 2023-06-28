@@ -7,12 +7,15 @@ namespace App\Model;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
 
 /**
- * @phpstan-type SerializedSerializedSuite array{state: ?non-empty-string}
+ * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ *
+ * @phpstan-type SerializedSerializedSuite array{request: SerializedRemoteRequest, state: ?non-empty-string}
  */
 class SerializedSuite
 {
     public function __construct(
         private readonly SerializedSuiteEntity $entity,
+        private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
 
@@ -22,6 +25,7 @@ class SerializedSuite
     public function toArray(): array
     {
         return [
+            'request' => $this->request->toArray(),
             'state' => $this->entity->getState(),
         ];
     }

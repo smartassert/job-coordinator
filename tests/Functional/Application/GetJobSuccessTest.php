@@ -332,6 +332,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'service_requests' => [],
                         'serialized_suite' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => 'prepared',
                         ],
                     ];
