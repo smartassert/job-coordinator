@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Entity\Machine;
+use App\Entity\Machine as MachineEntity;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
+use App\Model\Machine as MachineModel;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob as ResultsJobModel;
 use App\Model\SerializedSuite as SerializedSuiteModel;
@@ -19,7 +20,7 @@ use App\Repository\SerializedSuiteRepository;
 /**
  * @phpstan-import-type SerializedResultsJob from ResultsJobModel
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
- * @phpstan-import-type SerializedMachine from Machine
+ * @phpstan-import-type SerializedMachine from MachineModel
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
@@ -58,8 +59,8 @@ class JobSerializer
         }
 
         $machine = $this->machineRepository->find($job->id);
-        if ($machine instanceof Machine) {
-            $data['machine'] = $machine->toArray();
+        if ($machine instanceof MachineEntity) {
+            $data['machine'] = (new MachineModel($machine))->toArray();
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
