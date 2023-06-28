@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Entity\Machine;
-use App\Entity\ResultsJob;
-use App\Entity\SerializedSuite;
+use App\Entity\Machine as MachineEntity;
+use App\Entity\ResultsJob as ResultsJobEntity;
+use App\Entity\SerializedSuite as SerializedSuiteEntity;
+use App\Enum\RequestState;
+use App\Model\Machine as MachineModel;
 use App\Model\RemoteRequestCollection;
+use App\Model\ResultsJob as ResultsJobModel;
+use App\Model\SerializableRemoteRequest;
+use App\Model\SerializedSuite as SerializedSuiteModel;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
 /**
- * @phpstan-import-type SerializedResultsJob from ResultsJob
- * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
- * @phpstan-import-type SerializedMachine from Machine
+ * @phpstan-import-type SerializedResultsJob from ResultsJobModel
+ * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
+ * @phpstan-import-type SerializedMachine from MachineModel
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
@@ -46,18 +51,33 @@ class JobSerializer
         $data = $job->toArray();
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        if ($resultsJob instanceof ResultsJob) {
-            $data['results_job'] = $resultsJob->toArray();
+        if ($resultsJob instanceof ResultsJobEntity) {
+            $resultsJobModel = new ResultsJobModel(
+                $resultsJob,
+                new SerializableRemoteRequest(RequestState::SUCCEEDED),
+            );
+
+            $data['results_job'] = $resultsJobModel->toArray();
         }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        if ($serializedSuite instanceof SerializedSuite) {
-            $data['serialized_suite'] = $serializedSuite->toArray();
+        if ($serializedSuite instanceof SerializedSuiteEntity) {
+            $serializedSuiteModel = new SerializedSuiteModel(
+                $serializedSuite,
+                new SerializableRemoteRequest(RequestState::SUCCEEDED),
+            );
+
+            $data['serialized_suite'] = $serializedSuiteModel->toArray();
         }
 
         $machine = $this->machineRepository->find($job->id);
-        if ($machine instanceof Machine) {
-            $data['machine'] = $machine->toArray();
+        if ($machine instanceof MachineEntity) {
+            $machineModel = new MachineModel(
+                $machine,
+                new SerializableRemoteRequest(RequestState::SUCCEEDED),
+            );
+
+            $data['machine'] = $machineModel->toArray();
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
