@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\RemoteRequest;
+
 /**
- * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequest
  *
  * @phpstan-type SerializedRemoteRequestCollection array<
  *   array{
@@ -17,7 +19,7 @@ namespace App\Model;
 class RemoteRequestCollection
 {
     /**
-     * @param iterable<SerializableRemoteRequestInterface&TypedRemoteRequestInterface> $requests
+     * @param iterable<RemoteRequest> $requests
      */
     public function __construct(
         private readonly iterable $requests,
