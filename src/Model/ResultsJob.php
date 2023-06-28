@@ -7,12 +7,19 @@ namespace App\Model;
 use App\Entity\ResultsJob as ResultsJobEntity;
 
 /**
- * @phpstan-type SerializedResultsJob array{state: ?non-empty-string, end_state: ?non-empty-string}
+ * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ *
+ * @phpstan-type SerializedResultsJob array{
+ *   request: SerializedRemoteRequest,
+ *   state: ?non-empty-string,
+ *   end_state: ?non-empty-string
+ * }
  */
 class ResultsJob
 {
     public function __construct(
         private readonly ResultsJobEntity $entity,
+        private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
 
@@ -22,6 +29,7 @@ class ResultsJob
     public function toArray(): array
     {
         return [
+            'request' => $this->request->toArray(),
             'state' => $this->entity->getState(),
             'end_state' => $this->entity->getEndState(),
         ];

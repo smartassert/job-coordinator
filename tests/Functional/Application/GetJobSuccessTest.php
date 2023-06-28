@@ -275,6 +275,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
@@ -293,6 +296,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
                         ],
