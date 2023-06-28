@@ -81,7 +81,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
             $this->remoteRequestIndexGenerator->generate($message->getJobId(), $message->getRemoteRequestType())
         );
 
-        $this->setRemoteRequestForMessage($message, RequestState::UNKNOWN);
+        $this->setRemoteRequestForMessage($message, RequestState::REQUESTING);
     }
 
     private function setRemoteRequestForMessage(
