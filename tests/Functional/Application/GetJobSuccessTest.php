@@ -363,6 +363,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'machine' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],

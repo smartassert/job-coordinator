@@ -7,12 +7,19 @@ namespace App\Model;
 use App\Entity\Machine as MachineEntity;
 
 /**
- * @phpstan-type SerializedMachine array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
+ * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ *
+ * @phpstan-type SerializedMachine array{
+ *   request: SerializedRemoteRequest,
+ *   state_category: ?non-empty-string,
+ *   ip_address: ?non-empty-string
+ * }
  */
 class Machine
 {
     public function __construct(
         private readonly MachineEntity $entity,
+        private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
 
@@ -22,6 +29,7 @@ class Machine
     public function toArray(): array
     {
         return [
+            'request' => $this->request->toArray(),
             'state_category' => $this->entity->getStateCategory(),
             'ip_address' => $this->entity->getIp(),
         ];

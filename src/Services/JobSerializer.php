@@ -72,7 +72,12 @@ class JobSerializer
 
         $machine = $this->machineRepository->find($job->id);
         if ($machine instanceof MachineEntity) {
-            $data['machine'] = (new MachineModel($machine))->toArray();
+            $machineModel = new MachineModel(
+                $machine,
+                new SerializableRemoteRequest(RequestState::SUCCEEDED),
+            );
+
+            $data['machine'] = $machineModel->toArray();
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
