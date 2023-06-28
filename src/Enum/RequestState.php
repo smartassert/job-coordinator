@@ -6,7 +6,6 @@ namespace App\Enum;
 
 enum RequestState: string
 {
-    case UNKNOWN = 'unknown';
     case REQUESTING = 'requesting';
     case HALTED = 'halted';
     case FAILED = 'failed';
