@@ -79,47 +79,42 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
      */
     public function removeDataProvider(): array
     {
-        $failureIds = [
-            md5((string) rand()),
-            md5((string) rand()),
-        ];
-
         return [
             'single remote request failure, no remote requests' => [
-                'remoteRequestFailuresCreator' => function () use ($failureIds) {
+                'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure($failureIds[0], RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'remoteRequestFailureId' => $failureIds[0],
+                'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
             ],
             'multiple remote request failures, no remote requests' => [
-                'remoteRequestFailuresCreator' => function () use ($failureIds) {
+                'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure($failureIds[0], RemoteRequestFailureType::HTTP, 404, null),
-                        new RemoteRequestFailure($failureIds[1], RemoteRequestFailureType::HTTP, 503, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 503, null),
                     ];
                 },
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'remoteRequestFailureId' => $failureIds[0],
-                'expectedRemoteRequestFailuresCreator' => function () use ($failureIds) {
+                'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
+                'expectedRemoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure($failureIds[1], RemoteRequestFailureType::HTTP, 503, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 503, null),
                     ];
                 },
             ],
             'single remote request failure in use by single remote request' => [
-                'remoteRequestFailuresCreator' => function () use ($failureIds) {
+                'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure($failureIds[0], RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'remoteRequestsCreator' => function (array $remoteRequestFailures) {
@@ -131,10 +126,10 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
-                'remoteRequestFailureId' => $failureIds[0],
-                'expectedRemoteRequestFailuresCreator' => function () use ($failureIds) {
+                'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
+                'expectedRemoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure($failureIds[0], RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
             ],

@@ -194,7 +194,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
-                                md5((string) rand()),
                                 RemoteRequestFailureType::NETWORK,
                                 6,
                                 'unable to resolve host "sources.example.com"'
@@ -202,7 +201,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 1))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
-                                md5((string) rand()),
                                 RemoteRequestFailureType::HTTP,
                                 503,
                                 'service unavailable'
