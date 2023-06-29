@@ -165,6 +165,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => null,
                         ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -196,6 +203,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => 'pending',
                             ],
                             'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
                         ],
                         'service_requests' => [
                             [
@@ -255,6 +269,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => 'pending',
                             ],
                             'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
                         ],
                         'service_requests' => [
                             [
@@ -324,6 +345,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => null,
                         ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -350,6 +378,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => 'pending',
                             ],
                             'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
                         ],
                         'service_requests' => [],
                     ];
@@ -387,6 +422,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => RequestState::SUCCEEDED->value,
                             ],
                             'state' => 'prepared',
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
                         ],
                         'service_requests' => [],
                     ];

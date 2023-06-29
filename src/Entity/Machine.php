@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\MachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine
+class Machine implements MachineInterface
 {
     /**
      * @var non-empty-string

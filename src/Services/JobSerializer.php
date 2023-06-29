@@ -9,6 +9,7 @@ use App\Entity\Machine as MachineEntity;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Model\Machine as MachineModel;
+use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
 use App\Model\PendingResultsJob;
 use App\Model\PendingSerializedSuite;
@@ -76,10 +77,14 @@ class JobSerializer
 
         $machine = $this->machineRepository->find($job->id);
         if ($machine instanceof MachineEntity) {
-            $machineModel = new MachineModel($machine, new SuccessfulRemoteRequest());
-
-            $data['machine'] = $machineModel->toArray();
+            $machineRequest = new SuccessfulRemoteRequest();
+        } else {
+            $machine = new PendingMachine();
+            $machineRequest = new PendingRemoteRequest();
         }
+
+        $machineModel = new MachineModel($machine, $machineRequest);
+        $data['machine'] = $machineModel->toArray();
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
         $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
