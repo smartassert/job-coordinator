@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\Machine as MachineEntity;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
+use App\Enum\RemoteRequestType;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
@@ -57,8 +58,21 @@ class JobSerializer
         if ($resultsJob instanceof ResultsJobEntity) {
             $resultsJobRequest = new SuccessfulRemoteRequest();
         } else {
+            $resultsJobRequest = $this->remoteRequestRepository->findOneBy(
+                [
+                    'jobId' => $job->id,
+                    'type' => RemoteRequestType::RESULTS_CREATE,
+                ],
+                [
+                    'index' => 'DESC',
+                ]
+            );
+
+            if (null === $resultsJobRequest) {
+                $resultsJobRequest = new PendingRemoteRequest();
+            }
+
             $resultsJob = new PendingResultsJob();
-            $resultsJobRequest = new PendingRemoteRequest();
         }
 
         $resultsJobModel = new ResultsJobModel($resultsJob, $resultsJobRequest);

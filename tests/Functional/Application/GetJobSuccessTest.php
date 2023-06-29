@@ -15,6 +15,7 @@ use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -55,6 +56,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+
+        $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
+        \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -98,6 +102,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
         foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
             $remoteRequestRepository->remove($remoteRequest);
         }
+
+        foreach ($remoteRequestFailureRepository->findAll() as $remoteRequestFailure) {
+            $entityManager->remove($remoteRequestFailure);
+        }
+        $entityManager->flush();
 
         $remoteRequests = $remoteRequestsCreator($job);
         foreach ($remoteRequests as $remoteRequest) {
@@ -176,7 +185,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'results/create only' => [
+            'single results/create request, requesting' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
@@ -193,7 +202,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
                             'request' => [
-                                'state' => 'pending',
+                                'state' => 'requesting',
                             ],
                             'state' => null,
                             'end_state' => null,
@@ -224,11 +233,89 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'results/create success, serialized-suite/create success, serialized-suite/g failure and success' => [
+            'multiple results/create requests' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
-                            ->setState(RequestState::SUCCEEDED),
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::NETWORK,
+                                28,
+                                'timed out'
+                            )),
+                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 1))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            )),
+                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 2))
+                            ->setState(RequestState::REQUESTING),
+                    ];
+                },
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
+                'expectedSerializedJobCreator' => function (Job $job) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'requesting',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
+                        'service_requests' => [
+                            [
+                                'type' => 'results/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'network',
+                                            'code' => 28,
+                                            'message' => 'timed out',
+                                        ],
+                                    ],
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'http',
+                                            'code' => 503,
+                                            'message' => 'service unavailable',
+                                        ],
+                                    ],
+                                    [
+                                        'state' => 'requesting',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ];
+                },
+            ],
+            'results/create halted, serialized-suite/create success, serialized-suite/g failure and success' => [
+                'remoteRequestsCreator' => function (Job $job) {
+                    return [
+                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                            ->setState(RequestState::HALTED),
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
                             ->setState(RequestState::SUCCEEDED),
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 0))
@@ -259,7 +346,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'results_job' => [
                             'request' => [
-                                'state' => 'pending',
+                                'state' => 'halted',
                             ],
                             'state' => null,
                             'end_state' => null,
@@ -282,7 +369,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'type' => 'results/create',
                                 'attempts' => [
                                     [
-                                        'state' => 'succeeded',
+                                        'state' => 'halted',
                                     ],
                                 ],
                             ],
