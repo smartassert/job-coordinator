@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\ResultsJobInterface;
 use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
-class ResultsJob
+class ResultsJob implements ResultsJobInterface
 {
     /**
      * @var non-empty-string

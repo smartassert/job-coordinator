@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Entity\ResultsJob as ResultsJobEntity;
-
 /**
  * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
  *
@@ -18,7 +16,7 @@ use App\Entity\ResultsJob as ResultsJobEntity;
 class ResultsJob
 {
     public function __construct(
-        private readonly ResultsJobEntity $entity,
+        private readonly ResultsJobInterface $entity,
         private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
