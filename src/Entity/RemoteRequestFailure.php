@@ -35,15 +35,20 @@ class RemoteRequestFailure
     #[ORM\Column(type: 'string', length: 32, unique: true)]
     private readonly string $id;
 
-    /**
-     * @param non-empty-string $id
-     */
-    public function __construct(string $id, RemoteRequestFailureType $type, int $code, ?string $message)
+    public function __construct(RemoteRequestFailureType $type, int $code, ?string $message)
     {
-        $this->id = $id;
+        $this->id = self::generateId($type, $code, $message);
         $this->type = $type;
         $this->code = $code;
         $this->message = $message;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public static function generateId(RemoteRequestFailureType $type, int $code, ?string $message): string
+    {
+        return md5($type->value . $code . $message);
     }
 
     /**

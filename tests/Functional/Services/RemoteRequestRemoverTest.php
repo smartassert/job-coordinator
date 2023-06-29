@@ -217,7 +217,7 @@ class RemoteRequestRemoverTest extends WebTestCase
             'single remote request for machine/create, has remote request failure' => [
                 'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure(md5((string) rand()), RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'remoteRequestsCreator' => function (string $jobId, array $remoteRequestFailures) {
@@ -289,7 +289,7 @@ class RemoteRequestRemoverTest extends WebTestCase
             'multiple remote requests for machine/create, remote request failure used by single remote request' => [
                 'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure(md5((string) rand()), RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'remoteRequestsCreator' => function (string $jobId, array $remoteRequestFailures) {
@@ -324,7 +324,7 @@ class RemoteRequestRemoverTest extends WebTestCase
             'multiple remote requests for machine/create, remote request failure used by multiple remote requests' => [
                 'remoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure('1', RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'remoteRequestsCreator' => function (string $jobId, array $remoteRequestFailures) {
@@ -346,7 +346,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                 'type' => RemoteRequestType::MACHINE_CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [
-                        new RemoteRequestFailure('1', RemoteRequestFailureType::HTTP, 404, null),
+                        new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
                 'expectedRemoteRequestsCreator' => function (string $jobId, array $remoteRequestFailures) {
