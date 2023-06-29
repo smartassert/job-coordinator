@@ -311,13 +311,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'results/create halted, serialized-suite/create success, serialized-suite/g failure and success' => [
+            'results/create halted, serialized-suite/create halted, serialized-suite/g failure and success' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
                             ->setState(RequestState::HALTED),
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
-                            ->setState(RequestState::SUCCEEDED),
+                            ->setState(RequestState::HALTED),
                         (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
@@ -353,7 +353,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'serialized_suite' => [
                             'request' => [
-                                'state' => 'pending',
+                                'state' => 'halted',
                             ],
                             'state' => null,
                         ],
@@ -377,7 +377,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'type' => 'serialized-suite/create',
                                 'attempts' => [
                                     [
-                                        'state' => 'succeeded',
+                                        'state' => 'halted',
                                     ],
                                 ],
                             ],

@@ -82,8 +82,21 @@ class JobSerializer
         if ($serializedSuite instanceof SerializedSuiteEntity) {
             $serializedSuiteRequest = new SuccessfulRemoteRequest();
         } else {
+            $serializedSuiteRequest = $this->remoteRequestRepository->findOneBy(
+                [
+                    'jobId' => $job->id,
+                    'type' => RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                ],
+                [
+                    'index' => 'DESC',
+                ]
+            );
+
+            if (null === $serializedSuiteRequest) {
+                $serializedSuiteRequest = new PendingRemoteRequest();
+            }
+
             $serializedSuite = new PendingSerializedSuite();
-            $serializedSuiteRequest = new PendingRemoteRequest();
         }
 
         $serializedSuiteModel = new SerializedSuiteModel($serializedSuite, $serializedSuiteRequest);
