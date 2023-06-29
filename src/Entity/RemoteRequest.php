@@ -6,18 +6,18 @@ namespace App\Entity;
 
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
-use App\Model\SerializableRemoteRequestInterface;
+use App\Model\RemoteRequestInterface;
 use App\Model\TypedRemoteRequestInterface;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
  */
 #[ORM\Entity(repositoryClass: RemoteRequestRepository::class)]
 #[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
-class RemoteRequest implements SerializableRemoteRequestInterface, TypedRemoteRequestInterface
+class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterface
 {
     /**
      * @var non-empty-string

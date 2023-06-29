@@ -6,7 +6,7 @@ namespace App\Model;
 
 use App\Enum\RequestState;
 
-class SuccessfulRemoteRequest extends SerializableRemoteRequest
+class SuccessfulRemoteRequest extends RemoteRequest
 {
     public function __construct()
     {

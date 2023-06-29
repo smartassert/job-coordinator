@@ -8,9 +8,9 @@ use App\Entity\RemoteRequestFailure;
 use App\Enum\RequestState;
 
 /**
- * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
  */
-class SerializableRemoteRequest implements SerializableRemoteRequestInterface
+class RemoteRequest implements RemoteRequestInterface
 {
     public function __construct(
         private readonly RequestState $state,

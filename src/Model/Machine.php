@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
  *
  * @phpstan-type SerializedMachine array{
  *   request: SerializedRemoteRequest,
@@ -17,7 +17,7 @@ class Machine
 {
     public function __construct(
         private readonly MachineInterface $machine,
-        private readonly SerializableRemoteRequestInterface $request,
+        private readonly RemoteRequestInterface $request,
     ) {
     }
 
