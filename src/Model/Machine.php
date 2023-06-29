@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Entity\Machine as MachineEntity;
-
 /**
  * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
  *
@@ -18,7 +16,7 @@ use App\Entity\Machine as MachineEntity;
 class Machine
 {
     public function __construct(
-        private readonly MachineEntity $entity,
+        private readonly MachineInterface $machine,
         private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
@@ -30,8 +28,8 @@ class Machine
     {
         return [
             'request' => $this->request->toArray(),
-            'state_category' => $this->entity->getStateCategory(),
-            'ip_address' => $this->entity->getIp(),
+            'state_category' => $this->machine->getStateCategory(),
+            'ip_address' => $this->machine->getIp(),
         ];
     }
 }
