@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\MachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @phpstan-type SerializedMachine array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
- */
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine
+class Machine implements MachineInterface
 {
     /**
      * @var non-empty-string
@@ -110,16 +108,5 @@ class Machine
         $this->ip = $ip;
 
         return $this;
-    }
-
-    /**
-     * @return array{state_category: ?non-empty-string, ip_address: ?non-empty-string}
-     */
-    public function toArray(): array
-    {
-        return [
-            'state_category' => $this->stateCategory,
-            'ip_address' => $this->ip,
-        ];
     }
 }

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\SerializedSuiteInterface;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @phpstan-type SerializedSerializedSuite array{state: non-empty-string}
- */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite
+class SerializedSuite implements SerializedSuiteInterface
 {
     /**
      * @var non-empty-string
@@ -71,15 +69,5 @@ class SerializedSuite
         $this->state = $state;
 
         return $this;
-    }
-
-    /**
-     * @return SerializedSerializedSuite
-     */
-    public function toArray(): array
-    {
-        return [
-            'state' => $this->state,
-        ];
     }
 }
