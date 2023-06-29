@@ -152,6 +152,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -171,6 +178,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
                         'service_requests' => [
                             [
                                 'type' => 'results/create',
@@ -219,6 +233,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
                         'service_requests' => [
                             [
                                 'type' => 'results/create',
@@ -321,22 +342,25 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $serializedSuite;
                 },
                 'machineCreator' => $nullCreator,
-                'expectedSerializedJobCreator' => function (
-                    Job $job,
-                    ?ResultsJob $resultsJob,
-                    SerializedSuite $serializedSuite
-                ) {
+                'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'service_requests' => [],
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
                         'serialized_suite' => [
                             'request' => [
                                 'state' => RequestState::SUCCEEDED->value,
                             ],
                             'state' => 'prepared',
                         ],
+                        'service_requests' => [],
                     ];
                 },
             ],
@@ -362,6 +386,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
                         'machine' => [
                             'request' => [
                                 'state' => RequestState::SUCCEEDED->value,
