@@ -106,8 +106,21 @@ class JobSerializer
         if ($machine instanceof MachineEntity) {
             $machineRequest = new SuccessfulRemoteRequest();
         } else {
+            $machineRequest = $this->remoteRequestRepository->findOneBy(
+                [
+                    'jobId' => $job->id,
+                    'type' => RemoteRequestType::MACHINE_CREATE,
+                ],
+                [
+                    'index' => 'DESC',
+                ]
+            );
+
+            if (null === $machineRequest) {
+                $machineRequest = new PendingRemoteRequest();
+            }
+
             $machine = new PendingMachine();
-            $machineRequest = new PendingRemoteRequest();
         }
 
         $machineModel = new MachineModel($machine, $machineRequest);
