@@ -159,6 +159,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                             'end_state' => null,
                         ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -184,6 +190,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => null,
                             'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
                         ],
                         'service_requests' => [
                             [
@@ -237,6 +249,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => null,
                             'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
                         ],
                         'service_requests' => [
                             [
@@ -300,6 +318,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -320,6 +344,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
                         ],
                         'service_requests' => [],
                     ];
@@ -390,6 +420,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state' => null,
                             'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
                         ],
                         'machine' => [
                             'request' => [
