@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
  *
  * @phpstan-type SerializedResultsJob array{
  *   request: SerializedRemoteRequest,
@@ -17,7 +17,7 @@ class ResultsJob
 {
     public function __construct(
         private readonly ResultsJobInterface $entity,
-        private readonly SerializableRemoteRequestInterface $request,
+        private readonly RemoteRequestInterface $request,
     ) {
     }
 

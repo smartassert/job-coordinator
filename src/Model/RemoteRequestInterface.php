@@ -15,7 +15,7 @@ use App\Enum\RequestState;
  *   failure?: SerializedRemoteRequestFailure
  * }
  */
-interface SerializableRemoteRequestInterface
+interface RemoteRequestInterface
 {
     /**
      * @return SerializedRemoteRequest
