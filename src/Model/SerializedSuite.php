@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Entity\SerializedSuite as SerializedSuiteEntity;
-
 /**
  * @phpstan-import-type SerializedRemoteRequest from SerializableRemoteRequestInterface
  *
@@ -14,7 +12,7 @@ use App\Entity\SerializedSuite as SerializedSuiteEntity;
 class SerializedSuite
 {
     public function __construct(
-        private readonly SerializedSuiteEntity $entity,
+        private readonly SerializedSuiteInterface $entity,
         private readonly SerializableRemoteRequestInterface $request,
     ) {
     }
