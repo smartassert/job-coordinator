@@ -92,3 +92,24 @@ services:
     App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
+
+    app.services.remote_request_finder.results_create:
+        class: App\Services\RemoteRequestFinder
+        arguments:
+            $type: !php/enum App\Enum\RemoteRequestType::RESULTS_CREATE
+
+    app.services.remote_request_finder.serialized_suite_create:
+        class: App\Services\RemoteRequestFinder
+        arguments:
+            $type: !php/enum App\Enum\RemoteRequestType::SERIALIZED_SUITE_CREATE
+
+    app.services.remote_request_finder.machine_create:
+        class: App\Services\RemoteRequestFinder
+        arguments:
+            $type: !php/enum App\Enum\RemoteRequestType::MACHINE_CREATE
+
+    App\Services\JobSerializer:
+        arguments:
+            $resultsRequestFinder: '@app.services.remote_request_finder.results_create'
+            $serializedSuiteRequestFinder: '@app.services.remote_request_finder.serialized_suite_create'
+            $machineRequestFinder: '@app.services.remote_request_finder.machine_create'
