@@ -521,6 +521,54 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
+            'requesting machine' => [
+                'remoteRequestsCreator' => function (Job $job) {
+                    return [
+                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_CREATE, 0))
+                            ->setState(RequestState::REQUESTING),
+                    ];
+                },
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
+                'expectedSerializedJobCreator' => function (Job $job) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => RequestState::REQUESTING->value,
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
+                        'service_requests' => [
+                            [
+                                'type' => 'machine/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'requesting',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ];
+                },
+            ],
             'has machine' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
                 'resultsJobCreator' => $nullCreator,
