@@ -10,4 +10,5 @@ enum RequestState: string
     case HALTED = 'halted';
     case FAILED = 'failed';
     case SUCCEEDED = 'succeeded';
+    case PENDING = 'pending';
 }
