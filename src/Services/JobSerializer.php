@@ -11,6 +11,7 @@ use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingRemoteRequest;
 use App\Model\PendingResultsJob;
+use App\Model\PendingSerializedSuite;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob as ResultsJobModel;
 use App\Model\SerializedSuite as SerializedSuiteModel;
@@ -64,10 +65,14 @@ class JobSerializer
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
         if ($serializedSuite instanceof SerializedSuiteEntity) {
-            $serializedSuiteModel = new SerializedSuiteModel($serializedSuite, new SuccessfulRemoteRequest());
-
-            $data['serialized_suite'] = $serializedSuiteModel->toArray();
+            $serializedSuiteRequest = new SuccessfulRemoteRequest();
+        } else {
+            $serializedSuite = new PendingSerializedSuite();
+            $serializedSuiteRequest = new PendingRemoteRequest();
         }
+
+        $serializedSuiteModel = new SerializedSuiteModel($serializedSuite, $serializedSuiteRequest);
+        $data['serialized_suite'] = $serializedSuiteModel->toArray();
 
         $machine = $this->machineRepository->find($job->id);
         if ($machine instanceof MachineEntity) {
