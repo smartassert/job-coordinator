@@ -11,6 +11,7 @@ class StartWorkerJobMessage extends AbstractRemoteRequestMessage
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
+     * @param non-empty-string $machineIpAddress
      */
     public function __construct(
         string $authenticationToken,
