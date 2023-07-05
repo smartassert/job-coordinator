@@ -9,8 +9,6 @@ use App\Event\WorkerJobStartRequestedEvent;
 use App\Message\GetWorkerStateMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
 use App\Repository\JobRepository;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
-use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -78,11 +76,9 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
         $jobRepository->add($job);
 
         $authenticationToken = md5((string) rand());
-        $resultsToken = md5((string) rand());
-        $resultsJob = new ResultsJob($jobId, $resultsToken, new ResultsJobState('awaiting-events', null));
         $workerJob = \Mockery::mock(WorkerJob::class);
 
-        $event = new WorkerJobStartRequestedEvent($authenticationToken, $jobId, $workerJob);
+        $event = new WorkerJobStartRequestedEvent($authenticationToken, $jobId, $workerJob, '127.0.0.1');
 
         $this->dispatcher->dispatchForWorkerJobStartRequestedEvent($event);
 
