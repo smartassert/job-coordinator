@@ -80,7 +80,8 @@ final class StartWorkerJobMessageHandler
             $this->eventDispatcher->dispatch(new WorkerJobStartRequestedEvent(
                 $message->authenticationToken,
                 $job->id,
-                $workerJob
+                $workerJob,
+                $message->machineIpAddress,
             ));
         } catch (\Throwable $e) {
             throw new WorkerJobStartException($job, $e);
