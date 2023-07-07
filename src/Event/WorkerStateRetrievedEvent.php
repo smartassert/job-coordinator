@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerClient\Model\Job as WorkerJob;
+use SmartAssert\WorkerClient\Model\ApplicationState;
 
-class WorkerJobStartRequestedEvent extends AbstractWorkerEvent
+class WorkerStateRetrievedEvent extends AbstractWorkerEvent
 {
     /**
      * @param non-empty-string $jobId
@@ -15,7 +15,7 @@ class WorkerJobStartRequestedEvent extends AbstractWorkerEvent
     public function __construct(
         string $jobId,
         string $machineIpAddress,
-        public readonly WorkerJob $workerJob,
+        public readonly ApplicationState $state,
     ) {
         parent::__construct($jobId, $machineIpAddress);
     }
