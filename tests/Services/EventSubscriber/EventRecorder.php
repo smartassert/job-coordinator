@@ -16,6 +16,7 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\WorkerStateRetrievedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -66,6 +67,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             WorkerJobStartRequestedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            WorkerStateRetrievedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];
