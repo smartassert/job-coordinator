@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class CreateResultsJobMessage extends AbstractRemoteRequestMessage
+class CreateResultsJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     public function getRemoteRequestType(): RemoteRequestType
     {

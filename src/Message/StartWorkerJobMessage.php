@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class StartWorkerJobMessage extends AbstractRemoteRequestMessage
+class StartWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken
