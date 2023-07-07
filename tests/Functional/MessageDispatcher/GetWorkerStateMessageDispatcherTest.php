@@ -83,7 +83,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForWorkerJobStartRequestedEvent($event);
 
-        $this->assertDispatchedMessage(new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress));
+        $this->assertDispatchedMessage(new GetWorkerStateMessage($jobId, $machineIpAddress));
     }
 
     private function assertDispatchedMessage(GetWorkerStateMessage $expected): void

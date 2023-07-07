@@ -27,7 +27,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
 
-        $message = new GetWorkerStateMessage(self::$apiToken, $jobId, '127.0.0.1');
+        $message = new GetWorkerStateMessage($jobId, '127.0.0.1');
 
         $handler($message);
 
@@ -49,7 +49,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         ;
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new GetWorkerStateMessage($jobId, $machineIpAddress);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
@@ -78,7 +78,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->createJob(jobId: $jobId);
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new GetWorkerStateMessage($jobId, $machineIpAddress);
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
