@@ -108,7 +108,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(WorkerStateRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new WorkerStateRetrievedEvent($jobId, $retrievedWorkerState), $event);
+        self::assertEquals(new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState), $event);
     }
 
     protected function getHandlerClass(): string

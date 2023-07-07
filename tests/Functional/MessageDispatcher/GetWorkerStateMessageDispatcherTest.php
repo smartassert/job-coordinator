@@ -75,11 +75,10 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
-        $authenticationToken = md5((string) rand());
         $workerJob = \Mockery::mock(WorkerJob::class);
         $machineIpAddress = '127.0.0.1';
 
-        $event = new WorkerJobStartRequestedEvent($jobId, $workerJob, $machineIpAddress);
+        $event = new WorkerJobStartRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
         $this->dispatcher->dispatchForWorkerJobStartRequestedEvent($event);
 
