@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class GetSerializedSuiteMessage extends AbstractRemoteRequestMessage
+class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken

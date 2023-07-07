@@ -7,7 +7,7 @@ namespace App\Message;
 use App\Enum\RemoteRequestType;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class GetMachineMessage extends AbstractRemoteRequestMessage
+class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken

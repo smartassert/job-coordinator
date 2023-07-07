@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestType;
 
-class TerminateMachineMessage extends AbstractRemoteRequestMessage
+class TerminateMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     public function getRemoteRequestType(): RemoteRequestType
     {
