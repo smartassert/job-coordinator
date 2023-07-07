@@ -144,7 +144,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeWorkerJobStartRequests(
             new WorkerJobStartRequestedEvent(
-                'authentication token',
                 $jobId,
                 \Mockery::mock(WorkerJob::class),
                 '127.0.0.1'

@@ -10,12 +10,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class WorkerJobStartRequestedEvent extends Event
 {
     /**
-     * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      * @param non-empty-string $machineIpAddress
      */
     public function __construct(
-        public readonly string $authenticationToken,
         public readonly string $jobId,
         public readonly WorkerJob $workerJob,
         public readonly string $machineIpAddress
