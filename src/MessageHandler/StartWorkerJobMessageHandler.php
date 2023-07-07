@@ -79,8 +79,8 @@ final class StartWorkerJobMessageHandler
 
             $this->eventDispatcher->dispatch(new WorkerJobStartRequestedEvent(
                 $job->id,
-                $workerJob,
                 $message->machineIpAddress,
+                $workerJob,
             ));
         } catch (\Throwable $e) {
             throw new WorkerJobStartException($job, $e);

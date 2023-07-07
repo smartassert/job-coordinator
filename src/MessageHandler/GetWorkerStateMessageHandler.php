@@ -37,6 +37,7 @@ final class GetWorkerStateMessageHandler
         try {
             $this->eventDispatcher->dispatch(new WorkerStateRetrievedEvent(
                 $job->id,
+                $message->machineIpAddress,
                 $workerClient->getApplicationState()
             ));
         } catch (\Throwable $e) {

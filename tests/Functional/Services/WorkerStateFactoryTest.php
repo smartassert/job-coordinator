@@ -84,7 +84,11 @@ class WorkerStateFactoryTest extends WebTestCase
     {
         self::assertSame(0, $this->jobRepository->count([]));
 
-        $event = new WorkerStateRetrievedEvent(md5((string) rand()), \Mockery::mock(ApplicationState::class));
+        $event = new WorkerStateRetrievedEvent(
+            md5((string) rand()),
+            md5((string) rand()),
+            \Mockery::mock(ApplicationState::class)
+        );
 
         $this->workerStateFactory->setOnWorkerStateRetrievedEvent($event);
 
@@ -107,7 +111,8 @@ class WorkerStateFactoryTest extends WebTestCase
 
         $workerStateCreator($job, $this->workerStateRepository);
 
-        $event = new WorkerStateRetrievedEvent($job->id, $retrievedApplicationState);
+        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $event = new WorkerStateRetrievedEvent($job->id, $machineIpAddress, $retrievedApplicationState);
         $this->workerStateFactory->setOnWorkerStateRetrievedEvent($event);
 
         self::assertEquals($expectedWorkerStateCreator($job), $this->workerStateRepository->find($job->id));
