@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerStateMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,6 +25,9 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
             WorkerJobStartRequestedEvent::class => [
                 ['dispatchForWorkerJobStartRequestedEvent', 100],
             ],
+            WorkerStateRetrievedEvent::class => [
+                ['dispatchForWorkerStateRetrievedEvent', 100],
+            ],
         ];
     }
 
@@ -32,5 +36,14 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new GetWorkerStateMessage($event->jobId, $event->machineIpAddress)
         );
+    }
+
+    public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
+    {
+        if (!$event->state->applicationState->isEndState) {
+            $this->messageDispatcher->dispatch(
+                new GetWorkerStateMessage($event->jobId, $event->machineIpAddress)
+            );
+        }
     }
 }
