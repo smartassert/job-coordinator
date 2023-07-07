@@ -218,7 +218,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobStartRequestedEvent(self::$apiToken, $job->id, $workerJob, $machineIpAddress),
+            new WorkerJobStartRequestedEvent($job->id, $workerJob, $machineIpAddress),
             $event
         );
 
