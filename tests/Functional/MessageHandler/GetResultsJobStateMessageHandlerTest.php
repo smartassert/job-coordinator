@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
-use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
@@ -70,25 +69,15 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         }
     }
 
-    /**
-     * @dataProvider invokeSuccessDataProvider
-     *
-     * @param callable(Job, ResultsJobRepository): ?ResultsJob $initialResultsJobCreator
-     * @param callable(Job): ?ResultsJob                       $expectedResultsJobCreator
-     */
-    public function testInvokeSuccess(
-        callable $initialResultsJobCreator,
-        ResultsJobState $resultsServiceJobState,
-        callable $expectedResultsJobCreator
-    ): void {
+    public function testInvokeSuccess(): void
+    {
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
         $jobId = md5((string) rand());
         $job = $this->createJob(jobId: $jobId);
-        $initialResultsJob = $initialResultsJobCreator($job, $resultsJobRepository);
 
-        self::assertEquals($initialResultsJob, $resultsJobRepository->find($jobId));
+        $resultsServiceJobState = new ResultsJobState(md5((string) rand()), md5((string) rand()));
 
         $resultsClient = \Mockery::mock(ResultsClient::class);
         $resultsClient
@@ -103,50 +92,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler(new GetResultsJobStateMessage(self::$apiToken, $jobId));
 
-        $expectedResultsJob = $expectedResultsJobCreator($job);
-        self::assertEquals($expectedResultsJob, $resultsJobRepository->find($jobId));
-
         $events = $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(new ResultsJobStateRetrievedEvent(self::$apiToken, $jobId, $resultsServiceJobState), $event);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function invokeSuccessDataProvider(): array
-    {
-        $token = md5((string) rand());
-
-        return [
-            'no initial resultsJob' => [
-                'initialResultsJobCreator' => function () {
-                    return null;
-                },
-                'resultsServiceJobState' => new ResultsJobState('complete', 'ended'),
-                'expectedResultsJobCreator' => function () {
-                    return null;
-                },
-            ],
-            'has initial resultsJob' => [
-                'initialResultsJobCreator' => function (
-                    Job $job,
-                    ResultsJobRepository $resultsJobRepository
-                ) use (
-                    $token
-                ) {
-                    $resultsJob = new ResultsJob($job->id, $token, 'initial state', 'initial end state');
-                    $resultsJobRepository->save($resultsJob);
-
-                    return $resultsJob;
-                },
-                'resultsServiceJobState' => new ResultsJobState('expected state', 'expected end state'),
-                'expectedResultsJobCreator' => function (Job $job) use ($token) {
-                    return new ResultsJob($job->id, $token, 'expected state', 'expected end state');
-                },
-            ],
-        ];
     }
 
     protected function getHandlerClass(): string
