@@ -15,7 +15,6 @@ use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -23,16 +22,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $jobId = md5((string) rand());
 
-        $jobRepository = \Mockery::mock(JobRepository::class);
-        $jobRepository
-            ->shouldReceive('find')
-            ->with($jobId)
-            ->andReturnNull()
-        ;
-
-        $handler = $this->createHandler(
-            jobRepository: $jobRepository,
-        );
+        $handler = $this->createHandler();
 
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
 
@@ -179,16 +169,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     private function createHandler(
-        ?JobRepository $jobRepository = null,
         ?ResultsClient $resultsClient = null,
     ): GetResultsJobStateMessageHandler {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        if (null === $jobRepository) {
-            $jobRepository = self::getContainer()->get(JobRepository::class);
-            \assert($jobRepository instanceof JobRepository);
-        }
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         if (null === $resultsClient) {
             $resultsClient = \Mockery::mock(ResultsClient::class);
