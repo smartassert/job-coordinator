@@ -30,7 +30,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public function dispatchForWorkerJobStartRequestedEvent(WorkerJobStartRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetWorkerStateMessage($event->authenticationToken, $event->jobId)
+            new GetWorkerStateMessage($event->authenticationToken, $event->jobId, $event->machineIpAddress)
         );
     }
 }
