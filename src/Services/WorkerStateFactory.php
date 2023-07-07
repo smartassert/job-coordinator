@@ -26,12 +26,12 @@ class WorkerStateFactory implements EventSubscriberInterface
     {
         return [
             WorkerStateRetrievedEvent::class => [
-                ['createOnWorkerStateRetrievedEvent', 1000],
+                ['setOnWorkerStateRetrievedEvent', 1000],
             ],
         ];
     }
 
-    public function createOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
+    public function setOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
         $job = $this->jobRepository->find($event->jobId);
         if (!$job instanceof Job) {
@@ -39,7 +39,14 @@ class WorkerStateFactory implements EventSubscriberInterface
         }
 
         $workerState = $this->workerStateRepository->find($job->id);
-        if (null === $workerState) {
+        if ($workerState instanceof WorkerState) {
+            $workerState = $workerState
+                ->setApplicationState($event->state->applicationState->state)
+                ->setCompilationState($event->state->compilationState->state)
+                ->setExecutionState($event->state->executionState->state)
+                ->setEventDeliveryState($event->state->eventDeliveryState->state)
+            ;
+        } else {
             $workerState = new WorkerState(
                 $job->id,
                 $event->state->applicationState->state,
@@ -47,8 +54,8 @@ class WorkerStateFactory implements EventSubscriberInterface
                 $event->state->executionState->state,
                 $event->state->eventDeliveryState->state,
             );
-
-            $this->workerStateRepository->save($workerState);
         }
+
+        $this->workerStateRepository->save($workerState);
     }
 }

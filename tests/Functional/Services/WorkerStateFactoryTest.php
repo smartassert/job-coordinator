@@ -75,50 +75,131 @@ class WorkerStateFactoryTest extends WebTestCase
         return [
             WorkerStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
-                'expectedMethod' => 'createOnWorkerStateRetrievedEvent',
+                'expectedMethod' => 'setOnWorkerStateRetrievedEvent',
             ],
         ];
     }
 
-    public function testCreateOnWorkerStateRetrievedEventNoJob(): void
+    public function testSetOnWorkerStateRetrievedEventNoJob(): void
     {
         self::assertSame(0, $this->jobRepository->count([]));
 
         $event = new WorkerStateRetrievedEvent(md5((string) rand()), \Mockery::mock(ApplicationState::class));
 
-        $this->workerStateFactory->createOnWorkerStateRetrievedEvent($event);
+        $this->workerStateFactory->setOnWorkerStateRetrievedEvent($event);
 
         self::assertSame(0, $this->jobRepository->count([]));
     }
 
-    public function testCreateOnWorkerStateRetrievedEventSuccess(): void
-    {
+    /**
+     * @dataProvider setOnWorkerStateRetrievedEventSuccessDataProvider
+     *
+     * @param callable(Job, WorkerStateRepository): void $workerStateCreator
+     * @param callable(Job): WorkerState                 $expectedWorkerStateCreator
+     */
+    public function testSetOnWorkerStateRetrievedEventSuccess(
+        callable $workerStateCreator,
+        ApplicationState $retrievedApplicationState,
+        callable $expectedWorkerStateCreator,
+    ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
-        self::assertSame(0, $this->workerStateRepository->count([]));
+        $workerStateCreator($job, $this->workerStateRepository);
 
-        $applicationState = new ApplicationState(
-            new ComponentState(md5((string) rand()), false),
-            new ComponentState(md5((string) rand()), false),
-            new ComponentState(md5((string) rand()), false),
-            new ComponentState(md5((string) rand()), false),
-        );
+        $event = new WorkerStateRetrievedEvent($job->id, $retrievedApplicationState);
+        $this->workerStateFactory->setOnWorkerStateRetrievedEvent($event);
 
-        $event = new WorkerStateRetrievedEvent($job->id, $applicationState);
+        self::assertEquals($expectedWorkerStateCreator($job), $this->workerStateRepository->find($job->id));
+    }
 
-        $this->workerStateFactory->createOnWorkerStateRetrievedEvent($event);
-
-        $workerStateEntity = $this->workerStateRepository->find($job->id);
-        self::assertEquals(
-            new WorkerState(
-                $job->id,
-                $applicationState->applicationState->state,
-                $applicationState->compilationState->state,
-                $applicationState->executionState->state,
-                $applicationState->eventDeliveryState->state,
+    /**
+     * @return array<mixed>
+     */
+    public function setOnWorkerStateRetrievedEventSuccessDataProvider(): array
+    {
+        $applicationStates = [
+            new ApplicationState(
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
             ),
-            $workerStateEntity
-        );
+            new ApplicationState(
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
+                new ComponentState(md5((string) rand()), false),
+            ),
+        ];
+
+        return [
+            'no pre-existing entity' => [
+                'workerStateCreator' => function () {
+                },
+                'retrievedApplicationState' => $applicationStates[0],
+                'expectedWorkerStateCreator' => function (Job $job) use ($applicationStates) {
+                    return new WorkerState(
+                        $job->id,
+                        $applicationStates[0]->applicationState->state,
+                        $applicationStates[0]->compilationState->state,
+                        $applicationStates[0]->executionState->state,
+                        $applicationStates[0]->eventDeliveryState->state,
+                    );
+                },
+            ],
+            'has pre-existing entity, no changes' => [
+                'workerStateCreator' => function (
+                    Job $job,
+                    WorkerStateRepository $repository
+                ) use (
+                    $applicationStates
+                ) {
+                    $repository->save(new WorkerState(
+                        $job->id,
+                        $applicationStates[0]->applicationState->state,
+                        $applicationStates[0]->compilationState->state,
+                        $applicationStates[0]->executionState->state,
+                        $applicationStates[0]->eventDeliveryState->state,
+                    ));
+                },
+                'retrievedApplicationState' => $applicationStates[0],
+                'expectedWorkerStateCreator' => function (Job $job) use ($applicationStates) {
+                    return new WorkerState(
+                        $job->id,
+                        $applicationStates[0]->applicationState->state,
+                        $applicationStates[0]->compilationState->state,
+                        $applicationStates[0]->executionState->state,
+                        $applicationStates[0]->eventDeliveryState->state,
+                    );
+                },
+            ],
+            'has pre-existing entity, has changes' => [
+                'workerStateCreator' => function (
+                    Job $job,
+                    WorkerStateRepository $repository
+                ) use (
+                    $applicationStates
+                ) {
+                    $repository->save(new WorkerState(
+                        $job->id,
+                        $applicationStates[0]->applicationState->state,
+                        $applicationStates[0]->compilationState->state,
+                        $applicationStates[0]->executionState->state,
+                        $applicationStates[0]->eventDeliveryState->state,
+                    ));
+                },
+                'retrievedApplicationState' => $applicationStates[1],
+                'expectedWorkerStateCreator' => function (Job $job) use ($applicationStates) {
+                    return new WorkerState(
+                        $job->id,
+                        $applicationStates[1]->applicationState->state,
+                        $applicationStates[1]->compilationState->state,
+                        $applicationStates[1]->executionState->state,
+                        $applicationStates[1]->eventDeliveryState->state,
+                    );
+                },
+            ],
+        ];
     }
 }
