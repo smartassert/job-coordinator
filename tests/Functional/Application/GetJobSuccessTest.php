@@ -10,15 +10,18 @@ use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
+use App\Entity\WorkerComponentState;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
+use App\Enum\WorkerComponentName;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Repository\WorkerComponentStateRepository;
 use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,6 +39,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
      * @param callable(Job, ResultsJobRepository): ?ResultsJob                     $resultsJobCreator
      * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite           $serializedSuiteCreator
      * @param callable(Job, MachineRepository): ?Machine                           $machineCreator
+     * @param callable(Job, WorkerComponentStateRepository): void                  $workerComponentStatesCreator
      * @param callable(Job, ?ResultsJob, ?SerializedSuite, ?Machine): array<mixed> $expectedSerializedJobCreator
      */
     public function testGetSuccess(
@@ -43,6 +47,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         callable $resultsJobCreator,
         callable $serializedSuiteCreator,
         callable $machineCreator,
+        callable $workerComponentStatesCreator,
         callable $expectedSerializedJobCreator
     ): void {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -96,6 +101,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $resultsJob = $resultsJobCreator($job, $resultsJobRepository);
         $serializedSuite = $serializedSuiteCreator($job, $serializedSuiteRepository);
         $machine = $machineCreator($job, $machineRepository);
+
+        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
+        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
+        $workerComponentStatesCreator($job, $workerComponentStateRepository);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -151,11 +160,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
         };
 
         return [
-            'no remote requests, no results job, no serialized suite, no machine' => [
+            'no remote requests, no results job, no serialized suite, no machine, no worker state' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -181,6 +191,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -195,6 +223,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -219,6 +248,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state_category' => null,
                             'ip_address' => null,
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
                         ],
                         'service_requests' => [
                             [
@@ -257,6 +304,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -281,6 +329,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state_category' => null,
                             'ip_address' => null,
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
                         ],
                         'service_requests' => [
                             [
@@ -339,6 +405,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -363,6 +430,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state_category' => null,
                             'ip_address' => null,
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
                         ],
                         'service_requests' => [
                             [
@@ -414,6 +499,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), null),
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
@@ -439,6 +525,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -448,6 +552,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), md5((string) rand())),
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
                     return [
                         'id' => $job->id,
@@ -473,6 +578,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -492,6 +615,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $serializedSuite;
                 },
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -517,6 +641,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
                         'service_requests' => [],
                     ];
                 },
@@ -531,6 +673,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
@@ -556,6 +699,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
                         'service_requests' => [
                             [
                                 'type' => 'machine/create',
@@ -569,7 +730,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'has machine' => [
+            'has machine, no worker state' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
@@ -580,6 +741,96 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     $machineRepository->save($machine);
 
                     return $machine;
+                },
+                'workerComponentStatesCreator' => $nullCreator,
+                'expectedSerializedJobCreator' => function (
+                    Job $job,
+                    ?ResultsJob $resultsJob,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'pending',
+                            ],
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'has machine, has worker state' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                            ->setState('complete')
+                            ->setIsEndState(true)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
                 },
                 'expectedSerializedJobCreator' => function (
                     Job $job,
@@ -610,6 +861,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'complete',
+                                'is_end_state' => true,
+                            ],
+                            'execution' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
                         ],
                         'service_requests' => [],
                     ];
