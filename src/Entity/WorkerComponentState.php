@@ -8,6 +8,12 @@ use App\Enum\WorkerComponentName;
 use App\Repository\WorkerComponentStateRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedWorkerComponentState array{
+ *   state: non-empty-string,
+ *   is_end_state: bool
+ * }
+ */
 #[ORM\Entity(repositoryClass: WorkerComponentStateRepository::class)]
 class WorkerComponentState
 {
@@ -80,5 +86,16 @@ class WorkerComponentState
         $this->isEndState = $isEndState;
 
         return $this;
+    }
+
+    /**
+     * @return SerializedWorkerComponentState
+     */
+    public function toArray(): array
+    {
+        return [
+            'state' => $this->state,
+            'is_end_state' => $this->isEndState,
+        ];
     }
 }
