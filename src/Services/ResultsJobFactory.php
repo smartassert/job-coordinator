@@ -38,27 +38,15 @@ class ResultsJobFactory implements EventSubscriberInterface
             return;
         }
 
-        $this->create(
-            $job,
-            $event->resultsJob->token,
-            $event->resultsJob->state->state,
-            $event->resultsJob->state->endState
-        );
-    }
-
-    /**
-     * @param non-empty-string  $token
-     * @param non-empty-string  $state
-     * @param ?non-empty-string $endState
-     */
-    public function create(Job $job, string $token, string $state, ?string $endState): ResultsJob
-    {
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
-            $resultsJob = new ResultsJob($job->id, $token, $state, $endState);
+            $resultsJob = new ResultsJob(
+                $job->id,
+                $event->resultsJob->token,
+                $event->resultsJob->state->state,
+                $event->resultsJob->state->endState
+            );
             $this->resultsJobRepository->save($resultsJob);
         }
-
-        return $resultsJob;
     }
 }
