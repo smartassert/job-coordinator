@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\Machine as MachineEntity;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
+use App\Enum\RemoteRequestType;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
@@ -38,9 +39,6 @@ class JobSerializer
         private readonly MachineRepository $machineRepository,
         private readonly WorkerStateFactory $workerStateFactory,
         private readonly RemoteRequestRepository $remoteRequestRepository,
-        private readonly RemoteRequestFinder $resultsRequestFinder,
-        private readonly RemoteRequestFinder $serializedSuiteRequestFinder,
-        private readonly RemoteRequestFinder $machineRequestFinder,
     ) {
     }
 
@@ -64,7 +62,7 @@ class JobSerializer
         if ($resultsJob instanceof ResultsJobEntity) {
             $resultsJobRequest = new SuccessfulRemoteRequest();
         } else {
-            $resultsJobRequest = $this->resultsRequestFinder->findNewest($job);
+            $resultsJobRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::RESULTS_CREATE);
             if (null === $resultsJobRequest) {
                 $resultsJobRequest = new PendingRemoteRequest();
             }
@@ -79,7 +77,7 @@ class JobSerializer
         if ($serializedSuite instanceof SerializedSuiteEntity) {
             $serializedSuiteRequest = new SuccessfulRemoteRequest();
         } else {
-            $serializedSuiteRequest = $this->serializedSuiteRequestFinder->findNewest($job);
+            $serializedSuiteRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::SERIALIZED_SUITE_CREATE);
             if (null === $serializedSuiteRequest) {
                 $serializedSuiteRequest = new PendingRemoteRequest();
             }
@@ -94,7 +92,7 @@ class JobSerializer
         if ($machine instanceof MachineEntity) {
             $machineRequest = new SuccessfulRemoteRequest();
         } else {
-            $machineRequest = $this->machineRequestFinder->findNewest($job);
+            $machineRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::MACHINE_CREATE);
             if (null === $machineRequest) {
                 $machineRequest = new PendingRemoteRequest();
             }
