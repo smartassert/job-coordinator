@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
@@ -96,5 +97,18 @@ class RemoteRequestRepository extends ServiceEntityRepository
         }
 
         return $result > 0;
+    }
+
+    public function findNewest(Job $job, RemoteRequestType $type): ?RemoteRequest
+    {
+        return $this->findOneBy(
+            [
+                'jobId' => $job->id,
+                'type' => $type,
+            ],
+            [
+                'index' => 'DESC',
+            ]
+        );
     }
 }
