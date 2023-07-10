@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\WorkerComponentName;
+use App\Model\WorkerComponentStateInterface;
 use App\Repository\WorkerComponentStateRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-type SerializedWorkerComponentState array{
- *   state: non-empty-string,
- *   is_end_state: bool
- * }
+ * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
  */
 #[ORM\Entity(repositoryClass: WorkerComponentStateRepository::class)]
-class WorkerComponentState
+class WorkerComponentState implements WorkerComponentStateInterface
 {
     /**
      * @var non-empty-string
@@ -88,9 +86,6 @@ class WorkerComponentState
         return $this;
     }
 
-    /**
-     * @return SerializedWorkerComponentState
-     */
     public function toArray(): array
     {
         return [

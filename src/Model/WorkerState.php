@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 
 /**
- * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentState
+ * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
  *
  * @phpstan-type SerializedWorkerState array{
  *   'application': SerializedWorkerComponentState,
@@ -20,10 +19,10 @@ use App\Enum\WorkerComponentName;
 class WorkerState
 {
     public function __construct(
-        private readonly WorkerComponentState $applicationState,
-        private readonly WorkerComponentState $compilationState,
-        private readonly WorkerComponentState $executionState,
-        private readonly WorkerComponentState $eventDeliveryState,
+        private readonly WorkerComponentStateInterface $applicationState,
+        private readonly WorkerComponentStateInterface $compilationState,
+        private readonly WorkerComponentStateInterface $executionState,
+        private readonly WorkerComponentStateInterface $eventDeliveryState,
     ) {
     }
 
