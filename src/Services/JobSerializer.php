@@ -62,7 +62,11 @@ class JobSerializer
         if ($resultsJob instanceof ResultsJobEntity) {
             $resultsJobRequest = new SuccessfulRemoteRequest();
         } else {
-            $resultsJobRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::RESULTS_CREATE);
+            $resultsJobRequest = $this->remoteRequestRepository->findNewest(
+                $job,
+                RemoteRequestType::RESULTS_CREATE
+            );
+
             if (null === $resultsJobRequest) {
                 $resultsJobRequest = new PendingRemoteRequest();
             }
@@ -77,7 +81,11 @@ class JobSerializer
         if ($serializedSuite instanceof SerializedSuiteEntity) {
             $serializedSuiteRequest = new SuccessfulRemoteRequest();
         } else {
-            $serializedSuiteRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::SERIALIZED_SUITE_CREATE);
+            $serializedSuiteRequest = $this->remoteRequestRepository->findNewest(
+                $job,
+                RemoteRequestType::SERIALIZED_SUITE_CREATE
+            );
+
             if (null === $serializedSuiteRequest) {
                 $serializedSuiteRequest = new PendingRemoteRequest();
             }

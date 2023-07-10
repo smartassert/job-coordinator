@@ -8,7 +8,6 @@ use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestType;
-use App\Model\RemoteRequestInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -102,10 +101,10 @@ class RemoteRequestRepository extends ServiceEntityRepository
 
     public function findNewest(Job $job, RemoteRequestType $type): ?RemoteRequest
     {
-        return $this->repository->findOneBy(
+        return $this->findOneBy(
             [
                 'jobId' => $job->id,
-                'type' => $this->type,
+                'type' => $type,
             ],
             [
                 'index' => 'DESC',
