@@ -16,6 +16,7 @@ use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob as ResultsJobModel;
 use App\Model\SerializedSuite as SerializedSuiteModel;
 use App\Model\SuccessfulRemoteRequest;
+use App\Model\WorkerState;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -25,6 +26,7 @@ use App\Repository\SerializedSuiteRepository;
  * @phpstan-import-type SerializedResultsJob from ResultsJobModel
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
  * @phpstan-import-type SerializedMachine from MachineModel
+ * @phpstan-import-type SerializedWorkerState from WorkerState
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
@@ -33,6 +35,7 @@ class JobSerializer
         private readonly ResultsJobRepository $resultsJobRepository,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly MachineRepository $machineRepository,
+        private readonly WorkerStateFactory $workerStateFactory,
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestFinder $resultsRequestFinder,
         private readonly RemoteRequestFinder $serializedSuiteRequestFinder,
@@ -45,9 +48,10 @@ class JobSerializer
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   results_job?: SerializedResultsJob,
-     *   serialized_suite?: SerializedSerializedSuite,
-     *   machine?: SerializedMachine,
+     *   results_job: SerializedResultsJob,
+     *   serialized_suite: SerializedSerializedSuite,
+     *   machine: SerializedMachine,
+     *   worker_state: SerializedWorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
      */
@@ -87,6 +91,9 @@ class JobSerializer
 
         $machineModel = new MachineModel($machine, $machineRequest);
         $data['machine'] = $machineModel->toArray();
+
+        $workerState = $this->workerStateFactory->createForJob($job);
+        $data['worker_state'] = $workerState->toArray();
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
         $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
