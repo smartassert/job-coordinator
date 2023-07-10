@@ -33,17 +33,10 @@ class WorkerComponentState implements WorkerComponentStateInterface
 
     /**
      * @param non-empty-string $jobId
-     * @param non-empty-string $state
      */
-    public function __construct(
-        string $jobId,
-        WorkerComponentName $componentName,
-        string $state,
-        bool $isEndState,
-    ) {
+    public function __construct(string $jobId, WorkerComponentName $componentName)
+    {
         $this->id = static::generateId($jobId, $componentName);
-        $this->state = $state;
-        $this->isEndState = $isEndState;
     }
 
     /**
