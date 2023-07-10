@@ -43,3 +43,6 @@ services:
 
     App\Services\WorkerStateFactory:
         public: true
+
+    App\Services\PreparationStateDeriver:
+        public: true

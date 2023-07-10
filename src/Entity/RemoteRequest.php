@@ -65,6 +65,11 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
         return $this->type;
     }
 
+    public function getState(): RequestState
+    {
+        return $this->state;
+    }
+
     public function setState(RequestState $state): self
     {
         $this->state = $state;
