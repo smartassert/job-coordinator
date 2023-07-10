@@ -12,7 +12,6 @@ use App\Message\GetWorkerStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerStateMessageHandler;
 use App\Repository\JobRepository;
-use App\Repository\WorkerStateRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Client as WorkerClient;
@@ -71,9 +70,6 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $workerStateRepository = self::getContainer()->get(WorkerStateRepository::class);
-        \assert($workerStateRepository instanceof WorkerStateRepository);
-
         $jobId = md5((string) rand());
         $this->createJob(jobId: $jobId);
 

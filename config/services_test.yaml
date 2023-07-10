@@ -40,3 +40,6 @@ services:
         public: true
         arguments:
             $httpClient: '@app.tests.integration.http.client'
+
+    App\Services\WorkerStateFactory:
+        public: true
