@@ -9,7 +9,7 @@ use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
-use App\Model\WorkerState as WorkerStateModel;
+use App\Model\WorkerState;
 use App\Repository\WorkerComponentStateRepository;
 
 class WorkerStateFactory
@@ -19,9 +19,9 @@ class WorkerStateFactory
     ) {
     }
 
-    public function createForJob(Job $job): WorkerStateModel
+    public function createForJob(Job $job): WorkerState
     {
-        return new WorkerStateModel(
+        return new WorkerState(
             $this->createComponentState($job, WorkerComponentName::APPLICATION),
             $this->createComponentState($job, WorkerComponentName::COMPILATION),
             $this->createComponentState($job, WorkerComponentName::EXECUTION),
