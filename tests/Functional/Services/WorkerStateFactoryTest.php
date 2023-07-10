@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
+use App\Entity\WorkerComponentState;
 use App\Entity\WorkerState;
+use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Model\PendingWorkerComponentState;
+use App\Model\WorkerState as WorkerStateModel;
 use App\Repository\JobRepository;
+use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerStateRepository;
 use App\Services\WorkerStateFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +24,7 @@ class WorkerStateFactoryTest extends WebTestCase
 {
     private JobRepository $jobRepository;
     private WorkerStateRepository $workerStateRepository;
+    private WorkerComponentStateRepository $workerComponentStateRepository;
     private WorkerStateFactory $workerStateFactory;
 
     protected function setUp(): void
@@ -45,6 +51,15 @@ class WorkerStateFactoryTest extends WebTestCase
         }
 
         $this->workerStateRepository = $workerStateRepository;
+
+        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
+        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
+        foreach ($workerComponentStateRepository->findAll() as $entity) {
+            $entityManager->remove($entity);
+            $entityManager->flush();
+        }
+
+        $this->workerComponentStateRepository = $workerComponentStateRepository;
 
         $workerStateFactory = self::getContainer()->get(WorkerStateFactory::class);
         \assert($workerStateFactory instanceof WorkerStateFactory);
@@ -202,6 +217,152 @@ class WorkerStateFactoryTest extends WebTestCase
                         $applicationStates[1]->compilationState->state,
                         $applicationStates[1]->executionState->state,
                         $applicationStates[1]->eventDeliveryState->state,
+                    );
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createForJobDataProvider
+     *
+     * @param callable(Job, WorkerComponentStateRepository): void $componentStatesCreator
+     * @param callable(Job): WorkerStateModel                     $expectedWorkerStateCreator
+     */
+    public function testCreateForJob(
+        callable $componentStatesCreator,
+        callable $expectedWorkerStateCreator,
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $componentStatesCreator($job, $this->workerComponentStateRepository);
+
+        $workerState = $this->workerStateFactory->createForJob($job);
+
+        self::assertEquals($expectedWorkerStateCreator($job), $workerState);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function createForJobDataProvider(): array
+    {
+        return [
+            'no component state entities' => [
+                'componentStatesCreator' => function () {
+                },
+                'expectedWorkerStateCreator' => function () {
+                    return new WorkerStateModel(
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                    );
+                },
+            ],
+            'application component state entity only' => [
+                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::APPLICATION,
+                        'awaiting-job',
+                        false
+                    ));
+                },
+                'expectedWorkerStateCreator' => function (Job $job) {
+                    return new WorkerStateModel(
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::APPLICATION,
+                            'awaiting-job',
+                            false
+                        ),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                    );
+                },
+            ],
+            'execution component state entity only' => [
+                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::EXECUTION,
+                        'awaiting',
+                        false
+                    ));
+                },
+                'expectedWorkerStateCreator' => function (Job $job) {
+                    return new WorkerStateModel(
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::EXECUTION,
+                            'awaiting',
+                            false
+                        ),
+                        new PendingWorkerComponentState(),
+                    );
+                },
+            ],
+            'all component states' => [
+                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::APPLICATION,
+                        'executing',
+                        false
+                    ));
+
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::COMPILATION,
+                        'complete',
+                        true
+                    ));
+
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::EXECUTION,
+                        'running',
+                        false
+                    ));
+
+                    $repository->save(new WorkerComponentState(
+                        $job->id,
+                        WorkerComponentName::EVENT_DELIVERY,
+                        'running',
+                        false
+                    ));
+                },
+                'expectedWorkerStateCreator' => function (Job $job) {
+                    return new WorkerStateModel(
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::APPLICATION,
+                            'executing',
+                            false
+                        ),
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::COMPILATION,
+                            'complete',
+                            true
+                        ),
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::EXECUTION,
+                            'running',
+                            false
+                        ),
+                        new WorkerComponentState(
+                            $job->id,
+                            WorkerComponentName::EVENT_DELIVERY,
+                            'running',
+                            false
+                        ),
                     );
                 },
             ],
