@@ -10,6 +10,7 @@ use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
+use App\Model\PendingRemoteRequest;
 use App\Model\PendingResultsJob;
 use App\Model\PendingSerializedSuite;
 use App\Model\RemoteRequestCollection;
@@ -64,6 +65,10 @@ class JobSerializer
             $resultsJobRequest = new SuccessfulRemoteRequest();
         } else {
             $resultsJobRequest = $this->resultsRequestFinder->findNewest($job);
+            if (null === $resultsJobRequest) {
+                $resultsJobRequest = new PendingRemoteRequest();
+            }
+
             $resultsJob = new PendingResultsJob();
         }
 
@@ -75,6 +80,10 @@ class JobSerializer
             $serializedSuiteRequest = new SuccessfulRemoteRequest();
         } else {
             $serializedSuiteRequest = $this->serializedSuiteRequestFinder->findNewest($job);
+            if (null === $serializedSuiteRequest) {
+                $serializedSuiteRequest = new PendingRemoteRequest();
+            }
+
             $serializedSuite = new PendingSerializedSuite();
         }
 
@@ -86,6 +95,10 @@ class JobSerializer
             $machineRequest = new SuccessfulRemoteRequest();
         } else {
             $machineRequest = $this->machineRequestFinder->findNewest($job);
+            if (null === $machineRequest) {
+                $machineRequest = new PendingRemoteRequest();
+            }
+
             $machine = new PendingMachine();
         }
 
