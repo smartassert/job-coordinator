@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Model\PendingWorkerComponentState;
-use App\Model\WorkerState as WorkerStateModel;
+use App\Model\WorkerState;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerStateFactory;
@@ -55,7 +55,7 @@ class WorkerStateFactoryTest extends WebTestCase
      * @dataProvider createForJobDataProvider
      *
      * @param callable(Job, WorkerComponentStateRepository): void $componentStatesCreator
-     * @param callable(Job): WorkerStateModel                     $expectedWorkerStateCreator
+     * @param callable(Job): WorkerState                          $expectedWorkerStateCreator
      */
     public function testCreateForJob(
         callable $componentStatesCreator,
@@ -81,7 +81,7 @@ class WorkerStateFactoryTest extends WebTestCase
                 'componentStatesCreator' => function () {
                 },
                 'expectedWorkerStateCreator' => function () {
-                    return new WorkerStateModel(
+                    return new WorkerState(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
@@ -101,7 +101,7 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    return new WorkerStateModel(
+                    return new WorkerState(
                         (new WorkerComponentState(
                             $job->id,
                             WorkerComponentName::APPLICATION,
@@ -126,7 +126,7 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    return new WorkerStateModel(
+                    return new WorkerState(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         (new WorkerComponentState(
@@ -178,7 +178,7 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    return new WorkerStateModel(
+                    return new WorkerState(
                         (new WorkerComponentState(
                             $job->id,
                             WorkerComponentName::APPLICATION,
