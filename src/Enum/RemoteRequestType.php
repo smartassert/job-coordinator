@@ -16,4 +16,16 @@ enum RemoteRequestType: string
     case RESULTS_STATE_GET = 'results/state/get';
     case MACHINE_TERMINATE = 'machine/terminate';
     case MACHINE_STATE_GET = 'machine/state/get';
+    private const REPEATABLE_TYPES = [
+        self::MACHINE_GET,
+        self::SERIALIZED_SUITE_GET,
+        self::RESULTS_STATE_GET,
+        self::MACHINE_STATE_GET,
+        self::SERIALIZED_SUITE_READ,
+    ];
+
+    public function isRepeatable(): bool
+    {
+        return in_array($this, self::REPEATABLE_TYPES);
+    }
 }
