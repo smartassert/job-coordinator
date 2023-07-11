@@ -16,7 +16,7 @@ class ResultsJob implements ResultsJobInterface
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
-    public readonly string $id;
+    public readonly string $jobId;
 
     #[ORM\Column(length: 32)]
     public readonly string $token;
@@ -34,14 +34,14 @@ class ResultsJob implements ResultsJobInterface
     private ?string $endState;
 
     /**
-     * @param non-empty-string  $id
+     * @param non-empty-string  $jobId
      * @param non-empty-string  $token
      * @param non-empty-string  $state
      * @param ?non-empty-string $endState
      */
-    public function __construct(string $id, string $token, string $state, ?string $endState)
+    public function __construct(string $jobId, string $token, string $state, ?string $endState)
     {
-        $this->id = $id;
+        $this->jobId = $jobId;
         $this->token = $token;
         $this->state = $state;
         $this->endState = $endState;

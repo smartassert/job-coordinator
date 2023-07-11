@@ -19,11 +19,11 @@ final class Version20230612145927 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE results_job (
-                id VARCHAR(32) NOT NULL,
-                 token VARCHAR(32) NOT NULL, 
-                 state VARCHAR(128) NOT NULL, 
-                 end_state VARCHAR(128) DEFAULT NULL,
-                  PRIMARY KEY(id)
+                job_id VARCHAR(32) NOT NULL,
+                token VARCHAR(32) NOT NULL,
+                state VARCHAR(128) NOT NULL,
+                end_state VARCHAR(128) DEFAULT NULL,
+                PRIMARY KEY(job_id)
             )
         ');
     }
