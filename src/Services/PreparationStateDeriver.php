@@ -21,7 +21,7 @@ class PreparationStateDeriver
 
     public function getForResultsJob(Job $job): PreparationStateEnum
     {
-        if ($this->resultsJobRepository->count(['id' => $job->id]) > 0) {
+        if ($this->resultsJobRepository->count(['jobId' => $job->id]) > 0) {
             return PreparationStateEnum::SUCCEEDED;
         }
 
