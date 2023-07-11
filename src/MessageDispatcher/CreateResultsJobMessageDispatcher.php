@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\JobCreatedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateResultsJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,6 +28,9 @@ class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(

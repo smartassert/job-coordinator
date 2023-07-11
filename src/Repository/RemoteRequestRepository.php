@@ -111,4 +111,9 @@ class RemoteRequestRepository extends ServiceEntityRepository
             ]
         );
     }
+
+    public function getFirstForJobAndType(Job $job, RemoteRequestType $type): ?RemoteRequest
+    {
+        return $this->findOneBy(['jobId' => $job->id, 'type' => $type, 'index' => 0]);
+    }
 }

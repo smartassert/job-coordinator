@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetSerializedSuiteMessage;
 use App\Model\SerializedSuiteEndStates;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,6 +33,9 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(new GetSerializedSuiteMessage(
@@ -41,6 +45,9 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         ));
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
     {
         $serializedSuiteState = $event->serializedSuite->getState();

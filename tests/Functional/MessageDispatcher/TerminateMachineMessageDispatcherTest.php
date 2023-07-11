@@ -11,6 +11,7 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\Repository\JobRepository;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -79,9 +80,15 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+        $jobRepository->add($job);
+
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
-            md5((string) rand()),
+            $job->id,
             new ResultsJobState('complete', 'ended')
         );
 

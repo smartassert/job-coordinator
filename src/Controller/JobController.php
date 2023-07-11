@@ -37,9 +37,9 @@ class JobController
         }
 
         $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
+        $repository->add($job);
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
-        $repository->add($job);
 
         return new JsonResponse($jobSerializer->serialize($job));
     }

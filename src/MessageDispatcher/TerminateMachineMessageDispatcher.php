@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\TerminateMachineMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,6 +28,9 @@ class TerminateMachineMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatch(ResultsJobStateRetrievedEvent $event): void
     {
         if (null === $event->resultsJobState->endState) {
