@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetMachineMessage;
 use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,6 +34,9 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
     {
         if ('end' === $event->current->stateCategory) {
@@ -46,6 +50,9 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         ));
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatch(MachineCreationRequestedEvent $event): void
     {
         $machine = $event->machine;

@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
@@ -37,6 +38,9 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
         $job = $this->jobRepository->find($event->jobId);

@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetResultsJobStateMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,6 +32,9 @@ class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
@@ -38,6 +42,9 @@ class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForResultsJobStateRetrievedEvent(ResultsJobStateRetrievedEvent $event): void
     {
         if (is_string($event->resultsJobState->endState)) {

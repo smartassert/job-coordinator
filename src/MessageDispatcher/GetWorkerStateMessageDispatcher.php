@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetWorkerStateMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,6 +32,9 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForWorkerJobStartRequestedEvent(WorkerJobStartRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
@@ -38,6 +42,9 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
     public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
         if (!$event->state->applicationState->isEndState) {
