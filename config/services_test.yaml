@@ -44,5 +44,5 @@ services:
     App\Services\WorkerStateFactory:
         public: true
 
-    App\Services\PreparationStateDeriver:
+    App\Services\ComponentPreparationFactory:
         public: true

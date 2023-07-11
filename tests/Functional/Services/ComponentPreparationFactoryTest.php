@@ -7,23 +7,27 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\RemoteRequest;
+use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\PreparationState;
+use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
+use App\Model\ComponentPreparation;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\PreparationStateDeriver;
+use App\Services\ComponentPreparationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class PreparationStateDeriverTest extends WebTestCase
+class ComponentPreparationFactoryTest extends WebTestCase
 {
-    private PreparationStateDeriver $preparationStateDeriver;
+    private ComponentPreparationFactory $componentPreparationFactory;
     private RemoteRequestRepository $remoteRequestRepository;
     private JobRepository $jobRepository;
 
@@ -31,9 +35,9 @@ class PreparationStateDeriverTest extends WebTestCase
     {
         parent::setUp();
 
-        $preparationStateDeriver = self::getContainer()->get(PreparationStateDeriver::class);
-        \assert($preparationStateDeriver instanceof PreparationStateDeriver);
-        $this->preparationStateDeriver = $preparationStateDeriver;
+        $componentPreparationFactory = self::getContainer()->get(ComponentPreparationFactory::class);
+        \assert($componentPreparationFactory instanceof ComponentPreparationFactory);
+        $this->componentPreparationFactory = $componentPreparationFactory;
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -53,6 +57,13 @@ class PreparationStateDeriverTest extends WebTestCase
         }
 
         $this->jobRepository = $jobRepository;
+
+        $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
+        \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
+        foreach ($remoteRequestFailureRepository->findAll() as $entity) {
+            $entityManager->remove($entity);
+            $entityManager->flush();
+        }
     }
 
     /**
@@ -64,7 +75,7 @@ class PreparationStateDeriverTest extends WebTestCase
     public function testGetForResultsJob(
         callable $entityCreator,
         callable $remoteRequestsCreator,
-        PreparationState $expected
+        ComponentPreparation $expected
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
@@ -75,7 +86,7 @@ class PreparationStateDeriverTest extends WebTestCase
         $entityCreator($job, $resultsJobRepository);
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
-        self::assertSame($expected, $this->preparationStateDeriver->getForResultsJob($job));
+        self::assertEquals($expected, $this->componentPreparationFactory->getForResultsJob($job));
     }
 
     /**
@@ -89,7 +100,7 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::PENDING,
+                'expected' => new ComponentPreparation(PreparationState::PENDING),
             ],
             'no entity, single request of state "requesting"' => [
                 'entityCreator' => function () {
@@ -103,7 +114,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "halted"' => [
                 'entityCreator' => function () {
@@ -117,7 +128,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::HALTED)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "pending"' => [
                 'entityCreator' => function () {
@@ -131,9 +142,9 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
-            'no entity, single request of state "failed"' => [
+            'no entity, single request of state "failed", no remote request failure' => [
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
@@ -145,7 +156,34 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::FAILED,
+                'expected' => new ComponentPreparation(PreparationState::FAILED),
+            ],
+            'no entity, single request of state "failed", has remote request failure' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::RESULTS_CREATE,
+                            0
+                        ))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            ))
+                    );
+                },
+                'expected' => new ComponentPreparation(
+                    PreparationState::FAILED,
+                    new RemoteRequestFailure(
+                        RemoteRequestFailureType::HTTP,
+                        503,
+                        'service unavailable'
+                    )
+                ),
             ],
             'has entity, no remote requests' => [
                 'entityCreator' => function (Job $job, ResultsJobRepository $repository) {
@@ -158,9 +196,9 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
-            'has entity, many failed request' => [
+            'has entity, has failed request' => [
                 'entityCreator' => function (Job $job, ResultsJobRepository $repository) {
                     $repository->save(new ResultsJob(
                         $job->id,
@@ -178,7 +216,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
         ];
     }
@@ -192,7 +230,7 @@ class PreparationStateDeriverTest extends WebTestCase
     public function testGetForSerializedSuite(
         callable $entityCreator,
         callable $remoteRequestsCreator,
-        PreparationState $expected
+        ComponentPreparation $expected
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
@@ -203,7 +241,7 @@ class PreparationStateDeriverTest extends WebTestCase
         $entityCreator($job, $serializedSuiteRepository);
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
-        self::assertSame($expected, $this->preparationStateDeriver->getForSerializedSuite($job));
+        self::assertEquals($expected, $this->componentPreparationFactory->getForSerializedSuite($job));
     }
 
     /**
@@ -217,7 +255,7 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::PENDING,
+                'expected' => new ComponentPreparation(PreparationState::PENDING),
             ],
             'no entity, single request of state "requesting"' => [
                 'entityCreator' => function () {
@@ -231,7 +269,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "halted"' => [
                 'entityCreator' => function () {
@@ -245,7 +283,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::HALTED)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "pending"' => [
                 'entityCreator' => function () {
@@ -259,9 +297,9 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
-            'no entity, single request of state "failed"' => [
+            'no entity, single request of state "failed", no remote request failure' => [
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
@@ -273,7 +311,34 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::FAILED,
+                'expected' => new ComponentPreparation(PreparationState::FAILED),
+            ],
+            'no entity, single request of state "failed", has remote request failure' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            ))
+                    );
+                },
+                'expected' => new ComponentPreparation(
+                    PreparationState::FAILED,
+                    new RemoteRequestFailure(
+                        RemoteRequestFailureType::HTTP,
+                        503,
+                        'service unavailable'
+                    )
+                ),
             ],
             'has entity, no remote requests' => [
                 'entityCreator' => function (Job $job, SerializedSuiteRepository $repository) {
@@ -281,9 +346,9 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
-            'has entity, many failed request' => [
+            'has entity, has failed request' => [
                 'entityCreator' => function (Job $job, SerializedSuiteRepository $repository) {
                     $repository->save(new SerializedSuite($job->id, md5((string) rand()), 'requested'));
                 },
@@ -292,19 +357,11 @@ class PreparationStateDeriverTest extends WebTestCase
                         (new RemoteRequest(
                             $job->id,
                             RemoteRequestType::SERIALIZED_SUITE_CREATE,
-                            0
-                        ))->setState(RequestState::FAILED)
-                    );
-
-                    $repository->save(
-                        (new RemoteRequest(
-                            $job->id,
-                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
                             1
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
         ];
     }
@@ -318,7 +375,7 @@ class PreparationStateDeriverTest extends WebTestCase
     public function testGetForMachine(
         callable $entityCreator,
         callable $remoteRequestsCreator,
-        PreparationState $expected
+        ComponentPreparation $expected
     ): void {
         $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
@@ -329,7 +386,7 @@ class PreparationStateDeriverTest extends WebTestCase
         $entityCreator($job, $machineRepository);
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
-        self::assertSame($expected, $this->preparationStateDeriver->getForMachine($job));
+        self::assertEquals($expected, $this->componentPreparationFactory->getForMachine($job));
     }
 
     /**
@@ -343,7 +400,7 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::PENDING,
+                'expected' => new ComponentPreparation(PreparationState::PENDING),
             ],
             'no entity, single request of state "requesting"' => [
                 'entityCreator' => function () {
@@ -357,7 +414,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "halted"' => [
                 'entityCreator' => function () {
@@ -371,7 +428,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::HALTED)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
             'no entity, single request of state "pending"' => [
                 'entityCreator' => function () {
@@ -385,9 +442,9 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::REQUESTING)
                     );
                 },
-                'expected' => PreparationState::PREPARING,
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
             ],
-            'no entity, single request of state "failed"' => [
+            'no entity, single request of state "failed", no remote request failure' => [
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
@@ -399,7 +456,34 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::FAILED,
+                'expected' => new ComponentPreparation(PreparationState::FAILED),
+            ],
+            'no entity, single request of state "failed", has remote request failure' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_CREATE,
+                            0
+                        ))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            ))
+                    );
+                },
+                'expected' => new ComponentPreparation(
+                    PreparationState::FAILED,
+                    new RemoteRequestFailure(
+                        RemoteRequestFailureType::HTTP,
+                        503,
+                        'service unavailable'
+                    )
+                ),
             ],
             'has entity, no remote requests' => [
                 'entityCreator' => function (Job $job, MachineRepository $repository) {
@@ -407,9 +491,9 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
-            'has entity, many failed request' => [
+            'has entity, has failed request' => [
                 'entityCreator' => function (Job $job, MachineRepository $repository) {
                     $repository->save(new Machine($job->id, md5((string) rand()), md5((string) rand())));
                 },
@@ -422,7 +506,7 @@ class PreparationStateDeriverTest extends WebTestCase
                         ))->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => PreparationState::SUCCEEDED,
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
             ],
         ];
     }
