@@ -7,12 +7,14 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use App\Services\PreparationStateDeriver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -54,11 +56,11 @@ class PreparationStateDeriverTest extends WebTestCase
     /**
      * @dataProvider getForResultsJobDataProvider
      *
-     * @param callable(Job, ResultsJobRepository): void    $resultsJobCreator
+     * @param callable(Job, ResultsJobRepository): void    $entityCreator
      * @param callable(Job, RemoteRequestRepository): void $remoteRequestsCreator
      */
     public function testGetForResultsJob(
-        callable $resultsJobCreator,
+        callable $entityCreator,
         callable $remoteRequestsCreator,
         PreparationState $expected
     ): void {
@@ -68,7 +70,7 @@ class PreparationStateDeriverTest extends WebTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $resultsJobCreator($job, $resultsJobRepository);
+        $entityCreator($job, $resultsJobRepository);
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
         self::assertSame($expected, $this->preparationStateDeriver->getForResultsJob($job));
@@ -80,15 +82,15 @@ class PreparationStateDeriverTest extends WebTestCase
     public function getForResultsJobDataProvider(): array
     {
         return [
-            'no results job entity, no remote requests' => [
-                'resultsJobCreator' => function () {
+            'no entity, no remote requests' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function () {
                 },
                 'expected' => PreparationState::PENDING,
             ],
-            'no results job entity, single request of state "requesting"' => [
-                'resultsJobCreator' => function () {
+            'no entity, single request of state "requesting"' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
                     $repository->save(
@@ -101,8 +103,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::PREPARING,
             ],
-            'no results job entity, single request of state "halted"' => [
-                'resultsJobCreator' => function () {
+            'no entity, single request of state "halted"' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
                     $repository->save(
@@ -115,8 +117,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::PREPARING,
             ],
-            'no results job entity, single request of state "pending"' => [
-                'resultsJobCreator' => function () {
+            'no entity, single request of state "pending"' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
                     $repository->save(
@@ -129,8 +131,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::PREPARING,
             ],
-            'no results job entity, single request of state "failed"' => [
-                'resultsJobCreator' => function () {
+            'no entity, single request of state "failed"' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
                     $repository->save(
@@ -143,8 +145,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::FAILED,
             ],
-            'no results job entity, request of state "failed", request of state "requesting"' => [
-                'resultsJobCreator' => function () {
+            'no entity, request of state "failed", request of state "requesting"' => [
+                'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
                     $repository->save(
@@ -165,8 +167,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::PREPARING,
             ],
-            'has results job entity, no remote requests' => [
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $repository) {
+            'has entity, no remote requests' => [
+                'entityCreator' => function (Job $job, ResultsJobRepository $repository) {
                     $repository->save(new ResultsJob(
                         $job->id,
                         'results job token',
@@ -178,8 +180,8 @@ class PreparationStateDeriverTest extends WebTestCase
                 },
                 'expected' => PreparationState::SUCCEEDED,
             ],
-            'has results job entity, many remote requests' => [
-                'resultsJobCreator' => function (Job $job, ResultsJobRepository $repository) {
+            'has entity, many remote requests' => [
+                'entityCreator' => function (Job $job, ResultsJobRepository $repository) {
                     $repository->save(new ResultsJob(
                         $job->id,
                         'results job token',
@@ -200,6 +202,154 @@ class PreparationStateDeriverTest extends WebTestCase
                         (new RemoteRequest(
                             $job->id,
                             RemoteRequestType::RESULTS_CREATE,
+                            1
+                        ))->setState(RequestState::FAILED)
+                    );
+                },
+                'expected' => PreparationState::SUCCEEDED,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getForSerializedSuiteDataProvider
+     *
+     * @param callable(Job, SerializedSuiteRepository): void $entityCreator
+     * @param callable(Job, RemoteRequestRepository): void   $remoteRequestsCreator
+     */
+    public function testGetForSerializedSuite(
+        callable $entityCreator,
+        callable $remoteRequestsCreator,
+        PreparationState $expected
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $entityCreator($job, $serializedSuiteRepository);
+        $remoteRequestsCreator($job, $this->remoteRequestRepository);
+
+        self::assertSame($expected, $this->preparationStateDeriver->getForSerializedSuite($job));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getForSerializedSuiteDataProvider(): array
+    {
+        return [
+            'no entity, no remote requests' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function () {
+                },
+                'expected' => PreparationState::PENDING,
+            ],
+            'no entity, single request of state "requesting"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::REQUESTING)
+                    );
+                },
+                'expected' => PreparationState::PREPARING,
+            ],
+            'no entity, single request of state "halted"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::HALTED)
+                    );
+                },
+                'expected' => PreparationState::PREPARING,
+            ],
+            'no entity, single request of state "pending"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::REQUESTING)
+                    );
+                },
+                'expected' => PreparationState::PREPARING,
+            ],
+            'no entity, single request of state "failed"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::FAILED)
+                    );
+                },
+                'expected' => PreparationState::FAILED,
+            ],
+            'no entity, request of state "failed", request of state "requesting"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::FAILED)
+                    );
+
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            1
+                        ))->setState(RequestState::REQUESTING)
+                    );
+                },
+                'expected' => PreparationState::PREPARING,
+            ],
+            'has entity, no remote requests' => [
+                'entityCreator' => function (Job $job, SerializedSuiteRepository $repository) {
+                    $repository->save(new SerializedSuite($job->id, md5((string) rand()), 'requested'));
+                },
+                'remoteRequestsCreator' => function () {
+                },
+                'expected' => PreparationState::SUCCEEDED,
+            ],
+            'has entity, many remote requests' => [
+                'entityCreator' => function (Job $job, SerializedSuiteRepository $repository) {
+                    $repository->save(new SerializedSuite($job->id, md5((string) rand()), 'requested'));
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                            0
+                        ))->setState(RequestState::FAILED)
+                    );
+
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::SERIALIZED_SUITE_CREATE,
                             1
                         ))->setState(RequestState::FAILED)
                     );
