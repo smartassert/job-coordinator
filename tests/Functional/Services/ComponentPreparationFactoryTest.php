@@ -10,10 +10,12 @@ use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
+use App\Entity\WorkerComponentState;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
+use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
@@ -21,6 +23,7 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Repository\WorkerComponentStateRepository;
 use App\Services\ComponentPreparationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -502,6 +505,186 @@ class ComponentPreparationFactoryTest extends WebTestCase
                         (new RemoteRequest(
                             $job->id,
                             RemoteRequestType::MACHINE_CREATE,
+                            1
+                        ))->setState(RequestState::FAILED)
+                    );
+                },
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getForWorkerJobDataProvider
+     *
+     * @param callable(Job, WorkerComponentStateRepository): void $entityCreator
+     * @param callable(Job, RemoteRequestRepository): void        $remoteRequestsCreator
+     */
+    public function testGetForWorkerJob(
+        callable $entityCreator,
+        callable $remoteRequestsCreator,
+        ComponentPreparation $expected
+    ): void {
+        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $this->jobRepository->add($job);
+
+        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
+        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
+
+        $entityCreator($job, $workerComponentStateRepository);
+        $remoteRequestsCreator($job, $this->remoteRequestRepository);
+
+        self::assertEquals($expected, $this->componentPreparationFactory->getForWorkerJob($job));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getForWorkerJobDataProvider(): array
+    {
+        return [
+            'no entities, no remote requests' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function () {
+                },
+                'expected' => new ComponentPreparation(PreparationState::PENDING),
+            ],
+            'no entities, single request of state "requesting"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
+                            0
+                        ))->setState(RequestState::REQUESTING)
+                    );
+                },
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
+            ],
+            'no entities, single request of state "halted"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
+                            0
+                        ))->setState(RequestState::HALTED)
+                    );
+                },
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
+            ],
+            'no entities, single request of state "pending"' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
+                            0
+                        ))->setState(RequestState::REQUESTING)
+                    );
+                },
+                'expected' => new ComponentPreparation(PreparationState::PREPARING),
+            ],
+            'no entities, single request of state "failed", no remote request failure' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
+                            0
+                        ))->setState(RequestState::FAILED)
+                    );
+                },
+                'expected' => new ComponentPreparation(PreparationState::FAILED),
+            ],
+            'no entities, single request of state "failed", has remote request failure' => [
+                'entityCreator' => function () {
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
+                            0
+                        ))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            ))
+                    );
+                },
+                'expected' => new ComponentPreparation(
+                    PreparationState::FAILED,
+                    new RemoteRequestFailure(
+                        RemoteRequestFailureType::HTTP,
+                        503,
+                        'service unavailable'
+                    )
+                ),
+            ],
+            'has single entity, no remote requests' => [
+                'entityCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('awaiting-job')
+                            ->setIsEndState(false)
+                    );
+                },
+                'remoteRequestsCreator' => function () {
+                },
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
+            ],
+            'has multiple entities, no remote requests' => [
+                'entityCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('compiling')
+                            ->setIsEndState(false)
+                    );
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                            ->setState('pending')
+                            ->setIsEndState(false)
+                    );
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+                },
+                'remoteRequestsCreator' => function () {
+                },
+                'expected' => new ComponentPreparation(PreparationState::SUCCEEDED),
+            ],
+            'has single entity, has failed request' => [
+                'entityCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('awaiting-job')
+                            ->setIsEndState(false)
+                    );
+                },
+                'remoteRequestsCreator' => function (Job $job, RemoteRequestRepository $repository) {
+                    $repository->save(
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestType::MACHINE_START_JOB,
                             1
                         ))->setState(RequestState::FAILED)
                     );
