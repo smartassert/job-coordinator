@@ -14,6 +14,7 @@ use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
 use App\Model\PendingResultsJob;
 use App\Model\PendingSerializedSuite;
+use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob as ResultsJobModel;
 use App\Model\SerializedSuite as SerializedSuiteModel;
@@ -25,6 +26,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
 /**
+ * @phpstan-import-type SerializedPreparationState from PreparationState
  * @phpstan-import-type SerializedResultsJob from ResultsJobModel
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
  * @phpstan-import-type SerializedMachine from MachineModel
@@ -34,6 +36,7 @@ use App\Repository\SerializedSuiteRepository;
 class JobSerializer
 {
     public function __construct(
+        private readonly PreparationStateFactory $preparationStateFactory,
         private readonly ResultsJobRepository $resultsJobRepository,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly MachineRepository $machineRepository,
@@ -47,6 +50,7 @@ class JobSerializer
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
+     *   preparation: SerializedPreparationState,
      *   results_job: SerializedResultsJob,
      *   serialized_suite: SerializedSerializedSuite,
      *   machine: SerializedMachine,
@@ -57,6 +61,9 @@ class JobSerializer
     public function serialize(Job $job): array
     {
         $data = $job->toArray();
+
+        $preparationState = $this->preparationStateFactory->create($job);
+        $data['preparation'] = $preparationState->toArray();
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if ($resultsJob instanceof ResultsJobEntity) {

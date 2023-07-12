@@ -137,8 +137,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
      */
     public function getDataProvider(): array
     {
-        $serializedSuiteId = md5((string) rand());
-
         $nullCreator = function () {
             return null;
         };
@@ -171,6 +169,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'pending',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'pending',
@@ -229,6 +230,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'requesting',
@@ -314,6 +318,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'halted',
@@ -408,6 +415,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => RequestState::SUCCEEDED->value,
@@ -461,6 +471,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => RequestState::SUCCEEDED->value,
@@ -509,10 +522,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => function (
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
-                ) use (
-                    $serializedSuiteId
                 ) {
-                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
+                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -524,6 +535,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'pending',
@@ -582,6 +596,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'pending',
@@ -656,6 +673,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'pending',
@@ -745,6 +765,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'preparing',
+                        ],
                         'results_job' => [
                             'request' => [
                                 'state' => 'pending',
@@ -784,6 +807,283 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'service_requests' => [],
+                    ];
+                },
+            ],
+            'prepared' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator('awaiting-events', null),
+                'serializedSuiteCreator' => function (
+                    Job $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) {
+                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    return $serializedSuite;
+                },
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                            ->setState('complete')
+                            ->setIsEndState(true)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+                },
+                'expectedSerializedJobCreator' => function (
+                    Job $job,
+                    ?ResultsJob $resultsJob,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'succeeded',
+                        ],
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'succeeded',
+                            ],
+                            'state' => 'awaiting-events',
+                            'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'succeeded',
+                            ],
+                            'state' => 'prepared',
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => RequestState::SUCCEEDED->value,
+                            ],
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'complete',
+                                'is_end_state' => true,
+                            ],
+                            'execution' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'running',
+                                'is_end_state' => false,
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'all preparation failed' => [
+                'remoteRequestsCreator' => function (Job $job) {
+                    return [
+                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                503,
+                                'service unavailable'
+                            )),
+                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::NETWORK,
+                                28,
+                                'connection timed out'
+                            )),
+                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_CREATE, 0))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::HTTP,
+                                500,
+                                'internal server error'
+                            )),
+                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_START_JOB, 0))
+                            ->setState(RequestState::FAILED)
+                            ->setFailure(new RemoteRequestFailure(
+                                RemoteRequestFailureType::NETWORK,
+                                6,
+                                'hostname lookup failed'
+                            )),
+                    ];
+                },
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => $nullCreator,
+                'workerComponentStatesCreator' => $nullCreator,
+                'expectedSerializedJobCreator' => function (Job $job) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'preparation' => [
+                            'state' => 'failed',
+                            'failures' => [
+                                'results_job' => [
+                                    'type' => 'http',
+                                    'code' => 503,
+                                    'message' => 'service unavailable',
+                                ],
+                                'serialized_suite' => [
+                                    'type' => 'network',
+                                    'code' => 28,
+                                    'message' => 'connection timed out',
+                                ],
+                                'machine' => [
+                                    'type' => 'http',
+                                    'code' => 500,
+                                    'message' => 'internal server error',
+                                ],
+                                'worker_job' => [
+                                    'type' => 'network',
+                                    'code' => 6,
+                                    'message' => 'hostname lookup failed',
+                                ],
+                            ],
+                        ],
+                        'results_job' => [
+                            'request' => [
+                                'state' => 'failed',
+                                'failure' => [
+                                    'type' => 'http',
+                                    'code' => 503,
+                                    'message' => 'service unavailable',
+                                ],
+                            ],
+                            'state' => null,
+                            'end_state' => null,
+                        ],
+                        'serialized_suite' => [
+                            'request' => [
+                                'state' => 'failed',
+                                'failure' => [
+                                    'type' => 'network',
+                                    'code' => 28,
+                                    'message' => 'connection timed out',
+                                ],
+                            ],
+                            'state' => null,
+                        ],
+                        'machine' => [
+                            'request' => [
+                                'state' => 'failed',
+                                'failure' => [
+                                    'type' => 'http',
+                                    'code' => 500,
+                                    'message' => 'internal server error',
+                                ],
+                            ],
+                            'state_category' => null,
+                            'ip_address' => null,
+                        ],
+                        'worker_state' => [
+                            'application' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'compilation' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'execution' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'is_end_state' => false,
+                            ],
+                        ],
+                        'service_requests' => [
+                            [
+                                'type' => 'machine/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'http',
+                                            'code' => 500,
+                                            'message' => 'internal server error',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'machine/start-job',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'network',
+                                            'code' => 6,
+                                            'message' => 'hostname lookup failed',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'results/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'http',
+                                            'code' => 503,
+                                            'message' => 'service unavailable',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'serialized-suite/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'network',
+                                            'code' => 28,
+                                            'message' => 'connection timed out',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ];
                 },
             ],
