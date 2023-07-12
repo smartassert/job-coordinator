@@ -13,6 +13,7 @@ use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Repository\WorkerComponentStateRepository;
 
 class ComponentPreparationFactory
 {
@@ -21,6 +22,7 @@ class ComponentPreparationFactory
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly MachineRepository $machineRepository,
         private readonly RemoteRequestRepository $remoteRequestRepository,
+        private readonly WorkerComponentStateRepository $workerComponentStateRepository,
     ) {
     }
 
@@ -67,6 +69,25 @@ class ComponentPreparationFactory
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::MACHINE_CREATE);
+        if (null === $remoteRequest) {
+            return new ComponentPreparation(PreparationState::PENDING);
+        }
+
+        if (RequestState::FAILED === $remoteRequest->getState()) {
+            return new ComponentPreparation(PreparationState::FAILED, $remoteRequest->getFailure());
+        }
+
+        return new ComponentPreparation(PreparationState::PREPARING);
+    }
+
+    public function getForWorkerJob(Job $job): ComponentPreparation
+    {
+        $componentStates = $this->workerComponentStateRepository->getAllForJob($job);
+        if ([] !== $componentStates) {
+            return new ComponentPreparation(PreparationState::SUCCEEDED);
+        }
+
+        $remoteRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::MACHINE_START_JOB);
         if (null === $remoteRequest) {
             return new ComponentPreparation(PreparationState::PENDING);
         }
