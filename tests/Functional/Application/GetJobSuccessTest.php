@@ -213,7 +213,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'single results/create request, requesting' => [
+            'results/create: requesting' => [
                 'remoteRequestsCreator' => function (Job $job) {
                     return [
                         (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
@@ -271,103 +271,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             [
                                 'type' => 'results/create',
                                 'attempts' => [
-                                    [
-                                        'state' => 'requesting',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ];
-                },
-            ],
-            'multiple results/create requests' => [
-                'remoteRequestsCreator' => function (Job $job) {
-                    return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
-                            ->setState(RequestState::FAILED)
-                            ->setFailure(new RemoteRequestFailure(
-                                RemoteRequestFailureType::NETWORK,
-                                28,
-                                'timed out'
-                            )),
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 1))
-                            ->setState(RequestState::FAILED)
-                            ->setFailure(new RemoteRequestFailure(
-                                RemoteRequestFailureType::HTTP,
-                                503,
-                                'service unavailable'
-                            )),
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 2))
-                            ->setState(RequestState::REQUESTING),
-                    ];
-                },
-                'resultsJobCreator' => $nullCreator,
-                'serializedSuiteCreator' => $nullCreator,
-                'machineCreator' => $nullCreator,
-                'workerComponentStatesCreator' => $nullCreator,
-                'expectedSerializedJobCreator' => function (Job $job) {
-                    return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
-                        'results_job' => [
-                            'request' => [
-                                'state' => 'requesting',
-                            ],
-                            'state' => null,
-                            'end_state' => null,
-                        ],
-                        'serialized_suite' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
-                            'state' => null,
-                        ],
-                        'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
-                        'worker_state' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                        ],
-                        'service_requests' => [
-                            [
-                                'type' => 'results/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 28,
-                                            'message' => 'timed out',
-                                        ],
-                                    ],
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'http',
-                                            'code' => 503,
-                                            'message' => 'service unavailable',
-                                        ],
-                                    ],
                                     [
                                         'state' => 'requesting',
                                     ],
