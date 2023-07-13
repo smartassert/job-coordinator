@@ -45,7 +45,7 @@ class ComponentPreparationFactory
         ];
     }
 
-    public function getForResultsJob(Job $job): ComponentPreparation
+    private function getForResultsJob(Job $job): ComponentPreparation
     {
         if ($this->resultsJobRepository->count(['jobId' => $job->id]) > 0) {
             return new ComponentPreparation(PreparationState::SUCCEEDED);
@@ -63,7 +63,7 @@ class ComponentPreparationFactory
         return new ComponentPreparation(PreparationState::PREPARING);
     }
 
-    public function getForSerializedSuite(Job $job): ComponentPreparation
+    private function getForSerializedSuite(Job $job): ComponentPreparation
     {
         if ($this->serializedSuiteRepository->count(['jobId' => $job->id]) > 0) {
             return new ComponentPreparation(PreparationState::SUCCEEDED);
@@ -81,7 +81,7 @@ class ComponentPreparationFactory
         return new ComponentPreparation(PreparationState::PREPARING);
     }
 
-    public function getForMachine(Job $job): ComponentPreparation
+    private function getForMachine(Job $job): ComponentPreparation
     {
         if ($this->machineRepository->count(['jobId' => $job->id]) > 0) {
             return new ComponentPreparation(PreparationState::SUCCEEDED);
@@ -99,7 +99,7 @@ class ComponentPreparationFactory
         return new ComponentPreparation(PreparationState::PREPARING);
     }
 
-    public function getForWorkerJob(Job $job): ComponentPreparation
+    private function getForWorkerJob(Job $job): ComponentPreparation
     {
         $componentStates = $this->workerComponentStateRepository->getAllForJob($job);
         if ([] !== $componentStates) {
