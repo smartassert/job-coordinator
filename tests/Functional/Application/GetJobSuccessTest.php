@@ -192,7 +192,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -253,7 +253,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -341,7 +341,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -438,7 +438,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -494,7 +494,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -558,7 +558,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -619,7 +619,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -696,7 +696,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
@@ -788,7 +788,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'running',
                                 'is_end_state' => false,
@@ -888,7 +888,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'running',
                                 'is_end_state' => false,
@@ -1012,7 +1012,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => null,
                             'ip_address' => null,
                         ],
-                        'worker_state' => [
+                        'worker_job' => [
                             'application' => [
                                 'state' => 'pending',
                                 'is_end_state' => false,
