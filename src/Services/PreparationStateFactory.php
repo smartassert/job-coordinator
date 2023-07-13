@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
+use App\Enum\JobComponentName as ComponentName;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Model\ComponentFailure;
 use App\Model\ComponentFailures;
@@ -21,10 +22,10 @@ class PreparationStateFactory
     public function create(Job $job): PreparationState
     {
         $componentPreparationStates = [
-            'results_job' => $this->componentPreparationFactory->getForResultsJob($job),
-            'serialized_suite' => $this->componentPreparationFactory->getForSerializedSuite($job),
-            'machine' => $this->componentPreparationFactory->getForMachine($job),
-            'worker_job' => $this->componentPreparationFactory->getForWorkerJob($job),
+            ComponentName::RESULTS_JOB->value => $this->componentPreparationFactory->getForResultsJob($job),
+            ComponentName::SERIALIZED_SUITE->value => $this->componentPreparationFactory->getForSerializedSuite($job),
+            ComponentName::MACHINE->value => $this->componentPreparationFactory->getForMachine($job),
+            ComponentName::WORKER_JOB->value => $this->componentPreparationFactory->getForWorkerJob($job),
         ];
 
         $componentFailures = [];

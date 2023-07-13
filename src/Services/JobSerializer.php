@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\Machine as MachineEntity;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
+use App\Enum\JobComponentName;
 use App\Enum\RemoteRequestType;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
@@ -82,7 +83,7 @@ class JobSerializer
         }
 
         $resultsJobModel = new ResultsJobModel($resultsJob, $resultsJobRequest);
-        $data['results_job'] = $resultsJobModel->toArray();
+        $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
         if ($serializedSuite instanceof SerializedSuiteEntity) {
@@ -101,7 +102,7 @@ class JobSerializer
         }
 
         $serializedSuiteModel = new SerializedSuiteModel($serializedSuite, $serializedSuiteRequest);
-        $data['serialized_suite'] = $serializedSuiteModel->toArray();
+        $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
 
         $machine = $this->machineRepository->find($job->id);
         if ($machine instanceof MachineEntity) {
@@ -116,10 +117,10 @@ class JobSerializer
         }
 
         $machineModel = new MachineModel($machine, $machineRequest);
-        $data['machine'] = $machineModel->toArray();
+        $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
 
         $workerState = $this->workerStateFactory->createForJob($job);
-        $data['worker_job'] = $workerState->toArray();
+        $data[JobComponentName::WORKER_JOB->value] = $workerState->toArray();
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
         $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
