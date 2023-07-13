@@ -54,7 +54,7 @@ class JobSerializer
      *   results_job: SerializedResultsJob,
      *   serialized_suite: SerializedSerializedSuite,
      *   machine: SerializedMachine,
-     *   worker_state: SerializedWorkerState,
+     *   worker_job: SerializedWorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
      */
@@ -119,7 +119,7 @@ class JobSerializer
         $data['machine'] = $machineModel->toArray();
 
         $workerState = $this->workerStateFactory->createForJob($job);
-        $data['worker_state'] = $workerState->toArray();
+        $data['worker_job'] = $workerState->toArray();
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
         $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
