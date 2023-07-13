@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
+use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
@@ -24,6 +25,24 @@ class ComponentPreparationFactory
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
     ) {
+    }
+
+    /**
+     * @return array{
+     *   results_job: ComponentPreparation,
+     *   serialized_suite: ComponentPreparation,
+     *   machine: ComponentPreparation,
+     *   worker_job: ComponentPreparation
+     * }
+     */
+    public function getAll(Job $job): array
+    {
+        return [
+            JobComponentName::RESULTS_JOB->value => $this->getForResultsJob($job),
+            JobComponentName::SERIALIZED_SUITE->value => $this->getForSerializedSuite($job),
+            JobComponentName::MACHINE->value => $this->getForMachine($job),
+            JobComponentName::WORKER_JOB->value => $this->getForWorkerJob($job),
+        ];
     }
 
     public function getForResultsJob(Job $job): ComponentPreparation
