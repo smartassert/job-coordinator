@@ -6,18 +6,16 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine as MachineEntity;
-use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Enum\JobComponentName;
 use App\Enum\RemoteRequestType;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
-use App\Model\PendingResultsJob;
 use App\Model\PendingSerializedSuite;
 use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
-use App\Model\ResultsJob as ResultsJobModel;
+use App\Model\ResultsJob;
 use App\Model\SerializedSuite as SerializedSuiteModel;
 use App\Model\SuccessfulRemoteRequest;
 use App\Model\WorkerState;
@@ -28,7 +26,7 @@ use App\Repository\SerializedSuiteRepository;
 
 /**
  * @phpstan-import-type SerializedPreparationState from PreparationState
- * @phpstan-import-type SerializedResultsJob from ResultsJobModel
+ * @phpstan-import-type SerializedResultsJob from ResultsJob
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
  * @phpstan-import-type SerializedMachine from MachineModel
  * @phpstan-import-type SerializedWorkerState from WorkerState
@@ -66,22 +64,7 @@ class JobSerializer
         $data['preparation'] = $preparationState->toArray();
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        if ($resultsJob instanceof ResultsJobEntity) {
-            $resultsJobRequest = new SuccessfulRemoteRequest();
-        } else {
-            $resultsJobRequest = $this->remoteRequestRepository->findNewest(
-                $job,
-                RemoteRequestType::RESULTS_CREATE
-            );
-
-            if (null === $resultsJobRequest) {
-                $resultsJobRequest = new PendingRemoteRequest();
-            }
-
-            $resultsJob = new PendingResultsJob();
-        }
-
-        $resultsJobModel = new ResultsJobModel($resultsJob, $resultsJobRequest);
+        $resultsJobModel = new ResultsJob($resultsJob);
         $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);

@@ -177,9 +177,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -244,9 +241,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'requesting',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -338,9 +332,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'halted',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -441,9 +432,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => RequestState::SUCCEEDED->value,
-                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
@@ -503,9 +491,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => RequestState::SUCCEEDED->value,
-                            ],
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
                         ],
@@ -573,9 +558,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -640,9 +622,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -723,9 +702,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -821,9 +797,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
@@ -927,9 +900,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'succeeded',
-                            ],
                             'state' => 'awaiting-events',
                             'end_state' => null,
                         ],
@@ -1042,14 +1012,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => [
-                            'request' => [
-                                'state' => 'failed',
-                                'failure' => [
-                                    'type' => 'http',
-                                    'code' => 503,
-                                    'message' => 'service unavailable',
-                                ],
-                            ],
                             'state' => null,
                             'end_state' => null,
                         ],
