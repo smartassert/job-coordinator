@@ -8,6 +8,7 @@ use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestType;
 use App\Model\ComponentPreparation;
+use App\Model\JobComponent;
 use App\Services\PreparationStateReducer;
 use PHPUnit\Framework\TestCase;
 
@@ -28,23 +29,31 @@ class PreparationStateReducerTest extends TestCase
      */
     public function reduceDataProvider(): array
     {
+        $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
+        $serializedSuiteComponent = new JobComponent(
+            JobComponentName::SERIALIZED_SUITE,
+            RemoteRequestType::SERIALIZED_SUITE_CREATE
+        );
+        $machineComponent = new JobComponent(JobComponentName::MACHINE, RemoteRequestType::MACHINE_CREATE);
+        $workerComponent = new JobComponent(JobComponentName::WORKER_JOB, RemoteRequestType::MACHINE_START_JOB);
+
         return [
             'any occurrence of "failed" is "failed" (1)' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::FAILED
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -53,19 +62,19 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "failed" is "failed" (2)' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::FAILED
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -74,19 +83,19 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "failed" is "failed" (3)' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::FAILED
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -95,19 +104,19 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "failed" is "failed" (4)' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::SUCCEEDED
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::FAILED
                     ),
                 ],
@@ -116,19 +125,19 @@ class PreparationStateReducerTest extends TestCase
             'all "succeeded" is "succeeded"' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::SUCCEEDED
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::SUCCEEDED
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::SUCCEEDED
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -137,19 +146,19 @@ class PreparationStateReducerTest extends TestCase
             'all "pending" is "pending"' => [
                 'componentPreparationStates' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -158,15 +167,15 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "preparing" without any "failure" is "preparing" (1)' => [
                 'componentPreparationStates' => [
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -175,15 +184,15 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "preparing" without any "failure" is "preparing" (2)' => [
                 'componentPreparationStates' => [
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -192,15 +201,15 @@ class PreparationStateReducerTest extends TestCase
             'any occurrence of "preparing" without any "failure" is "preparing" (3)' => [
                 'componentPreparationStates' => [
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::SUCCEEDED
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                 ],
