@@ -15,6 +15,7 @@ class PreparationStateFactory
     public function __construct(
         private readonly ComponentPreparationFactory $componentPreparationFactory,
         private readonly PreparationStateReducer $preparationStateReducer,
+        private readonly RequestStatesFactory $requestStatesFactory,
     ) {
     }
 
@@ -31,7 +32,8 @@ class PreparationStateFactory
 
         return new PreparationState(
             $this->preparationStateReducer->reduce($componentPreparationStates),
-            new ComponentFailures($componentFailures)
+            new ComponentFailures($componentFailures),
+            $this->requestStatesFactory->create($job),
         );
     }
 }

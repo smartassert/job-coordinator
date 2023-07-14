@@ -34,6 +34,21 @@ class ResultsJobHandler implements JobComponentHandlerInterface
         return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
+    public function getRequestState(JobComponent $jobComponent, Job $job): ?RequestState
+    {
+        if (JobComponentName::RESULTS_JOB !== $jobComponent->name) {
+            return null;
+        }
+
+        if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
+            return RequestState::SUCCEEDED;
+        }
+
+        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+
+        return $remoteRequest?->getState();
+    }
+
     private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);

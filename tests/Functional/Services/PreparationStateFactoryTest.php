@@ -19,6 +19,7 @@ use App\Enum\WorkerComponentName;
 use App\Model\ComponentFailure;
 use App\Model\ComponentFailures;
 use App\Model\PreparationState as PreparationStateModel;
+use App\Model\RequestStates;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -129,7 +130,13 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::PENDING,
-                    new ComponentFailures([])
+                    new ComponentFailures([]),
+                    new RequestStates([
+                        'results_job' => RequestState::PENDING,
+                        'serialized_suite' => RequestState::PENDING,
+                        'machine' => RequestState::PENDING,
+                        'worker_job' => RequestState::PENDING,
+                    ]),
                 ),
             ],
             'succeeded' => [
@@ -157,7 +164,13 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::SUCCEEDED,
-                    new ComponentFailures([])
+                    new ComponentFailures([]),
+                    new RequestStates([
+                        'results_job' => RequestState::SUCCEEDED,
+                        'serialized_suite' => RequestState::SUCCEEDED,
+                        'machine' => RequestState::SUCCEEDED,
+                        'worker_job' => RequestState::SUCCEEDED,
+                    ]),
                 ),
             ],
             'preparing' => [
@@ -170,7 +183,13 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::PREPARING,
-                    new ComponentFailures([])
+                    new ComponentFailures([]),
+                    new RequestStates([
+                        'results_job' => RequestState::REQUESTING,
+                        'serialized_suite' => RequestState::PENDING,
+                        'machine' => RequestState::PENDING,
+                        'worker_job' => RequestState::PENDING,
+                    ]),
                 ),
             ],
             'failed, single component failure' => [
@@ -198,7 +217,13 @@ class PreparationStateFactoryTest extends WebTestCase
                                 'service unavailable'
                             )
                         ),
-                    ])
+                    ]),
+                    new RequestStates([
+                        'results_job' => RequestState::FAILED,
+                        'serialized_suite' => RequestState::PENDING,
+                        'machine' => RequestState::PENDING,
+                        'worker_job' => RequestState::PENDING,
+                    ]),
                 ),
             ],
             'failed, multiple component failures' => [
@@ -244,7 +269,13 @@ class PreparationStateFactoryTest extends WebTestCase
                                 'connection timed out'
                             )
                         ),
-                    ])
+                    ]),
+                    new RequestStates([
+                        'results_job' => RequestState::FAILED,
+                        'serialized_suite' => RequestState::FAILED,
+                        'machine' => RequestState::PENDING,
+                        'worker_job' => RequestState::PENDING,
+                    ]),
                 ),
             ],
         ];
