@@ -184,9 +184,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -245,9 +242,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -333,9 +327,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -430,9 +421,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -486,9 +474,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -550,9 +535,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => 'prepared',
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'pending',
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -611,9 +593,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => RequestState::REQUESTING->value,
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],
@@ -688,9 +667,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => RequestState::SUCCEEDED->value,
-                            ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
@@ -780,9 +756,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => RequestState::SUCCEEDED->value,
-                            ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
@@ -880,9 +853,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => 'prepared',
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => RequestState::SUCCEEDED->value,
-                            ],
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                         ],
@@ -989,14 +959,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => null,
                         ],
                         'machine' => [
-                            'request' => [
-                                'state' => 'failed',
-                                'failure' => [
-                                    'type' => 'http',
-                                    'code' => 500,
-                                    'message' => 'internal server error',
-                                ],
-                            ],
                             'state_category' => null,
                             'ip_address' => null,
                         ],

@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Entity\Machine as MachineEntity;
 use App\Enum\JobComponentName;
-use App\Enum\RemoteRequestType;
-use App\Model\Machine as MachineModel;
-use App\Model\PendingMachine;
-use App\Model\PendingRemoteRequest;
+use App\Model\Machine;
 use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob;
 use App\Model\SerializedSuite;
-use App\Model\SuccessfulRemoteRequest;
 use App\Model\WorkerState;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
@@ -26,7 +21,7 @@ use App\Repository\SerializedSuiteRepository;
  * @phpstan-import-type SerializedPreparationState from PreparationState
  * @phpstan-import-type SerializedResultsJob from ResultsJob
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
- * @phpstan-import-type SerializedMachine from MachineModel
+ * @phpstan-import-type SerializedMachine from Machine
  * @phpstan-import-type SerializedWorkerState from WorkerState
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
@@ -70,18 +65,7 @@ class JobSerializer
         $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
 
         $machine = $this->machineRepository->find($job->id);
-        if ($machine instanceof MachineEntity) {
-            $machineRequest = new SuccessfulRemoteRequest();
-        } else {
-            $machineRequest = $this->remoteRequestRepository->findNewest($job, RemoteRequestType::MACHINE_CREATE);
-            if (null === $machineRequest) {
-                $machineRequest = new PendingRemoteRequest();
-            }
-
-            $machine = new PendingMachine();
-        }
-
-        $machineModel = new MachineModel($machine, $machineRequest);
+        $machineModel = new Machine($machine);
         $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
 
         $workerState = $this->workerStateFactory->createForJob($job);
