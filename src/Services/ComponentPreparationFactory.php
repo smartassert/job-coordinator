@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Enum\JobComponentName;
-use App\Enum\RemoteRequestType;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
@@ -15,8 +14,10 @@ class ComponentPreparationFactory
 {
     /**
      * @param JobComponentHandlerInterface[] $jobComponentHandlers
+     * @param JobComponent[]                 $jobComponents
      */
     public function __construct(
+        private readonly iterable $jobComponents,
         private readonly iterable $jobComponentHandlers,
     ) {
     }
@@ -26,16 +27,9 @@ class ComponentPreparationFactory
      */
     public function getAll(Job $job): array
     {
-        $jobComponents = [
-            new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE),
-            new JobComponent(JobComponentName::SERIALIZED_SUITE, RemoteRequestType::SERIALIZED_SUITE_CREATE),
-            new JobComponent(JobComponentName::MACHINE, RemoteRequestType::MACHINE_CREATE),
-            new JobComponent(JobComponentName::WORKER_JOB, RemoteRequestType::MACHINE_START_JOB),
-        ];
-
         $componentPreparations = [];
 
-        foreach ($jobComponents as $jobComponent) {
+        foreach ($this->jobComponents as $jobComponent) {
             $componentPreparation = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
