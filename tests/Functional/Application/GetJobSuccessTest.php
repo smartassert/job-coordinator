@@ -188,21 +188,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -246,21 +246,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [
@@ -331,21 +331,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [
@@ -425,21 +425,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -478,21 +478,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -539,21 +539,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -597,21 +597,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [
@@ -671,21 +671,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -760,21 +760,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'complete',
-                                'is_end_state' => true,
-                            ],
-                            'execution' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
+                            'state' => 'running',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'complete',
+                                    'is_end_state' => true,
+                                ],
+                                'execution' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -857,21 +857,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'complete',
-                                'is_end_state' => true,
-                            ],
-                            'execution' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'running',
-                                'is_end_state' => false,
+                            'state' => 'running',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'complete',
+                                    'is_end_state' => true,
+                                ],
+                                'execution' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [],
@@ -963,21 +963,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => null,
                         ],
                         'worker_job' => [
-                            'application' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'compilation' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'execution' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
-                            ],
-                            'event_delivery' => [
-                                'state' => 'pending',
-                                'is_end_state' => false,
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
                             ],
                         ],
                         'service_requests' => [
