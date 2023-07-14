@@ -10,10 +10,13 @@ use App\Enum\WorkerComponentName;
  * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
  *
  * @phpstan-type SerializedWorkerState array{
- *   'application': SerializedWorkerComponentState,
- *   'compilation': SerializedWorkerComponentState,
- *   'execution': SerializedWorkerComponentState,
- *   'event_delivery': SerializedWorkerComponentState,
+ *   state: non-empty-string,
+ *   is_end_state: bool,
+ *   components: array{
+ *     compilation: SerializedWorkerComponentState,
+ *     execution: SerializedWorkerComponentState,
+ *     event_delivery: SerializedWorkerComponentState
+ *   }
  * }
  */
 class WorkerState
@@ -31,11 +34,15 @@ class WorkerState
      */
     public function toArray(): array
     {
-        return [
-            WorkerComponentName::APPLICATION->value => $this->applicationState->toArray(),
-            WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
-            WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
-            WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
-        ];
+        return array_merge(
+            $this->applicationState->toArray(),
+            [
+                'components' => [
+                    WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
+                    WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
+                    WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
+                ],
+            ]
+        );
     }
 }
