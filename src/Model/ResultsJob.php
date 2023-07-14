@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 /**
- * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
- *
  * @phpstan-type SerializedResultsJob array{
- *   request: SerializedRemoteRequest,
  *   state: ?non-empty-string,
  *   end_state: ?non-empty-string
  * }
@@ -16,8 +13,7 @@ namespace App\Model;
 class ResultsJob
 {
     public function __construct(
-        private readonly ResultsJobInterface $entity,
-        private readonly RemoteRequestInterface $request,
+        private readonly ?ResultsJobInterface $entity,
     ) {
     }
 
@@ -27,9 +23,8 @@ class ResultsJob
     public function toArray(): array
     {
         return [
-            'request' => $this->request->toArray(),
-            'state' => $this->entity->getState(),
-            'end_state' => $this->entity->getEndState(),
+            'state' => $this->entity?->getState() ?? null,
+            'end_state' => $this->entity?->getEndState() ?? null,
         ];
     }
 }
