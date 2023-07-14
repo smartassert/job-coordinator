@@ -48,7 +48,7 @@ class ComponentPreparationFactory
     private function getForResultsJob(Job $job): ComponentPreparation
     {
         if ($this->resultsJobRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(PreparationState::SUCCEEDED);
+            return new ComponentPreparation(RemoteRequestType::RESULTS_CREATE, PreparationState::SUCCEEDED);
         }
 
         return $this->deriveFromRemoteRequests($job, RemoteRequestType::RESULTS_CREATE);
@@ -57,7 +57,7 @@ class ComponentPreparationFactory
     private function getForSerializedSuite(Job $job): ComponentPreparation
     {
         if ($this->serializedSuiteRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(PreparationState::SUCCEEDED);
+            return new ComponentPreparation(RemoteRequestType::SERIALIZED_SUITE_CREATE, PreparationState::SUCCEEDED);
         }
 
         return $this->deriveFromRemoteRequests($job, RemoteRequestType::SERIALIZED_SUITE_CREATE);
@@ -66,7 +66,7 @@ class ComponentPreparationFactory
     private function getForMachine(Job $job): ComponentPreparation
     {
         if ($this->machineRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(PreparationState::SUCCEEDED);
+            return new ComponentPreparation(RemoteRequestType::MACHINE_CREATE, PreparationState::SUCCEEDED);
         }
 
         return $this->deriveFromRemoteRequests($job, RemoteRequestType::MACHINE_CREATE);
@@ -76,7 +76,7 @@ class ComponentPreparationFactory
     {
         $componentStates = $this->workerComponentStateRepository->getAllForJob($job);
         if ([] !== $componentStates) {
-            return new ComponentPreparation(PreparationState::SUCCEEDED);
+            return new ComponentPreparation(RemoteRequestType::MACHINE_START_JOB, PreparationState::SUCCEEDED);
         }
 
         return $this->deriveFromRemoteRequests($job, RemoteRequestType::MACHINE_START_JOB);
@@ -86,13 +86,13 @@ class ComponentPreparationFactory
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest($job, $type);
         if (null === $remoteRequest) {
-            return new ComponentPreparation(PreparationState::PENDING);
+            return new ComponentPreparation($type, PreparationState::PENDING);
         }
 
         if (RequestState::FAILED === $remoteRequest->getState()) {
-            return new ComponentPreparation(PreparationState::FAILED, $remoteRequest->getFailure());
+            return new ComponentPreparation($type, PreparationState::FAILED, $remoteRequest->getFailure());
         }
 
-        return new ComponentPreparation(PreparationState::PREPARING);
+        return new ComponentPreparation($type, PreparationState::PREPARING);
     }
 }
