@@ -18,6 +18,7 @@ use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
+use App\Model\JobComponent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -146,21 +147,29 @@ class ComponentPreparationFactoryTest extends WebTestCase
             );
         };
 
+        $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
+        $serializedSuiteComponent = new JobComponent(
+            JobComponentName::SERIALIZED_SUITE,
+            RemoteRequestType::SERIALIZED_SUITE_CREATE
+        );
+        $machineComponent = new JobComponent(JobComponentName::MACHINE, RemoteRequestType::MACHINE_CREATE);
+        $workerComponent = new JobComponent(JobComponentName::WORKER_JOB, RemoteRequestType::MACHINE_START_JOB);
+
         $expectedAllSuccess = [
             JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                RemoteRequestType::RESULTS_CREATE,
+                $resultsComponent,
                 PreparationState::SUCCEEDED
             ),
             JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                $serializedSuiteComponent,
                 PreparationState::SUCCEEDED
             ),
             JobComponentName::MACHINE->value => new ComponentPreparation(
-                RemoteRequestType::MACHINE_CREATE,
+                $machineComponent,
                 PreparationState::SUCCEEDED
             ),
             JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                RemoteRequestType::MACHINE_START_JOB,
+                $workerComponent,
                 PreparationState::SUCCEEDED
             ),
         ];
@@ -173,19 +182,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -204,19 +213,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -235,19 +244,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -266,19 +275,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PREPARING
                     ),
                 ],
@@ -297,19 +306,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -328,19 +337,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -359,19 +368,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::PREPARING
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -390,19 +399,19 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::FAILED
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],
@@ -427,7 +436,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 },
                 'expected' => [
                     JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::RESULTS_CREATE,
+                        $resultsComponent,
                         PreparationState::FAILED,
                         new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
@@ -436,15 +445,15 @@ class ComponentPreparationFactoryTest extends WebTestCase
                         )
                     ),
                     JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        RemoteRequestType::SERIALIZED_SUITE_CREATE,
+                        $serializedSuiteComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::MACHINE->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_CREATE,
+                        $machineComponent,
                         PreparationState::PENDING
                     ),
                     JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        RemoteRequestType::MACHINE_START_JOB,
+                        $workerComponent,
                         PreparationState::PENDING
                     ),
                 ],

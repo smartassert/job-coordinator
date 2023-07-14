@@ -10,6 +10,7 @@ use App\Enum\PreparationState;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
+use App\Model\JobComponent;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -47,52 +48,63 @@ class ComponentPreparationFactory
 
     private function getForResultsJob(Job $job): ComponentPreparation
     {
+        $jobComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
+
         if ($this->resultsJobRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(RemoteRequestType::RESULTS_CREATE, PreparationState::SUCCEEDED);
+            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, RemoteRequestType::RESULTS_CREATE);
+        return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
     private function getForSerializedSuite(Job $job): ComponentPreparation
     {
+        $jobComponent = new JobComponent(
+            JobComponentName::SERIALIZED_SUITE,
+            RemoteRequestType::SERIALIZED_SUITE_CREATE
+        );
+
         if ($this->serializedSuiteRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(RemoteRequestType::SERIALIZED_SUITE_CREATE, PreparationState::SUCCEEDED);
+            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, RemoteRequestType::SERIALIZED_SUITE_CREATE);
+        return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
     private function getForMachine(Job $job): ComponentPreparation
     {
+        $jobComponent = new JobComponent(JobComponentName::MACHINE, RemoteRequestType::MACHINE_CREATE);
+
         if ($this->machineRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation(RemoteRequestType::MACHINE_CREATE, PreparationState::SUCCEEDED);
+            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, RemoteRequestType::MACHINE_CREATE);
+        return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
     private function getForWorkerJob(Job $job): ComponentPreparation
     {
+        $jobComponent = new JobComponent(JobComponentName::WORKER_JOB, RemoteRequestType::MACHINE_START_JOB);
+
         $componentStates = $this->workerComponentStateRepository->getAllForJob($job);
         if ([] !== $componentStates) {
-            return new ComponentPreparation(RemoteRequestType::MACHINE_START_JOB, PreparationState::SUCCEEDED);
+            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, RemoteRequestType::MACHINE_START_JOB);
+        return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
-    private function deriveFromRemoteRequests(Job $job, RemoteRequestType $type): ComponentPreparation
+    private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
     {
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $type);
+        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
         if (null === $remoteRequest) {
-            return new ComponentPreparation($type, PreparationState::PENDING);
+            return new ComponentPreparation($jobComponent, PreparationState::PENDING);
         }
 
         if (RequestState::FAILED === $remoteRequest->getState()) {
-            return new ComponentPreparation($type, PreparationState::FAILED, $remoteRequest->getFailure());
+            return new ComponentPreparation($jobComponent, PreparationState::FAILED, $remoteRequest->getFailure());
         }
 
-        return new ComponentPreparation($type, PreparationState::PREPARING);
+        return new ComponentPreparation($jobComponent, PreparationState::PREPARING);
     }
 }
