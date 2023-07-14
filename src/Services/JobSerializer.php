@@ -62,7 +62,6 @@ class JobSerializer
     public function serialize(Job $job): array
     {
         $data = $job->toArray();
-
         $preparationState = $this->preparationStateFactory->create($job);
         $data['preparation'] = $preparationState->toArray();
 

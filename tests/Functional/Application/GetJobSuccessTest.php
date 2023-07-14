@@ -85,7 +85,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
-
         self::assertSame(200, $createResponse->getStatusCode());
         self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
 
@@ -123,7 +122,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         }
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
-
         self::assertSame(200, $getResponse->getStatusCode());
         self::assertSame('application/json', $getResponse->getHeaderLine('content-type'));
 
@@ -171,6 +169,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'pending',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -232,6 +236,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'requesting',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -320,6 +330,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'halted',
+                                'serialized_suite' => 'halted',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -417,6 +433,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'succeeded',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -473,6 +495,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'succeeded',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -537,6 +565,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'succeeded',
+                                'machine' => 'pending',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -598,6 +632,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'requesting',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -675,6 +715,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'succeeded',
+                                'worker_job' => 'pending',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -767,6 +813,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'succeeded',
+                                'worker_job' => 'succeeded',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -867,6 +919,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'succeeded',
+                            'request_states' => [
+                                'results_job' => 'succeeded',
+                                'serialized_suite' => 'succeeded',
+                                'machine' => 'succeeded',
+                                'worker_job' => 'succeeded',
+                            ],
                         ],
                         'results_job' => [
                             'request' => [
@@ -954,6 +1012,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
                         'preparation' => [
                             'state' => 'failed',
+                            'request_states' => [
+                                'results_job' => 'failed',
+                                'serialized_suite' => 'failed',
+                                'machine' => 'failed',
+                                'worker_job' => 'failed',
+                            ],
                             'failures' => [
                                 'results_job' => [
                                     'type' => 'http',

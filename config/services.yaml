@@ -129,3 +129,8 @@ services:
         arguments:
             $jobComponents: !tagged_iterator 'app.job_components.component'
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
+
+    App\Services\RequestStatesFactory:
+        arguments:
+            $jobComponents: !tagged_iterator 'app.job_components.component'
+            $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
