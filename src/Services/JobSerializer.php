@@ -6,17 +6,15 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine as MachineEntity;
-use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Enum\JobComponentName;
 use App\Enum\RemoteRequestType;
 use App\Model\Machine as MachineModel;
 use App\Model\PendingMachine;
 use App\Model\PendingRemoteRequest;
-use App\Model\PendingSerializedSuite;
 use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob;
-use App\Model\SerializedSuite as SerializedSuiteModel;
+use App\Model\SerializedSuite;
 use App\Model\SuccessfulRemoteRequest;
 use App\Model\WorkerState;
 use App\Repository\MachineRepository;
@@ -27,7 +25,7 @@ use App\Repository\SerializedSuiteRepository;
 /**
  * @phpstan-import-type SerializedPreparationState from PreparationState
  * @phpstan-import-type SerializedResultsJob from ResultsJob
- * @phpstan-import-type SerializedSerializedSuite from SerializedSuiteModel
+ * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
  * @phpstan-import-type SerializedMachine from MachineModel
  * @phpstan-import-type SerializedWorkerState from WorkerState
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
@@ -68,22 +66,7 @@ class JobSerializer
         $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        if ($serializedSuite instanceof SerializedSuiteEntity) {
-            $serializedSuiteRequest = new SuccessfulRemoteRequest();
-        } else {
-            $serializedSuiteRequest = $this->remoteRequestRepository->findNewest(
-                $job,
-                RemoteRequestType::SERIALIZED_SUITE_CREATE
-            );
-
-            if (null === $serializedSuiteRequest) {
-                $serializedSuiteRequest = new PendingRemoteRequest();
-            }
-
-            $serializedSuite = new PendingSerializedSuite();
-        }
-
-        $serializedSuiteModel = new SerializedSuiteModel($serializedSuite, $serializedSuiteRequest);
+        $serializedSuiteModel = new SerializedSuite($serializedSuite);
         $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
 
         $machine = $this->machineRepository->find($job->id);
