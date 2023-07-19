@@ -6,7 +6,6 @@ namespace App\Tests\Integration;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
-use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -22,10 +21,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user@example.com');
 
-        $ulidFactory = self::getContainer()->get(UlidFactory::class);
-        \assert($ulidFactory instanceof UlidFactory);
-
-        $suiteId = $ulidFactory->create();
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

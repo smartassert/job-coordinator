@@ -6,11 +6,11 @@ namespace App\Tests\Application;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
-use App\Services\UlidFactory;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
 use SmartAssert\UsersClient\Model\User;
+use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 {
@@ -39,10 +39,8 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
         \assert($userProvider instanceof UserProvider);
         self::$user = $userProvider->get('user@example.com');
 
-        $ulidFactory = self::getContainer()->get(UlidFactory::class);
-        \assert($ulidFactory instanceof UlidFactory);
-
-        $suiteId = $ulidFactory->create();
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
 
         self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(self::$apiToken, $suiteId, 600);
 
