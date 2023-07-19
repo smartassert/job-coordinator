@@ -14,12 +14,14 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Uid\Ulid;
 
 class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
         $jobRepository = \Mockery::mock(JobRepository::class);
         $jobRepository
@@ -41,8 +43,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
         $workerManagerException = new \Exception('Failed to terminate machine');
 
@@ -57,7 +58,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->id);
 
         try {
             $handler($message);
@@ -70,10 +71,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
-        $machine = new Machine($jobId, 'create/requested', 'pre_active', []);
+        $machine = new Machine($job->id, 'create/requested', 'pre_active', []);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
@@ -86,7 +86,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
-        $handler(new TerminateMachineMessage(self::$apiToken, $jobId));
+        $handler(new TerminateMachineMessage(self::$apiToken, $job->id));
 
         $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;
@@ -106,17 +106,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return TerminateMachineMessage::class;
     }
 
-    /**
-     * @param non-empty-string $jobId
-     */
-    private function createJob(string $jobId): Job
+    private function createJob(): Job
     {
-        $job = new Job(
-            $jobId,
-            md5((string) rand()),
-            md5((string) rand()),
-            600
-        );
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

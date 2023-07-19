@@ -13,6 +13,7 @@ use App\Services\ResultsJobMutator;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class ResultsJobMutatorTest extends WebTestCase
 {
@@ -29,11 +30,6 @@ class ResultsJobMutatorTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
@@ -82,10 +78,10 @@ class ResultsJobMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateSuccessDataProvider
      *
-     * @param callable(non-empty-string, JobRepository): ?Job $jobCreator
-     * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
-     * @param callable(?Job): ResultsJobStateRetrievedEvent   $eventCreator
-     * @param callable(?Job): ?ResultsJob                     $expectedResultsJobCreator
+     * @param callable(JobRepository): ?Job                 $jobCreator
+     * @param callable(?Job, ResultsJobRepository): void    $resultsJobCreator
+     * @param callable(?Job): ResultsJobStateRetrievedEvent $eventCreator
+     * @param callable(?Job): ?ResultsJob                   $expectedResultsJobCreator
      */
     public function testSetStateSuccess(
         callable $jobCreator,
@@ -93,16 +89,17 @@ class ResultsJobMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedResultsJobCreator,
     ): void {
-        $jobId = md5((string) rand());
-
-        $job = $jobCreator($jobId, $this->jobRepository);
+        $job = $jobCreator($this->jobRepository);
         $resultsJobCreator($job, $this->resultsJobRepository);
 
         $event = $eventCreator($job);
 
         $this->resultsJobMutator->setState($event);
 
-        $resultsJob = $this->resultsJobRepository->find($jobId);
+        $resultsJob = null === $job
+            ? null
+            : $this->resultsJobRepository->find($job->id);
+
         self::assertEquals($expectedResultsJobCreator($job), $resultsJob);
     }
 
@@ -112,10 +109,8 @@ class ResultsJobMutatorTest extends WebTestCase
     public function setStateSuccessDataProvider(): array
     {
         $resultsJobToken = md5((string) rand());
-        $jobCreator = function (string $jobId, JobRepository $jobRepository) {
-            \assert('' !== $jobId);
-
-            $job = new Job($jobId, 'user id', 'suite id', 600);
+        $jobCreator = function (JobRepository $jobRepository) {
+            $job = new Job('user id', 'suite id', 600);
             $jobRepository->add($job);
 
             return $job;
@@ -129,9 +124,12 @@ class ResultsJobMutatorTest extends WebTestCase
                 'resultsJobCreator' => function () {
                 },
                 'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        md5((string) rand()),
+                        $jobId,
                         new ResultsJobState('awaiting-events', null),
                     );
                 },

@@ -17,12 +17,14 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Client as WorkerClient;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
+use Symfony\Component\Uid\Ulid;
 
 class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
 
@@ -35,8 +37,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $jobId = md5((string) rand());
-        $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
         $workerClientException = new \Exception('Failed to get worker state');
 
@@ -48,7 +49,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         ;
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
@@ -70,11 +71,10 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
@@ -104,7 +104,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(WorkerStateRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState), $event);
+        self::assertEquals(new WorkerStateRetrievedEvent($job->id, $machineIpAddress, $retrievedWorkerState), $event);
     }
 
     protected function getHandlerClass(): string
@@ -117,21 +117,15 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         return GetResultsJobStateMessage::class;
     }
 
-    /**
-     * @param non-empty-string $jobId
-     */
-    private function createJob(string $jobId): void
+    private function createJob(): Job
     {
-        $job = new Job(
-            $jobId,
-            md5((string) rand()),
-            md5((string) rand()),
-            600
-        );
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
+
+        return $job;
     }
 
     private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerStateMessageHandler

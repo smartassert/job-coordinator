@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerMachine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Uid\Ulid;
 
 class MachineFactoryTest extends WebTestCase
 {
@@ -30,11 +31,6 @@ class MachineFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
@@ -89,7 +85,10 @@ class MachineFactoryTest extends WebTestCase
     {
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = new WorkerManagerMachine(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $machine = new WorkerManagerMachine($jobId, md5((string) rand()), md5((string) rand()), []);
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
@@ -100,7 +99,7 @@ class MachineFactoryTest extends WebTestCase
 
     public function testCreateOnMachineRetrievedEventSuccess(): void
     {
-        $job = new Job(md5((string) rand()), 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->machineRepository->count([]));

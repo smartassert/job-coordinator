@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
@@ -16,7 +17,9 @@ class Job
      * @var non-empty-string
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 32, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(UlidGenerator::class)]
+    #[ORM\Column(type: 'ulid', unique: true)]
     public readonly string $id;
 
     /**
@@ -40,12 +43,10 @@ class Job
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
-     * @param non-empty-string $id
      * @param positive-int     $maximumDurationInSeconds
      */
-    public function __construct(string $id, string $userId, string $suiteId, int $maximumDurationInSeconds)
+    public function __construct(string $userId, string $suiteId, int $maximumDurationInSeconds)
     {
-        $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;

@@ -15,6 +15,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRemoverTest extends WebTestCase
 {
@@ -50,11 +51,6 @@ class RemoteRequestRemoverTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
     }
 
@@ -73,7 +69,7 @@ class RemoteRequestRemoverTest extends WebTestCase
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
 
         $this->doRemoteRequestRemoverTest(
             $jobId,
@@ -105,7 +101,7 @@ class RemoteRequestRemoverTest extends WebTestCase
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $this->doRemoteRequestRemoverTest(

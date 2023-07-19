@@ -56,11 +56,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
@@ -89,7 +84,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
         callable $remoteRequestsCreator,
         array $expected
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);

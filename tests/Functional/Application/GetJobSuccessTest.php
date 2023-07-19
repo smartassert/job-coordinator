@@ -22,7 +22,6 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\UlidFactory;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -54,10 +53,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user@example.com');
 
-        $ulidFactory = self::getContainer()->get(UlidFactory::class);
-        \assert($ulidFactory instanceof UlidFactory);
-
-        $suiteId = $ulidFactory->create();
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -68,11 +65,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
 
-        foreach ($jobRepository->findAll() as $job) {
-            $entityManager->remove($job);
-            $entityManager->flush();
-        }
-
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
@@ -81,8 +73,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-
-        self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
         self::assertSame(200, $createResponse->getStatusCode());

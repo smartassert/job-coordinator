@@ -41,8 +41,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
@@ -50,7 +49,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $event = new MachineIsActiveEvent($authenticationToken, $jobId, $machineIpAddress);
+        $event = new MachineIsActiveEvent($authenticationToken, $job->id, $machineIpAddress);
 
         $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 
@@ -58,7 +57,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

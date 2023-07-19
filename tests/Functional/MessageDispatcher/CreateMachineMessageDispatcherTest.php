@@ -22,6 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -48,11 +49,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-        foreach ($jobRepository->findAll() as $job) {
-            $entityManager->remove($job);
-        }
-        $entityManager->flush();
-
         $this->jobRepository = $jobRepository;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
@@ -92,16 +88,20 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      * @param callable(JobRepository): ?Job                   $jobCreator
      * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
+     * @param callable(?Job): object                          $eventCreator
      */
     public function testDispatchMessageNotDispatched(
         callable $jobCreator,
         callable $resultsJobCreator,
         callable $serializedSuiteCreator,
-        ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event
+        callable $eventCreator,
     ): void {
         $job = $jobCreator($this->jobRepository);
         $resultsJobCreator($job, $this->resultsJobRepository);
         $serializedSuiteCreator($job, $this->serializedSuiteRepository);
+
+        $event = $eventCreator($job);
+        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof SerializedSuiteSerializedEvent);
 
         $this->dispatcher->dispatch($event);
 
@@ -113,26 +113,28 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public function dispatchMessageNotDispatchedDataProvider(): array
     {
-        $jobId = md5((string) rand());
-        $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
+        $resultsJobCreatedEventCreator = function (Job $job) {
+            return new ResultsJobCreatedEvent(
+                md5((string) rand()),
+                $job->id,
+                \Mockery::mock(ResultsJobModel::class)
+            );
+        };
 
-        $resultsJobCreatedEvent = new ResultsJobCreatedEvent(
-            md5((string) rand()),
-            $job->id,
-            \Mockery::mock(ResultsJobModel::class)
-        );
-
-        $serializedSuiteSerializedEvent = new SerializedSuiteSerializedEvent(
-            md5((string) rand()),
-            $job->id,
-            md5((string) rand())
-        );
+        $serializedSuiteSerializedEventCreator = function (Job $job) {
+            return new SerializedSuiteSerializedEvent(
+                md5((string) rand()),
+                $job->id,
+                md5((string) rand())
+            );
+        };
 
         $nullCreator = function () {
             return null;
         };
 
-        $jobCreator = function (JobRepository $jobRepository) use ($job) {
+        $jobCreator = function (JobRepository $jobRepository) {
+            $job = new Job(md5((string) rand()), md5((string) rand()), 600);
             $jobRepository->add($job);
 
             return $job;
@@ -160,25 +162,43 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'jobCreator' => $nullCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
-                'event' => $resultsJobCreatedEvent,
+                'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
+                    return new ResultsJobCreatedEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        \Mockery::mock(ResultsJobModel::class)
+                    );
+                },
             ],
             'SerializedSuiteSerializedEvent, no job' => [
                 'jobCreator' => $nullCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
-                'event' => $serializedSuiteSerializedEvent,
+                'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
+                    return new SerializedSuiteSerializedEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        md5((string) rand())
+                    );
+                },
             ],
             'ResultsJobCreatedEvent, no results job' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
-                'event' => $resultsJobCreatedEvent,
+                'eventCreator' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent, no results job' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
-                'event' => $serializedSuiteSerializedEvent,
+                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
             'ResultsJobCreatedEvent, no serialized suite' => [
                 'jobCreator' => $jobCreator,
@@ -186,7 +206,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'serializedSuiteCreator' => function () {
                     return null;
                 },
-                'event' => $resultsJobCreatedEvent,
+                'eventCreator' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent, no serialized suite' => [
                 'jobCreator' => $jobCreator,
@@ -194,30 +214,31 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'serializedSuiteCreator' => function () {
                     return null;
                 },
-                'event' => $serializedSuiteSerializedEvent,
+                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
             'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $resultsJobCreatedEvent,
+                'event' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $serializedSuiteSerializedEvent,
+                'event' => $serializedSuiteSerializedEventCreator,
             ],
         ];
     }
 
     /**
      * @dataProvider dispatchSuccessDataProvider
+     *
+     * @param callable(Job): object $eventCreator
      */
-    public function testDispatchSuccess(
-        Job $job,
-        ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event
-    ): void {
+    public function testDispatchSuccess(callable $eventCreator): void
+    {
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
@@ -225,6 +246,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
         $this->serializedSuiteRepository->save($serializedSuite);
+
+        $event = $eventCreator($job);
+        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof SerializedSuiteSerializedEvent);
 
         $this->dispatcher->dispatch($event);
 
@@ -236,29 +260,28 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public function dispatchSuccessDataProvider(): array
     {
-        $jobId = md5((string) rand());
-        $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
+        $resultsJobCreatedEventCreator = function (Job $job) {
+            return new ResultsJobCreatedEvent(
+                md5((string) rand()),
+                $job->id,
+                \Mockery::mock(ResultsJobModel::class)
+            );
+        };
 
-        $resultsJobCreatedEvent = new ResultsJobCreatedEvent(
-            md5((string) rand()),
-            $jobId,
-            \Mockery::mock(ResultsJobModel::class)
-        );
-
-        $serializedSuiteSerializedEvent = new SerializedSuiteSerializedEvent(
-            md5((string) rand()),
-            $jobId,
-            md5((string) rand())
-        );
+        $serializedSuiteSerializedEventCreator = function (Job $job) {
+            return new SerializedSuiteSerializedEvent(
+                md5((string) rand()),
+                $job->id,
+                md5((string) rand())
+            );
+        };
 
         return [
             'ResultsJobCreatedEvent' => [
-                'job' => $job,
-                'event' => $resultsJobCreatedEvent,
+                'eventCreator' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent' => [
-                'job' => $job,
-                'event' => $serializedSuiteSerializedEvent,
+                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
     }

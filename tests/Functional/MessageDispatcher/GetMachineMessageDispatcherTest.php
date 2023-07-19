@@ -69,13 +69,12 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
-        $machine = new Machine($jobId, 'create/requested', 'pre_active', []);
+        $machine = new Machine($job->id, 'create/requested', 'pre_active', []);
 
         $authenticationToken = md5((string) rand());
 

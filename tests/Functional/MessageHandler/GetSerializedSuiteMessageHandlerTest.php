@@ -16,12 +16,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
-        $this->createMessageAndHandleMessage(self::$apiToken, md5((string) rand()), md5((string) rand()));
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $this->createMessageAndHandleMessage(self::$apiToken, $jobId, md5((string) rand()));
 
         self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
@@ -211,18 +215,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     private function createJob(): Job
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), rand(1, 1000));
+        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000));
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
 
         $jobRepository->add($job);
 

@@ -30,11 +30,6 @@ class WorkerStateFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
@@ -61,7 +56,7 @@ class WorkerStateFactoryTest extends WebTestCase
         callable $componentStatesCreator,
         callable $expectedWorkerStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $componentStatesCreator($job, $this->workerComponentStateRepository);

@@ -13,12 +13,18 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Uid\Ulid;
 
 class GetMachineMessageHandlerTest extends TestCase
 {
     public function testInvokeMachineRetrievalThrowsException(): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+
+        $jobReflector = new \ReflectionClass($job);
+        $idProperty = $jobReflector->getProperty('id');
+        $idProperty->setValue($job, (string) new Ulid());
+
         $machine = new Machine($job->id, 'up/active', 'active', ['127.0.0.1']);
 
         $jobRepository = \Mockery::mock(JobRepository::class);

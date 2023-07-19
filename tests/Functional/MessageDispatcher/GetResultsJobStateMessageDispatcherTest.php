@@ -76,27 +76,25 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForResultsJobCreatedEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
         $authenticationToken = md5((string) rand());
         $resultsToken = md5((string) rand());
-        $resultsJob = new ResultsJob($jobId, $resultsToken, new JobState('awaiting-events', null));
+        $resultsJob = new ResultsJob($job->id, $resultsToken, new JobState('awaiting-events', null));
 
-        $event = new ResultsJobCreatedEvent($authenticationToken, $jobId, $resultsJob);
+        $event = new ResultsJobCreatedEvent($authenticationToken, $job->id, $resultsJob);
 
         $this->dispatcher->dispatchForResultsJobCreatedEvent($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $jobId));
+        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
     }
 
     public function testDispatchForResultsJobStateRetrievedEventNotEndState(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
@@ -104,17 +102,16 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
         $resultsJobState = new ResultsJobState('started', null);
 
-        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $jobId, $resultsJobState);
+        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->id, $resultsJobState);
 
         $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $jobId));
+        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
     }
 
     public function testDispatchForResultsJobStateRetrievedEventIsEndState(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
@@ -122,7 +119,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
         $resultsJobState = new ResultsJobState('complete', 'ended');
 
-        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $jobId, $resultsJobState);
+        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->id, $resultsJobState);
 
         $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
 

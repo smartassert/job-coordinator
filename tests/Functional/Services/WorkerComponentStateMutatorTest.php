@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class WorkerComponentStateMutatorTest extends WebTestCase
 {
@@ -31,11 +32,6 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
@@ -83,17 +79,16 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
     public function testSetOnWorkerStateRetrievedEventNoJob(): void
     {
-        self::assertSame(0, $this->jobRepository->count([]));
+        $jobCount = $this->jobRepository->count([]);
 
-        $event = new WorkerStateRetrievedEvent(
-            md5((string) rand()),
-            md5((string) rand()),
-            \Mockery::mock(ApplicationState::class)
-        );
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), \Mockery::mock(ApplicationState::class));
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
-        self::assertSame(0, $this->jobRepository->count([]));
+        self::assertSame($jobCount, $this->jobRepository->count([]));
         self::assertSame(0, $this->workerComponentStateRepository->count([]));
     }
 
@@ -114,7 +109,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         callable $expectedExecutionStateCreator,
         callable $expectedEventDeliveryStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $componentStateCreator($job, $this->workerComponentStateRepository);

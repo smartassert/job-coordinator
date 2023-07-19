@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Job;
-use App\Enum\ErrorResponseType;
 use App\Event\JobCreatedEvent;
-use App\Exception\EmptyUlidException;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
-use App\Response\ErrorResponse;
 use App\Services\JobSerializer;
-use App\Services\UlidFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,19 +23,12 @@ class JobController
         User $user,
         JobRepository $repository,
         JobSerializer $jobSerializer,
-        UlidFactory $ulidFactory,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-        try {
-            $id = $ulidFactory->create();
-        } catch (EmptyUlidException) {
-            return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
-        }
-
-        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
+        $job = new Job($user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
         $repository->add($job);
 
-        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
+        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
 
         return new JsonResponse($jobSerializer->serialize($job));
     }

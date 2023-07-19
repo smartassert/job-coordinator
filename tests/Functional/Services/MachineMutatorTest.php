@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Uid\Ulid;
 
 class MachineMutatorTest extends WebTestCase
 {
@@ -31,11 +32,6 @@ class MachineMutatorTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
@@ -93,10 +89,10 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateOnMachineStateChangeEventDataProvider
      *
-     * @param callable(non-empty-string, JobRepository): ?Job $jobCreator
-     * @param callable(?Job, MachineRepository): void         $machineCreator
-     * @param callable(?Job): MachineStateChangeEvent         $eventCreator
-     * @param callable(?Job): ?Machine                        $expectedMachineCreator
+     * @param callable(JobRepository): ?Job           $jobCreator
+     * @param callable(?Job, MachineRepository): void $machineCreator
+     * @param callable(?Job): MachineStateChangeEvent $eventCreator
+     * @param callable(?Job): ?Machine                $expectedMachineCreator
      */
     public function testSetStateOnMachineStateChangeEvent(
         callable $jobCreator,
@@ -104,16 +100,17 @@ class MachineMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedMachineCreator,
     ): void {
-        $jobId = md5((string) rand());
+        $job = $jobCreator($this->jobRepository);
 
-        $job = $jobCreator($jobId, $this->jobRepository);
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
 
         $this->machineMutator->setStateOnMachineStateChangeEvent($event);
 
-        $machine = $this->machineRepository->find($jobId);
+        $machine = null === $job
+            ? null
+            : $this->machineRepository->find($job->id);
 
         self::assertEquals($expectedMachineCreator($job), $machine);
     }
@@ -123,10 +120,8 @@ class MachineMutatorTest extends WebTestCase
      */
     public function setStateOnMachineStateChangeEventDataProvider(): array
     {
-        $jobCreator = function (string $jobId, JobRepository $jobRepository) {
-            \assert('' !== $jobId);
-
-            $job = new Job($jobId, 'user id', 'suite id', 600);
+        $jobCreator = function (JobRepository $jobRepository) {
+            $job = new Job('user id', 'suite id', 600);
             $jobRepository->add($job);
 
             return $job;
@@ -140,10 +135,13 @@ class MachineMutatorTest extends WebTestCase
                 'machineCreator' => function () {
                 },
                 'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
                         \Mockery::mock(MachineModel::class),
-                        new MachineModel(md5((string) rand()), md5((string) rand()), md5((string) rand()), [])
+                        new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -155,10 +153,13 @@ class MachineMutatorTest extends WebTestCase
                 'machineCreator' => function () {
                 },
                 'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
                         \Mockery::mock(MachineModel::class),
-                        new MachineModel(md5((string) rand()), md5((string) rand()), md5((string) rand()), [])
+                        new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -209,10 +210,10 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @dataProvider setIpOnMachineIsActiveEventDataProvider
      *
-     * @param callable(non-empty-string, JobRepository): ?Job $jobCreator
-     * @param callable(?Job, MachineRepository): void         $machineCreator
-     * @param callable(?Job): MachineIsActiveEvent            $eventCreator
-     * @param callable(?Job): ?Machine                        $expectedMachineCreator
+     * @param callable(JobRepository): ?Job           $jobCreator
+     * @param callable(?Job, MachineRepository): void $machineCreator
+     * @param callable(?Job): MachineIsActiveEvent    $eventCreator
+     * @param callable(?Job): ?Machine                $expectedMachineCreator
      */
     public function testSetIpOnMachineIsActiveEvent(
         callable $jobCreator,
@@ -220,16 +221,16 @@ class MachineMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedMachineCreator,
     ): void {
-        $jobId = md5((string) rand());
-
-        $job = $jobCreator($jobId, $this->jobRepository);
+        $job = $jobCreator($this->jobRepository);
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
 
         $this->machineMutator->setIpOnMachineIsActiveEvent($event);
 
-        $machine = $this->machineRepository->find($jobId);
+        $machine = null === $job
+            ? null
+            : $this->machineRepository->find($job->id);
 
         self::assertEquals($expectedMachineCreator($job), $machine);
     }
@@ -239,10 +240,8 @@ class MachineMutatorTest extends WebTestCase
      */
     public function setIpOnMachineIsActiveEventDataProvider(): array
     {
-        $jobCreator = function (string $jobId, JobRepository $jobRepository) {
-            \assert('' !== $jobId);
-
-            $job = new Job($jobId, 'user id', 'suite id', 600);
+        $jobCreator = function (JobRepository $jobRepository) {
+            $job = new Job('user id', 'suite id', 600);
             $jobRepository->add($job);
 
             return $job;
@@ -256,7 +255,10 @@ class MachineMutatorTest extends WebTestCase
                 'machineCreator' => function () {
                 },
                 'eventCreator' => function () {
-                    return new MachineIsActiveEvent(md5((string) rand()), md5((string) rand()), '127.0.0.1');
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
+                    return new MachineIsActiveEvent(md5((string) rand()), $jobId, '127.0.0.1');
                 },
                 'expectedMachineCreator' => function () {
                     return null;

@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -39,7 +40,8 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNoJob(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
         $handler = $this->createHandler();
 
         $message = new StartWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
@@ -256,12 +258,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createJob(): Job
     {
-        $job = new Job(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            600
-        );
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
