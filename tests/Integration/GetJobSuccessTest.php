@@ -7,7 +7,6 @@ namespace App\Tests\Integration;
 use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Tests\Application\AbstractApplicationTest;
-use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -26,16 +25,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-
-        foreach ($jobRepository->findAll() as $job) {
-            $entityManager->remove($job);
-            $entityManager->flush();
-        }
-
-        self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
 
