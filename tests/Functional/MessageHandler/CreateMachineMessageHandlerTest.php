@@ -43,8 +43,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
         $workerManagerException = new \Exception('Failed to create machine');
 
@@ -59,7 +58,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerManagerClient: $workerManagerClient,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $jobId);
+        $message = new CreateMachineMessage(self::$apiToken, $job->id);
 
         try {
             $handler($message);
@@ -72,10 +71,9 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = $this->createJob(jobId: $jobId);
+        $job = $this->createJob();
 
-        $machine = new MachineModel($jobId, 'create/requested', 'pre_active', []);
+        $machine = new MachineModel($job->id, 'create/requested', 'pre_active', []);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
@@ -93,7 +91,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($machineRepository->find($job->id));
 
-        $handler(new CreateMachineMessage(self::$apiToken, $jobId));
+        $handler(new CreateMachineMessage(self::$apiToken, $job->id));
 
         $createdMachine = $machineRepository->find($job->id);
         self::assertEquals(
@@ -120,17 +118,9 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return CreateMachineMessage::class;
     }
 
-    /**
-     * @param non-empty-string $jobId
-     */
-    private function createJob(string $jobId): Job
+    private function createJob(): Job
     {
-        $job = new Job(
-            $jobId,
-            md5((string) rand()),
-            md5((string) rand()),
-            600
-        );
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

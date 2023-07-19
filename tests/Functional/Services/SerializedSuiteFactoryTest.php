@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteFactoryTest extends WebTestCase
 {
@@ -30,11 +31,6 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
@@ -87,9 +83,10 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
     public function testCreateOnSerializedSuiteCreatedEventNoJob(): void
     {
-        self::assertSame(0, $this->jobRepository->count([]));
+        $jobCount = $this->jobRepository->count([]);
 
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
         $event = new SerializedSuiteCreatedEvent(
             'authentication token',
@@ -99,14 +96,12 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);
 
-        self::assertSame(0, $this->jobRepository->count([]));
+        self::assertSame($jobCount, $this->jobRepository->count([]));
     }
 
     public function testCreateOnSerializedSuiteCreatedEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
@@ -124,13 +119,13 @@ class SerializedSuiteFactoryTest extends WebTestCase
             null
         );
 
-        $event = new SerializedSuiteCreatedEvent('authentication token', $jobId, $sourcesSerializedSuite);
+        $event = new SerializedSuiteCreatedEvent('authentication token', $job->id, $sourcesSerializedSuite);
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);
 
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($jobId);
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         self::assertEquals(
-            new SerializedSuite($jobId, $serializedSuiteId, $serializedSuiteState),
+            new SerializedSuite($job->id, $serializedSuiteId, $serializedSuiteState),
             $serializedSuiteEntity
         );
     }

@@ -17,6 +17,7 @@ use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -52,7 +53,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNoJob(): void
     {
-        $machine = new Machine(md5((string) rand()), 'find/received', 'finding', []);
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $machine = new Machine($jobId, 'find/received', 'finding', []);
 
         $this->createMessageAndHandleMessage($machine, $machine, self::$apiToken);
 
@@ -67,7 +71,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -115,7 +119,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         callable $expectedEventCreator
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -179,7 +183,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         string $expectedEventClass
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);

@@ -16,9 +16,6 @@ class JobTest extends WebTestCase
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
 
-        $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $userId = (string) new Ulid();
         \assert('' !== $userId);
 
@@ -30,7 +27,7 @@ class JobTest extends WebTestCase
 
         $maximumDurationInSeconds = 600;
 
-        $job = new Job($id, $userId, $suiteId, $maximumDurationInSeconds);
+        $job = new Job($userId, $suiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();
@@ -41,7 +38,8 @@ class JobTest extends WebTestCase
 
         $retrievedJob = $entityManager->find(Job::class, $jobId);
         self::assertInstanceOf(Job::class, $retrievedJob);
-        self::assertSame($id, $retrievedJob->id);
+        self::assertNotNull($retrievedJob->id);
+        self::assertTrue(Ulid::isValid($retrievedJob->id));
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
         self::assertSame($maximumDurationInSeconds, $retrievedJob->maximumDurationInSeconds);

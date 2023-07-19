@@ -44,10 +44,6 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 
         $suiteId = $ulidFactory->create();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        self::assertCount(0, $jobRepository->findAll());
-
         self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(self::$apiToken, $suiteId, 600);
 
         self::assertSame(200, self::$createResponse->getStatusCode());
@@ -62,9 +58,7 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
     {
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-        $jobs = $jobRepository->findAll();
-        $job = $jobs[0] ?? null;
 
-        return $job instanceof Job ? $job : null;
+        return $jobRepository->find(self::$createResponseData['id'] ?? null);
     }
 }

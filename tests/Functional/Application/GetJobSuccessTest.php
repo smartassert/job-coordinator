@@ -68,11 +68,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
 
-        foreach ($jobRepository->findAll() as $job) {
-            $entityManager->remove($job);
-            $entityManager->flush();
-        }
-
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
@@ -81,8 +76,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-
-        self::assertCount(0, $jobRepository->findAll());
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
         self::assertSame(200, $createResponse->getStatusCode());

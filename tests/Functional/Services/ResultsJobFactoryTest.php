@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class ResultsJobFactoryTest extends WebTestCase
 {
@@ -30,11 +31,6 @@ class ResultsJobFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
@@ -82,22 +78,20 @@ class ResultsJobFactoryTest extends WebTestCase
 
     public function testCreateOnResultsJobCreatedEventNoJob(): void
     {
-        self::assertSame(0, $this->jobRepository->count([]));
-
-        $jobId = md5((string) rand());
+        $jobCount = $this->jobRepository->count([]);
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
         $event = new ResultsJobCreatedEvent('authentication token', $jobId, \Mockery::mock(ResultsClientJob::class));
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 
-        self::assertSame(0, $this->jobRepository->count([]));
+        self::assertSame($jobCount, $this->jobRepository->count([]));
     }
 
     public function testCreateOnResultsJobCreatedEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->resultsJobRepository->count([]));
@@ -107,18 +101,18 @@ class ResultsJobFactoryTest extends WebTestCase
         $resultsJobEndState = null;
 
         $resultsJob = new ResultsClientJob(
-            $jobId,
+            $job->id,
             $resultsJobToken,
             new ResultsJobState($resultsJobState, $resultsJobEndState)
         );
 
-        $event = new ResultsJobCreatedEvent('authentication token', $jobId, $resultsJob);
+        $event = new ResultsJobCreatedEvent('authentication token', $job->id, $resultsJob);
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 
-        $resultsJobEntity = $this->resultsJobRepository->find($jobId);
+        $resultsJobEntity = $this->resultsJobRepository->find($job->id);
         self::assertEquals(
-            new ResultsJob($jobId, $resultsJobToken, $resultsJobState, $resultsJobEndState),
+            new ResultsJob($job->id, $resultsJobToken, $resultsJobState, $resultsJobEndState),
             $resultsJobEntity
         );
     }

@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
-use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
@@ -80,7 +77,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -95,38 +92,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatch($event);
 
         $this->assertDispatchedMessage($event->authenticationToken, $event->jobId);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function dispatchSuccessDataProvider(): array
-    {
-        $jobId = md5((string) rand());
-        $job = (new Job($jobId, md5((string) rand()), md5((string) rand()), 600));
-
-        $resultsJobCreatedEvent = new ResultsJobCreatedEvent(
-            md5((string) rand()),
-            $jobId,
-            \Mockery::mock(ResultsJob::class)
-        );
-
-        $serializedSuiteSerializedEvent = new SerializedSuiteSerializedEvent(
-            md5((string) rand()),
-            $jobId,
-            md5((string) rand())
-        );
-
-        return [
-            'ResultsJobCreatedEvent' => [
-                'job' => $job,
-                'event' => $resultsJobCreatedEvent,
-            ],
-            'SerializedSuiteSerializedEvent' => [
-                'job' => $job,
-                'event' => $serializedSuiteSerializedEvent,
-            ],
-        ];
     }
 
     private function assertNoMessagesDispatched(): void

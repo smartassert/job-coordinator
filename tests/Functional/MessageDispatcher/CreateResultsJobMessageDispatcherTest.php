@@ -41,15 +41,14 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForJobCreatedEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
         $authenticationToken = md5((string) rand());
 
-        $event = new JobCreatedEvent($authenticationToken, $jobId, []);
+        $event = new JobCreatedEvent($authenticationToken, $job->id, []);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -57,7 +56,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $jobId);
+        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $job->id);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

@@ -41,8 +41,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForJobCreatedEventSuccess(): void
     {
-        $jobId = md5((string) rand());
-        $job = new Job($jobId, 'user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600);
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
@@ -54,7 +53,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
             md5((string) rand()) => md5((string) rand()),
         ];
 
-        $event = new JobCreatedEvent($authenticationToken, $jobId, $parameters);
+        $event = new JobCreatedEvent($authenticationToken, $job->id, $parameters);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -62,7 +61,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $jobId, $parameters);
+        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $job->id, $parameters);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

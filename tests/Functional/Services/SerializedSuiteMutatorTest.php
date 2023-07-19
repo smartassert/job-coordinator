@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteMutatorTest extends WebTestCase
 {
@@ -30,11 +31,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        foreach ($jobRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
-
         $this->jobRepository = $jobRepository;
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
@@ -88,7 +84,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateSuccessDataProvider
      *
-     * @param callable(non-empty-string, JobRepository): ?Job $jobCreator
+     * @param callable(JobRepository): ?Job                   $jobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): SerializedSuiteRetrievedEvent   $eventCreator
      * @param callable(?Job): ?SerializedSuite                $expectedSerializedSuiteCreator
@@ -99,16 +95,17 @@ class SerializedSuiteMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedSerializedSuiteCreator,
     ): void {
-        $jobId = md5((string) rand());
-
-        $job = $jobCreator($jobId, $this->jobRepository);
+        $job = $jobCreator($this->jobRepository);
         $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
         $event = $eventCreator($job);
 
         $this->serializedSuiteMutator->setState($event);
 
-        $resultsJob = $this->serializedSuiteRepository->find($jobId);
+        $resultsJob = null === $job
+            ? null
+            : $this->serializedSuiteRepository->find($job->id);
+
         self::assertEquals($expectedSerializedSuiteCreator($job), $resultsJob);
     }
 
@@ -118,10 +115,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
     public function setStateSuccessDataProvider(): array
     {
         $serializedSuiteId = md5((string) rand());
-        $jobCreator = function (string $jobId, JobRepository $jobRepository) {
-            \assert('' !== $jobId);
-
-            $job = new Job($jobId, 'user id', 'suite id', 600);
+        $jobCreator = function (JobRepository $jobRepository) {
+            $job = new Job('user id', 'suite id', 600);
             $jobRepository->add($job);
 
             return $job;
@@ -135,9 +130,12 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 'serializedSuiteCreator' => function () {
                 },
                 'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
-                        md5((string) rand()),
+                        $jobId,
                         \Mockery::mock(SourcesSerializedSuite::class)
                     );
                 },

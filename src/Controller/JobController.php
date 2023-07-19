@@ -36,10 +36,10 @@ class JobController
             return new ErrorResponse(ErrorResponseType::SERVER_ERROR, 'Generated job id is an empty string.');
         }
 
-        $job = new Job($id, $user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
+        $job = new Job($user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
         $repository->add($job);
 
-        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $id, $request->parameters));
+        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
 
         return new JsonResponse($jobSerializer->serialize($job));
     }
