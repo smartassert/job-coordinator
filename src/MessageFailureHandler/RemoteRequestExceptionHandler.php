@@ -7,6 +7,7 @@ namespace App\MessageFailureHandler;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Services\RemoteRequestFailureRecorder;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
+use Symfony\Component\Messenger\Envelope;
 
 class RemoteRequestExceptionHandler implements ExceptionHandlerInterface
 {
@@ -15,7 +16,7 @@ class RemoteRequestExceptionHandler implements ExceptionHandlerInterface
     ) {
     }
 
-    public function handle(\Throwable $throwable): void
+    public function handle(Envelope $envelope, \Throwable $throwable): void
     {
         if (!$throwable instanceof RemoteRequestExceptionInterface) {
             return;
