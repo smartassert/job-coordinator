@@ -27,6 +27,7 @@ use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Messenger\Envelope;
 
 class RemoteRequestExceptionHandlerTest extends WebTestCase
 {
@@ -89,7 +90,9 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         self::assertNull($remoteRequest->getFailure());
 
-        $this->handler->handle($exception);
+        $envelope = new Envelope(new \stdClass());
+
+        $this->handler->handle($envelope, $exception);
 
         self::assertSame(1, $this->remoteRequestFailureRepository->count([]));
 
