@@ -96,7 +96,7 @@ services:
     restart: unless-stopped
 
   sources-service:
-    image: ghcr.io/smartassert/sources:1.8
+    image: ghcr.io/smartassert/sources:2.0
     profiles: ["integration"]
     container_name: sources-service
     environment:

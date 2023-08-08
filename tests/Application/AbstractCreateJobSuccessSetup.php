@@ -39,10 +39,11 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
         \assert($userProvider instanceof UserProvider);
         self::$user = $userProvider->get('user@example.com');
 
-        $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
-        self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(self::$apiToken, $suiteId, 600);
+        self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(
+            self::$apiToken,
+            static::createSuiteId(),
+            600
+        );
 
         self::assertSame(200, self::$createResponse->getStatusCode());
         self::assertSame('application/json', self::$createResponse->getHeaderLine('content-type'));
@@ -50,6 +51,17 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
         $responseData = json_decode(self::$createResponse->getBody()->getContents(), true);
         self::assertIsArray($responseData);
         self::$createResponseData = $responseData;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    protected static function createSuiteId(): string
+    {
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
+        return $suiteId;
     }
 
     protected function getJob(): ?Job
