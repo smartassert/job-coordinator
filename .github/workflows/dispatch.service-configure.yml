@@ -1,0 +1,16 @@
+name: dispatch.service-configure
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dummy step
+        run: echo "noop"
