@@ -20,7 +20,7 @@ jobs:
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "job-coordinator",
+              "service_id": "job_coordinator",
               "state_url": "http://{{ host }}/",
               "health_check_url": "http://{{ host }}/health-check"
             }
