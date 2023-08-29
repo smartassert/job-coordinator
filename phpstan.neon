@@ -5,3 +5,7 @@ parameters:
     - src
     - tests
   inferPrivatePropertyTypeFromConstructor: true
+  ignoreErrors:
+    -
+      message: '#Dead catch - Doctrine\\ORM\\NoResultException is never thrown in the try block#'
+      path: src/Repository/RemoteRequestRepository.php
