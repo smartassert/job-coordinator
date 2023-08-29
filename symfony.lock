@@ -193,6 +193,9 @@
     "sebastian/version": {
         "version": "3.0.2"
     },
+    "smartassert/health-check-bundle": {
+        "version": "4.0"
+    },
     "smartassert/test-authenticaton-provider-bundle": {
         "version": "0.2"
     },

@@ -8,6 +8,8 @@ parameters:
     users_security_bundle_public_pattern: '^/(status)|(health-check)'
     users_security_bundle_secured_pattern: '^/*'
     users_security_bundle_access_control_path: '^/*'
+    health_check_bundle_enable_status_readiness_inspector: true
+    health_check_bundle_status_is_ready: '%env(bool:IS_READY)%'
     message_delays:
         App\Message\StartWorkerJobMessage: '%env(int:START_WORKER_JOB_DELAY_MS)%'
         App\Message\GetSerializedSuiteMessage: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'

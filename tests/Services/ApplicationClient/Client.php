@@ -51,6 +51,11 @@ class Client
         );
     }
 
+    public function makeHealthCheckRequest(string $method = 'GET'): ResponseInterface
+    {
+        return $this->client->makeRequest($method, $this->router->generate('health-check'));
+    }
+
     /**
      * @return array<string, string>
      */
