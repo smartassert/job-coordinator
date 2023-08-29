@@ -45,6 +45,8 @@ jobs:
           sleep 10
 
       - name: Run tests
+        env:
+          EXPECTED_VERSION: gh-action-version
         run: composer test-integration
 
       - name: Dump docker-compose logs

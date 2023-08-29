@@ -132,6 +132,7 @@ services:
         RESULTS_BASE_URL: http://results-http
         WORKER_MANAGER_BASE_URL: http://worker-manager-http
         SOURCES_BASE_URL: http://sources-http
+        VERSION: ${VERSION}
     container_name: app
     restart: unless-stopped
     depends_on:
