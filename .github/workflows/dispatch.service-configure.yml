@@ -12,5 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Dummy step
-        run: echo "noop"
+      - name: Dispatch service-configure event to instance manager
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
+          repository: smartassert/instance-manager
+          event-type: service-configure
+          client-payload: |
+            {
+              "service_id": "job-coordinator",
+              "state_url": "http://{{ host }}/",
+              "health_check_url": "http://{{ host }}/health-check"
+            }
