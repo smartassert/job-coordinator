@@ -33,6 +33,7 @@ jobs:
       - name: Setup integration environment
         env:
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/job-coordinator?charset=UTF-8
+          VERSION: gh-action-version
         run: composer integration-setup
 
       - name: Verify integration environment state
