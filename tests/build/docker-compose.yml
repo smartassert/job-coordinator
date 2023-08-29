@@ -123,7 +123,6 @@ services:
 
   app:
     profiles: ["integration"]
-    env_file: .env
     build:
       context: ../..
       args:
