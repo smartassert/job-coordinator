@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set env.service_env_vars
-        run: echo "service_env_vars=$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')" >> "$GITHUB_ENV"
+        run: echo "service_env_vars=$(base64 --wrap=0 <<< $(jq . < ./build/instance-manager/env.json))
 
       - uses: peter-evans/repository-dispatch@v2
         with:
@@ -55,5 +55,5 @@ jobs:
           client-payload: |
             {
               "service_id": "${{ needs.setup.outputs.service_id }}",
-              "env_vars": "{\"\"foo\"\":\"\"bar\"\"}"
+              "env_vars": "${{ env.service_env_vars }}"
             }
