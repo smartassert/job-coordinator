@@ -19,12 +19,16 @@ jobs:
         run: echo "service_id=job_coordinator" >> "$GITHUB_ENV"
 
   instance-manager-service-configure:
-    needs: setup
     name: Dispatch service-configure event to instance manager
     runs-on: ubuntu-latest
 
     steps:
-      - uses: peter-evans/repository-dispatch@v1
+      -
+        name: foo
+        run: |
+          echo "${{ env.service_id }}"
+
+      - uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
           repository: smartassert/instance-manager
@@ -37,17 +41,16 @@ jobs:
             }
 
   instance-manager-service-set-env:
-    needs: setup
     name: Dispatch service-set-env event to instance manager
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set env.service_env_vars
         run: echo "service_env_vars=$(jq -R . < ./build/instance-manager/env.json | tr -d '\n' | sed 's/""//g')" >> "$GITHUB_ENV"
 
-      - uses: peter-evans/repository-dispatch@v1
+      - uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
           repository: smartassert/instance-manager
