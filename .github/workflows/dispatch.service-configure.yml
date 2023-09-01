@@ -24,11 +24,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: foo
-        run: |
-          echo "${{ needs.setup.outputs.service_id }}"
-
       - uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
@@ -36,12 +31,13 @@ jobs:
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "${{ env.service_id }}",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "state_url": "http://{{ host }}/status",
               "health_check_url": "http://{{ host }}/health-check"
             }
 
   instance-manager-service-set-env:
+    needs: setup
     name: Dispatch service-set-env event to instance manager
     runs-on: ubuntu-latest
 
@@ -58,6 +54,6 @@ jobs:
           event-type: service-set-env
           client-payload: |
             {
-              "service_id": "${{ env.service_id }}",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
               "env_vars": ${{ env.service_env_vars }}
             }
