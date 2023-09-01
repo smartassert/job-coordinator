@@ -55,5 +55,5 @@ jobs:
           client-payload: |
             {
               "service_id": "${{ needs.setup.outputs.service_id }}",
-              "env_vars": ${{ env.service_env_vars }}
+              "env_vars": "{}"
             }
