@@ -19,6 +19,7 @@ jobs:
         run: echo "service_id=job_coordinator" >> "$GITHUB_ENV"
 
   instance-manager-service-configure:
+    needs: setup
     name: Dispatch service-configure event to instance manager
     runs-on: ubuntu-latest
 
@@ -26,7 +27,7 @@ jobs:
       -
         name: foo
         run: |
-          echo "${{ env.service_id }}"
+          echo "${{ needs.setup.outputs.service_id }}"
 
       - uses: peter-evans/repository-dispatch@v2
         with:
