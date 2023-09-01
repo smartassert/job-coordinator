@@ -8,19 +8,54 @@ on:
         required: true
 
 jobs:
-  deploy:
+  setup:
+    name: Set service id
+    runs-on: ubuntu-latest
+    outputs:
+      service_id: ${{ env.service_id }}
+
+    steps:
+      - name: Set env.service_id
+        run: echo "service_id=job_coordinator" >> "$GITHUB_ENV"
+
+  instance-manager-service-configure:
+    needs: setup
+    name: Dispatch service-configure event to instance manager
     runs-on: ubuntu-latest
 
     steps:
-      - name: Dispatch service-configure event to instance manager
-        uses: peter-evans/repository-dispatch@v2
+      - uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
           repository: smartassert/instance-manager
           event-type: service-configure
           client-payload: |
             {
-              "service_id": "job_coordinator",
-              "state_url": "http://{{ host }}/",
+              "service_id": "${{ needs.setup.outputs.service_id }}",
+              "state_url": "http://{{ host }}/status",
               "health_check_url": "http://{{ host }}/health-check"
+            }
+
+  instance-manager-service-set-env:
+    needs: setup
+    name: Dispatch service-set-env event to instance manager
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set env.service_env_vars
+        run: |
+          JSON=$(jq . < ./build/instance-manager/env.json)          
+          echo "service_env_vars=$(base64 --wrap=0 <<< "$JSON")" >> "$GITHUB_ENV"
+
+      - uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INSTANCE_MANAGER_TOKEN }}
+          repository: smartassert/instance-manager
+          event-type: service-set-env
+          client-payload: |
+            {
+              "service_id": "${{ needs.setup.outputs.service_id }}",
+              "env_vars": "${{ env.service_env_vars }}"
             }
