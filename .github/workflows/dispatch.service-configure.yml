@@ -18,6 +18,22 @@ jobs:
       - name: Set env.service_id
         run: echo "service_id=job_coordinator" >> "$GITHUB_ENV"
 
+  image-builder-service-configure:
+    name: Dispatch service-configure event to image builder
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.IMAGE_BUILDER_TOKEN }}
+          repository: smartassert/image-builder
+          event-type: service-configure
+          client-payload: |
+            {
+              "service_id": "${{ env.service_id }}",
+              "build_configuration": "{\"version\": \"${{ github.event.inputs.version }}\"}"
+            }
+
   instance-manager-service-configure:
     needs: setup
     name: Dispatch service-configure event to instance manager
