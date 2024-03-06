@@ -2,14 +2,12 @@ services:
   postgres:
     env_file: .env
     image: postgres:12.5-alpine
-    profiles: ["functional"]
     container_name: postgres
     ports:
       - "5432:5432"
 
   users-service:
     image: ghcr.io/smartassert/users:0.8
-    profiles: ["functional"]
     container_name: users-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
@@ -22,7 +20,6 @@ services:
 
   users-http:
     image: caddy:2.4.5-alpine
-    profiles: ["functional"]
     container_name: users-http
     restart: unless-stopped
     ports:
@@ -35,7 +32,6 @@ services:
 
   results-service:
     image: ghcr.io/smartassert/results:1.6
-    profiles: ["integration"]
     container_name: results-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/results?serverVersion=12&charset=utf8
@@ -47,7 +43,6 @@ services:
 
   results-http:
     image: caddy:2.4.5-alpine
-    profiles: ["integration"]
     container_name: results-http
     restart: unless-stopped
     ports:
@@ -60,7 +55,6 @@ services:
 
   worker-manager-service:
     image: ghcr.io/smartassert/worker-manager:0.27
-    profiles: ["integration"]
     container_name: worker-manager-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/worker_manager?serverVersion=12&charset=utf8
@@ -73,7 +67,6 @@ services:
 
   worker-manager-http:
     image: caddy:2.4.5-alpine
-    profiles: ["integration"]
     container_name: worker-manager-http
     restart: unless-stopped
     ports:
@@ -86,7 +79,6 @@ services:
 
   s3-mock:
     image: adobe/s3mock:2.4.14
-    profiles: ["integration"]
     container_name: s3-mock
     ports:
       - "9090:9090"
@@ -97,7 +89,6 @@ services:
 
   sources-service:
     image: ghcr.io/smartassert/sources:2.0
-    profiles: ["integration"]
     container_name: sources-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
@@ -110,7 +101,6 @@ services:
 
   sources-http:
     image: caddy:2.4.5-alpine
-    profiles: ["integration"]
     container_name: sources-http
     restart: unless-stopped
     ports:
@@ -122,7 +112,6 @@ services:
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
 
   app:
-    profiles: ["integration"]
     build:
       context: ../..
       args:
@@ -142,7 +131,6 @@ services:
 
   app-http:
     image: caddy:2.4.5-alpine
-    profiles: ["integration"]
     container_name: app-http
     restart: unless-stopped
     environment:
