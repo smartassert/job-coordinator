@@ -106,10 +106,10 @@
             "@test-unit",
             "@test-functional"
         ],
-        "functional-start": "docker compose -f ./tests/build/docker-compose.yml --profile functional up -d",
-        "functional-status": "docker compose -f ./tests/build/docker-compose.yml --profile functional ps",
+        "functional-start": "docker compose -f ./tests/build/docker-compose.yml up -d postgres users-service users-http",
+        "functional-status": "docker compose -f ./tests/build/docker-compose.yml ps",
         "functional-teardown": [
-            "docker compose -f ./tests/build/docker-compose.yml --profile functional down"
+            "docker compose -f ./tests/build/docker-compose.yml down"
         ],
         "functional-setup": [
             "@functional-start",
@@ -146,7 +146,7 @@
         ],
         "integration-build": "docker compose -f tests/build/docker-compose.yml build app",
         "integration-pull": "docker compose -f tests/build/docker-compose.yml pull",
-        "integration-up": "docker compose -f ./tests/build/docker-compose.yml --profile functional --profile integration up -d",
+        "integration-up": "docker compose -f ./tests/build/docker-compose.yml up -d",
         "integration-setup": [
             "@integration-build",
             "@integration-up",
@@ -157,9 +157,9 @@
             "@worker-manager-setup",
             "@sources-setup"
         ],
-        "integration-status": "docker compose -f ./tests/build/docker-compose.yml --profile functional --profile integration ps",
+        "integration-status": "docker compose -f ./tests/build/docker-compose.yml ps",
         "integration-logs": "docker compose -f tests/build/docker-compose.yml logs",
-        "integration-teardown": "docker compose -f ./tests/build/docker-compose.yml --profile functional --profile integration down",
+        "integration-teardown": "docker compose -f ./tests/build/docker-compose.yml down",
         "messenger-setup": "php bin/console messenger:setup-transports",
         "messenger-listen": "php bin/console messenger:consume async -vv"
     },
