@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\ResultsClient\Model\JobInterface as ResultsJob;
+use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ResultsJobCreatedEvent extends Event

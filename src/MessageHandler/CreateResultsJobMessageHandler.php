@@ -9,7 +9,7 @@ use App\Exception\ResultsJobCreationException;
 use App\Message\CreateResultsJobMessage;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
+use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

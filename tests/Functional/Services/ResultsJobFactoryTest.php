@@ -10,9 +10,9 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobFactory;
+use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
-use SmartAssert\ResultsClient\Model\JobInterface as ResultsClientJobInterface;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -86,7 +86,7 @@ class ResultsJobFactoryTest extends WebTestCase
         $event = new ResultsJobCreatedEvent(
             'authentication token',
             $jobId,
-            \Mockery::mock(ResultsClientJobInterface::class)
+            ResultsClientJobFactory::createRandom()
         );
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
