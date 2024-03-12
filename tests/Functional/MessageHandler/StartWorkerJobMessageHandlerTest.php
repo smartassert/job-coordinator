@@ -15,10 +15,11 @@ use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
+use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Factory\WorkerClientJobFactory;
+use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
-use SmartAssert\WorkerClient\ClientInterface as WorkerClient;
-use SmartAssert\WorkerClient\Model\JobInterface as WorkerJob;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -178,7 +179,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared');
-        $resultsJob = $this->createResultsJob($job);
+        $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
 
@@ -190,15 +191,19 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ;
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $workerJob = WorkerClientJobFactory::createRandom();
 
-        $workerJob = \Mockery::mock(WorkerJob::class);
-
-        $workerClient = \Mockery::mock(WorkerClient::class);
-        $workerClient
-            ->shouldReceive('createJob')
-            ->with($job->id, $resultsJob->token, $job->maximumDurationInSeconds, $serializedSuiteContent)
-            ->andReturn($workerJob)
-        ;
+        $workerClient = HttpMockedWorkerClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'label' => $workerJob->reference->label,
+                'reference' => $workerJob->reference->reference,
+                'maximum_duration_in_seconds' => $workerJob->maximumDurationInSeconds,
+                'sources' => [],
+                'test_paths' => [],
+                'references' => [],
+                'tests' => [],
+            ])),
+        ]);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
@@ -267,15 +272,13 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return $job;
     }
 
-    private function createResultsJob(Job $job): ResultsJob
+    private function createResultsJob(Job $job): void
     {
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), md5((string) rand()));
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
         $resultsJobRepository->save($resultsJob);
-
-        return $resultsJob;
     }
 
     /**

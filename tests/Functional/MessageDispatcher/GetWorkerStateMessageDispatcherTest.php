@@ -9,9 +9,9 @@ use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerStateMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\Tests\Services\Factory\WorkerClientJobFactory;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
-use SmartAssert\WorkerClient\Model\JobInterface as WorkerJob;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -76,7 +76,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
     public function testDispatchForWorkerJobStartRequestedEventSuccess(): void
     {
         $jobId = md5((string) rand());
-        $workerJob = \Mockery::mock(WorkerJob::class);
+        $workerJob = WorkerClientJobFactory::createRandom();
 
         $machineIpAddress = '127.0.0.1';
 

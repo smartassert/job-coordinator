@@ -17,9 +17,9 @@ use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
+use App\Tests\Services\Factory\WorkerClientJobFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use SmartAssert\WorkerClient\Model\JobInterface as WorkerJob;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MachineInterface;
 
@@ -154,7 +154,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeWorkerJobStartRequests(
-            new WorkerJobStartRequestedEvent($jobId, '127.0.0.1', \Mockery::mock(WorkerJob::class))
+            new WorkerJobStartRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
         );
 
         self::assertTrue(true);
