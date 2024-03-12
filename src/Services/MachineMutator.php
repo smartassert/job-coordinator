@@ -39,7 +39,7 @@ class MachineMutator implements EventSubscriberInterface
     {
         $machineModel = $event->current;
 
-        $job = $this->jobRepository->find($machineModel->id);
+        $job = $this->jobRepository->find($machineModel->getId());
         if (!$job instanceof Job) {
             return;
         }
@@ -49,8 +49,8 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineEntity->setState($machineModel->state);
-        $machineEntity->setStateCategory($machineModel->stateCategory);
+        $machineEntity->setState($machineModel->getState());
+        $machineEntity->setStateCategory($machineModel->getStateCategory());
 
         $this->machineRepository->save($machineEntity);
     }

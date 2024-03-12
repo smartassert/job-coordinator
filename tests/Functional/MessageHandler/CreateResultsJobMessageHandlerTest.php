@@ -13,7 +13,7 @@ use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\ResultsClient\Client as ResultsClient;
+use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -99,9 +99,9 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals(
             new ResultsJobEntity(
                 $job->id,
-                $resultsJobModel->token,
-                $resultsJobModel->state->state,
-                $resultsJobModel->state->endState
+                $resultsJobModel->getToken(),
+                $resultsJobModel->getState()->state,
+                $resultsJobModel->getState()->endState
             ),
             $resultsJob
         );

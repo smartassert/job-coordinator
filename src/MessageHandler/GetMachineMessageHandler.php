@@ -8,7 +8,7 @@ use App\Event\MachineRetrievedEvent;
 use App\Exception\MachineRetrievalException;
 use App\Message\GetMachineMessage;
 use App\Repository\JobRepository;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

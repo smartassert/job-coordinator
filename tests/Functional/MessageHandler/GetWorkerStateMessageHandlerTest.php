@@ -14,7 +14,7 @@ use App\MessageHandler\GetWorkerStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerClient\Client as WorkerClient;
+use SmartAssert\WorkerClient\ClientInterface as WorkerClient;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\Uid\Ulid;

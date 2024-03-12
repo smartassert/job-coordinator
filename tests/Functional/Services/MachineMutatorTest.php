@@ -13,6 +13,7 @@ use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
+use SmartAssert\WorkerManagerClient\Model\MachineInterface as MachineModelInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -140,7 +141,7 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
+                        \Mockery::mock(MachineModelInterface::class),
                         new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
                     );
                 },
@@ -158,7 +159,7 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
+                        \Mockery::mock(MachineModelInterface::class),
                         new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
                     );
                 },
@@ -177,7 +178,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
+                        \Mockery::mock(MachineModelInterface::class),
                         new MachineModel($job->id, 'up/started', 'pre_active', [])
                     );
                 },
@@ -196,7 +197,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
+                        \Mockery::mock(MachineModelInterface::class),
                         new MachineModel($job->id, 'up/active', 'active', [])
                     );
                 },

@@ -76,6 +76,12 @@ services:
 
     SmartAssert\WorkerManagerClient\Client: ~
 
+    SmartAssert\WorkerManagerClient\ClientInterface:
+        alias: SmartAssert\WorkerManagerClient\Client
+
+    SmartAssert\ResultsClient\ClientInterface:
+        alias: SmartAssert\ResultsClient\Client
+
     SmartAssert\SourcesClient\ExceptionFactory: ~
 
     SmartAssert\SourcesClient\SerializedSuiteFactory: ~
@@ -139,3 +145,8 @@ services:
         arguments:
             $jobComponents: !tagged_iterator 'app.job_components.component'
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
+
+    SmartAssert\ServiceClient\ResponseFactory\ResponseFactory:
+        factory: ['SmartAssert\ServiceClient\ResponseFactory\ResponseFactory', 'createFactory']
+
+    SmartAssert\ServiceClient\Client: ~

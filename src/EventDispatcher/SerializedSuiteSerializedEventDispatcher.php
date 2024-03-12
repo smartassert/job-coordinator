@@ -40,7 +40,7 @@ class SerializedSuiteSerializedEventDispatcher implements EventSubscriberInterfa
         $this->eventDispatcher->dispatch(new SerializedSuiteSerializedEvent(
             $event->authenticationToken,
             $event->jobId,
-            $event->serializedSuite->getId()
+            $event->serializedSuite->getId(),
         ));
     }
 }

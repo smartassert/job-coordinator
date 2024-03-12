@@ -10,7 +10,7 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use PHPUnit\Framework\TestCase;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
@@ -49,7 +49,7 @@ class GetMachineMessageHandlerTest extends TestCase
 
         $authenticationToken = md5((string) rand());
 
-        $message = new GetMachineMessage($authenticationToken, $machine->id, $machine);
+        $message = new GetMachineMessage($authenticationToken, $machine->getId(), $machine);
 
         self::expectException(MachineRetrievalException::class);
 

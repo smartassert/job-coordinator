@@ -13,7 +13,7 @@ use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -247,7 +247,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient
             ->shouldReceive('getMachine')
-            ->with($authenticationToken, $previous->id)
+            ->with($authenticationToken, $previous->getId())
             ->andReturn($current)
         ;
 
@@ -255,7 +255,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
-        $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
+        $message = new GetMachineMessage($authenticationToken, $previous->getId(), $previous);
 
         ($handler)($message);
     }

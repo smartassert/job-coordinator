@@ -16,11 +16,12 @@ use App\Event\WorkerJobStartRequestedEvent;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
 use PHPUnit\Framework\TestCase;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ResultsClient\Model\JobInterface as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
+use SmartAssert\SourcesClient\Model\SerializedSuiteInterface;
 use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\MachineInterface;
 
 class RemoteRequestRemoverForEventsTest extends TestCase
 {
@@ -78,7 +79,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
-            new SerializedSuiteCreatedEvent('authentication token', $jobId, \Mockery::mock(SerializedSuite::class))
+            new SerializedSuiteCreatedEvent(
+                'authentication token',
+                $jobId,
+                \Mockery::mock(SerializedSuiteInterface::class)
+            )
         );
 
         self::assertTrue(true);
@@ -102,7 +107,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
             new MachineRetrievedEvent(
                 'authentication token',
-                \Mockery::mock(Machine::class),
+                \Mockery::mock(MachineInterface::class),
                 $currentMachine,
             )
         );
@@ -123,7 +128,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(
-            new SerializedSuiteRetrievedEvent('authentication token', $jobId, \Mockery::mock(SerializedSuite::class))
+            new SerializedSuiteRetrievedEvent(
+                'authentication token',
+                $jobId,
+                \Mockery::mock(SerializedSuiteInterface::class)
+            )
         );
 
         self::assertTrue(true);

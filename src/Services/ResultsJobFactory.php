@@ -42,9 +42,9 @@ class ResultsJobFactory implements EventSubscriberInterface
         if (null === $resultsJob) {
             $resultsJob = new ResultsJob(
                 $job->id,
-                $event->resultsJob->token,
-                $event->resultsJob->state->state,
-                $event->resultsJob->state->endState
+                $event->resultsJob->getToken(),
+                $event->resultsJob->getState()->state,
+                $event->resultsJob->getState()->endState
             );
             $this->resultsJobRepository->save($resultsJob);
         }

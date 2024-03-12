@@ -10,7 +10,7 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
 use App\Repository\JobRepository;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
+use SmartAssert\SourcesClient\Model\SerializedSuiteInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -83,7 +83,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
 
         $serializedSuiteId = md5((string) rand());
-        $serializedSuite = \Mockery::mock(SerializedSuite::class);
+        $serializedSuite = \Mockery::mock(SerializedSuiteInterface::class);
         $serializedSuite
             ->shouldReceive('getId')
             ->andReturn($serializedSuiteId)

@@ -12,7 +12,7 @@ use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\ResultsClient\Client as ResultsClient;
+use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Component\Uid\Ulid;
 

@@ -17,7 +17,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
+use SmartAssert\ResultsClient\Model\JobInterface as ResultsJobModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;

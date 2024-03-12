@@ -39,13 +39,13 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
     {
-        if ('end' === $event->current->stateCategory) {
+        if ('end' === $event->current->getStateCategory()) {
             return;
         }
 
         $this->messageDispatcher->dispatch(new GetMachineMessage(
             $event->authenticationToken,
-            $event->current->id,
+            $event->current->getId(),
             $event->current
         ));
     }
@@ -56,7 +56,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
     public function dispatch(MachineCreationRequestedEvent $event): void
     {
         $machine = $event->machine;
-        $jobId = $machine->id;
+        $jobId = $machine->getId();
 
         $job = $this->jobRepository->find($jobId);
         if (null === $job) {
@@ -64,7 +64,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetMachineMessage($event->authenticationToken, $machine->id, $machine)
+            new GetMachineMessage($event->authenticationToken, $machine->getId(), $machine)
         );
     }
 }

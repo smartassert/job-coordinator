@@ -35,12 +35,12 @@ class MachineFactory implements EventSubscriberInterface
     {
         $machine = $event->machine;
 
-        $job = $this->jobRepository->find($machine->id);
+        $job = $this->jobRepository->find($machine->getId());
         if (!$job instanceof Job) {
             return;
         }
 
-        $this->create($job, $machine->state, $machine->stateCategory);
+        $this->create($job, $machine->getState(), $machine->getStateCategory());
     }
 
     /**

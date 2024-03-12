@@ -32,7 +32,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
     public function dispatchMachineStateChangeEvent(MachineRetrievedEvent $event): void
     {
-        if ($event->previous->state !== $event->current->state) {
+        if ($event->previous->getState() !== $event->current->getState()) {
             $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
                 $event->authenticationToken,
                 $event->previous,
@@ -44,17 +44,17 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     public function dispatchMachineIsActiveEvent(MachineRetrievedEvent $event): void
     {
         if (
-            in_array($event->previous->stateCategory, ['unknown', 'finding', 'pre_active'])
-            && 'active' === $event->current->stateCategory
+            in_array($event->previous->getStateCategory(), ['unknown', 'finding', 'pre_active'])
+            && 'active' === $event->current->getStateCategory()
         ) {
-            $primaryIpAddress = $event->current->ipAddresses[0] ?? null;
+            $primaryIpAddress = $event->current->getIpAddresses()[0] ?? null;
             if (!is_string($primaryIpAddress)) {
                 return;
             }
 
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
                 $event->authenticationToken,
-                $event->current->id,
+                $event->current->getId(),
                 $primaryIpAddress
             ));
         }

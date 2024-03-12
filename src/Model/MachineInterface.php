@@ -15,4 +15,9 @@ interface MachineInterface
      * @return ?non-empty-string
      */
     public function getIp(): ?string;
+
+    /**
+     * @return non-empty-string
+     */
+    public function getId(): string;
 }

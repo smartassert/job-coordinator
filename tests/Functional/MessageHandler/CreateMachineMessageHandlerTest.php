@@ -13,7 +13,7 @@ use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
 use Symfony\Component\Messenger\MessageBusInterface;
 

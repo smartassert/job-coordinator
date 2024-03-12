@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\Job;
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\MachineInterface;
 
 class MachineRetrievalException extends AbstractRemoteRequestException
 {
     public function __construct(
         Job $job,
-        public readonly Machine $machine,
+        public readonly MachineInterface $machine,
         \Throwable $previousException
     ) {
         parent::__construct(
@@ -19,7 +19,7 @@ class MachineRetrievalException extends AbstractRemoteRequestException
             $previousException,
             sprintf(
                 'Failed to get worker machine "%s": %s',
-                $this->machine->id,
+                $this->machine->getId(),
                 $previousException->getMessage()
             ),
         );

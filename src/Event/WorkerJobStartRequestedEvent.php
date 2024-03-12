@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerClient\Model\Job as WorkerJob;
+use SmartAssert\WorkerClient\Model\JobInterface as WorkerJob;
 
 class WorkerJobStartRequestedEvent extends AbstractWorkerEvent
 {
