@@ -83,7 +83,11 @@ class ResultsJobFactoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $event = new ResultsJobCreatedEvent('authentication token', $jobId, \Mockery::mock(ResultsClientJobInterface::class));
+        $event = new ResultsJobCreatedEvent(
+            'authentication token',
+            $jobId,
+            \Mockery::mock(ResultsClientJobInterface::class)
+        );
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 
