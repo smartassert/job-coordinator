@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\SourcesClient\Model\SerializedSuiteInterface;
+use SmartAssert\SourcesClient\Model\SerializedSuite;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class SerializedSuiteRetrievedEvent extends Event
@@ -16,7 +16,7 @@ class SerializedSuiteRetrievedEvent extends Event
     public function __construct(
         public readonly string $authenticationToken,
         public readonly string $jobId,
-        public readonly SerializedSuiteInterface $serializedSuite,
+        public readonly SerializedSuite $serializedSuite,
     ) {
     }
 }

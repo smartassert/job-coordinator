@@ -14,7 +14,7 @@
         "smartassert/health-check-bundle": "^5.0",
         "smartassert/results-client": "^8.0",
         "smartassert/service-client": "*",
-        "smartassert/sources-client": "^10.1",
+        "smartassert/sources-client": "10.0",
         "smartassert/users-security-bundle": "^10.0",
         "smartassert/worker-client": "^3.2",
         "smartassert/worker-manager-client": "^7.2",

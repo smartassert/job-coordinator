@@ -10,9 +10,9 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteMutator;
+use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
-use SmartAssert\SourcesClient\Model\SerializedSuiteInterface as SourcesSerializedSuiteInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -137,7 +137,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $jobId,
-                        \Mockery::mock(SourcesSerializedSuiteInterface::class)
+                        SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
                     );
                 },
                 'expectedSerializedSuiteCreator' => function () {
@@ -152,7 +152,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->id,
-                        \Mockery::mock(SourcesSerializedSuiteInterface::class)
+                        SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
                     );
                 },
                 'expectedSerializedSuiteCreator' => function () {
