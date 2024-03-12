@@ -10,9 +10,9 @@ use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -73,7 +73,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
 
-        $machine = new Machine($job->id, 'create/requested', 'pre_active', []);
+        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient

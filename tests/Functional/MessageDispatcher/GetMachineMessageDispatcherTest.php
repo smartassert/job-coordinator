@@ -10,7 +10,7 @@ use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Repository\JobRepository;
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -74,7 +74,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);
 
-        $machine = new Machine($job->id, 'create/requested', 'pre_active', []);
+        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 
         $authenticationToken = md5((string) rand());
 

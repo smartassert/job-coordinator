@@ -12,9 +12,9 @@ use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -73,7 +73,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
 
-        $machine = new MachineModel($job->id, 'create/requested', 'pre_active', []);
+        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 
         $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
         $workerManagerClient

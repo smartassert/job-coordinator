@@ -10,8 +10,8 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerMachine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -88,7 +88,7 @@ class MachineFactoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = new WorkerManagerMachine($jobId, md5((string) rand()), md5((string) rand()), []);
+        $machine = WorkerMachineFactory::create($jobId, md5((string) rand()), md5((string) rand()), []);
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
@@ -104,7 +104,7 @@ class MachineFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = new WorkerManagerMachine($job->id, md5((string) rand()), md5((string) rand()), []);
+        $machine = WorkerMachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 

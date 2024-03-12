@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Message;
 
 use App\Enum\RemoteRequestType;
-use SmartAssert\WorkerManagerClient\Model\MachineInterface;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
@@ -16,7 +16,7 @@ class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
     public function __construct(
         string $authenticationToken,
         string $jobId,
-        public readonly MachineInterface $machine,
+        public readonly Machine $machine,
     ) {
         parent::__construct($authenticationToken, $jobId);
     }

@@ -8,8 +8,8 @@ use App\Event\MachineRetrievedEvent;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Repository\JobRepository;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetMachineEventDispatcherTest extends WebTestCase
@@ -19,7 +19,7 @@ class GetMachineEventDispatcherTest extends WebTestCase
     public function testDispatchIfMachineNotInEndStateForMachineInEndState(): void
     {
         $machineId = md5((string) rand());
-        $machine = new Machine($machineId, 'an_end_state', 'end', []);
+        $machine = MachineFactory::create($machineId, 'an_end_state', 'end', []);
 
         $messageDispatcher = \Mockery::mock(JobRemoteRequestMessageDispatcher::class);
         $messageDispatcher

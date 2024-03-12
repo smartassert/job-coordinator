@@ -12,6 +12,7 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -56,7 +57,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = new Machine($jobId, 'find/received', 'finding', []);
+        $machine = MachineFactory::create($jobId, 'find/received', 'finding', []);
 
         $this->createMessageAndHandleMessage($machine, $machine, self::$apiToken);
 
@@ -98,10 +99,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'find/received => find/received' => [
                 'previousMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'find/received', 'finding', []);
+                    return MachineFactory::create($job->id, 'find/received', 'finding', []);
                 },
                 'currentMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'find/received', 'finding', []);
+                    return MachineFactory::create($job->id, 'find/received', 'finding', []);
                 },
             ],
         ];
@@ -140,27 +141,27 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'unknown => find/received' => [
                 'previousMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'unknown', 'unknown', []);
+                    return MachineFactory::create($job->id, 'unknown', 'unknown', []);
                 },
                 'currentMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'find/received', 'finding', []);
+                    return MachineFactory::create($job->id, 'find/received', 'finding', []);
                 },
                 'expectedEventCreator' => function (Job $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);
 
                     return new MachineStateChangeEvent(
                         $authenticationToken,
-                        new Machine($job->id, 'unknown', 'unknown', []),
-                        new Machine($job->id, 'find/received', 'finding', [])
+                        MachineFactory::create($job->id, 'unknown', 'unknown', []),
+                        MachineFactory::create($job->id, 'find/received', 'finding', [])
                     );
                 },
             ],
             'unknown => active' => [
                 'previousMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'unknown', 'unknown', []);
+                    return MachineFactory::create($job->id, 'unknown', 'unknown', []);
                 },
                 'currentMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'up/active', 'active', ['127.0.0.1']);
+                    return MachineFactory::create($job->id, 'up/active', 'active', ['127.0.0.1']);
                 },
                 'expectedEventCreator' => function (Job $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);
@@ -213,10 +214,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'up/active => delete/deleted' => [
                 'previousMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'up/active', 'active', []);
+                    return MachineFactory::create($job->id, 'up/active', 'active', []);
                 },
                 'currentMachineCreator' => function (Job $job) {
-                    return new Machine($job->id, 'delete/deleted', 'end', []);
+                    return MachineFactory::create($job->id, 'delete/deleted', 'end', []);
                 },
                 'expectedEventClass' => MachineStateChangeEvent::class,
             ],

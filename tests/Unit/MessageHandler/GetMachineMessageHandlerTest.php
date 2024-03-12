@@ -9,9 +9,9 @@ use App\Exception\MachineRetrievalException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -25,7 +25,7 @@ class GetMachineMessageHandlerTest extends TestCase
         $idProperty = $jobReflector->getProperty('id');
         $idProperty->setValue($job, (string) new Ulid());
 
-        $machine = new Machine($job->id, 'up/active', 'active', ['127.0.0.1']);
+        $machine = MachineFactory::create($job->id, 'up/active', 'active', ['127.0.0.1']);
 
         $jobRepository = \Mockery::mock(JobRepository::class);
         $jobRepository
