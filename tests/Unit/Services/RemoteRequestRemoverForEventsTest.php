@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\JobInterface as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\SourcesClient\Model\SerializedSuiteInterface;
-use SmartAssert\WorkerClient\Model\Job as WorkerJob;
+use SmartAssert\WorkerClient\Model\JobInterface as WorkerJob;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MachineInterface;
 
@@ -172,7 +172,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeResultsStateGetRequests(
-            new ResultsJobStateRetrievedEvent('authentication token', $jobId, \Mockery::mock(ResultsJobState::class))
+            new ResultsJobStateRetrievedEvent(
+                'authentication token',
+                $jobId,
+                new ResultsJobState('irrelevant', 'irrelevant')
+            )
         );
 
         self::assertTrue(true);
