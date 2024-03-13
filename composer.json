@@ -11,7 +11,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.12",
         "guzzlehttp/guzzle": "^7.5",
-        "smartassert/health-check-bundle": "^5.0",
+        "smartassert/health-check-bundle": "^6.1",
         "smartassert/results-client": "^8.0",
         "smartassert/service-client": "*",
         "smartassert/sources-client": "^10.0",
