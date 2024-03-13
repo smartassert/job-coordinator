@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Request\CreateJobRequest;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -91,12 +92,17 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         self::assertSame('application/json', $response->getHeaderLine('content-type'));
         self::assertSame(
             [
-                'error' => [
-                    'type' => 'invalid_request',
-                    'payload' => [
-                        'name' => 'maximum_duration_in_seconds',
-                        'value' => 0,
-                        'message' => 'Maximum duration in seconds must be an integer between 1 and 2147483647',
+                'class' => 'bad_request',
+                'type' => 'wrong_size',
+                'parameter' => [
+                    'name' => 'maximum_duration_in_seconds',
+                    'value' => 0,
+                    'requirements' => [
+                        'data_type' => 'integer',
+                        'size' => [
+                            'minimum' => 1,
+                            'maximum' => CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE,
+                        ],
                     ],
                 ],
             ],

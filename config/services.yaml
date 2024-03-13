@@ -144,3 +144,7 @@ services:
         factory: ['SmartAssert\ServiceClient\ResponseFactory\ResponseFactory', 'createFactory']
 
     SmartAssert\ServiceClient\Client: ~
+
+    SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory: ~
+
+    SmartAssert\ServiceRequest\Parameter\Validator\PositiveIntegerParameterValidator: ~

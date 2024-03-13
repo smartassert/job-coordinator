@@ -5,15 +5,26 @@ declare(strict_types=1);
 namespace App\ValueResolver;
 
 use App\Request\CreateJobRequest;
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Size;
+use SmartAssert\ServiceRequest\Parameter\Validator\PositiveIntegerParameterValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class CreateJobRequestResolver implements ValueResolverInterface
+readonly class CreateJobRequestResolver implements ValueResolverInterface
 {
+    public function __construct(
+        private PositiveIntegerParameterValidator $parameterValidator,
+    ) {
+    }
+
     /**
      * @return CreateJobRequest[]
+     *
+     * @throws ErrorResponseException
      */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
@@ -26,33 +37,19 @@ class CreateJobRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $maximumDurationInSeconds = $request->request->getInt(CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS);
-
-        if (
-            $maximumDurationInSeconds < 1
-            || $maximumDurationInSeconds > CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE
-        ) {
-            throw new BadRequestHttpException(
-                message: (string) json_encode([
-                    'error' => [
-                        'type' => 'invalid_request',
-                        'payload' => [
-                            'name' => 'maximum_duration_in_seconds',
-                            'value' => $maximumDurationInSeconds,
-                            'message' => sprintf(
-                                'Maximum duration in seconds must be an integer between 1 and %d',
-                                CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE
-                            ),
-                        ],
-                    ],
-                ]),
-                headers: ['content-type' => 'application/json']
-            );
-        }
+        $parameter = (new Parameter(
+            CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS,
+            $request->request->getInt(CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS)
+        ))->withRequirements(
+            new Requirements(
+                'integer',
+                new Size(1, CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE)
+            )
+        );
 
         return [new CreateJobRequest(
             $suiteId,
-            $maximumDurationInSeconds,
+            $this->parameterValidator->validateInteger($parameter),
             $this->getJobParameters($request->request->all(CreateJobRequest::KEY_PARAMETERS))
         )];
     }

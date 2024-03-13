@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use SmartAssert\ServiceRequest\Exception\ErrorResponseException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +29,11 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
     {
         $throwable = $event->getThrowable();
         $response = null;
+
+        if ($throwable instanceof ErrorResponseException) {
+            $event->setResponse(new JsonResponse($throwable->error->serialize(), $throwable->getCode()));
+            $event->stopPropagation();
+        }
 
         if ($throwable instanceof HttpExceptionInterface) {
             $contentType = $throwable->getHeaders()['content-type'] ?? null;
