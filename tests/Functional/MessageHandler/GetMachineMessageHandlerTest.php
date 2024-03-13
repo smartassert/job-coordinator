@@ -12,9 +12,10 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
+use GuzzleHttp\Psr7\Response;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -245,12 +246,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
-        $workerManagerClient
-            ->shouldReceive('getMachine')
-            ->with($authenticationToken, $previous->getId())
-            ->andReturn($current)
-        ;
+        $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'id' => $current->getId(),
+                'state' => $current->getState(),
+                'state_category' => $current->getStateCategory(),
+                'ip_addresses' => $current->getIpAddresses(),
+            ])),
+        ]);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

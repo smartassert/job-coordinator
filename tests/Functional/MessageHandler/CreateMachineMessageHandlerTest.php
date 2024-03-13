@@ -12,9 +12,11 @@ use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
+use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -30,9 +32,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturnNull()
         ;
 
-        $handler = $this->createHandler(
-            jobRepository: $jobRepository,
-        );
+        $handler = $this->createHandler($jobRepository, HttpMockedWorkerManagerClientFactory::create());
 
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
@@ -43,20 +43,16 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
         $job = $this->createJob();
 
         $workerManagerException = new \Exception('Failed to create machine');
 
-        $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
-        $workerManagerClient
-            ->shouldReceive('createMachine')
-            ->with(self::$apiToken, $job->id)
-            ->andThrow($workerManagerException)
-        ;
+        $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
 
-        $handler = $this->createHandler(
-            workerManagerClient: $workerManagerClient,
-        );
+        $handler = $this->createHandler($jobRepository, $workerManagerClient);
 
         $message = new CreateMachineMessage(self::$apiToken, $job->id);
 
@@ -71,20 +67,23 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
         $job = $this->createJob();
 
         $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 
-        $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
-        $workerManagerClient
-            ->shouldReceive('createMachine')
-            ->with(self::$apiToken, $job->id)
-            ->andReturn($machine)
-        ;
+        $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'id' => $machine->getId(),
+                'state' => $machine->getState(),
+                'state_category' => $machine->getStateCategory(),
+                'ip_addresses' => $machine->getIpAddresses(),
+            ])),
+        ]);
 
-        $handler = $this->createHandler(
-            workerManagerClient: $workerManagerClient,
-        );
+        $handler = $this->createHandler($jobRepository, $workerManagerClient);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -130,20 +129,11 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        ?JobRepository $jobRepository = null,
-        ?WorkerManagerClient $workerManagerClient = null,
+        JobRepository $jobRepository,
+        WorkerManagerClient $workerManagerClient,
     ): CreateMachineMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
-
-        if (null === $jobRepository) {
-            $jobRepository = self::getContainer()->get(JobRepository::class);
-            \assert($jobRepository instanceof JobRepository);
-        }
-
-        if (null === $workerManagerClient) {
-            $workerManagerClient = \Mockery::mock(WorkerManagerClient::class);
-        }
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
