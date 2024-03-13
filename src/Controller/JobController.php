@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class JobController
 {
-    #[Route('/' . JobRoutes::ROUTE_SUITE_ID_PATTERN, name: 'job_create', methods: ['POST'])]
+    #[Route('/{suiteId<[A-Z90-9]{26}>}', name: 'job_create', methods: ['POST'])]
     public function create(
         CreateJobRequest $request,
         User $user,
@@ -33,7 +33,7 @@ class JobController
         return new JsonResponse($jobSerializer->serialize($job));
     }
 
-    #[Route('/' . JobRoutes::ROUTE_JOB_ID_PATTERN, name: 'job_get', methods: ['GET'])]
+    #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
     public function get(string $jobId, User $user, JobRepository $repository, JobSerializer $jobSerializer): Response
     {
         $job = $repository->find($jobId);
