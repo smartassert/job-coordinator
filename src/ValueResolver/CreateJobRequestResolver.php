@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\ValueResolver;
 
-use App\Controller\JobRoutes;
 use App\Request\CreateJobRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -22,7 +21,7 @@ class CreateJobRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $suiteId = $request->attributes->get(JobRoutes::SUITE_ID_ATTRIBUTE);
+        $suiteId = $request->attributes->get('suiteId');
         if (!is_string($suiteId) || '' === $suiteId) {
             return [];
         }
