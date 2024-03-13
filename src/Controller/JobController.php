@@ -15,28 +15,32 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class JobController
+readonly class JobController
 {
+    public function __construct(
+        private JobRepository $jobRepository,
+        private JobSerializer $jobSerializer,
+    ) {
+    }
+
     #[Route('/{suiteId<[A-Z90-9]{26}>}', name: 'job_create', methods: ['POST'])]
     public function create(
         CreateJobRequest $request,
         User $user,
-        JobRepository $repository,
-        JobSerializer $jobSerializer,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
         $job = new Job($user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
-        $repository->add($job);
+        $this->jobRepository->add($job);
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
 
-        return new JsonResponse($jobSerializer->serialize($job));
+        return new JsonResponse($this->jobSerializer->serialize($job));
     }
 
     #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
-    public function get(string $jobId, User $user, JobRepository $repository, JobSerializer $jobSerializer): Response
+    public function get(string $jobId, User $user): Response
     {
-        $job = $repository->find($jobId);
+        $job = $this->jobRepository->find($jobId);
         if (null === $job) {
             return new Response(null, 404);
         }
@@ -45,6 +49,6 @@ class JobController
             return new Response(null, 401);
         }
 
-        return new JsonResponse($jobSerializer->serialize($job));
+        return new JsonResponse($this->jobSerializer->serialize($job));
     }
 }
