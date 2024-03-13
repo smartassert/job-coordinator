@@ -33,9 +33,9 @@ class Client
             $this->router->generate('job_create', ['suiteId' => $suiteId]),
             array_merge(
                 $this->createAuthorizationHeader($authenticationToken),
-                ['content-type' => 'application/json'],
+                ['content-type' => 'application/x-www-form-urlencoded'],
             ),
-            (string) json_encode($requestPayload)
+            http_build_query($requestPayload)
         );
     }
 
