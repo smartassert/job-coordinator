@@ -25,7 +25,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
 
     public function testJobUser(): void
     {
-        self::assertSame($this->getJob()?->userId, self::$user->id);
+        self::assertSame($this->getJob()?->userId, self::$user['id']);
     }
 
     public function testJobResultsTokenIsNotSet(): void

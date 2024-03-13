@@ -16,8 +16,8 @@ use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -117,7 +117,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             return new ResultsJobCreatedEvent(
                 md5((string) rand()),
                 $job->id,
-                \Mockery::mock(ResultsJobModel::class)
+                ResultsClientJobFactory::createRandom()
             );
         };
 
@@ -169,7 +169,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                     return new ResultsJobCreatedEvent(
                         md5((string) rand()),
                         $jobId,
-                        \Mockery::mock(ResultsJobModel::class)
+                        ResultsClientJobFactory::createRandom()
                     );
                 },
             ],
@@ -264,7 +264,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             return new ResultsJobCreatedEvent(
                 md5((string) rand()),
                 $job->id,
-                \Mockery::mock(ResultsJobModel::class)
+                ResultsClientJobFactory::createRandom()
             );
         };
 

@@ -19,7 +19,7 @@ class HttpResponseExceptionHandler implements ExceptionHandlerInterface
         return new RemoteRequestFailure(
             RemoteRequestFailureType::HTTP,
             $throwable->getStatusCode(),
-            $throwable->getReasonPhrase()
+            $throwable->getHttpResponse()->getReasonPhrase()
         );
     }
 }

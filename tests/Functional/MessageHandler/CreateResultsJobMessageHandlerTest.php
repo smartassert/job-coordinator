@@ -12,6 +12,8 @@ use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
+use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
@@ -31,9 +33,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturnNull()
         ;
 
-        $handler = $this->createHandler(
-            jobRepository: $jobRepository,
-        );
+        $handler = $this->createHandler($jobRepository, HttpMockedResultsClientFactory::create());
 
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
 
@@ -44,20 +44,16 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeResultsClientThrowsException(): void
     {
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
         $job = $this->createJob();
 
         $resultsClientException = new \Exception('Failed to create results job');
 
-        $resultsClient = \Mockery::mock(ResultsClient::class);
-        $resultsClient
-            ->shouldReceive('createJob')
-            ->with(self::$apiToken, $job->id)
-            ->andThrow($resultsClientException)
-        ;
+        $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
-        $handler = $this->createHandler(
-            resultsClient: $resultsClient,
-        );
+        $handler = $this->createHandler($jobRepository, $resultsClient);
 
         $message = new CreateResultsJobMessage(self::$apiToken, $job->id);
 
@@ -72,20 +68,22 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $job = $this->createJob();
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
+        $job = $this->createJob();
         $resultsJobModel = new ResultsJobModel($job->id, md5((string) rand()), new JobState('awaiting-events', null));
 
-        $resultsClient = \Mockery::mock(ResultsClient::class);
-        $resultsClient
-            ->shouldReceive('createJob')
-            ->with(self::$apiToken, $job->id)
-            ->andReturn($resultsJobModel)
-        ;
+        $resultsClient = HttpMockedResultsClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'label' => $resultsJobModel->label,
+                'token' => $resultsJobModel->token,
+                'state' => $resultsJobModel->state->state,
+                'end_state' => $resultsJobModel->state->endState,
+            ])),
+        ]);
 
-        $handler = $this->createHandler(
-            resultsClient: $resultsClient,
-        );
+        $handler = $this->createHandler($jobRepository, $resultsClient);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -98,7 +96,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsJob = $resultsJobRepository->find($job->id);
         self::assertEquals(
             new ResultsJobEntity(
-                $job->id,
+                $resultsJobModel->label,
                 $resultsJobModel->token,
                 $resultsJobModel->state->state,
                 $resultsJobModel->state->endState
@@ -134,20 +132,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        ?JobRepository $jobRepository = null,
-        ?ResultsClient $resultsClient = null,
+        JobRepository $jobRepository,
+        ResultsClient $resultsClient,
     ): CreateResultsJobMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
-
-        if (null === $jobRepository) {
-            $jobRepository = self::getContainer()->get(JobRepository::class);
-            \assert($jobRepository instanceof JobRepository);
-        }
-
-        if (null === $resultsClient) {
-            $resultsClient = \Mockery::mock(ResultsClient::class);
-        }
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

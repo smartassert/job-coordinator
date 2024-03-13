@@ -13,8 +13,9 @@ use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
+use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerClient\Client as WorkerClient;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\Uid\Ulid;
@@ -41,12 +42,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $workerClientException = new \Exception('Failed to get worker state');
 
-        $workerClient = \Mockery::mock(WorkerClient::class);
-        $workerClient
-            ->shouldReceive('getApplicationState')
-            ->withNoArgs()
-            ->andThrow($workerClientException)
-        ;
+        $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
@@ -83,12 +79,26 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
             new ComponentState(md5((string) rand()), (bool) rand(0, 1))
         );
 
-        $workerClient = \Mockery::mock(WorkerClient::class);
-        $workerClient
-            ->shouldReceive('getApplicationState')
-            ->withNoArgs()
-            ->andReturn($retrievedWorkerState)
-        ;
+        $workerClient = HttpMockedWorkerClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'application' => [
+                    'state' => $retrievedWorkerState->applicationState->state,
+                    'is_end_state' => $retrievedWorkerState->applicationState->isEndState,
+                ],
+                'compilation' => [
+                    'state' => $retrievedWorkerState->compilationState->state,
+                    'is_end_state' => $retrievedWorkerState->compilationState->isEndState,
+                ],
+                'execution' => [
+                    'state' => $retrievedWorkerState->executionState->state,
+                    'is_end_state' => $retrievedWorkerState->executionState->isEndState,
+                ],
+                'event_delivery' => [
+                    'state' => $retrievedWorkerState->eventDeliveryState->state,
+                    'is_end_state' => $retrievedWorkerState->eventDeliveryState->isEndState,
+                ],
+            ])),
+        ]);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory

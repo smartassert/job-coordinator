@@ -11,8 +11,8 @@ use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\WorkerManagerClient\Model\Machine as MachineModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -140,8 +140,13 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
-                        new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
+                        WorkerManagerClientMachineFactory::createRandom(),
+                        WorkerManagerClientMachineFactory::create(
+                            $jobId,
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            []
+                        )
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -158,8 +163,13 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
-                        new MachineModel($jobId, md5((string) rand()), md5((string) rand()), [])
+                        WorkerManagerClientMachineFactory::createRandom(),
+                        WorkerManagerClientMachineFactory::create(
+                            $jobId,
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            []
+                        )
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -177,8 +187,8 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
-                        new MachineModel($job->id, 'up/started', 'pre_active', [])
+                        WorkerManagerClientMachineFactory::createRandom(),
+                        WorkerManagerClientMachineFactory::create($job->id, 'up/started', 'pre_active', [])
                     );
                 },
                 'expectedMachineCreator' => function (Job $job) {
@@ -196,8 +206,8 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
-                        \Mockery::mock(MachineModel::class),
-                        new MachineModel($job->id, 'up/active', 'active', [])
+                        WorkerManagerClientMachineFactory::createRandom(),
+                        WorkerManagerClientMachineFactory::create($job->id, 'up/active', 'active', [])
                     );
                 },
                 'expectedMachineCreator' => function (Job $job) {

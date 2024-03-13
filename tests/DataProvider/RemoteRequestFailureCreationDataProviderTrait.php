@@ -10,6 +10,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
+use SmartAssert\ServiceClient\Response\Response as ServiceClientResponse;
 
 trait RemoteRequestFailureCreationDataProviderTrait
 {
@@ -34,7 +35,7 @@ trait RemoteRequestFailureCreationDataProviderTrait
             ],
             NonSuccessResponseException::class => [
                 'throwable' => new NonSuccessResponseException(
-                    new Response(status: 503, reason: 'service unavailable'),
+                    new ServiceClientResponse(new Response(status: 503, reason: 'service unavailable')),
                 ),
                 'expectedType' => RemoteRequestFailureType::HTTP,
                 'expectedCode' => 503,

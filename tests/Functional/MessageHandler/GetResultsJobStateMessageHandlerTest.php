@@ -11,6 +11,8 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
+use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -23,7 +25,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $handler = $this->createHandler();
+        $handler = $this->createHandler(HttpMockedResultsClientFactory::create());
 
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
 
@@ -38,16 +40,9 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
-        $resultsClient = \Mockery::mock(ResultsClient::class);
-        $resultsClient
-            ->shouldReceive('getJobStatus')
-            ->with(self::$apiToken, $job->id)
-            ->andThrow($resultsClientException)
-        ;
+        $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
-        $handler = $this->createHandler(
-            resultsClient: $resultsClient,
-        );
+        $handler = $this->createHandler($resultsClient);
 
         $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
 
@@ -69,16 +64,14 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsServiceJobState = new ResultsJobState(md5((string) rand()), md5((string) rand()));
 
-        $resultsClient = \Mockery::mock(ResultsClient::class);
-        $resultsClient
-            ->shouldReceive('getJobStatus')
-            ->with(self::$apiToken, $job->id)
-            ->andReturn($resultsServiceJobState)
-        ;
+        $resultsClient = HttpMockedResultsClientFactory::create([
+            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'state' => $resultsServiceJobState->state,
+                'end_state' => $resultsServiceJobState->endState,
+            ])),
+        ]);
 
-        $handler = $this->createHandler(
-            resultsClient: $resultsClient,
-        );
+        $handler = $this->createHandler($resultsClient);
 
         $handler(new GetResultsJobStateMessage(self::$apiToken, $job->id));
 
@@ -112,15 +105,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         return $job;
     }
 
-    private function createHandler(
-        ?ResultsClient $resultsClient = null,
-    ): GetResultsJobStateMessageHandler {
+    private function createHandler(ResultsClient $resultsClient): GetResultsJobStateMessageHandler
+    {
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-
-        if (null === $resultsClient) {
-            $resultsClient = \Mockery::mock(ResultsClient::class);
-        }
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

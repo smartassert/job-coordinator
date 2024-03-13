@@ -9,13 +9,19 @@ use App\Repository\JobRepository;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
-use SmartAssert\UsersClient\Model\User;
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * @phpstan-import-type User from UserProvider
+ */
 abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 {
     protected static ResponseInterface $createResponse;
-    protected static User $user;
+
+    /**
+     * @var User
+     */
+    protected static array $user;
 
     /**
      * @var non-empty-string

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Tests\Application\AbstractCreateJobSuccessTest;
-use SmartAssert\SourcesClient\FileClient;
-use SmartAssert\SourcesClient\SourceClient;
-use SmartAssert\SourcesClient\SuiteClient;
+use SmartAssert\TestSourcesClient\FileClient;
+use SmartAssert\TestSourcesClient\FileSourceClient;
+use SmartAssert\TestSourcesClient\SuiteClient;
 use Symfony\Component\Uid\Ulid;
 
 class CreateJobSuccessTest extends AbstractCreateJobSuccessTest
@@ -16,18 +16,19 @@ class CreateJobSuccessTest extends AbstractCreateJobSuccessTest
 
     protected static function createSuiteId(): string
     {
-        $sourceClient = self::getContainer()->get(SourceClient::class);
-        \assert($sourceClient instanceof SourceClient);
+        $fileSourceClient = self::getContainer()->get(FileSourceClient::class);
+        \assert($fileSourceClient instanceof FileSourceClient);
 
         $fileSourceLabel = (string) new Ulid();
         \assert('' !== $fileSourceLabel);
 
-        $fileSource = $sourceClient->createFileSource(self::$apiToken, $fileSourceLabel);
+        $fileSourceId = $fileSourceClient->create(self::$apiToken, $fileSourceLabel);
+        \assert(is_string($fileSourceId));
 
         $fileClient = self::getContainer()->get(FileClient::class);
         \assert($fileClient instanceof FileClient);
 
-        $fileClient->add(self::$apiToken, $fileSource->getId(), 'test.yaml', '- test file content');
+        $fileClient->add(self::$apiToken, $fileSourceId, 'test.yaml', '- test file content');
 
         $suiteClient = self::getContainer()->get(SuiteClient::class);
         \assert($suiteClient instanceof SuiteClient);
@@ -35,8 +36,9 @@ class CreateJobSuccessTest extends AbstractCreateJobSuccessTest
         $suiteLabel = (string) new Ulid();
         \assert('' !== $suiteLabel);
 
-        $suite = $suiteClient->create(self::$apiToken, $fileSource->getId(), $suiteLabel, ['test.yaml']);
+        $suiteId = $suiteClient->create(self::$apiToken, $fileSourceId, $suiteLabel, ['test.yaml']);
+        \assert(is_string($suiteId));
 
-        return $suite->getId();
+        return $suiteId;
     }
 }

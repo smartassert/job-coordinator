@@ -24,8 +24,8 @@ use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 
@@ -121,7 +121,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 return function (Job $job) use ($inner) {
                     return new MachineRetrievalException(
                         $job,
-                        new Machine($job->id, md5((string) rand()), md5((string) rand()), []),
+                        MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []),
                         $inner
                     );
                 };

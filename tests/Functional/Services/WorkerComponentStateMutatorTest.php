@@ -84,7 +84,14 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), \Mockery::mock(ApplicationState::class));
+        $irrelevantApplicationState = new ApplicationState(
+            new ComponentState('state', false),
+            new ComponentState('state', false),
+            new ComponentState('state', false),
+            new ComponentState('state', false),
+        );
+
+        $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 

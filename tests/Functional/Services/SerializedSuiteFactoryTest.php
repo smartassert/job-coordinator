@@ -10,6 +10,7 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteFactory;
+use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -91,7 +92,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $event = new SerializedSuiteCreatedEvent(
             'authentication token',
             $jobId,
-            \Mockery::mock(SourcesSerializedSuite::class)
+            SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
         );
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);

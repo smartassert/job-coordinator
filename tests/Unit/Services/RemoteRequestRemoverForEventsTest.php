@@ -15,12 +15,12 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
+use App\Tests\Services\Factory\ResultsClientJobFactory;
+use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
+use App\Tests\Services\Factory\WorkerClientJobFactory;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use PHPUnit\Framework\TestCase;
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use SmartAssert\SourcesClient\Model\SerializedSuite;
-use SmartAssert\WorkerClient\Model\Job as WorkerJob;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class RemoteRequestRemoverForEventsTest extends TestCase
 {
@@ -57,8 +57,10 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
+        $resultsClientJob = ResultsClientJobFactory::createRandom();
+
         $remoteRequestRemoverForEvents->removeResultsCreateRequests(
-            new ResultsJobCreatedEvent('authentication token', $jobId, \Mockery::mock(ResultsJob::class))
+            new ResultsJobCreatedEvent('authentication token', $jobId, $resultsClientJob)
         );
 
         self::assertTrue(true);
@@ -78,7 +80,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
-            new SerializedSuiteCreatedEvent('authentication token', $jobId, \Mockery::mock(SerializedSuite::class))
+            new SerializedSuiteCreatedEvent(
+                'authentication token',
+                $jobId,
+                SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
+            )
         );
 
         self::assertTrue(true);
@@ -97,13 +103,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
-        $currentMachine = new Machine($jobId, 'state', 'state-category', []);
-
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
             new MachineRetrievedEvent(
                 'authentication token',
-                \Mockery::mock(Machine::class),
-                $currentMachine,
+                WorkerManagerClientMachineFactory::createRandom(),
+                WorkerManagerClientMachineFactory::create($jobId, 'state', 'state-category', []),
             )
         );
 
@@ -123,7 +127,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(
-            new SerializedSuiteRetrievedEvent('authentication token', $jobId, \Mockery::mock(SerializedSuite::class))
+            new SerializedSuiteRetrievedEvent(
+                'authentication token',
+                $jobId,
+                SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
+            )
         );
 
         self::assertTrue(true);
@@ -143,7 +151,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeWorkerJobStartRequests(
-            new WorkerJobStartRequestedEvent($jobId, '127.0.0.1', \Mockery::mock(WorkerJob::class))
+            new WorkerJobStartRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
         );
 
         self::assertTrue(true);
@@ -163,7 +171,11 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeResultsStateGetRequests(
-            new ResultsJobStateRetrievedEvent('authentication token', $jobId, \Mockery::mock(ResultsJobState::class))
+            new ResultsJobStateRetrievedEvent(
+                'authentication token',
+                $jobId,
+                new ResultsJobState('irrelevant', 'irrelevant')
+            )
         );
 
         self::assertTrue(true);

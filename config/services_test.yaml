@@ -1,6 +1,8 @@
 parameters:
     test_authentication_provider_bundle_frontend_token_provider_users:
         'user@example.com': 'password'
+    test_authentication_provider_bundle_users_url: 'http://localhost:9080'
+    sources_base_url: 'http://localhost:9083'
 
 services:
     _defaults:
@@ -47,15 +49,17 @@ services:
     App\Services\PreparationStateFactory:
         public: true
 
-    SmartAssert\SourcesClient\SourceFactory: ~
-
-    SmartAssert\SourcesClient\SourceClient:
+    SmartAssert\TestSourcesClient\FileSourceClient:
         public: true
+        arguments:
+            $baseUrl: '%sources_base_url%'
 
-    SmartAssert\SourcesClient\FileClient:
+    SmartAssert\TestSourcesClient\FileClient:
         public: true
+        arguments:
+            $baseUrl: '%sources_base_url%'
 
-    SmartAssert\SourcesClient\SuiteFactory: ~
-
-    SmartAssert\SourcesClient\SuiteClient:
+    SmartAssert\TestSourcesClient\SuiteClient:
         public: true
+        arguments:
+            $baseUrl: '%sources_base_url%'
