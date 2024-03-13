@@ -76,9 +76,6 @@ services:
 
     SmartAssert\WorkerManagerClient\Client: ~
 
-    SmartAssert\WorkerManagerClient\ClientInterface:
-        alias: SmartAssert\WorkerManagerClient\Client
-
     SmartAssert\SourcesClient\ExceptionFactory: ~
 
     SmartAssert\SourcesClient\SerializedSuiteFactory: ~

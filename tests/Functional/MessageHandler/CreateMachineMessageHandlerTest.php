@@ -76,10 +76,10 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-                'id' => $machine->getId(),
-                'state' => $machine->getState(),
-                'state_category' => $machine->getStateCategory(),
-                'ip_addresses' => $machine->getIpAddresses(),
+                'id' => $machine->id,
+                'state' => $machine->state,
+                'state_category' => $machine->stateCategory,
+                'ip_addresses' => $machine->ipAddresses,
             ])),
         ]);
 

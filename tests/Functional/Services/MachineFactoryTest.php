@@ -111,6 +111,6 @@ class MachineFactoryTest extends WebTestCase
         $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
         $machineEntity = $this->machineRepository->find($job->id);
-        self::assertEquals(new Machine($job->id, $machine->getState(), $machine->getStateCategory()), $machineEntity);
+        self::assertEquals(new Machine($job->id, $machine->state, $machine->stateCategory), $machineEntity);
     }
 }

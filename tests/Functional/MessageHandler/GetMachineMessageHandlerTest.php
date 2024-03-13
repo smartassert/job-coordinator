@@ -275,7 +275,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
-        $message = new GetMachineMessage($authenticationToken, $previous->getId(), $previous);
+        $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);
     }
@@ -283,10 +283,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHttpResponseForMachine(Machine $machine): ResponseInterface
     {
         return new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-            'id' => $machine->getId(),
-            'state' => $machine->getState(),
-            'state_category' => $machine->getStateCategory(),
-            'ip_addresses' => $machine->getIpAddresses(),
+            'id' => $machine->id,
+            'state' => $machine->state,
+            'state_category' => $machine->stateCategory,
+            'ip_addresses' => $machine->ipAddresses,
         ]));
     }
 }

@@ -9,7 +9,7 @@ use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerManagerClient\ClientInterface as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

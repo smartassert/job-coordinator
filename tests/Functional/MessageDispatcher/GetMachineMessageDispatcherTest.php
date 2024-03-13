@@ -86,7 +86,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetMachineMessage($authenticationToken, $machine->getId(), $machine);
+        $expectedMessage = new GetMachineMessage($authenticationToken, $machine->id, $machine);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

@@ -19,7 +19,7 @@ class MachineRetrievalException extends AbstractRemoteRequestException
             $previousException,
             sprintf(
                 'Failed to get worker machine "%s": %s',
-                $this->machine->getId(),
+                $this->machine->id,
                 $previousException->getMessage()
             ),
         );
