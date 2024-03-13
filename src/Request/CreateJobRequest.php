@@ -7,6 +7,7 @@ namespace App\Request;
 class CreateJobRequest
 {
     public const KEY_MAXIMUM_DURATION_IN_SECONDS = 'maximum_duration_in_seconds';
+    public const KEY_PARAMETERS = 'parameters';
     public const MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE = 2147483647;
 
     /**

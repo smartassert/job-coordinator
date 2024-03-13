@@ -26,11 +26,10 @@ class CreateJobRequestResolver implements ValueResolverInterface
             return [];
         }
 
-        $payload = $this->getDecodedRequestPayload($request);
-        $maximumDurationInSeconds = $payload[CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS] ?? null;
+        $maximumDurationInSeconds = $request->request->getInt(CreateJobRequest::KEY_MAXIMUM_DURATION_IN_SECONDS);
+
         if (
-            !is_int($maximumDurationInSeconds)
-            || $maximumDurationInSeconds < 1
+            $maximumDurationInSeconds < 1
             || $maximumDurationInSeconds > CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE
         ) {
             throw new BadRequestHttpException(
@@ -39,7 +38,7 @@ class CreateJobRequestResolver implements ValueResolverInterface
                         'type' => 'invalid_request',
                         'payload' => [
                             'name' => 'maximum_duration_in_seconds',
-                            'value' => is_scalar($maximumDurationInSeconds) ? $maximumDurationInSeconds : '',
+                            'value' => $maximumDurationInSeconds,
                             'message' => sprintf(
                                 'Maximum duration in seconds must be an integer between 1 and %d',
                                 CreateJobRequest::MAXIMUM_DURATION_IN_SECONDS_MAX_SIZE
@@ -51,7 +50,11 @@ class CreateJobRequestResolver implements ValueResolverInterface
             );
         }
 
-        return [new CreateJobRequest($suiteId, $maximumDurationInSeconds, $this->getJobParameters($payload))];
+        return [new CreateJobRequest(
+            $suiteId,
+            $maximumDurationInSeconds,
+            $this->getJobParameters($request->request->all(CreateJobRequest::KEY_PARAMETERS))
+        )];
     }
 
     /**
@@ -74,19 +77,5 @@ class CreateJobRequestResolver implements ValueResolverInterface
         }
 
         return $parameters;
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function getDecodedRequestPayload(Request $request): array
-    {
-        if ('json' !== $request->getContentTypeFormat()) {
-            return [];
-        }
-
-        $payload = json_decode($request->getContent(), true);
-
-        return is_array($payload) ? $payload : [];
     }
 }
