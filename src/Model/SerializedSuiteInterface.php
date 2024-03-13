@@ -10,9 +10,4 @@ interface SerializedSuiteInterface
      * @return ?non-empty-string
      */
     public function getState(): ?string;
-
-    /**
-     * @return non-empty-string
-     */
-    public function getId(): string;
 }
