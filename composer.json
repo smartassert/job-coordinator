@@ -16,7 +16,7 @@
         "smartassert/service-client": "*",
         "smartassert/sources-client": "^10.0",
         "smartassert/users-security-bundle": "^10.0",
-        "smartassert/worker-client": "^3.0",
+        "smartassert/worker-client": "^4.1",
         "smartassert/worker-manager-client": "^7.0",
         "smartassert/worker-message-failed-event-bundle": "^3.0",
         "symfony/console": "6.4.*",
