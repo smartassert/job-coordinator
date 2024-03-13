@@ -51,14 +51,6 @@ class Machine implements MachineInterface
     /**
      * @return non-empty-string
      */
-    public function getId(): string
-    {
-        return $this->jobId;
-    }
-
-    /**
-     * @return non-empty-string
-     */
     public function getState(): string
     {
         return $this->state;
