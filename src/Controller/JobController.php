@@ -38,17 +38,8 @@ readonly class JobController
     }
 
     #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
-    public function get(string $jobId, User $user): Response
+    public function get(Job $job): Response
     {
-        $job = $this->jobRepository->find($jobId);
-        if (null === $job) {
-            return new Response(null, 404);
-        }
-
-        if ($job->userId !== $user->getUserIdentifier()) {
-            return new Response(null, 401);
-        }
-
         return new JsonResponse($this->jobSerializer->serialize($job));
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class KernelExceptionEventSubscriber implements EventSubscriberInterface
 {
@@ -30,9 +31,12 @@ class KernelExceptionEventSubscriber implements EventSubscriberInterface
         $throwable = $event->getThrowable();
         $response = null;
 
+        if ($throwable instanceof AccessDeniedException) {
+            $response = new Response(null, 401);
+        }
+
         if ($throwable instanceof ErrorResponseException) {
-            $event->setResponse(new JsonResponse($throwable->error->serialize(), $throwable->getCode()));
-            $event->stopPropagation();
+            $response = new JsonResponse($throwable->error->serialize(), $throwable->getCode());
         }
 
         if ($throwable instanceof HttpExceptionInterface) {

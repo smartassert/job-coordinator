@@ -74,4 +74,20 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
             ],
         ];
     }
+
+    public function testGetJobNotFound(): void
+    {
+        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
+        \assert($apiTokenProvider instanceof ApiTokenProvider);
+        $apiToken = $apiTokenProvider->get('user@example.com');
+
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
+        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, $suiteId);
+
+        echo $response->getBody()->getContents();
+
+        self::assertSame(401, $response->getStatusCode());
+    }
 }
