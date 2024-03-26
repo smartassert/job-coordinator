@@ -42,4 +42,25 @@ readonly class JobController
     {
         return new JsonResponse($this->jobSerializer->serialize($job));
     }
+
+    #[Route('/{suiteId<[A-Z90-9]{26}>}/list', name: 'job_list', methods: ['GET'])]
+    public function list(User $user, string $suiteId): Response
+    {
+        $jobs = $this->jobRepository->findBy(
+            [
+                'userId' => $user->getUserIdentifier(),
+                'suiteId' => $suiteId,
+            ],
+            [
+                'id' => 'DESC',
+            ]
+        );
+
+        $serializedJobs = [];
+        foreach ($jobs as $job) {
+            $serializedJobs[] = $job->toArray();
+        }
+
+        return new JsonResponse($serializedJobs);
+    }
 }
