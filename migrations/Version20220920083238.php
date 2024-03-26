@@ -26,7 +26,6 @@ final class Version20220920083238 extends AbstractMigration
                 PRIMARY KEY(id)
             )
         ');
-        $this->addSql('COMMENT ON COLUMN job.id IS \'(DC2Type:ulid)\'');
         $this->addSql('CREATE INDEX user_idx ON job (user_id)');
         $this->addSql('CREATE INDEX user_suite_idx ON job (user_id, suite_id)');
     }
