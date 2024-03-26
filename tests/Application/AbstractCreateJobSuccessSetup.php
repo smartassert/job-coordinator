@@ -39,11 +39,11 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
 
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
-        self::$apiToken = $apiTokenProvider->get('user@example.com');
+        self::$apiToken = $apiTokenProvider->get('user1@example.com');
 
         $userProvider = self::getContainer()->get(UserProvider::class);
         \assert($userProvider instanceof UserProvider);
-        self::$user = $userProvider->get('user@example.com');
+        self::$user = $userProvider->get('user1@example.com');
 
         self::$createResponse = self::$staticApplicationClient->makeCreateJobRequest(
             self::$apiToken,

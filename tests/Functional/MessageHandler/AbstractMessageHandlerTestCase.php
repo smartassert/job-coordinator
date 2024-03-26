@@ -24,7 +24,7 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
 
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
-        self::$apiToken = $apiTokenProvider->get('user@example.com');
+        self::$apiToken = $apiTokenProvider->get('user1@example.com');
     }
 
     protected function setUp(): void
