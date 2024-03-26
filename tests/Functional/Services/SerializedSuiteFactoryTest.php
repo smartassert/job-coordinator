@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
@@ -29,10 +29,10 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+        $this->jobRepository = $jobRepository;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
@@ -102,8 +102,9 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
     public function testCreateOnSerializedSuiteCreatedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
 

@@ -11,6 +11,7 @@ use App\Event\WorkerStateRetrievedEvent;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerComponentStateMutator;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
@@ -29,10 +30,10 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+        $this->jobRepository = $jobRepository;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
@@ -116,8 +117,9 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         callable $expectedExecutionStateCreator,
         callable $expectedEventDeliveryStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 

@@ -19,7 +19,6 @@ use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -27,6 +26,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\ComponentPreparationFactory;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -34,7 +34,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
 {
     private ComponentPreparationFactory $componentPreparationFactory;
     private RemoteRequestRepository $remoteRequestRepository;
-    private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
@@ -53,10 +52,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $this->jobRepository = $jobRepository;
 
         $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
         \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
@@ -84,8 +79,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
         callable $remoteRequestsCreator,
         array $expected
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);

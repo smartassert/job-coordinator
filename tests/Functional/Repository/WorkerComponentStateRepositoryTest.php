@@ -7,8 +7,8 @@ namespace App\Tests\Functional\Repository;
 use App\Entity\Job;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
-use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -40,11 +40,9 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
      */
     public function testGetAllForJob(callable $statesCreator, callable $expectedStatesCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000), new \DateTimeImmutable());
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $statesCreator($job, $this->repository);
 

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Message\StartWorkerJobMessage;
 use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
-use App\Repository\JobRepository;
+use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -41,10 +40,9 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());

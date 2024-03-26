@@ -8,9 +8,9 @@ use App\Entity\Job;
 use App\Entity\Machine;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -19,20 +19,20 @@ use Symfony\Component\Uid\Ulid;
 
 class MachineMutatorTest extends WebTestCase
 {
-    private JobRepository $jobRepository;
     private MachineRepository $machineRepository;
     private MachineMutator $machineMutator;
+    private JobFactory $jobFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $this->jobFactory = $jobFactory;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -89,7 +89,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateOnMachineStateChangeEventDataProvider
      *
-     * @param callable(JobRepository): ?Job           $jobCreator
+     * @param callable(JobFactory): ?Job              $jobCreator
      * @param callable(?Job, MachineRepository): void $machineCreator
      * @param callable(?Job): MachineStateChangeEvent $eventCreator
      * @param callable(?Job): ?Machine                $expectedMachineCreator
@@ -100,7 +100,7 @@ class MachineMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedMachineCreator,
     ): void {
-        $job = $jobCreator($this->jobRepository);
+        $job = $jobCreator($this->jobFactory);
 
         $machineCreator($job, $this->machineRepository);
 
@@ -120,11 +120,8 @@ class MachineMutatorTest extends WebTestCase
      */
     public function setStateOnMachineStateChangeEventDataProvider(): array
     {
-        $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-            $jobRepository->add($job);
-
-            return $job;
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
         };
 
         return [
@@ -220,7 +217,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @dataProvider setIpOnMachineIsActiveEventDataProvider
      *
-     * @param callable(JobRepository): ?Job           $jobCreator
+     * @param callable(JobFactory): ?Job              $jobCreator
      * @param callable(?Job, MachineRepository): void $machineCreator
      * @param callable(?Job): MachineIsActiveEvent    $eventCreator
      * @param callable(?Job): ?Machine                $expectedMachineCreator
@@ -231,7 +228,7 @@ class MachineMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedMachineCreator,
     ): void {
-        $job = $jobCreator($this->jobRepository);
+        $job = $jobCreator($this->jobFactory);
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
@@ -250,11 +247,8 @@ class MachineMutatorTest extends WebTestCase
      */
     public function setIpOnMachineIsActiveEventDataProvider(): array
     {
-        $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-            $jobRepository->add($job);
-
-            return $job;
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
         };
 
         return [

@@ -20,10 +20,10 @@ use App\Exception\SerializedSuiteCreationException;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Exception\WorkerJobStartException;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -47,11 +47,9 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
         \assert($handler instanceof RemoteRequestExceptionHandler);
         $this->handler = $handler;
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $this->job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-        $jobRepository->add($this->job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $this->job = $jobFactory->createRandom();
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);

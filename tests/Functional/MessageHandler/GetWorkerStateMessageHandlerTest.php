@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\WorkerStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
@@ -14,6 +13,7 @@ use App\MessageHandler\GetWorkerStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
@@ -38,7 +38,9 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $workerClientException = new \Exception('Failed to get worker state');
 
@@ -67,7 +69,9 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
@@ -125,17 +129,6 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
     protected function getHandledMessageClass(): string
     {
         return GetResultsJobStateMessage::class;
-    }
-
-    private function createJob(): Job
-    {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        return $job;
     }
 
     private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerStateMessageHandler

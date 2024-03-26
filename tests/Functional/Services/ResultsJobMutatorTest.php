@@ -7,9 +7,9 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -17,20 +17,20 @@ use Symfony\Component\Uid\Ulid;
 
 class ResultsJobMutatorTest extends WebTestCase
 {
-    private JobRepository $jobRepository;
     private ResultsJobRepository $resultsJobRepository;
     private ResultsJobMutator $resultsJobMutator;
+    private JobFactory $jobFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
+
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $this->jobFactory = $jobFactory;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -78,7 +78,7 @@ class ResultsJobMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateSuccessDataProvider
      *
-     * @param callable(JobRepository): ?Job                 $jobCreator
+     * @param callable(JobFactory): ?Job                    $jobCreator
      * @param callable(?Job, ResultsJobRepository): void    $resultsJobCreator
      * @param callable(?Job): ResultsJobStateRetrievedEvent $eventCreator
      * @param callable(?Job): ?ResultsJob                   $expectedResultsJobCreator
@@ -89,7 +89,7 @@ class ResultsJobMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedResultsJobCreator,
     ): void {
-        $job = $jobCreator($this->jobRepository);
+        $job = $jobCreator($this->jobFactory);
         $resultsJobCreator($job, $this->resultsJobRepository);
 
         $event = $eventCreator($job);
@@ -109,11 +109,8 @@ class ResultsJobMutatorTest extends WebTestCase
     public function setStateSuccessDataProvider(): array
     {
         $resultsJobToken = md5((string) rand());
-        $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-            $jobRepository->add($job);
-
-            return $job;
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
         };
 
         return [

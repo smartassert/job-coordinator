@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -22,7 +21,6 @@ class RemoteRequestRemoverTest extends WebTestCase
     private RemoteRequestRemover $remoteRequestRemover;
     private RemoteRequestRepository $remoteRequestRepository;
     private RemoteRequestFailureRepository $remoteRequestFailureRepository;
-    private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
@@ -48,10 +46,6 @@ class RemoteRequestRemoverTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $this->jobRepository = $jobRepository;
     }
 
     /**
@@ -101,8 +95,9 @@ class RemoteRequestRemoverTest extends WebTestCase
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $this->doRemoteRequestRemoverTest(
             $job->id,

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
@@ -12,6 +11,7 @@ use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
@@ -36,7 +36,9 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     public function testInvokeResultsClientThrowsException(): void
     {
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
@@ -60,7 +62,9 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $resultsServiceJobState = new ResultsJobState(md5((string) rand()), md5((string) rand()));
 
@@ -92,17 +96,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     protected function getHandledMessageClass(): string
     {
         return GetResultsJobStateMessage::class;
-    }
-
-    private function createJob(): Job
-    {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        return $job;
     }
 
     private function createHandler(ResultsClient $resultsClient): GetResultsJobStateMessageHandler

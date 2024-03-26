@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Job;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
-use App\Repository\JobRepository;
+use App\Tests\Services\Factory\JobFactory;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -76,10 +75,9 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForResultsJobCreatedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
         $resultsToken = md5((string) rand());
@@ -94,10 +92,9 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForResultsJobStateRetrievedEventNotEndState(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
         $resultsJobState = new ResultsJobState('started', null);
@@ -111,10 +108,9 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForResultsJobStateRetrievedEventIsEndState(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
         $resultsJobState = new ResultsJobState('complete', 'ended');

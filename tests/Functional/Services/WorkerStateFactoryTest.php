@@ -9,15 +9,14 @@ use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerState;
-use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerStateFactory;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class WorkerStateFactoryTest extends WebTestCase
 {
-    private JobRepository $jobRepository;
     private WorkerComponentStateRepository $workerComponentStateRepository;
     private WorkerStateFactory $workerStateFactory;
 
@@ -25,12 +24,8 @@ class WorkerStateFactoryTest extends WebTestCase
     {
         parent::setUp();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
@@ -56,8 +51,9 @@ class WorkerStateFactoryTest extends WebTestCase
         callable $componentStatesCreator,
         callable $expectedWorkerStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $componentStatesCreator($job, $this->workerComponentStateRepository);
 
