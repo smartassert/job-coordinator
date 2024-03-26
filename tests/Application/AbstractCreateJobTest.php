@@ -26,7 +26,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
-        $apiToken = $apiTokenProvider->get('user@example.com');
+        $apiToken = $apiTokenProvider->get('user1@example.com');
 
         $response = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $this->suiteId, null, $method);
 
@@ -80,7 +80,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
         \assert($apiTokenProvider instanceof ApiTokenProvider);
-        $apiToken = $apiTokenProvider->get('user@example.com');
+        $apiToken = $apiTokenProvider->get('user1@example.com');
 
         $response = self::$staticApplicationClient->makeCreateJobRequest(
             $apiToken,
