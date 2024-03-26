@@ -12,7 +12,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-class Job
+readonly class Job
 {
     /**
      * @var non-empty-string
@@ -21,25 +21,25 @@ class Job
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(UlidGenerator::class)]
     #[ORM\Column(type: 'ulid', unique: true)]
-    public readonly string $id;
+    public string $id;
 
     /**
      * @var non-empty-string
      */
     #[ORM\Column(length: 32)]
-    public readonly string $userId;
+    public string $userId;
 
     /**
      * @var non-empty-string
      */
     #[ORM\Column(length: 32)]
-    public readonly string $suiteId;
+    public string $suiteId;
 
     /**
      * @var positive-int
      */
     #[ORM\Column]
-    public readonly int $maximumDurationInSeconds;
+    public int $maximumDurationInSeconds;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     public readonly \DateTimeImmutable $createdAt;
