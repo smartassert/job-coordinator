@@ -96,7 +96,7 @@ class ResultsJobFactoryTest extends WebTestCase
 
     public function testCreateOnResultsJobCreatedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->resultsJobRepository->count([]));

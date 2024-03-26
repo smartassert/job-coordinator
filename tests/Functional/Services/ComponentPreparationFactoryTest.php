@@ -84,7 +84,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
         callable $remoteRequestsCreator,
         array $expected
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);

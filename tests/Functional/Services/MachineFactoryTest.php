@@ -99,7 +99,7 @@ class MachineFactoryTest extends WebTestCase
 
     public function testCreateOnMachineRetrievedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->machineRepository->count([]));

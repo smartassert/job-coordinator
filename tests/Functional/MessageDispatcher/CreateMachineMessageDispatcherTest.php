@@ -134,7 +134,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         };
 
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+            $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
             $jobRepository->add($job);
 
             return $job;
@@ -238,7 +238,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public function testDispatchSuccess(callable $eventCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);

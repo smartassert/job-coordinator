@@ -23,6 +23,7 @@ final class Version20220920083238 extends AbstractMigration
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
                 maximum_duration_in_seconds INT NOT NULL,
+                created_at TIMESTAMP(0) WITH TIME ZONE NOT NULL,
                 PRIMARY KEY(id)
             )
         ');

@@ -84,7 +84,7 @@ class PreparationStateFactoryTest extends WebTestCase
         callable $remoteRequestCreator,
         PreparationStateModel $expected
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000));
+        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000), new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);

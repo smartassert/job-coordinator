@@ -69,7 +69,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $machine = MachineFactory::create($job->id, 'unknown', 'unknown', []);
@@ -92,7 +92,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -140,7 +140,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         callable $expectedEventCreator
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -204,7 +204,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         string $expectedEventClass
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);

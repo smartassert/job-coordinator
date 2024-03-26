@@ -116,7 +116,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         callable $expectedExecutionStateCreator,
         callable $expectedEventDeliveryStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         $componentStateCreator($job, $this->workerComponentStateRepository);

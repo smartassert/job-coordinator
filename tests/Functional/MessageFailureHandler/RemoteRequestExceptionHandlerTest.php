@@ -50,7 +50,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $this->job = new Job(md5((string) rand()), md5((string) rand()), 600);
+        $this->job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
         $jobRepository->add($this->job);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);

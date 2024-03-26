@@ -157,6 +157,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'pending',
                             'request_states' => [
@@ -215,6 +216,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -300,6 +302,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -394,6 +397,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -447,6 +451,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -508,6 +513,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -566,6 +572,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -640,6 +647,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -729,6 +737,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'preparing',
                             'request_states' => [
@@ -826,6 +835,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'succeeded',
                             'request_states' => [
@@ -910,6 +920,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
                         'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->createdAt->format('U'),
                         'preparation' => [
                             'state' => 'failed',
                             'request_states' => [

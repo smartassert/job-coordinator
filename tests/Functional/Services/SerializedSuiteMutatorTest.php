@@ -117,7 +117,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     {
         $serializedSuiteId = md5((string) rand());
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600);
+            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
             $jobRepository->add($job);
 
             return $job;

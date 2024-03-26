@@ -102,7 +102,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
     public function testCreateOnSerializedSuiteCreatedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
