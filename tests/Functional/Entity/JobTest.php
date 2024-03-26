@@ -26,9 +26,8 @@ class JobTest extends WebTestCase
         \assert('' !== $resultToken);
 
         $maximumDurationInSeconds = 600;
-        $createdAt = new \DateTimeImmutable();
 
-        $job = new Job($userId, $suiteId, $maximumDurationInSeconds, $createdAt);
+        $job = new Job($userId, $suiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();
@@ -44,6 +43,5 @@ class JobTest extends WebTestCase
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
         self::assertSame($maximumDurationInSeconds, $retrievedJob->maximumDurationInSeconds);
-        self::assertSame($createdAt, $job->createdAt);
     }
 }

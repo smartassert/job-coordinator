@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\JobRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
@@ -41,24 +41,23 @@ readonly class Job
     #[ORM\Column]
     public int $maximumDurationInSeconds;
 
-    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
-    public readonly \DateTimeImmutable $createdAt;
-
     /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
      */
-    public function __construct(
-        string $userId,
-        string $suiteId,
-        int $maximumDurationInSeconds,
-        \DateTimeImmutable $createdAt
-    ) {
+    public function __construct(string $userId, string $suiteId, int $maximumDurationInSeconds)
+    {
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-        $this->createdAt = $createdAt;
+    }
+
+    public function getCreatedAt(): int
+    {
+        $idAsUlid = new Ulid($this->id);
+
+        return (int) $idAsUlid->getDateTime()->format('U');
     }
 
     /**
@@ -71,11 +70,13 @@ readonly class Job
      */
     public function toArray(): array
     {
+        $idAsUlid = new Ulid($this->id);
+
         return [
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
-            'created_at' => max((int) $this->createdAt->format('U'), 1),
+            'created_at' => max($this->getCreatedAt(), 1),
         ];
     }
 }

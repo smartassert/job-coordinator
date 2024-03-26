@@ -24,9 +24,8 @@ readonly class JobFactory
         \assert('' !== $suiteId);
 
         $maximumDurationInSeconds = rand(1, 1000);
-        $createdAt = new \DateTimeImmutable();
 
-        $job = new Job($userId, $suiteId, $maximumDurationInSeconds, $createdAt);
+        $job = new Job($userId, $suiteId, $maximumDurationInSeconds);
 
         $this->jobRepository->add($job);
 
