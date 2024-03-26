@@ -216,14 +216,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     private function createJob(): Job
     {
-        $job = JobFactory::createRandom();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $jobRepository->add($job);
-
-        return $job;
+        return $jobFactory->createRandom();
     }
 
     /**

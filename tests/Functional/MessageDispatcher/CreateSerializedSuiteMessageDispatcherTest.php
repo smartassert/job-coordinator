@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
-use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,10 +40,9 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForJobCreatedEventSuccess(): void
     {
-        $job = JobFactory::createRandom();
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
         $parameters = [

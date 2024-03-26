@@ -29,10 +29,10 @@ class ResultsJobFactoryTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+        $this->jobRepository = $jobRepository;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -96,8 +96,9 @@ class ResultsJobFactoryTest extends WebTestCase
 
     public function testCreateOnResultsJobCreatedEventSuccess(): void
     {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         self::assertSame(0, $this->resultsJobRepository->count([]));
 

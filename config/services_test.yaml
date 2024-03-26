@@ -63,3 +63,6 @@ services:
         public: true
         arguments:
             $baseUrl: '%sources_base_url%'
+
+    App\Tests\Services\Factory\JobFactory:
+        public: true

@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -18,7 +17,6 @@ use Symfony\Component\Uid\Ulid;
 
 class MachineFactoryTest extends WebTestCase
 {
-    private JobRepository $jobRepository;
     private MachineRepository $machineRepository;
     private MachineFactory $machineFactory;
 
@@ -26,12 +24,8 @@ class MachineFactoryTest extends WebTestCase
     {
         parent::setUp();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -99,8 +93,9 @@ class MachineFactoryTest extends WebTestCase
 
     public function testCreateOnMachineRetrievedEventSuccess(): void
     {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         self::assertSame(0, $this->machineRepository->count([]));
 

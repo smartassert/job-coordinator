@@ -8,7 +8,6 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
-use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -75,10 +74,9 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
     public function testDispatchForSerializedSuiteCreatedEventSuccess(): void
     {
-        $job = JobFactory::createRandom();
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
 

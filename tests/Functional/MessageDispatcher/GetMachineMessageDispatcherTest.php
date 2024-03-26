@@ -8,7 +8,6 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
-use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -69,10 +68,9 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
-        $job = JobFactory::createRandom();
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 

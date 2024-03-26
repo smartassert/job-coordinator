@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\MachineTerminationException;
 use App\Message\TerminateMachineMessage;
@@ -47,7 +46,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $workerManagerException = new \Exception('Failed to terminate machine');
 
@@ -71,7 +72,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
 
@@ -104,17 +107,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     protected function getHandledMessageClass(): string
     {
         return TerminateMachineMessage::class;
-    }
-
-    private function createJob(): Job
-    {
-        $job = JobFactory::createRandom();
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        return $job;
     }
 
     private function createHandler(

@@ -27,15 +27,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    private JobRepository $jobRepository;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $this->jobRepository = $jobRepository;
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -70,8 +64,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $machine = MachineFactory::create($job->id, 'unknown', 'unknown', []);
         $workerManagerException = new \Exception('Failed to create machine');
@@ -93,8 +88,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -141,8 +137,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         callable $expectedEventCreator
     ): void {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -205,8 +202,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         string $expectedEventClass
     ): void {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);

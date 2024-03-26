@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\ResultsJobCreationException;
@@ -48,7 +47,9 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $resultsClientException = new \Exception('Failed to create results job');
 
@@ -72,7 +73,10 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
         $resultsJobModel = new ResultsJobModel($job->id, md5((string) rand()), new JobState('awaiting-events', null));
 
         $resultsClient = HttpMockedResultsClientFactory::create([
@@ -119,17 +123,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     protected function getHandledMessageClass(): string
     {
         return CreateResultsJobMessage::class;
-    }
-
-    private function createJob(): Job
-    {
-        $job = JobFactory::createRandom();
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        return $job;
     }
 
     private function createHandler(

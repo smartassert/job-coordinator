@@ -8,7 +8,6 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
-use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -77,11 +76,9 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
-        $job = JobFactory::createRandom();
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),

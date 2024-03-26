@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\SerializedSuiteCreationException;
@@ -43,7 +42,9 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $serializedSuiteCreateParameters = [];
 
@@ -73,7 +74,9 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
     public function testInvokeSuccess(): void
     {
-        $job = $this->createJob();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),
@@ -123,17 +126,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     protected function getHandledMessageClass(): string
     {
         return CreateSerializedSuiteMessage::class;
-    }
-
-    private function createJob(): Job
-    {
-        $job = JobFactory::createRandom();
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $jobRepository->add($job);
-
-        return $job;
     }
 
     private function createHandler(

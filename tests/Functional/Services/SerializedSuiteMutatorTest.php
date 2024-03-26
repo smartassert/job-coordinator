@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteMutator;
 use App\Tests\Services\Factory\JobFactory;
@@ -20,20 +19,20 @@ use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteMutatorTest extends WebTestCase
 {
-    private JobRepository $jobRepository;
     private SerializedSuiteRepository $serializedSuiteRepository;
     private SerializedSuiteMutator $serializedSuiteMutator;
+    private JobFactory $jobFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
+
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $this->jobFactory = $jobFactory;
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
@@ -86,7 +85,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @dataProvider setStateSuccessDataProvider
      *
-     * @param callable(JobRepository): ?Job                   $jobCreator
+     * @param callable(JobFactory): ?Job                      $jobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): SerializedSuiteRetrievedEvent   $eventCreator
      * @param callable(?Job): ?SerializedSuite                $expectedSerializedSuiteCreator
@@ -97,7 +96,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedSerializedSuiteCreator,
     ): void {
-        $job = $jobCreator($this->jobRepository);
+        $job = $jobCreator($this->jobFactory);
         $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
         $event = $eventCreator($job);
@@ -117,11 +116,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
     public function setStateSuccessDataProvider(): array
     {
         $serializedSuiteId = md5((string) rand());
-        $jobCreator = function (JobRepository $jobRepository) {
-            $job = JobFactory::createRandom();
-            $jobRepository->add($job);
-
-            return $job;
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
         };
 
         return [

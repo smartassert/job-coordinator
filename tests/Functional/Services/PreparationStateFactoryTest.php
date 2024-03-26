@@ -20,7 +20,6 @@ use App\Model\ComponentFailure;
 use App\Model\ComponentFailures;
 use App\Model\PreparationState as PreparationStateModel;
 use App\Model\RequestStates;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -36,7 +35,6 @@ class PreparationStateFactoryTest extends WebTestCase
 {
     private PreparationStateFactory $preparationStateFactory;
     private RemoteRequestRepository $remoteRequestRepository;
-    private JobRepository $jobRepository;
 
     protected function setUp(): void
     {
@@ -55,10 +53,6 @@ class PreparationStateFactoryTest extends WebTestCase
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $this->jobRepository = $jobRepository;
 
         $remoteRequestFailureRepository = self::getContainer()->get(RemoteRequestFailureRepository::class);
         \assert($remoteRequestFailureRepository instanceof RemoteRequestFailureRepository);
@@ -85,8 +79,9 @@ class PreparationStateFactoryTest extends WebTestCase
         callable $remoteRequestCreator,
         PreparationStateModel $expected
     ): void {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);

@@ -12,7 +12,6 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -29,9 +28,10 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 {
     private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
-    private JobRepository $jobRepository;
     private ResultsJobRepository $resultsJobRepository;
     private SerializedSuiteRepository $serializedSuiteRepository;
+
+    private JobFactory $jobFactory;
 
     protected function setUp(): void
     {
@@ -48,9 +48,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-        $this->jobRepository = $jobRepository;
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $this->jobFactory = $jobFactory;
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -86,7 +86,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @dataProvider dispatchMessageNotDispatchedDataProvider
      *
-     * @param callable(JobRepository): ?Job                   $jobCreator
+     * @param callable(JobFactory): ?Job                      $jobCreator
      * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): object                          $eventCreator
@@ -97,7 +97,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         callable $serializedSuiteCreator,
         callable $eventCreator,
     ): void {
-        $job = $jobCreator($this->jobRepository);
+        $job = $jobCreator($this->jobFactory);
         $resultsJobCreator($job, $this->resultsJobRepository);
         $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
@@ -134,11 +134,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             return null;
         };
 
-        $jobCreator = function (JobRepository $jobRepository) {
-            $job = JobFactory::createRandom();
-            $jobRepository->add($job);
-
-            return $job;
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
         };
 
         $resultsJobCreator = function (Job $job, ResultsJobRepository $resultsJobRepository) {
@@ -239,8 +236,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public function testDispatchSuccess(callable $eventCreator): void
     {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $job = $this->jobFactory->createRandom();
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
         $this->resultsJobRepository->save($resultsJob);

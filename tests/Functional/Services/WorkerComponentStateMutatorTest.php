@@ -30,10 +30,10 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
+        $this->jobRepository = $jobRepository;
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
-        $this->jobRepository = $jobRepository;
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
@@ -117,8 +117,9 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         callable $expectedExecutionStateCreator,
         callable $expectedEventDeliveryStateCreator,
     ): void {
-        $job = JobFactory::createRandom();
-        $this->jobRepository->add($job);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
