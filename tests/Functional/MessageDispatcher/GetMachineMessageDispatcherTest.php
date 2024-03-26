@@ -69,7 +69,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600);
+        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
         $jobRepository->add($job);

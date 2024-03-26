@@ -121,7 +121,7 @@ class MachineMutatorTest extends WebTestCase
     public function setStateOnMachineStateChangeEventDataProvider(): array
     {
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600);
+            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
             $jobRepository->add($job);
 
             return $job;
@@ -251,7 +251,7 @@ class MachineMutatorTest extends WebTestCase
     public function setIpOnMachineIsActiveEventDataProvider(): array
     {
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600);
+            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
             $jobRepository->add($job);
 
             return $job;

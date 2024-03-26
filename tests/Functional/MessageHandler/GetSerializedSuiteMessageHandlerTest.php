@@ -215,7 +215,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     private function createJob(): Job
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000));
+        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000), new \DateTimeImmutable());
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
