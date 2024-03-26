@@ -11,6 +11,7 @@ use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -121,7 +122,7 @@ class MachineMutatorTest extends WebTestCase
     public function setStateOnMachineStateChangeEventDataProvider(): array
     {
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
+            $job = JobFactory::createRandom();
             $jobRepository->add($job);
 
             return $job;

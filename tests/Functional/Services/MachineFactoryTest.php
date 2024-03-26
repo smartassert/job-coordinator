@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -99,7 +99,7 @@ class MachineFactoryTest extends WebTestCase
 
     public function testCreateOnMachineRetrievedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->machineRepository->count([]));

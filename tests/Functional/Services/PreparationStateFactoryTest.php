@@ -28,6 +28,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\PreparationStateFactory;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -84,7 +85,7 @@ class PreparationStateFactoryTest extends WebTestCase
         callable $remoteRequestCreator,
         PreparationStateModel $expected
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000), new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);

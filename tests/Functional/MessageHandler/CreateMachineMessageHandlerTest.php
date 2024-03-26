@@ -13,6 +13,7 @@ use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -119,7 +120,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createJob(): Job
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

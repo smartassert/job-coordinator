@@ -16,6 +16,7 @@ use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -134,7 +135,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         };
 
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+            $job = JobFactory::createRandom();
             $jobRepository->add($job);
 
             return $job;
@@ -238,7 +239,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public function testDispatchSuccess(callable $eventCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);

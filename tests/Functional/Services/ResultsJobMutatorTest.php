@@ -10,6 +10,7 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -110,7 +111,7 @@ class ResultsJobMutatorTest extends WebTestCase
     {
         $resultsJobToken = md5((string) rand());
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
+            $job = JobFactory::createRandom();
             $jobRepository->add($job);
 
             return $job;

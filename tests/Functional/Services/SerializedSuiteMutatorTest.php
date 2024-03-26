@@ -10,6 +10,7 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteMutator;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
@@ -117,7 +118,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     {
         $serializedSuiteId = md5((string) rand());
         $jobCreator = function (JobRepository $jobRepository) {
-            $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
+            $job = JobFactory::createRandom();
             $jobRepository->add($job);
 
             return $job;

@@ -12,6 +12,7 @@ use App\Model\WorkerState;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerStateFactory;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -56,7 +57,7 @@ class WorkerStateFactoryTest extends WebTestCase
         callable $componentStatesCreator,
         callable $expectedWorkerStateCreator,
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $componentStatesCreator($job, $this->workerComponentStateRepository);

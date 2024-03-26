@@ -14,6 +14,7 @@ use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
@@ -69,7 +70,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $machine = MachineFactory::create($job->id, 'unknown', 'unknown', []);
@@ -92,7 +93,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -140,7 +141,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         callable $expectedEventCreator
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);
@@ -204,7 +205,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         callable $currentMachineCreator,
         string $expectedEventClass
     ): void {
-        $job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         $previous = $previousMachineCreator($job);

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobCreatedEvent;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
@@ -96,7 +96,7 @@ class ResultsJobFactoryTest extends WebTestCase
 
     public function testCreateOnResultsJobCreatedEventSuccess(): void
     {
-        $job = new Job('user id', 'suite id', 600, new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
         $this->jobRepository->add($job);
 
         self::assertSame(0, $this->resultsJobRepository->count([]));

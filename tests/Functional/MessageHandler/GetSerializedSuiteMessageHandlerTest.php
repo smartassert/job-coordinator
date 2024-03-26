@@ -12,6 +12,7 @@ use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -215,7 +216,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     private function createJob(): Job
     {
-        $job = new Job(md5((string) rand()), md5((string) rand()), rand(1, 1000), new \DateTimeImmutable());
+        $job = JobFactory::createRandom();
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);

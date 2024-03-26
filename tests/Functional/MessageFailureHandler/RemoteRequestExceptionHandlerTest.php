@@ -24,6 +24,7 @@ use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -50,7 +51,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $this->job = new Job(md5((string) rand()), md5((string) rand()), 600, new \DateTimeImmutable());
+        $this->job = JobFactory::createRandom();
         $jobRepository->add($this->job);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
