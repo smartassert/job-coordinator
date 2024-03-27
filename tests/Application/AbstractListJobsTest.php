@@ -125,7 +125,6 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $responseData = json_decode($response->getBody()->getContents(), true);
 
-//        var_dump($expectedCreator($filteredJobs), $responseData);
         self::assertSame($expectedCreator($filteredJobs), $responseData);
     }
 
