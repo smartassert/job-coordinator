@@ -101,7 +101,12 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
-        $jobs = $jobRepository->findAll();
+        $jobs = $jobRepository->findBy(
+            [],
+            [
+                'id' => 'ASC',
+            ]
+        );
 
         $filteredJobs = [];
         foreach ($jobs as $job) {
@@ -120,6 +125,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $responseData = json_decode($response->getBody()->getContents(), true);
 
+//        var_dump($expectedCreator($filteredJobs), $responseData);
         self::assertSame($expectedCreator($filteredJobs), $responseData);
     }
 
