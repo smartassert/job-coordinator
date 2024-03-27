@@ -61,6 +61,18 @@ class Client
         return $this->client->makeRequest($method, $this->router->generate('status'));
     }
 
+    public function makeListJobsRequest(
+        ?string $authenticationToken,
+        string $suiteId,
+        string $method = 'GET'
+    ): ResponseInterface {
+        return $this->client->makeRequest(
+            $method,
+            $this->router->generate('job_list', ['suiteId' => $suiteId]),
+            $this->createAuthorizationHeader($authenticationToken)
+        );
+    }
+
     /**
      * @return array<string, string>
      */
