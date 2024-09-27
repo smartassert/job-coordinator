@@ -101,9 +101,9 @@
             "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
         ],
         "static-analysis": "XDEBUG_MODE=off ./vendor/bin/phpstan analyse --ansi",
-        "test-unit": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Unit",
-        "test-functional": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Functional",
-        "test-integration": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always tests/Integration",
+        "test-unit": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always --display-deprecations --display-phpunit-deprecations tests/Unit",
+        "test-functional": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always --display-deprecations --display-phpunit-deprecations tests/Functional",
+        "test-integration": "XDEBUG_MODE=off ./vendor/bin/phpunit --colors=always --display-deprecations --display-phpunit-deprecations tests/Integration",
         "test": [
             "@test-unit",
             "@test-functional"
