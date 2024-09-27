@@ -23,13 +23,16 @@ class EventListenerConfigurationTest extends WebTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $listeners = $eventDispatcher->getListeners($eventName);
-
         self::assertNotEmpty($listeners, 'Ahh no listeners!');
 
         $listenerFound = false;
         foreach ($listeners as $listenerConfiguration) {
-            $listenerClass = $listenerConfiguration[0] ?? null;
-            $listenerMethod = $listenerConfiguration[1] ?? null;
+            \assert(is_array($listenerConfiguration));
+            \assert(isset($listenerConfiguration[0]));
+            \assert(isset($listenerConfiguration[1]));
+
+            $listenerClass = $listenerConfiguration[0];
+            $listenerMethod = $listenerConfiguration[1];
 
             if (
                 is_object($listenerClass)
