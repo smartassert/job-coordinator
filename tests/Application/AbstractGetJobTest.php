@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -18,9 +19,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         $this->jobId = (string) new Ulid();
     }
 
-    /**
-     * @dataProvider getBadMethodDataProvider
-     */
+    #[DataProvider('getBadMethodDataProvider')]
     public function testGetBadMethod(string $method): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -35,7 +34,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function getBadMethodDataProvider(): array
+    public static function getBadMethodDataProvider(): array
     {
         return [
             'PUT' => [
@@ -47,9 +46,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         ];
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testGetUnauthorizedUser(?string $apiToken): void
     {
         $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, $this->jobId);
@@ -60,7 +57,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function unauthorizedUserDataProvider(): array
+    public static function unauthorizedUserDataProvider(): array
     {
         return [
             'no user token' => [

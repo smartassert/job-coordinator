@@ -14,6 +14,7 @@ use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -42,10 +43,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     /**
-     * @dataProvider serializedSuiteEndStateDataProvider
-     *
      * @param non-empty-string $state
      */
+    #[DataProvider('serializedSuiteEndStateDataProvider')]
     public function testInvokeSerializedSuiteStateIsEndState(string $state): void
     {
         $job = $this->createJob();
@@ -59,7 +59,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     /**
      * @return array<mixed>
      */
-    public function serializedSuiteEndStateDataProvider(): array
+    public static function serializedSuiteEndStateDataProvider(): array
     {
         return [
             'prepared' => [
@@ -103,11 +103,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     /**
-     * @dataProvider invokeNotEndStateDataProvider
-     *
      * @param non-empty-string $currentSerializedSuiteState
      * @param non-empty-string $newSerializedSuiteState
      */
+    #[DataProvider('invokeNotEndStateDataProvider')]
     public function testInvokeNotEndState(string $currentSerializedSuiteState, string $newSerializedSuiteState): void
     {
         $job = $this->createJob();
@@ -153,7 +152,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     /**
      * @return array<mixed>
      */
-    public function invokeNotEndStateDataProvider(): array
+    public static function invokeNotEndStateDataProvider(): array
     {
         $state = md5((string) rand());
 

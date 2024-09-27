@@ -13,6 +13,7 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerStateFactory;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class WorkerStateFactoryTest extends WebTestCase
@@ -42,11 +43,10 @@ class WorkerStateFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createForJobDataProvider
-     *
      * @param callable(Job, WorkerComponentStateRepository): void $componentStatesCreator
      * @param callable(Job): WorkerState                          $expectedWorkerStateCreator
      */
+    #[DataProvider('createForJobDataProvider')]
     public function testCreateForJob(
         callable $componentStatesCreator,
         callable $expectedWorkerStateCreator,
@@ -65,7 +65,7 @@ class WorkerStateFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createForJobDataProvider(): array
+    public static function createForJobDataProvider(): array
     {
         return [
             'no component state entities' => [

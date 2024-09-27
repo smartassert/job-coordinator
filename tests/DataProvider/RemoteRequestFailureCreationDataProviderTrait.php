@@ -22,7 +22,7 @@ trait RemoteRequestFailureCreationDataProviderTrait
      *     expectedMessage: string
      * }>
      */
-    public function remoteRequestFailureCreationDataProvider(): array
+    public static function remoteRequestFailureCreationDataProvider(): array
     {
         $request = \Mockery::mock(RequestInterface::class);
 

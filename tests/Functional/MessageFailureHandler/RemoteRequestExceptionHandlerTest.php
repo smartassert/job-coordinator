@@ -26,6 +26,7 @@ use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 
@@ -69,10 +70,9 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider handleSetRemoteRequestFailureDataProvider
-     *
      * @param callable(Job): RemoteRequestExceptionInterface $exceptionCreator
      */
+    #[DataProvider('handleSetRemoteRequestFailureDataProvider')]
     public function testHandleSetRemoteRequestFailure(
         callable $exceptionCreator,
         RemoteRequestFailureType $expectedType,
@@ -107,7 +107,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function handleSetRemoteRequestFailureDataProvider(): array
+    public static function handleSetRemoteRequestFailureDataProvider(): array
     {
         $remoteRequestExceptionCases = [
             MachineCreationException::class => function (\Throwable $inner) {
@@ -158,7 +158,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             },
         ];
 
-        $innerExceptionCases = $this->remoteRequestFailureCreationDataProvider();
+        $innerExceptionCases = self::remoteRequestFailureCreationDataProvider();
 
         $testCases = [];
 

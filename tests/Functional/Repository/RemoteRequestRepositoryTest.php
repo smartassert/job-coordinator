@@ -11,6 +11,7 @@ use App\Enum\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RemoteRequestRepositoryTest extends WebTestCase
@@ -43,10 +44,9 @@ class RemoteRequestRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getLargestIndexDataProvider
-     *
      * @param RemoteRequest[] $existingRemoteRequests
      */
+    #[DataProvider('getLargestIndexDataProvider')]
     public function testGetLargestIndex(
         array $existingRemoteRequests,
         string $jobId,
@@ -63,7 +63,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getLargestIndexDataProvider(): array
+    public static function getLargestIndexDataProvider(): array
     {
         $jobId = md5((string) rand());
 
@@ -120,11 +120,10 @@ class RemoteRequestRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider hasAnyWithFailureDataProvider
-     *
      * @param callable(): RemoteRequestFailure[]                $remoteRequestFailuresCreator
      * @param callable(RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
      */
+    #[DataProvider('hasAnyWithFailureDataProvider')]
     public function testHasAnyWithFailure(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
@@ -150,7 +149,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function hasAnyWithFailureDataProvider(): array
+    public static function hasAnyWithFailureDataProvider(): array
     {
         return [
             'single remote request failure, no remote requests' => [

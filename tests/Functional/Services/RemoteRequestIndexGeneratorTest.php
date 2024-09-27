@@ -9,6 +9,7 @@ use App\Enum\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestIndexGenerator;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RemoteRequestIndexGeneratorTest extends WebTestCase
@@ -37,10 +38,9 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider generateDataProvider
-     *
      * @param RemoteRequest[] $existingRemoteRequests
      */
+    #[DataProvider('generateDataProvider')]
     public function testGenerate(
         array $existingRemoteRequests,
         string $jobId,
@@ -57,7 +57,7 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function generateDataProvider(): array
+    public static function generateDataProvider(): array
     {
         $jobId = md5((string) rand());
 

@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
@@ -25,9 +26,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         $this->suiteId = (string) new Ulid();
     }
 
-    /**
-     * @dataProvider getBadMethodDataProvider
-     */
+    #[DataProvider('getBadMethodDataProvider')]
     public function testListBadMethod(string $method): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -42,7 +41,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function getBadMethodDataProvider(): array
+    public static function getBadMethodDataProvider(): array
     {
         return [
             'POST' => [
@@ -57,9 +56,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         ];
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testListUnauthorizedUser(?string $apiToken): void
     {
         $response = self::$staticApplicationClient->makeListJobsRequest($apiToken, $this->suiteId);
@@ -70,7 +67,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function unauthorizedUserDataProvider(): array
+    public static function unauthorizedUserDataProvider(): array
     {
         return [
             'no user token' => [
@@ -86,11 +83,10 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
      * @param callable(Job[]): array<mixed>                                  $expectedCreator
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -131,7 +127,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function listSuccessDataProvider(): array
+    public static function listSuccessDataProvider(): array
     {
         return [
             'no jobs' => [
@@ -154,7 +150,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId, 123)
                     );
 
@@ -188,15 +184,15 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId2, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 789)
                     );
 
@@ -231,15 +227,15 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId2, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 789)
                     );
 
@@ -274,19 +270,19 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user2ApiToken, $suiteId1, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId2, 789)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId1, 321)
                     );
 
@@ -315,7 +311,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         ];
     }
 
-    private function getJobIdFromResponse(ResponseInterface $response): string
+    private static function getJobIdFromResponse(ResponseInterface $response): string
     {
         $responseData = json_decode($response->getBody()->getContents(), true);
         \assert(is_array($responseData));

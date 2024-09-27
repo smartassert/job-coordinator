@@ -28,6 +28,7 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\ComponentPreparationFactory;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ComponentPreparationFactoryTest extends WebTestCase
@@ -62,8 +63,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getAllDataProvider
-     *
      * @param callable(
      *   Job,
      *   ResultsJobRepository,
@@ -74,6 +73,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
      * @param callable(Job, RemoteRequestRepository): void $remoteRequestsCreator
      * @param ComponentPreparation[]                       $expected
      */
+    #[DataProvider('getAllDataProvider')]
     public function testGetAll(
         callable $entityCreator,
         callable $remoteRequestsCreator,
@@ -111,7 +111,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getAllDataProvider(): array
+    public static function getAllDataProvider(): array
     {
         $allEntitiesCreator = function (
             Job $job,

@@ -13,6 +13,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -49,13 +50,12 @@ class RemoteRequestRemoverTest extends WebTestCase
     }
 
     /**
-     * @dataProvider noRemoteRequestsDataProvider
-     *
      * @param callable(): RemoteRequestFailure[]                        $remoteRequestFailuresCreator
      * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
      * @param callable(): RemoteRequestFailure[]                        $expectedRemoteRequestFailuresCreator
      * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $expectedRemoteRequestsCreator
      */
+    #[DataProvider('noRemoteRequestsDataProvider')]
     public function testRemoveForJobAndTypeNoJob(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
@@ -78,16 +78,15 @@ class RemoteRequestRemoverTest extends WebTestCase
     }
 
     /**
-     * @dataProvider noRemoteRequestsDataProvider
-     * @dataProvider noRemoteRequestsForTypeDataProvider
-     * @dataProvider singleRequestForTypeDataProvider
-     * @dataProvider multipleRequestsForTypeDataProvider
-     *
      * @param callable(): RemoteRequestFailure[]                        $remoteRequestFailuresCreator
      * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
      * @param callable(): RemoteRequestFailure[]                        $expectedRemoteRequestFailuresCreator
      * @param callable(string, RemoteRequestFailure[]): RemoteRequest[] $expectedRemoteRequestsCreator
      */
+    #[DataProvider('noRemoteRequestsDataProvider')]
+    #[DataProvider('noRemoteRequestsForTypeDataProvider')]
+    #[DataProvider('singleRequestForTypeDataProvider')]
+    #[DataProvider('multipleRequestsForTypeDataProvider')]
     public function testRemoveForJobAndType(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
@@ -114,7 +113,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function noRemoteRequestsDataProvider(): array
+    public static function noRemoteRequestsDataProvider(): array
     {
         return [
             'no remote requests' => [
@@ -138,7 +137,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function noRemoteRequestsForTypeDataProvider(): array
+    public static function noRemoteRequestsForTypeDataProvider(): array
     {
         return [
             'no remote requests for machine/create' => [
@@ -174,7 +173,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function singleRequestForTypeDataProvider(): array
+    public static function singleRequestForTypeDataProvider(): array
     {
         return [
             'single remote request for machine/create, no remote request failure' => [
@@ -244,7 +243,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function multipleRequestsForTypeDataProvider(): array
+    public static function multipleRequestsForTypeDataProvider(): array
     {
         return [
             'multiple remote requests for machine/create, no remote request failures' => [

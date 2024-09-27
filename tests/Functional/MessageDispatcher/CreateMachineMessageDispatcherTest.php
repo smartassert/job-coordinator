@@ -18,6 +18,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -84,13 +85,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @dataProvider dispatchMessageNotDispatchedDataProvider
-     *
      * @param callable(JobFactory): ?Job                      $jobCreator
      * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): object                          $eventCreator
      */
+    #[DataProvider('dispatchMessageNotDispatchedDataProvider')]
     public function testDispatchMessageNotDispatched(
         callable $jobCreator,
         callable $resultsJobCreator,
@@ -112,7 +112,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function dispatchMessageNotDispatchedDataProvider(): array
+    public static function dispatchMessageNotDispatchedDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
             return new ResultsJobCreatedEvent(
@@ -218,22 +218,21 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $resultsJobCreatedEventCreator,
+                'eventCreator' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $serializedSuiteSerializedEventCreator,
+                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
     }
 
     /**
-     * @dataProvider dispatchSuccessDataProvider
-     *
      * @param callable(Job): object $eventCreator
      */
+    #[DataProvider('dispatchSuccessDataProvider')]
     public function testDispatchSuccess(callable $eventCreator): void
     {
         $job = $this->jobFactory->createRandom();
@@ -255,7 +254,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function dispatchSuccessDataProvider(): array
+    public static function dispatchSuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
             return new ResultsJobCreatedEvent(

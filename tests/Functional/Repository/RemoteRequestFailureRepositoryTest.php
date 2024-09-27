@@ -11,6 +11,7 @@ use App\Enum\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RemoteRequestFailureRepositoryTest extends WebTestCase
@@ -43,12 +44,11 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider removeDataProvider
-     *
      * @param callable(): RemoteRequestFailure[]                $remoteRequestFailuresCreator
      * @param callable(RemoteRequestFailure[]): RemoteRequest[] $remoteRequestsCreator
      * @param callable(): RemoteRequestFailure[]                $expectedRemoteRequestFailuresCreator
      */
+    #[DataProvider('removeDataProvider')]
     public function testRemove(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
@@ -77,7 +77,7 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function removeDataProvider(): array
+    public static function removeDataProvider(): array
     {
         return [
             'single remote request failure, no remote requests' => [

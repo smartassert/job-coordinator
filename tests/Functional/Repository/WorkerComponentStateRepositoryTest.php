@@ -10,6 +10,7 @@ use App\Enum\WorkerComponentName;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class WorkerComponentStateRepositoryTest extends WebTestCase
@@ -33,11 +34,10 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider getAllForJobDataProvider
-     *
      * @param callable(Job, WorkerComponentStateRepository): void $statesCreator
      * @param callable(Job): WorkerComponentState[]               $expectedStatesCreator
      */
+    #[DataProvider('getAllForJobDataProvider')]
     public function testGetAllForJob(callable $statesCreator, callable $expectedStatesCreator): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -55,7 +55,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getAllForJobDataProvider(): array
+    public static function getAllForJobDataProvider(): array
     {
         return [
             'no states' => [

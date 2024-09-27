@@ -19,6 +19,7 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Envelope;
@@ -100,10 +101,9 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @dataProvider invokeMessageIsRedispatchedDataProvider
-     *
      * @param non-empty-string $serializedSuiteState
      */
+    #[DataProvider('invokeMessageIsRedispatchedDataProvider')]
     public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(string $serializedSuiteState): void
     {
         $job = $this->createJob();
@@ -126,7 +126,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeMessageIsRedispatchedDataProvider(): array
+    public static function invokeMessageIsRedispatchedDataProvider(): array
     {
         return [
             'requested' => [

@@ -9,6 +9,7 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -40,9 +41,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->dispatcher::getSubscribedEvents();
@@ -59,7 +58,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             ResultsJobCreatedEvent::class => [

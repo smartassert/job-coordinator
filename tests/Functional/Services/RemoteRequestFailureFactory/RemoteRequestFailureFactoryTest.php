@@ -10,6 +10,7 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestFailureFactory\RemoteRequestFailureFactory;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -44,9 +45,7 @@ class RemoteRequestFailureFactoryTest extends WebTestCase
         $this->remoteRequestFailureRepository = $remoteRequestFailureRepository;
     }
 
-    /**
-     * @dataProvider remoteRequestFailureCreationDataProvider
-     */
+    #[DataProvider('remoteRequestFailureCreationDataProvider')]
     public function testCreate(
         \Throwable $throwable,
         RemoteRequestFailureType $expectedType,

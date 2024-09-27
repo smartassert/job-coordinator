@@ -10,15 +10,15 @@ use App\Enum\RemoteRequestType;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
 use App\Services\PreparationStateReducer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PreparationStateReducerTest extends TestCase
 {
     /**
-     * @dataProvider reduceDataProvider
-     *
      * @param ComponentPreparation[] $componentPreparationStates
      */
+    #[DataProvider('reduceDataProvider')]
     public function testReduce(array $componentPreparationStates, PreparationState $expected): void
     {
         self::assertSame($expected, (new PreparationStateReducer())->reduce($componentPreparationStates));
@@ -27,7 +27,7 @@ class PreparationStateReducerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function reduceDataProvider(): array
+    public static function reduceDataProvider(): array
     {
         $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
         $serializedSuiteComponent = new JobComponent(
