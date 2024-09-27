@@ -23,6 +23,7 @@ class EventListenerConfigurationTest extends WebTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $listeners = $eventDispatcher->getListeners($eventName);
+
         self::assertNotEmpty($listeners, 'Ahh no listeners!');
 
         $listenerFound = false;
