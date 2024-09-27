@@ -35,10 +35,10 @@
     "require-dev": {
         "mockery/mockery": "^1.5",
         "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan": "^1.10",
-        "phpstan/phpstan-doctrine": "^1.3",
+        "phpstan/phpstan": "^1.12",
+        "phpstan/phpstan-doctrine": "^1.5",
         "phpstan/phpstan-mockery": "^1.1",
-        "phpstan/phpstan-phpunit": "^1.1",
+        "phpstan/phpstan-phpunit": "^1.4",
         "phpunit/phpunit": "^9.5",
         "smartassert/symfony-test-client": "^2.0",
         "smartassert/test-authenticaton-provider-bundle": "^5.0",
