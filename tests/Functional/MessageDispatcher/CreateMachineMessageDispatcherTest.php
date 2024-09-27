@@ -218,13 +218,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $resultsJobCreatedEventCreator,
+                'eventCreator' => $resultsJobCreatedEventCreator,
             ],
             'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => $resultsJobCreator,
                 'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'event' => $serializedSuiteSerializedEventCreator,
+                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
     }
