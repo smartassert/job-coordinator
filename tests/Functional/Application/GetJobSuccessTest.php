@@ -24,6 +24,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -32,8 +33,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
     use GetClientAdapterTrait;
 
     /**
-     * @dataProvider getDataProvider
-     *
      * @param callable(Job): RemoteRequest[]                                       $remoteRequestsCreator
      * @param callable(Job, ResultsJobRepository): ?ResultsJob                     $resultsJobCreator
      * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite           $serializedSuiteCreator
@@ -41,6 +40,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
      * @param callable(Job, WorkerComponentStateRepository): void                  $workerComponentStatesCreator
      * @param callable(Job, ?ResultsJob, ?SerializedSuite, ?Machine): array<mixed> $expectedSerializedJobCreator
      */
+    #[DataProvider('getDataProvider')]
     public function testGetSuccess(
         callable $remoteRequestsCreator,
         callable $resultsJobCreator,

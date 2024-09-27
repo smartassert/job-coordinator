@@ -12,6 +12,7 @@ use App\Services\SerializedSuiteMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -53,9 +54,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->serializedSuiteMutator);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->serializedSuiteMutator::getSubscribedEvents();
@@ -83,13 +82,12 @@ class SerializedSuiteMutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setStateSuccessDataProvider
-     *
      * @param callable(JobFactory): ?Job                      $jobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): SerializedSuiteRetrievedEvent   $eventCreator
      * @param callable(?Job): ?SerializedSuite                $expectedSerializedSuiteCreator
      */
+    #[DataProvider('setStateSuccessDataProvider')]
     public function testSetStateSuccess(
         callable $jobCreator,
         callable $serializedSuiteCreator,

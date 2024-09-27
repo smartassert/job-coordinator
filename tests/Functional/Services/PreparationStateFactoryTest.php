@@ -29,6 +29,7 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\PreparationStateFactory;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PreparationStateFactoryTest extends WebTestCase
@@ -63,8 +64,6 @@ class PreparationStateFactoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
-     *
      * @param callable(
      *   Job,
      *   ResultsJobRepository,
@@ -74,6 +73,7 @@ class PreparationStateFactoryTest extends WebTestCase
      * ): void $entityCreator
      * @param callable(Job, RemoteRequestRepository): void $remoteRequestCreator
      */
+    #[DataProvider('createDataProvider')]
     public function testCreate(
         callable $entityCreator,
         callable $remoteRequestCreator,

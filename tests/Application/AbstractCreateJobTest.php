@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Request\CreateJobRequest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -19,9 +20,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         $this->suiteId = (string) new Ulid();
     }
 
-    /**
-     * @dataProvider createBadMethodDataProvider
-     */
+    #[DataProvider('createBadMethodDataProvider')]
     public function testCreateBadMethod(string $method): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -48,9 +47,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
         ];
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testCreateUnauthorizedUser(?string $apiToken): void
     {
         $response = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $this->suiteId, null);

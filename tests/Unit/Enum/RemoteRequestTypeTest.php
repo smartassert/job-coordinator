@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Enum;
 
 use App\Enum\RemoteRequestType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RemoteRequestTypeTest extends TestCase
 {
-    /**
-     * @dataProvider isRepeatableDataProvider
-     */
+    #[DataProvider('isRepeatableDataProvider')]
     public function testIsRepeatable(RemoteRequestType $type, bool $expected): void
     {
         self::assertSame($expected, $type->isRepeatable());

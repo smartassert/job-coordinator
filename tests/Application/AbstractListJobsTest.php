@@ -7,6 +7,7 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
@@ -25,9 +26,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         $this->suiteId = (string) new Ulid();
     }
 
-    /**
-     * @dataProvider getBadMethodDataProvider
-     */
+    #[DataProvider('getBadMethodDataProvider')]
     public function testListBadMethod(string $method): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -57,9 +56,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         ];
     }
 
-    /**
-     * @dataProvider unauthorizedUserDataProvider
-     */
+    #[DataProvider('unauthorizedUserDataProvider')]
     public function testListUnauthorizedUser(?string $apiToken): void
     {
         $response = self::$staticApplicationClient->makeListJobsRequest($apiToken, $this->suiteId);
@@ -86,11 +83,10 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     }
 
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
      * @param callable(Job[]): array<mixed>                                  $expectedCreator
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void
     {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);

@@ -11,6 +11,7 @@ use App\Services\MachineFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -46,9 +47,7 @@ class MachineFactoryTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->machineFactory);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->machineFactory::getSubscribedEvents();

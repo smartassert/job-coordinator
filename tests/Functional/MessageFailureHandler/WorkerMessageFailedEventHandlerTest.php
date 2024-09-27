@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageFailureHandler;
 
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerMessageFailedEventBundle\HandlerFailedExceptionHandler;
 use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,9 +26,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         $this->handler = $handler;
     }
 
-    /**
-     * @dataProvider hasExpectedWorkerMessageFailedEventHandlerHandlersDataProvider
-     */
+    #[DataProvider('hasExpectedWorkerMessageFailedEventHandlerHandlersDataProvider')]
     public function testHasExpectedWorkerMessageFailedEventHandlerHandlers(string $expectedHandlerClass): void
     {
         $handlerFound = false;
@@ -52,9 +51,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider hasExpectedHandlerFailedExceptionHandlerHandlersDataProvider
-     */
+    #[DataProvider('hasExpectedHandlerFailedExceptionHandlerHandlersDataProvider')]
     public function testHasExpectedHandlerFailedExceptionHandlerHandlers(string $expectedHandlerClass): void
     {
         $handlerFailedExceptionHandler = null;

@@ -18,6 +18,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -84,13 +85,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @dataProvider dispatchMessageNotDispatchedDataProvider
-     *
      * @param callable(JobFactory): ?Job                      $jobCreator
      * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
      * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
      * @param callable(?Job): object                          $eventCreator
      */
+    #[DataProvider('dispatchMessageNotDispatchedDataProvider')]
     public function testDispatchMessageNotDispatched(
         callable $jobCreator,
         callable $resultsJobCreator,
@@ -230,10 +230,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @dataProvider dispatchSuccessDataProvider
-     *
      * @param callable(Job): object $eventCreator
      */
+    #[DataProvider('dispatchSuccessDataProvider')]
     public function testDispatchSuccess(callable $eventCreator): void
     {
         $job = $this->jobFactory->createRandom();

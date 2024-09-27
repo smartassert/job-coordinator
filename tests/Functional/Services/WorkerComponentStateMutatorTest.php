@@ -13,6 +13,7 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerComponentStateMutator;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -49,9 +50,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $this->workerComponentStateMutator = $workerComponentStateMutator;
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->workerComponentStateMutator::getSubscribedEvents();
@@ -101,14 +100,13 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setOnWorkerStateRetrievedEventSuccessDataProvider
-     *
      * @param callable(Job, WorkerComponentStateRepository): void $componentStateCreator
      * @param callable(Job): WorkerComponentState                 $expectedApplicationStateCreator
      * @param callable(Job): WorkerComponentState                 $expectedCompilationStateCreator
      * @param callable(Job): WorkerComponentState                 $expectedExecutionStateCreator
      * @param callable(Job): WorkerComponentState                 $expectedEventDeliveryStateCreator
      */
+    #[DataProvider('setOnWorkerStateRetrievedEventSuccessDataProvider')]
     public function testSetOnWorkerStateRetrievedEventSuccess(
         callable $componentStateCreator,
         ApplicationState $retrievedApplicationState,

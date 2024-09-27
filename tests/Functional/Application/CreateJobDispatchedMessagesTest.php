@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Application;
 use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -36,9 +37,7 @@ class CreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
         self::assertCount(2, self::$envelopes);
     }
 
-    /**
-     * @dataProvider messageIsDispatchedDataProvider
-     */
+    #[DataProvider('messageIsDispatchedDataProvider')]
     public function testMessageIsDispatched(callable $expectedMessageCreator): void
     {
         $expectedMessage = $expectedMessageCreator();

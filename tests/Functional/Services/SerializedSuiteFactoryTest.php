@@ -12,6 +12,7 @@ use App\Services\SerializedSuiteFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -53,9 +54,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->serializedSuiteFactory);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->serializedSuiteFactory::getSubscribedEvents();

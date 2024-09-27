@@ -13,6 +13,7 @@ use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -53,9 +54,7 @@ class MachineMutatorTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->machineMutator);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->machineMutator::getSubscribedEvents();
@@ -87,13 +86,12 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setStateOnMachineStateChangeEventDataProvider
-     *
      * @param callable(JobFactory): ?Job              $jobCreator
      * @param callable(?Job, MachineRepository): void $machineCreator
      * @param callable(?Job): MachineStateChangeEvent $eventCreator
      * @param callable(?Job): ?Machine                $expectedMachineCreator
      */
+    #[DataProvider('setStateOnMachineStateChangeEventDataProvider')]
     public function testSetStateOnMachineStateChangeEvent(
         callable $jobCreator,
         callable $machineCreator,
@@ -215,13 +213,12 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setIpOnMachineIsActiveEventDataProvider
-     *
      * @param callable(JobFactory): ?Job              $jobCreator
      * @param callable(?Job, MachineRepository): void $machineCreator
      * @param callable(?Job): MachineIsActiveEvent    $eventCreator
      * @param callable(?Job): ?Machine                $expectedMachineCreator
      */
+    #[DataProvider('setIpOnMachineIsActiveEventDataProvider')]
     public function testSetIpOnMachineIsActiveEvent(
         callable $jobCreator,
         callable $machineCreator,

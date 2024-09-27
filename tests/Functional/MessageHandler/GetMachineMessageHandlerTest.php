@@ -18,6 +18,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -81,11 +82,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @dataProvider invokeNoStateChangeDataProvider
-     *
      * @param callable(Job): Machine $previousMachineCreator
      * @param callable(Job): Machine $currentMachineCreator
      */
+    #[DataProvider('invokeNoStateChangeDataProvider')]
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -126,12 +126,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @dataProvider invokeHasStateChangeDataProvider
-     *
      * @param callable(Job): Machine       $previousMachineCreator
      * @param callable(Job): Machine       $currentMachineCreator
      * @param callable(Job, string): Event $expectedEventCreator
      */
+    #[DataProvider('invokeHasStateChangeDataProvider')]
     public function testInvokeHasStateChange(
         callable $previousMachineCreator,
         callable $currentMachineCreator,
@@ -191,12 +190,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @dataProvider invokeHasEndStateChangeDataProvider
-     *
      * @param callable(Job): Machine $previousMachineCreator
      * @param callable(Job): Machine $currentMachineCreator
      * @param class-string           $expectedEventClass
      */
+    #[DataProvider('invokeHasEndStateChangeDataProvider')]
     public function testInvokeHasEndStateChange(
         callable $previousMachineCreator,
         callable $currentMachineCreator,

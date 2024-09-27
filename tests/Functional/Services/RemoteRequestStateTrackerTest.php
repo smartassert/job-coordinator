@@ -11,6 +11,7 @@ use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestStateTracker;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -48,9 +49,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->remoteRequestStateTracker);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->remoteRequestStateTracker::getSubscribedEvents();
@@ -86,10 +85,9 @@ class RemoteRequestStateTrackerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setRemoteRequestStateForMessageFailedEventDataProvider
-     *
      * @param callable(): WorkerMessageFailedEvent $eventCreator
      */
+    #[DataProvider('setRemoteRequestStateForMessageFailedEventDataProvider')]
     public function testSetRemoteRequestStateForMessageFailedEvent(
         callable $eventCreator,
         RequestState $expectedRequestState

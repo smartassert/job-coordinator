@@ -10,6 +10,7 @@ use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -39,9 +40,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->dispatcher::getSubscribedEvents();

@@ -10,6 +10,7 @@ use App\Message\GetWorkerStateMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -40,9 +41,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->dispatcher::getSubscribedEvents();

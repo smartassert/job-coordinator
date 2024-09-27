@@ -10,6 +10,7 @@ use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -33,9 +34,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->dispatcher::getSubscribedEvents();

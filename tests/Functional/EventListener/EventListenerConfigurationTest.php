@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerMessageFailedEventBundle\WorkerMessageFailedEventHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -11,9 +12,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 
 class EventListenerConfigurationTest extends WebTestCase
 {
-    /**
-     * @dataProvider eventListenersAreDefinedDataProvider
-     */
+    #[DataProvider('eventListenersAreDefinedDataProvider')]
     public function testEventListenersAreDefined(
         string $eventName,
         string $expectedListenerClass,

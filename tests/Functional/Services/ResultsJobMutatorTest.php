@@ -11,6 +11,7 @@ use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -46,9 +47,7 @@ class ResultsJobMutatorTest extends WebTestCase
         $this->resultsJobMutator = $resultsJobMutator;
     }
 
-    /**
-     * @dataProvider eventSubscriptionsDataProvider
-     */
+    #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
         $subscribedEvents = $this->resultsJobMutator::getSubscribedEvents();
@@ -76,13 +75,12 @@ class ResultsJobMutatorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider setStateSuccessDataProvider
-     *
      * @param callable(JobFactory): ?Job                    $jobCreator
      * @param callable(?Job, ResultsJobRepository): void    $resultsJobCreator
      * @param callable(?Job): ResultsJobStateRetrievedEvent $eventCreator
      * @param callable(?Job): ?ResultsJob                   $expectedResultsJobCreator
      */
+    #[DataProvider('setStateSuccessDataProvider')]
     public function testSetStateSuccess(
         callable $jobCreator,
         callable $resultsJobCreator,
