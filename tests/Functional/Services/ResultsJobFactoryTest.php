@@ -67,7 +67,7 @@ class ResultsJobFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             ResultsJobCreatedEvent::class => [

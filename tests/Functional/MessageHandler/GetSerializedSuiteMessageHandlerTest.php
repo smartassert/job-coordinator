@@ -59,7 +59,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     /**
      * @return array<mixed>
      */
-    public function serializedSuiteEndStateDataProvider(): array
+    public static function serializedSuiteEndStateDataProvider(): array
     {
         return [
             'prepared' => [
@@ -153,7 +153,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     /**
      * @return array<mixed>
      */
-    public function invokeNotEndStateDataProvider(): array
+    public static function invokeNotEndStateDataProvider(): array
     {
         $state = md5((string) rand());
 

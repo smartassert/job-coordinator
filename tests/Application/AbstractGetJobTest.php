@@ -35,7 +35,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function getBadMethodDataProvider(): array
+    public static function getBadMethodDataProvider(): array
     {
         return [
             'PUT' => [
@@ -60,7 +60,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function unauthorizedUserDataProvider(): array
+    public static function unauthorizedUserDataProvider(): array
     {
         return [
             'no user token' => [

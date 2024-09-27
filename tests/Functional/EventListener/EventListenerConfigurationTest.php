@@ -68,7 +68,7 @@ class EventListenerConfigurationTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventListenersAreDefinedDataProvider(): array
+    public static function eventListenersAreDefinedDataProvider(): array
     {
         return [
             WorkerMessageFailedEventHandler::class . ' listens for ' . WorkerMessageFailedEvent::class => [

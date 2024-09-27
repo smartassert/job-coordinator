@@ -72,7 +72,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             SerializedSuiteRetrievedEvent::class => [
@@ -113,7 +113,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setStateSuccessDataProvider(): array
+    public static function setStateSuccessDataProvider(): array
     {
         $serializedSuiteId = md5((string) rand());
         $jobCreator = function (JobFactory $jobFactory) {

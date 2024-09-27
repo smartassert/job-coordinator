@@ -20,7 +20,7 @@ class RemoteRequestTypeTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function isRepeatableDataProvider(): array
+    public static function isRepeatableDataProvider(): array
     {
         return [
             RemoteRequestType::MACHINE_CREATE->value => [

@@ -68,7 +68,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             WorkerStateRetrievedEvent::class => [
@@ -159,7 +159,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setOnWorkerStateRetrievedEventSuccessDataProvider(): array
+    public static function setOnWorkerStateRetrievedEventSuccessDataProvider(): array
     {
         $applicationStates = [
             new ApplicationState(

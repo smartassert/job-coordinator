@@ -114,7 +114,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function noRemoteRequestsDataProvider(): array
+    public static function noRemoteRequestsDataProvider(): array
     {
         return [
             'no remote requests' => [
@@ -138,7 +138,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function noRemoteRequestsForTypeDataProvider(): array
+    public static function noRemoteRequestsForTypeDataProvider(): array
     {
         return [
             'no remote requests for machine/create' => [
@@ -174,7 +174,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function singleRequestForTypeDataProvider(): array
+    public static function singleRequestForTypeDataProvider(): array
     {
         return [
             'single remote request for machine/create, no remote request failure' => [
@@ -244,7 +244,7 @@ class RemoteRequestRemoverTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function multipleRequestsForTypeDataProvider(): array
+    public static function multipleRequestsForTypeDataProvider(): array
     {
         return [
             'multiple remote requests for machine/create, no remote request failures' => [

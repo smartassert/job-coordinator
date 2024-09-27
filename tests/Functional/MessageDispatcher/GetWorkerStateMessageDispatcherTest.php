@@ -59,7 +59,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             WorkerJobStartRequestedEvent::class => [

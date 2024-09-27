@@ -57,7 +57,7 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function generateDataProvider(): array
+    public static function generateDataProvider(): array
     {
         $jobId = md5((string) rand());
 

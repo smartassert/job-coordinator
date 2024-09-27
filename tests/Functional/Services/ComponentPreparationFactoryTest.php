@@ -111,7 +111,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getAllDataProvider(): array
+    public static function getAllDataProvider(): array
     {
         $allEntitiesCreator = function (
             Job $job,

@@ -59,7 +59,7 @@ class CreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
     /**
      * @return array<mixed>
      */
-    public function messageIsDispatchedDataProvider(): array
+    public static function messageIsDispatchedDataProvider(): array
     {
         return [
             CreateResultsJobMessage::class => [

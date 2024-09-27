@@ -77,7 +77,7 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function removeDataProvider(): array
+    public static function removeDataProvider(): array
     {
         return [
             'single remote request failure, no remote requests' => [

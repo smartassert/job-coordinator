@@ -42,7 +42,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function getBadMethodDataProvider(): array
+    public static function getBadMethodDataProvider(): array
     {
         return [
             'POST' => [
@@ -70,7 +70,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function unauthorizedUserDataProvider(): array
+    public static function unauthorizedUserDataProvider(): array
     {
         return [
             'no user token' => [
@@ -131,7 +131,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function listSuccessDataProvider(): array
+    public static function listSuccessDataProvider(): array
     {
         return [
             'no jobs' => [
@@ -154,7 +154,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId, 123)
                     );
 
@@ -188,15 +188,15 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId2, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 789)
                     );
 
@@ -231,15 +231,15 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId2, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($apiToken, $suiteId1, 789)
                     );
 
@@ -274,19 +274,19 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $jobIds = [];
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId1, 123)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user2ApiToken, $suiteId1, 456)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId2, 789)
                     );
 
-                    $jobIds[] = $this->getJobIdFromResponse(
+                    $jobIds[] = self::getJobIdFromResponse(
                         $applicationClient->makeCreateJobRequest($user1ApiToken, $suiteId1, 321)
                     );
 
@@ -315,7 +315,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
         ];
     }
 
-    private function getJobIdFromResponse(ResponseInterface $response): string
+    private static function getJobIdFromResponse(ResponseInterface $response): string
     {
         $responseData = json_decode($response->getBody()->getContents(), true);
         \assert(is_array($responseData));

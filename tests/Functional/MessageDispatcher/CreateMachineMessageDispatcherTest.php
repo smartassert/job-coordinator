@@ -112,7 +112,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function dispatchMessageNotDispatchedDataProvider(): array
+    public static function dispatchMessageNotDispatchedDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
             return new ResultsJobCreatedEvent(
@@ -255,7 +255,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function dispatchSuccessDataProvider(): array
+    public static function dispatchSuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
             return new ResultsJobCreatedEvent(

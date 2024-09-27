@@ -107,7 +107,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function handleSetRemoteRequestFailureDataProvider(): array
+    public static function handleSetRemoteRequestFailureDataProvider(): array
     {
         $remoteRequestExceptionCases = [
             MachineCreationException::class => function (\Throwable $inner) {
@@ -158,7 +158,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             },
         ];
 
-        $innerExceptionCases = $this->remoteRequestFailureCreationDataProvider();
+        $innerExceptionCases = self::remoteRequestFailureCreationDataProvider();
 
         $testCases = [];
 

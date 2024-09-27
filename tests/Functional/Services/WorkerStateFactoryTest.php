@@ -65,7 +65,7 @@ class WorkerStateFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createForJobDataProvider(): array
+    public static function createForJobDataProvider(): array
     {
         return [
             'no component state entities' => [

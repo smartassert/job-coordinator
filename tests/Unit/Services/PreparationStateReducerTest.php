@@ -27,7 +27,7 @@ class PreparationStateReducerTest extends TestCase
     /**
      * @return array<mixed>
      */
-    public function reduceDataProvider(): array
+    public static function reduceDataProvider(): array
     {
         $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
         $serializedSuiteComponent = new JobComponent(

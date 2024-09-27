@@ -65,7 +65,7 @@ class MachineFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             MachineCreationRequestedEvent::class => [

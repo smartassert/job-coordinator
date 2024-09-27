@@ -43,7 +43,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function hasExpectedWorkerMessageFailedEventHandlerHandlersDataProvider(): array
+    public static function hasExpectedWorkerMessageFailedEventHandlerHandlersDataProvider(): array
     {
         return [
             HandlerFailedExceptionHandler::class => [
@@ -80,7 +80,7 @@ class WorkerMessageFailedEventHandlerTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function hasExpectedHandlerFailedExceptionHandlerHandlersDataProvider(): array
+    public static function hasExpectedHandlerFailedExceptionHandlerHandlersDataProvider(): array
     {
         return [
             RemoteRequestExceptionHandler::class => [

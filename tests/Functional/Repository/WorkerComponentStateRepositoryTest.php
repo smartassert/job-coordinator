@@ -55,7 +55,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getAllForJobDataProvider(): array
+    public static function getAllForJobDataProvider(): array
     {
         return [
             'no states' => [

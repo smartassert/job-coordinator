@@ -63,7 +63,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function getLargestIndexDataProvider(): array
+    public static function getLargestIndexDataProvider(): array
     {
         $jobId = md5((string) rand());
 
@@ -150,7 +150,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function hasAnyWithFailureDataProvider(): array
+    public static function hasAnyWithFailureDataProvider(): array
     {
         return [
             'single remote request failure, no remote requests' => [

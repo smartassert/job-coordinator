@@ -72,7 +72,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             MachineStateChangeEvent::class => [
@@ -118,7 +118,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setStateOnMachineStateChangeEventDataProvider(): array
+    public static function setStateOnMachineStateChangeEventDataProvider(): array
     {
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();
@@ -245,7 +245,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setIpOnMachineIsActiveEventDataProvider(): array
+    public static function setIpOnMachineIsActiveEventDataProvider(): array
     {
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();

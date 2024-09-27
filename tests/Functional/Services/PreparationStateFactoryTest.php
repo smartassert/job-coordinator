@@ -111,7 +111,7 @@ class PreparationStateFactoryTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function createDataProvider(): array
+    public static function createDataProvider(): array
     {
         return [
             'pending' => [

@@ -126,7 +126,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeMessageIsRedispatchedDataProvider(): array
+    public static function invokeMessageIsRedispatchedDataProvider(): array
     {
         return [
             'requested' => [

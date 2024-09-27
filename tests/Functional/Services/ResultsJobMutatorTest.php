@@ -65,7 +65,7 @@ class ResultsJobMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function eventSubscriptionsDataProvider(): array
+    public static function eventSubscriptionsDataProvider(): array
     {
         return [
             ResultsJobStateRetrievedEvent::class => [
@@ -106,7 +106,7 @@ class ResultsJobMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public function setStateSuccessDataProvider(): array
+    public static function setStateSuccessDataProvider(): array
     {
         $resultsJobToken = md5((string) rand());
         $jobCreator = function (JobFactory $jobFactory) {

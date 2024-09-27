@@ -123,7 +123,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
     /**
      * @return array<mixed>
      */
-    public function getDataProvider(): array
+    public static function getDataProvider(): array
     {
         $nullCreator = function () {
             return null;

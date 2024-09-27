@@ -111,7 +111,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeNoStateChangeDataProvider(): array
+    public static function invokeNoStateChangeDataProvider(): array
     {
         return [
             'find/received => find/received' => [
@@ -154,7 +154,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeHasStateChangeDataProvider(): array
+    public static function invokeHasStateChangeDataProvider(): array
     {
         return [
             'unknown => find/received' => [
@@ -228,7 +228,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @return array<mixed>
      */
-    public function invokeHasEndStateChangeDataProvider(): array
+    public static function invokeHasEndStateChangeDataProvider(): array
     {
         return [
             'up/active => delete/deleted' => [
