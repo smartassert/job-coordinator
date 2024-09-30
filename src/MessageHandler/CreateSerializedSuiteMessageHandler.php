@@ -46,7 +46,7 @@ final class CreateSerializedSuiteMessageHandler
                 $serializedSuite
             ));
         } catch (\Throwable $e) {
-            throw new SerializedSuiteCreationException($job, $e);
+            throw new SerializedSuiteCreationException($job, $e, $message);
         }
     }
 }

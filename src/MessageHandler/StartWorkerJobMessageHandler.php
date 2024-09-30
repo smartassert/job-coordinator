@@ -83,7 +83,7 @@ final class StartWorkerJobMessageHandler
                 $workerJob,
             ));
         } catch (\Throwable $e) {
-            throw new WorkerJobStartException($job, $e);
+            throw new WorkerJobStartException($job, $e, $message);
         }
     }
 }

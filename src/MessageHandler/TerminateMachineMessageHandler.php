@@ -40,7 +40,7 @@ final class TerminateMachineMessageHandler
                 $job->id
             ));
         } catch (\Throwable $e) {
-            throw new MachineTerminationException($job, $e);
+            throw new MachineTerminationException($job, $e, $message);
         }
     }
 }

@@ -39,7 +39,7 @@ final class CreateMachineMessageHandler
                 new MachineCreationRequestedEvent($message->authenticationToken, $machine)
             );
         } catch (\Throwable $e) {
-            throw new MachineCreationException($job, $e);
+            throw new MachineCreationException($job, $e, $message);
         }
     }
 }

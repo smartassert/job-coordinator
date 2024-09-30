@@ -41,7 +41,7 @@ final class GetWorkerStateMessageHandler
                 $workerClient->getApplicationState()
             ));
         } catch (\Throwable $e) {
-            throw new WorkerStateRetrievalException($job, $e);
+            throw new WorkerStateRetrievalException($job, $e, $message);
         }
     }
 }

@@ -46,7 +46,7 @@ final class GetResultsJobStateMessageHandler
                 $resultsJobState
             ));
         } catch (\Throwable $e) {
-            throw new ResultsJobStateRetrievalException($job, $e);
+            throw new ResultsJobStateRetrievalException($job, $e, $message);
         }
     }
 }

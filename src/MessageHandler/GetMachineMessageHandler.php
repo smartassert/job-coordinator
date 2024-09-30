@@ -43,7 +43,7 @@ final class GetMachineMessageHandler
                 $machine
             ));
         } catch (\Throwable $e) {
-            throw new MachineRetrievalException($job, $previousMachine, $e);
+            throw new MachineRetrievalException($job, $previousMachine, $e, $message);
         }
     }
 }

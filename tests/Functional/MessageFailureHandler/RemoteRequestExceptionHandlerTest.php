@@ -19,6 +19,14 @@ use App\Exception\ResultsJobStateRetrievalException;
 use App\Exception\SerializedSuiteCreationException;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Exception\WorkerJobStartException;
+use App\Message\CreateMachineMessage;
+use App\Message\CreateResultsJobMessage;
+use App\Message\CreateSerializedSuiteMessage;
+use App\Message\GetMachineMessage;
+use App\Message\GetResultsJobStateMessage;
+use App\Message\GetSerializedSuiteMessage;
+use App\Message\StartWorkerJobMessage;
+use App\Message\TerminateMachineMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -112,48 +120,82 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
         $remoteRequestExceptionCases = [
             MachineCreationException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new MachineCreationException($job, $inner);
+                    return new MachineCreationException(
+                        $job,
+                        $inner,
+                        new CreateMachineMessage(md5((string) rand()), $job->id),
+                    );
                 };
             },
             MachineRetrievalException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
+                    $machine = MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
+
                     return new MachineRetrievalException(
                         $job,
-                        MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []),
-                        $inner
+                        $machine,
+                        $inner,
+                        new GetMachineMessage(md5((string) rand()), $job->id, $machine),
                     );
                 };
             },
             ResultsJobCreationException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new ResultsJobCreationException($job, $inner);
+                    return new ResultsJobCreationException(
+                        $job,
+                        $inner,
+                        new CreateResultsJobMessage(md5((string) rand()), $job->id),
+                    );
                 };
             },
             SerializedSuiteCreationException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new SerializedSuiteCreationException($job, $inner);
+                    return new SerializedSuiteCreationException(
+                        $job,
+                        $inner,
+                        new CreateSerializedSuiteMessage(md5((string) rand()), $job->id, []),
+                    );
                 };
             },
             SerializedSuiteRetrievalException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+                    $serializedSuiteId = md5((string) rand());
 
-                    return new SerializedSuiteRetrievalException($job, $serializedSuite, $inner);
+                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
+
+                    return new SerializedSuiteRetrievalException(
+                        $job,
+                        $serializedSuite,
+                        $inner,
+                        new GetSerializedSuiteMessage(md5((string) rand()), $job->id, $serializedSuiteId),
+                    );
                 };
             },
             WorkerJobStartException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new WorkerJobStartException($job, $inner);
+                    return new WorkerJobStartException(
+                        $job,
+                        $inner,
+                        new StartWorkerJobMessage(md5((string) rand()), $job->id, '127.0.0.1'),
+                    );
                 };
             },
             ResultsJobStateRetrievalException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new ResultsJobStateRetrievalException($job, $inner);
+                    return new ResultsJobStateRetrievalException(
+                        $job,
+                        $inner,
+                        new GetResultsJobStateMessage(md5((string) rand()), $job->id),
+                    );
                 };
             },
             MachineTerminationException::class => function (\Throwable $inner) {
                 return function (Job $job) use ($inner) {
-                    return new MachineTerminationException($job, $inner);
+                    return new MachineTerminationException(
+                        $job,
+                        $inner,
+                        new TerminateMachineMessage(md5((string) rand()), $job->id),
+                    );
                 };
             },
         ];
