@@ -26,4 +26,9 @@ class FallbackHandler implements JobComponentHandlerInterface
     {
         return RequestState::PENDING;
     }
+
+    public function hasFailed(JobComponent $jobComponent, Job $job): bool
+    {
+        return false;
+    }
 }
