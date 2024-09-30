@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Entity\Job;
+use App\Message\JobRemoteRequestMessageInterface;
 
 abstract class AbstractRemoteRequestException extends \Exception implements RemoteRequestExceptionInterface
 {
@@ -12,6 +13,7 @@ abstract class AbstractRemoteRequestException extends \Exception implements Remo
         private readonly Job $job,
         private readonly \Throwable $previousException,
         string $message,
+        private readonly JobRemoteRequestMessageInterface $failedMessage,
     ) {
         parent::__construct($message, 0, $previousException);
     }
@@ -24,5 +26,10 @@ abstract class AbstractRemoteRequestException extends \Exception implements Remo
     public function getPreviousException(): \Throwable
     {
         return $this->previousException;
+    }
+
+    public function getFailedMessage(): JobRemoteRequestMessageInterface
+    {
+        return $this->failedMessage;
     }
 }

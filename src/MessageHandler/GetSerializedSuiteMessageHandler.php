@@ -56,7 +56,7 @@ final class GetSerializedSuiteMessageHandler
                 $serializedSuiteModel
             ));
         } catch (\Throwable $e) {
-            throw new SerializedSuiteRetrievalException($job, $serializedSuiteEntity, $e);
+            throw new SerializedSuiteRetrievalException($job, $serializedSuiteEntity, $e, $message);
         }
     }
 }

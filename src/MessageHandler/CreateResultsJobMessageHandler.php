@@ -40,7 +40,7 @@ final class CreateResultsJobMessageHandler
                 $resultsJob
             ));
         } catch (\Throwable $e) {
-            throw new ResultsJobCreationException($job, $e);
+            throw new ResultsJobCreationException($job, $e, $message);
         }
     }
 }
