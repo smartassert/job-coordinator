@@ -83,6 +83,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     #[DataProvider('handleSetRemoteRequestFailureDataProvider')]
     public function testHandleSetRemoteRequestFailure(
         callable $exceptionCreator,
+        RemoteRequestType $remoteRequestType,
         RemoteRequestFailureType $expectedType,
         int $expectedCode,
         string $expectedMessage,
@@ -91,7 +92,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         $exception = $exceptionCreator($this->job);
 
-        $remoteRequest = new RemoteRequest($this->job->id, RemoteRequestType::RESULTS_CREATE, 1);
+        $remoteRequest = new RemoteRequest($this->job->id, $remoteRequestType, 0);
         $this->remoteRequestRepository->save($remoteRequest);
 
         self::assertNull($remoteRequest->getFailure());
@@ -118,93 +119,116 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     public static function handleSetRemoteRequestFailureDataProvider(): array
     {
         $remoteRequestExceptionCases = [
-            MachineCreationException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new MachineCreationException(
-                        $job,
-                        $inner,
-                        new CreateMachineMessage(md5((string) rand()), $job->id),
-                    );
-                };
-            },
-            MachineRetrievalException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    $machine = MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
+            MachineCreationException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new MachineCreationException(
+                            $job,
+                            $inner,
+                            new CreateMachineMessage(md5((string) rand()), $job->id),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::MACHINE_CREATE,
+            ],
+            MachineRetrievalException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        $machine = MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
 
-                    return new MachineRetrievalException(
-                        $job,
-                        $machine,
-                        $inner,
-                        new GetMachineMessage(md5((string) rand()), $job->id, $machine),
-                    );
-                };
-            },
-            ResultsJobCreationException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new ResultsJobCreationException(
-                        $job,
-                        $inner,
-                        new CreateResultsJobMessage(md5((string) rand()), $job->id),
-                    );
-                };
-            },
-            SerializedSuiteCreationException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new SerializedSuiteCreationException(
-                        $job,
-                        $inner,
-                        new CreateSerializedSuiteMessage(md5((string) rand()), $job->id, []),
-                    );
-                };
-            },
-            SerializedSuiteRetrievalException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    $serializedSuiteId = md5((string) rand());
+                        return new MachineRetrievalException(
+                            $job,
+                            $machine,
+                            $inner,
+                            new GetMachineMessage(md5((string) rand()), $job->id, $machine),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::MACHINE_GET,
+            ],
+            ResultsJobCreationException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new ResultsJobCreationException(
+                            $job,
+                            $inner,
+                            new CreateResultsJobMessage(md5((string) rand()), $job->id),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::RESULTS_CREATE,
+            ],
+            SerializedSuiteCreationException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new SerializedSuiteCreationException(
+                            $job,
+                            $inner,
+                            new CreateSerializedSuiteMessage(md5((string) rand()), $job->id, []),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::SERIALIZED_SUITE_CREATE,
+            ],
+            SerializedSuiteRetrievalException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        $serializedSuiteId = md5((string) rand());
 
-                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
+                        $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
 
-                    return new SerializedSuiteRetrievalException(
-                        $job,
-                        $serializedSuite,
-                        $inner,
-                        new GetSerializedSuiteMessage(md5((string) rand()), $job->id, $serializedSuiteId),
-                    );
-                };
-            },
-            WorkerJobStartException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new WorkerJobStartException(
-                        $job,
-                        $inner,
-                        new StartWorkerJobMessage(md5((string) rand()), $job->id, '127.0.0.1'),
-                    );
-                };
-            },
-            ResultsJobStateRetrievalException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new ResultsJobStateRetrievalException(
-                        $job,
-                        $inner,
-                        new GetResultsJobStateMessage(md5((string) rand()), $job->id),
-                    );
-                };
-            },
-            MachineTerminationException::class => function (\Throwable $inner) {
-                return function (Job $job) use ($inner) {
-                    return new MachineTerminationException(
-                        $job,
-                        $inner,
-                        new TerminateMachineMessage(md5((string) rand()), $job->id),
-                    );
-                };
-            },
+                        return new SerializedSuiteRetrievalException(
+                            $job,
+                            $serializedSuite,
+                            $inner,
+                            new GetSerializedSuiteMessage(md5((string) rand()), $job->id, $serializedSuiteId),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::SERIALIZED_SUITE_GET,
+            ],
+            WorkerJobStartException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new WorkerJobStartException(
+                            $job,
+                            $inner,
+                            new StartWorkerJobMessage(md5((string) rand()), $job->id, '127.0.0.1'),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::MACHINE_START_JOB,
+            ],
+            ResultsJobStateRetrievalException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new ResultsJobStateRetrievalException(
+                            $job,
+                            $inner,
+                            new GetResultsJobStateMessage(md5((string) rand()), $job->id),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::RESULTS_STATE_GET,
+            ],
+            MachineTerminationException::class => [
+                'exceptionCreator' => function (\Throwable $inner) {
+                    return function (Job $job) use ($inner) {
+                        return new MachineTerminationException(
+                            $job,
+                            $inner,
+                            new TerminateMachineMessage(md5((string) rand()), $job->id),
+                        );
+                    };
+                },
+                'remoteRequestType' => RemoteRequestType::MACHINE_TERMINATE,
+            ],
         ];
 
         $innerExceptionCases = self::remoteRequestFailureCreationDataProvider();
 
         $testCases = [];
-
-        foreach ($remoteRequestExceptionCases as $exceptionClass => $exceptionCreator) {
+        foreach ($remoteRequestExceptionCases as $exceptionClass => $testCaseProperties) {
             foreach ($innerExceptionCases as $innerExceptionCase) {
                 $inner = $innerExceptionCase['throwable'];
                 unset($innerExceptionCase['throwable']);
@@ -218,7 +242,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 );
 
                 $testCase = array_merge(
-                    ['exceptionCreator' => $exceptionCreator($inner)],
+                    [
+                        'exceptionCreator' => ($testCaseProperties['exceptionCreator'])($inner),
+                        'remoteRequestType' => $testCaseProperties['remoteRequestType'],
+                    ],
                     $innerExceptionCase,
                 );
 
