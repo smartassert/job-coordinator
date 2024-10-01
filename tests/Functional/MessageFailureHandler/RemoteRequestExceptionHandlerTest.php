@@ -92,7 +92,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         $exception = $exceptionCreator($this->job);
 
-        $remoteRequest = new RemoteRequest($this->job->id, $remoteRequestType, 1);
+        $remoteRequest = new RemoteRequest($this->job->id, $remoteRequestType, 0);
         $this->remoteRequestRepository->save($remoteRequest);
 
         self::assertNull($remoteRequest->getFailure());
