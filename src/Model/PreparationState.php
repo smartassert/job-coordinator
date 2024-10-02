@@ -13,7 +13,7 @@ use App\Enum\PreparationState as PreparationStateEnum;
  * @phpstan-type SerializedPreparationState array{
  *   state: value-of<PreparationStateEnum>,
  *   request_states: SerializedRequestStates,
- *   failures?: SerializedComponentFailures
+ *   failures: SerializedComponentFailures
  * }
  */
 class PreparationState
@@ -30,17 +30,10 @@ class PreparationState
      */
     public function toArray(): array
     {
-        $data = [
+        return [
             'state' => $this->state->value,
+            'request_states' => $this->requestStates->toArray(),
+            'failures' => $this->componentFailures->toArray(),
         ];
-
-        $data['request_states'] = $this->requestStates->toArray();
-
-        $componentFailuresData = $this->componentFailures->toArray();
-        if (0 !== count($componentFailuresData)) {
-            $data['failures'] = $componentFailuresData;
-        }
-
-        return $data;
     }
 }
