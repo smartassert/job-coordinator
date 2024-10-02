@@ -11,7 +11,7 @@ use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
  *
  * @phpstan-type SerializedComponentFailures array<non-empty-string, RemoteRequestFailureEntity|null>
  */
-class ComponentFailures
+class ComponentFailures implements \JsonSerializable
 {
     /**
      * @param ComponentFailure[] $componentFailures
@@ -24,16 +24,12 @@ class ComponentFailures
     /**
      * @return SerializedComponentFailures
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $data = [];
 
         foreach ($this->componentFailures as $componentFailure) {
-            $failure = $componentFailure->failure;
-
-            $data[$componentFailure->componentName] = $failure instanceof RemoteRequestFailureEntity
-                ? $failure
-                : null;
+            $data[$componentFailure->componentName] = $componentFailure->failure;
         }
 
         return $data;

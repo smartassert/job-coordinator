@@ -9,12 +9,10 @@ use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
 
 /**
- * @phpstan-import-type SerializedComponentFailures from ComponentFailures
- *
  * @phpstan-type SerializedPreparationState array{
  *   state: value-of<PreparationStateEnum>,
  *   request_states: array<RequestState>,
- *   failures: SerializedComponentFailures
+ *   failures: ComponentFailures
  * }
  */
 class PreparationState implements \JsonSerializable
@@ -37,7 +35,7 @@ class PreparationState implements \JsonSerializable
         return [
             'state' => $this->state->value,
             'request_states' => $this->requestStates,
-            'failures' => $this->componentFailures->toArray(),
+            'failures' => $this->componentFailures,
         ];
     }
 }
