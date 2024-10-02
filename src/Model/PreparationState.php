@@ -11,7 +11,7 @@ use App\Enum\RequestState;
 
 /**
  * @phpstan-type SerializedPreparationState array{
- *   state: value-of<PreparationStateEnum>,
+ *   state: PreparationStateEnum,
  *   request_states: array<RequestState>,
  *   failures: array<value-of<JobComponentName>, RemoteRequestFailure|null>
  * }
@@ -35,7 +35,7 @@ class PreparationState implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state' => $this->state->value,
+            'state' => $this->state,
             'request_states' => $this->requestStates,
             'failures' => $this->componentFailures,
         ];
