@@ -9,7 +9,7 @@ use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
 /**
  * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailureEntity
  *
- * @phpstan-type SerializedComponentFailures array<non-empty-string, SerializedRemoteRequestFailure|null>
+ * @phpstan-type SerializedComponentFailures array<non-empty-string, RemoteRequestFailureEntity|null>
  */
 class ComponentFailures
 {
@@ -30,9 +30,10 @@ class ComponentFailures
 
         foreach ($this->componentFailures as $componentFailure) {
             $failure = $componentFailure->failure;
-            $failureData = $failure instanceof RemoteRequestFailureEntity ? $failure->toArray() : null;
 
-            $data[$componentFailure->componentName] = $failureData;
+            $data[$componentFailure->componentName] = $failure instanceof RemoteRequestFailureEntity
+                ? $failure
+                : null;
         }
 
         return $data;

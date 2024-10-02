@@ -28,7 +28,7 @@ class RemoteRequest implements RemoteRequestInterface
         ];
 
         if ($this->failure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->failure->toArray();
+            $data['failure'] = $this->failure;
         }
 
         return $data;

@@ -12,7 +12,7 @@ use App\Enum\RequestState;
  *
  * @phpstan-type SerializedRemoteRequest array{
  *   state: value-of<RequestState>,
- *   failure?: SerializedRemoteRequestFailure
+ *   failure?: RemoteRequestFailure
  * }
  */
 interface RemoteRequestInterface

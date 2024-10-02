@@ -11,13 +11,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @phpstan-type SerializedRemoteRequestFailure array{
- *   type: value-of<RemoteRequestFailureType>,
+ *   type: RemoteRequestFailureType,
  *   code: int,
  *   message: ?string
  * }
  */
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
-class RemoteRequestFailure
+class RemoteRequestFailure implements \JsonSerializable
 {
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
     private readonly RemoteRequestFailureType $type;
@@ -54,10 +54,10 @@ class RemoteRequestFailure
     /**
      * @return SerializedRemoteRequestFailure
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
-            'type' => $this->type->value,
+            'type' => $this->type,
             'code' => $this->code,
             'message' => $this->message,
         ];

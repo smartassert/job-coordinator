@@ -58,10 +58,10 @@ class RemoteRequestFailureFactoryTest extends WebTestCase
 
         self::assertInstanceOf(RemoteRequestFailureEntity::class, $remoteRequestFailure);
 
-        $remoteRequestFailureData = $remoteRequestFailure->toArray();
-        self::assertSame($expectedType->value, $remoteRequestFailureData['type']);
-        self::assertSame($expectedCode, $remoteRequestFailureData['code']);
-        self::assertSame($expectedMessage, $remoteRequestFailureData['message']);
+        self::assertEquals(
+            new RemoteRequestFailureEntity($expectedType, $expectedCode, $expectedMessage),
+            $remoteRequestFailure
+        );
     }
 
     public function testExistingEntityIsReturned(): void
