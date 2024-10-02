@@ -18,7 +18,6 @@ use App\Repository\SerializedSuiteRepository;
 
 /**
  * @phpstan-import-type SerializedPreparationState from PreparationStateFactory
- * @phpstan-import-type SerializedWorkerState from WorkerState
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
@@ -42,7 +41,7 @@ class JobSerializer
      *   results_job: ResultsJob|null,
      *   serialized_suite: SerializedSuite|null,
      *   machine: Machine|null,
-     *   worker_job: SerializedWorkerState,
+     *   worker_job: WorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
      */
@@ -54,9 +53,7 @@ class JobSerializer
         $data[JobComponentName::RESULTS_JOB->value] = $this->resultsJobRepository->find($job->id);
         $data[JobComponentName::SERIALIZED_SUITE->value] = $this->serializedSuiteRepository->find($job->id);
         $data[JobComponentName::MACHINE->value] = $this->machineRepository->find($job->id);
-
-        $workerState = $this->workerStateFactory->createForJob($job);
-        $data[JobComponentName::WORKER_JOB->value] = $workerState->toArray();
+        $data[JobComponentName::WORKER_JOB->value] = $this->workerStateFactory->createForJob($job);
 
         $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
         $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
