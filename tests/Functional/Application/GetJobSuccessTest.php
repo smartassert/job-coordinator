@@ -166,6 +166,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -225,6 +226,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -311,6 +313,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -406,6 +409,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => $resultsJob->getState(),
@@ -460,6 +464,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => $resultsJob->getState(),
@@ -522,6 +527,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -581,6 +587,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'requesting',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -656,6 +663,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker_job' => 'pending',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -746,6 +754,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker_job' => 'succeeded',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => null,
@@ -844,6 +853,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker_job' => 'succeeded',
                             ],
+                            'failures' => [],
                         ],
                         'results_job' => [
                             'state' => 'awaiting-events',
