@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\ResultsJobInterface;
 use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
-class ResultsJob implements ResultsJobInterface
+class ResultsJob implements \JsonSerializable
 {
     /**
      * @var non-empty-string
@@ -81,5 +80,16 @@ class ResultsJob implements ResultsJobInterface
         $this->endState = $state;
 
         return $this;
+    }
+
+    /**
+     * @return array{state: ?non-empty-string,  end_state: ?non-empty-string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'state' => $this->state ?? null,
+            'end_state' => $this->endState ?? null,
+        ];
     }
 }
