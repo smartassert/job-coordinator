@@ -170,10 +170,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => null,
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -225,10 +222,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => null,
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -307,10 +301,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => null,
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -401,10 +392,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'end_state' => null,
                         ],
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -454,10 +442,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'end_state' => $resultsJob->getEndState(),
                         ],
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -514,10 +499,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'serialized_suite' => [
                             'state' => 'prepared',
                         ],
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -569,10 +551,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => null,
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,
@@ -927,10 +906,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'results_job' => null,
                         'serialized_suite' => null,
-                        'machine' => [
-                            'state_category' => null,
-                            'ip_address' => null,
-                        ],
+                        'machine' => null,
                         'worker_job' => [
                             'state' => 'pending',
                             'is_end_state' => false,

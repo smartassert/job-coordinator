@@ -45,7 +45,7 @@ class JobSerializer
      *   preparation: SerializedPreparationState,
      *   results_job: SerializedResultsJob|null,
      *   serialized_suite: SerializedSerializedSuite|null,
-     *   machine: SerializedMachine,
+     *   machine: SerializedMachine|null,
      *   worker_job: SerializedWorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
@@ -73,8 +73,12 @@ class JobSerializer
         }
 
         $machine = $this->machineRepository->find($job->id);
-        $machineModel = new Machine($machine);
-        $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
+        if ($machine instanceof \App\Entity\Machine) {
+            $machineModel = new Machine($machine);
+            $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
+        } else {
+            $data[JobComponentName::MACHINE->value] = null;
+        }
 
         $workerState = $this->workerStateFactory->createForJob($job);
         $data[JobComponentName::WORKER_JOB->value] = $workerState->toArray();
