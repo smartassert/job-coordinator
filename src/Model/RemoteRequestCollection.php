@@ -14,7 +14,7 @@ namespace App\Model;
  *   }
  * >
  */
-class RemoteRequestCollection
+class RemoteRequestCollection implements \JsonSerializable
 {
     /**
      * @param iterable<RemoteRequestInterface&TypedRemoteRequestInterface> $requests
@@ -27,7 +27,7 @@ class RemoteRequestCollection
     /**
      * @return SerializedRemoteRequestCollection
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $requestsByType = [];
         foreach ($this->requests as $request) {

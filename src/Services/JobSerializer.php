@@ -54,9 +54,9 @@ class JobSerializer
         $data[JobComponentName::SERIALIZED_SUITE->value] = $this->serializedSuiteRepository->find($job->id);
         $data[JobComponentName::MACHINE->value] = $this->machineRepository->find($job->id);
         $data[JobComponentName::WORKER_JOB->value] = $this->workerStateFactory->createForJob($job);
-
-        $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
-        $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
+        $data['service_requests'] = new RemoteRequestCollection(
+            $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC'])
+        );
 
         return $data;
     }
