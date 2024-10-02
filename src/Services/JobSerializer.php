@@ -44,7 +44,7 @@ class JobSerializer
      *   maximum_duration_in_seconds: positive-int,
      *   preparation: SerializedPreparationState,
      *   results_job: SerializedResultsJob|null,
-     *   serialized_suite: SerializedSerializedSuite,
+     *   serialized_suite: SerializedSerializedSuite|null,
      *   machine: SerializedMachine,
      *   worker_job: SerializedWorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
@@ -65,8 +65,13 @@ class JobSerializer
         }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        $serializedSuiteModel = new SerializedSuite($serializedSuite);
-        $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
+
+        if ($serializedSuite instanceof \App\Entity\SerializedSuite) {
+            $serializedSuiteModel = new SerializedSuite($serializedSuite);
+            $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
+        } else {
+            $data[JobComponentName::SERIALIZED_SUITE->value] = null;
+        }
 
         $machine = $this->machineRepository->find($job->id);
         $machineModel = new Machine($machine);
