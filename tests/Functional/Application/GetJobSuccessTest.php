@@ -169,9 +169,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -226,9 +224,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -310,9 +306,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -406,9 +400,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => $resultsJob->getState(),
                             'end_state' => null,
                         ],
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -461,9 +453,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => $resultsJob->getState(),
                             'end_state' => $resultsJob->getEndState(),
                         ],
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -578,9 +568,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
@@ -651,9 +639,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
@@ -739,9 +725,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
@@ -942,9 +926,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'results_job' => null,
-                        'serialized_suite' => [
-                            'state' => null,
-                        ],
+                        'serialized_suite' => null,
                         'machine' => [
                             'state_category' => null,
                             'ip_address' => null,
