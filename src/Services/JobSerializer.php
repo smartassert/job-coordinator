@@ -65,7 +65,6 @@ class JobSerializer
         }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-
         if ($serializedSuite instanceof \App\Entity\SerializedSuite) {
             $serializedSuiteModel = new SerializedSuite($serializedSuite);
             $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
