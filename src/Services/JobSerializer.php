@@ -42,7 +42,7 @@ class JobSerializer
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   preparation: SerializedPreparationState,
+     *   preparation: PreparationState,
      *   results_job: SerializedResultsJob|null,
      *   serialized_suite: SerializedSerializedSuite|null,
      *   machine: SerializedMachine|null,
@@ -53,8 +53,8 @@ class JobSerializer
     public function serialize(Job $job): array
     {
         $data = $job->toArray();
-        $preparationState = $this->preparationStateFactory->create($job);
-        $data['preparation'] = $preparationState->toArray();
+
+        $data['preparation'] = $this->preparationStateFactory->create($job);
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if ($resultsJob instanceof \App\Entity\ResultsJob) {

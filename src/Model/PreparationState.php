@@ -16,7 +16,7 @@ use App\Enum\PreparationState as PreparationStateEnum;
  *   failures: SerializedComponentFailures
  * }
  */
-class PreparationState
+class PreparationState implements \JsonSerializable
 {
     public function __construct(
         private readonly PreparationStateEnum $state,
@@ -28,7 +28,7 @@ class PreparationState
     /**
      * @return SerializedPreparationState
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'state' => $this->state->value,
