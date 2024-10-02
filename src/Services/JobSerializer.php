@@ -47,17 +47,18 @@ class JobSerializer
      */
     public function serialize(Job $job): array
     {
-        $data = $job->toArray();
-
-        $data['preparation'] = $this->preparationStateFactory->create($job);
-        $data[JobComponentName::RESULTS_JOB->value] = $this->resultsJobRepository->find($job->id);
-        $data[JobComponentName::SERIALIZED_SUITE->value] = $this->serializedSuiteRepository->find($job->id);
-        $data[JobComponentName::MACHINE->value] = $this->machineRepository->find($job->id);
-        $data[JobComponentName::WORKER_JOB->value] = $this->workerStateFactory->createForJob($job);
-        $data['service_requests'] = new RemoteRequestCollection(
-            $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC'])
+        return array_merge(
+            $job->toArray(),
+            [
+                'preparation' => $this->preparationStateFactory->create($job),
+                JobComponentName::RESULTS_JOB->value => $this->resultsJobRepository->find($job->id),
+                JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuiteRepository->find($job->id),
+                JobComponentName::MACHINE->value => $this->machineRepository->find($job->id),
+                JobComponentName::WORKER_JOB->value => $this->workerStateFactory->createForJob($job),
+                'service_requests' => new RemoteRequestCollection(
+                    $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC'])
+                ),
+            ]
         );
-
-        return $data;
     }
 }
