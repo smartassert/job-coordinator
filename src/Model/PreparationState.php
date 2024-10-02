@@ -36,8 +36,9 @@ class PreparationState
 
         $data['request_states'] = $this->requestStates->toArray();
 
-        if ($this->componentFailures->has()) {
-            $data['failures'] = $this->componentFailures->toArray();
+        $componentFailuresData = $this->componentFailures->toArray();
+        if (0 !== count($componentFailuresData)) {
+            $data['failures'] = $componentFailuresData;
         }
 
         return $data;

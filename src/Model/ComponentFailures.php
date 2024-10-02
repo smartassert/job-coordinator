@@ -21,11 +21,6 @@ class ComponentFailures
     ) {
     }
 
-    public function has(): bool
-    {
-        return 0 !== count($this->componentFailures);
-    }
-
     /**
      * @return SerializedComponentFailures
      */
@@ -34,12 +29,10 @@ class ComponentFailures
         $data = [];
 
         foreach ($this->componentFailures as $componentFailure) {
-            if ($componentFailure instanceof ComponentFailure) {
-                $failure = $componentFailure->failure;
-                $failureData = $failure instanceof RemoteRequestFailureEntity ? $failure->toArray() : null;
+            $failure = $componentFailure->failure;
+            $failureData = $failure instanceof RemoteRequestFailureEntity ? $failure->toArray() : null;
 
-                $data[$componentFailure->componentName] = $failureData;
-            }
+            $data[$componentFailure->componentName] = $failureData;
         }
 
         return $data;
