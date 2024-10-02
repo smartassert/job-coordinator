@@ -16,8 +16,6 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
-use App\Model\ComponentFailure;
-use App\Model\ComponentFailures;
 use App\Model\PreparationState as PreparationStateModel;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -120,7 +118,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::PENDING,
-                    new ComponentFailures([]),
+                    [],
                     [
                         'results_job' => RequestState::PENDING,
                         'serialized_suite' => RequestState::PENDING,
@@ -154,7 +152,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::SUCCEEDED,
-                    new ComponentFailures([]),
+                    [],
                     [
                         'results_job' => RequestState::SUCCEEDED,
                         'serialized_suite' => RequestState::SUCCEEDED,
@@ -173,7 +171,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::PREPARING,
-                    new ComponentFailures([]),
+                    [],
                     [
                         'results_job' => RequestState::REQUESTING,
                         'serialized_suite' => RequestState::PENDING,
@@ -198,16 +196,13 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::FAILED,
-                    new ComponentFailures([
-                        'results_job' => new ComponentFailure(
-                            'results_job',
-                            new RemoteRequestFailure(
-                                RemoteRequestFailureType::HTTP,
-                                503,
-                                'service unavailable'
-                            )
+                    [
+                        'results_job' => new RemoteRequestFailure(
+                            RemoteRequestFailureType::HTTP,
+                            503,
+                            'service unavailable'
                         ),
-                    ]),
+                    ],
                     [
                         'results_job' => RequestState::FAILED,
                         'serialized_suite' => RequestState::PENDING,
@@ -242,24 +237,18 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'expected' => new PreparationStateModel(
                     PreparationStateEnum::FAILED,
-                    new ComponentFailures([
-                        'results_job' => new ComponentFailure(
-                            'results_job',
-                            new RemoteRequestFailure(
-                                RemoteRequestFailureType::HTTP,
-                                503,
-                                'service unavailable'
-                            )
+                    [
+                        'results_job' => new RemoteRequestFailure(
+                            RemoteRequestFailureType::HTTP,
+                            503,
+                            'service unavailable'
                         ),
-                        'serialized_suite' => new ComponentFailure(
-                            'serialized_suite',
-                            new RemoteRequestFailure(
-                                RemoteRequestFailureType::NETWORK,
-                                28,
-                                'connection timed out'
-                            )
+                        'serialized_suite' => new RemoteRequestFailure(
+                            RemoteRequestFailureType::NETWORK,
+                            28,
+                            'connection timed out'
                         ),
-                    ]),
+                    ],
                     [
                         'results_job' => RequestState::FAILED,
                         'serialized_suite' => RequestState::FAILED,
