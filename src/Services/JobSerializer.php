@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
+use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\JobComponentName;
-use App\Model\Machine;
 use App\Model\RemoteRequestCollection;
 use App\Model\WorkerState;
 use App\Repository\MachineRepository;
@@ -18,7 +18,6 @@ use App\Repository\SerializedSuiteRepository;
 
 /**
  * @phpstan-import-type SerializedPreparationState from PreparationStateFactory
- * @phpstan-import-type SerializedMachine from Machine
  * @phpstan-import-type SerializedWorkerState from WorkerState
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
@@ -42,7 +41,7 @@ class JobSerializer
      *   preparation: SerializedPreparationState,
      *   results_job: ResultsJob|null,
      *   serialized_suite: SerializedSuite|null,
-     *   machine: SerializedMachine|null,
+     *   machine: Machine|null,
      *   worker_job: SerializedWorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
@@ -54,14 +53,7 @@ class JobSerializer
         $data['preparation'] = $this->preparationStateFactory->create($job);
         $data[JobComponentName::RESULTS_JOB->value] = $this->resultsJobRepository->find($job->id);
         $data[JobComponentName::SERIALIZED_SUITE->value] = $this->serializedSuiteRepository->find($job->id);
-
-        $machine = $this->machineRepository->find($job->id);
-        if ($machine instanceof \App\Entity\Machine) {
-            $machineModel = new Machine($machine);
-            $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
-        } else {
-            $data[JobComponentName::MACHINE->value] = null;
-        }
+        $data[JobComponentName::MACHINE->value] = $this->machineRepository->find($job->id);
 
         $workerState = $this->workerStateFactory->createForJob($job);
         $data[JobComponentName::WORKER_JOB->value] = $workerState->toArray();
