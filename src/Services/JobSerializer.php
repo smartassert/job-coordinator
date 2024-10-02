@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Entity\Job;
 use App\Enum\JobComponentName;
 use App\Model\Machine;
-use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
 use App\Model\ResultsJob;
 use App\Model\SerializedSuite;
@@ -18,7 +17,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
 /**
- * @phpstan-import-type SerializedPreparationState from PreparationState
+ * @phpstan-import-type SerializedPreparationState from PreparationStateFactory
  * @phpstan-import-type SerializedResultsJob from ResultsJob
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
  * @phpstan-import-type SerializedMachine from Machine
@@ -42,7 +41,7 @@ class JobSerializer
      *   id: non-empty-string,
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
-     *   preparation: PreparationState,
+     *   preparation: SerializedPreparationState,
      *   results_job: SerializedResultsJob|null,
      *   serialized_suite: SerializedSerializedSuite|null,
      *   machine: SerializedMachine|null,

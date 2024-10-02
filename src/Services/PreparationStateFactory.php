@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
+use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponentName;
 use App\Enum\PreparationState as PreparationStateEnum;
-use App\Model\PreparationState;
+use App\Enum\RequestState;
 
+/**
+ * @phpstan-type SerializedPreparationState array{
+ *   state: PreparationStateEnum,
+ *   request_states: array<RequestState>,
+ *   failures: array<value-of<JobComponentName>, RemoteRequestFailure|null>
+ * }
+ */
 class PreparationStateFactory
 {
     public function __construct(
@@ -17,7 +26,10 @@ class PreparationStateFactory
     ) {
     }
 
-    public function create(Job $job): PreparationState
+    /**
+     * @return SerializedPreparationState
+     */
+    public function create(Job $job): array
     {
         $componentPreparationStates = $this->componentPreparationFactory->getAll($job);
 
@@ -28,10 +40,10 @@ class PreparationStateFactory
             }
         }
 
-        return new PreparationState(
-            $this->preparationStateReducer->reduce($componentPreparationStates),
-            $componentFailures,
-            $this->requestStatesFactory->create($job),
-        );
+        return [
+            'state' => $this->preparationStateReducer->reduce($componentPreparationStates),
+            'request_states' => $this->requestStatesFactory->create($job),
+            'failures' => $componentFailures,
+        ];
     }
 }
