@@ -168,10 +168,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -228,10 +225,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -315,10 +309,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -529,10 +520,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => 'prepared',
                         ],
@@ -589,10 +577,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -665,10 +650,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -756,10 +738,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],
@@ -962,10 +941,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                         ],
-                        'results_job' => [
-                            'state' => null,
-                            'end_state' => null,
-                        ],
+                        'results_job' => null,
                         'serialized_suite' => [
                             'state' => null,
                         ],

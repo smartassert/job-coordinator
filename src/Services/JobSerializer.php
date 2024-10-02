@@ -43,7 +43,7 @@ class JobSerializer
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   preparation: SerializedPreparationState,
-     *   results_job: SerializedResultsJob,
+     *   results_job: SerializedResultsJob|null,
      *   serialized_suite: SerializedSerializedSuite,
      *   machine: SerializedMachine,
      *   worker_job: SerializedWorkerState,
@@ -57,8 +57,12 @@ class JobSerializer
         $data['preparation'] = $preparationState->toArray();
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        $resultsJobModel = new ResultsJob($resultsJob);
-        $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
+        if ($resultsJob instanceof \App\Entity\ResultsJob) {
+            $resultsJobModel = new ResultsJob($resultsJob);
+            $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
+        } else {
+            $data[JobComponentName::RESULTS_JOB->value] = null;
+        }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
         $serializedSuiteModel = new SerializedSuite($serializedSuite);
