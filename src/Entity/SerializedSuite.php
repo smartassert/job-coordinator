@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\SerializedSuiteInterface;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements SerializedSuiteInterface
+class SerializedSuite implements \JsonSerializable
 {
     /**
      * @var non-empty-string
@@ -69,5 +68,15 @@ class SerializedSuite implements SerializedSuiteInterface
         $this->state = $state;
 
         return $this;
+    }
+
+    /**
+     * @return array{state: ?non-empty-string}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'state' => $this->state,
+        ];
     }
 }

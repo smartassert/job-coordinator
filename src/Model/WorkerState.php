@@ -19,7 +19,7 @@ use App\Enum\WorkerComponentName;
  *   }
  * }
  */
-class WorkerState
+class WorkerState implements \JsonSerializable
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,
@@ -32,7 +32,7 @@ class WorkerState
     /**
      * @return SerializedWorkerState
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return array_merge(
             $this->applicationState->toArray(),

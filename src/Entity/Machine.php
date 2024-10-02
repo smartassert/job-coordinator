@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\MachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine implements MachineInterface
+class Machine implements \JsonSerializable
 {
     /**
      * @var non-empty-string
@@ -108,5 +107,19 @@ class Machine implements MachineInterface
         $this->ip = $ip;
 
         return $this;
+    }
+
+    /**
+     * @return array{
+     *   state_category: non-empty-string,
+     *   ip_address: ?non-empty-string
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'state_category' => $this->stateCategory,
+            'ip_address' => $this->ip,
+        ];
     }
 }

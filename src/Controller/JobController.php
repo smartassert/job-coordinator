@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Job;
 use App\Event\JobCreatedEvent;
+use App\Model\FooJob;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\JobSerializer;
@@ -34,13 +35,13 @@ readonly class JobController
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
 
-        return new JsonResponse($this->jobSerializer->serialize($job));
+        return new JsonResponse(new FooJob($this->jobSerializer->serialize($job)));
     }
 
     #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
     public function get(Job $job): Response
     {
-        return new JsonResponse($this->jobSerializer->serialize($job));
+        return new JsonResponse(new FooJob($this->jobSerializer->serialize($job)));
     }
 
     #[Route('/{suiteId<[A-Z90-9]{26}>}/list', name: 'job_list', methods: ['GET'])]

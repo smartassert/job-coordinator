@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
+use App\Entity\Machine;
+use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Enum\JobComponentName;
-use App\Model\Machine;
-use App\Model\PreparationState;
 use App\Model\RemoteRequestCollection;
-use App\Model\ResultsJob;
-use App\Model\SerializedSuite;
 use App\Model\WorkerState;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
@@ -18,11 +17,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
 /**
- * @phpstan-import-type SerializedPreparationState from PreparationState
- * @phpstan-import-type SerializedResultsJob from ResultsJob
- * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
- * @phpstan-import-type SerializedMachine from Machine
- * @phpstan-import-type SerializedWorkerState from WorkerState
+ * @phpstan-import-type SerializedPreparationState from PreparationStateFactory
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 class JobSerializer
@@ -43,49 +38,27 @@ class JobSerializer
      *   suite_id: non-empty-string,
      *   maximum_duration_in_seconds: positive-int,
      *   preparation: SerializedPreparationState,
-     *   results_job: SerializedResultsJob|null,
-     *   serialized_suite: SerializedSerializedSuite|null,
-     *   machine: SerializedMachine|null,
-     *   worker_job: SerializedWorkerState,
+     *   results_job: ResultsJob|null,
+     *   serialized_suite: SerializedSuite|null,
+     *   machine: Machine|null,
+     *   worker_job: WorkerState,
      *   remote_requests?: SerializedRemoteRequestCollection
      *  }
      */
     public function serialize(Job $job): array
     {
-        $data = $job->toArray();
-        $preparationState = $this->preparationStateFactory->create($job);
-        $data['preparation'] = $preparationState->toArray();
-
-        $resultsJob = $this->resultsJobRepository->find($job->id);
-        if ($resultsJob instanceof \App\Entity\ResultsJob) {
-            $resultsJobModel = new ResultsJob($resultsJob);
-            $data[JobComponentName::RESULTS_JOB->value] = $resultsJobModel->toArray();
-        } else {
-            $data[JobComponentName::RESULTS_JOB->value] = null;
-        }
-
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        if ($serializedSuite instanceof \App\Entity\SerializedSuite) {
-            $serializedSuiteModel = new SerializedSuite($serializedSuite);
-            $data[JobComponentName::SERIALIZED_SUITE->value] = $serializedSuiteModel->toArray();
-        } else {
-            $data[JobComponentName::SERIALIZED_SUITE->value] = null;
-        }
-
-        $machine = $this->machineRepository->find($job->id);
-        if ($machine instanceof \App\Entity\Machine) {
-            $machineModel = new Machine($machine);
-            $data[JobComponentName::MACHINE->value] = $machineModel->toArray();
-        } else {
-            $data[JobComponentName::MACHINE->value] = null;
-        }
-
-        $workerState = $this->workerStateFactory->createForJob($job);
-        $data[JobComponentName::WORKER_JOB->value] = $workerState->toArray();
-
-        $remoteRequests = $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC']);
-        $data['service_requests'] = (new RemoteRequestCollection($remoteRequests))->toArray();
-
-        return $data;
+        return array_merge(
+            $job->toArray(),
+            [
+                'preparation' => $this->preparationStateFactory->create($job),
+                JobComponentName::RESULTS_JOB->value => $this->resultsJobRepository->find($job->id),
+                JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuiteRepository->find($job->id),
+                JobComponentName::MACHINE->value => $this->machineRepository->find($job->id),
+                JobComponentName::WORKER_JOB->value => $this->workerStateFactory->createForJob($job),
+                'service_requests' => new RemoteRequestCollection(
+                    $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC'])
+                ),
+            ]
+        );
     }
 }
