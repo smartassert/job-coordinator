@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Event\JobCreatedEvent;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
-use App\Services\JobSerializer;
+use App\Services\JobStatusFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +19,7 @@ readonly class JobController
 {
     public function __construct(
         private JobRepository $jobRepository,
-        private JobSerializer $jobSerializer,
+        private JobStatusFactory $jobStatusFactory,
     ) {
     }
 
@@ -34,13 +34,13 @@ readonly class JobController
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
 
-        return new JsonResponse($this->jobSerializer->serialize($job));
+        return new JsonResponse($this->jobStatusFactory->create($job));
     }
 
     #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
     public function get(Job $job): Response
     {
-        return new JsonResponse($this->jobSerializer->serialize($job));
+        return new JsonResponse($this->jobStatusFactory->create($job));
     }
 
     #[Route('/{suiteId<[A-Z90-9]{26}>}/list', name: 'job_list', methods: ['GET'])]
