@@ -9,10 +9,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * @phpstan-type SerializedJob array{
+ *   id: non-empty-string,
+ *   suite_id: non-empty-string,
+ *   maximum_duration_in_seconds: positive-int,
+ *   created_at: positive-int
+ *  }
+ */
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-readonly class Job
+readonly class Job implements \JsonSerializable
 {
     /**
      * @var non-empty-string
@@ -61,22 +69,23 @@ readonly class Job
     }
 
     /**
-     * @return array{
-     *   id: non-empty-string,
-     *   suite_id: non-empty-string,
-     *   maximum_duration_in_seconds: positive-int,
-     *   created_at: positive-int
-     *  }
+     * @return SerializedJob
      */
     public function toArray(): array
     {
-        $idAsUlid = new Ulid($this->id);
-
         return [
             'id' => $this->id,
             'suite_id' => $this->suiteId,
             'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
             'created_at' => max($this->getCreatedAt(), 1),
         ];
+    }
+
+    /**
+     * @return SerializedJob
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }
