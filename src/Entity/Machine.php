@@ -35,6 +35,9 @@ class Machine implements \JsonSerializable
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ip = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?MachineActionFailure $actionFailure = null;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
@@ -109,10 +112,18 @@ class Machine implements \JsonSerializable
         return $this;
     }
 
+    public function setActionFailure(?MachineActionFailure $actionFailure): static
+    {
+        $this->actionFailure = $actionFailure;
+
+        return $this;
+    }
+
     /**
      * @return array{
      *   state_category: non-empty-string,
-     *   ip_address: ?non-empty-string
+     *   ip_address: ?non-empty-string,
+     *   action_failure: ?MachineActionFailure
      * }
      */
     public function jsonSerialize(): array
@@ -120,6 +131,7 @@ class Machine implements \JsonSerializable
         return [
             'state_category' => $this->stateCategory,
             'ip_address' => $this->ip,
+            'action_failure' => $this->actionFailure,
         ];
     }
 }
