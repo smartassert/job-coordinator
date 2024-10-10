@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
+use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class WorkerManagerClientMachineFactory
@@ -14,9 +15,14 @@ class WorkerManagerClientMachineFactory
      * @param non-empty-string   $stateCategory
      * @param non-empty-string[] $ipAddresses
      */
-    public static function create(string $id, string $state, string $stateCategory, array $ipAddresses): Machine
-    {
-        return new Machine($id, $state, $stateCategory, $ipAddresses);
+    public static function create(
+        string $id,
+        string $state,
+        string $stateCategory,
+        array $ipAddresses,
+        ?ActionFailure $actionFailure = null,
+    ): Machine {
+        return new Machine($id, $state, $stateCategory, $ipAddresses, $actionFailure);
     }
 
     public static function createRandom(): Machine
