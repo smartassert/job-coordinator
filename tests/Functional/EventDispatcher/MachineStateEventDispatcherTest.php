@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\EventDispatcher;
 
+use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
@@ -167,5 +169,55 @@ class MachineStateEventDispatcherTest extends WebTestCase
                 ),
             ],
         ];
+    }
+
+    public function testDispatchMachineHasActionFailureEventNoActionFailure(): void
+    {
+        $machineId = (string) new Ulid();
+        \assert('' !== $machineId);
+
+        $authenticationToken = md5((string) rand());
+
+        $previousMachine = MachineFactory::create($machineId, 'previous-state', 'active', []);
+        $currentMachine = MachineFactory::create($machineId, 'current-state', 'active', []);
+
+        $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
+
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+        $eventDispatcher->dispatch($event);
+
+        self::assertEquals([], $this->eventRecorder->all(MachineHasActionFailureEvent::class));
+    }
+
+    public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
+    {
+        $machineId = (string) new Ulid();
+        \assert('' !== $machineId);
+
+        $authenticationToken = md5((string) rand());
+        $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
+
+        $previousMachine = MachineFactory::create($machineId, 'find/finding', 'finding', []);
+        $currentMachine = MachineFactory::create(
+            $machineId,
+            'find/not-findable',
+            'end',
+            [],
+            $actionFailure
+        );
+
+        $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
+
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+        $eventDispatcher->dispatch($event);
+
+        self::assertEquals(
+            [
+                new MachineHasActionFailureEvent($authenticationToken, $machineId, $actionFailure),
+            ],
+            $this->eventRecorder->all(MachineHasActionFailureEvent::class)
+        );
     }
 }

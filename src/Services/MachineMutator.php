@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
+use App\Entity\MachineActionFailure;
+use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\JobRepository;
@@ -31,6 +33,9 @@ class MachineMutator implements EventSubscriberInterface
             ],
             MachineIsActiveEvent::class => [
                 ['setIpOnMachineIsActiveEvent', 1000],
+            ],
+            MachineHasActionFailureEvent::class => [
+                ['setActionFailureOnMachineHasActionFailureEvent', 1000],
             ],
         ];
     }
@@ -70,5 +75,31 @@ class MachineMutator implements EventSubscriberInterface
         $machineEntity->setIp($event->ipAddress);
 
         $this->machineRepository->save($machineEntity);
+    }
+
+    public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
+    {
+        $job = $this->jobRepository->find($event->jobId);
+        if (!$job instanceof Job) {
+            return;
+        }
+
+        $machineEntity = $this->machineRepository->find($job->id);
+        if (!$machineEntity instanceof Machine) {
+            return;
+        }
+
+        if ($machineEntity->getActionFailure() instanceof MachineActionFailure) {
+            return;
+        }
+
+        $machineEntity->setActionFailure(
+            new MachineActionFailure(
+                $job->id,
+                $event->machineActionFailure->action,
+                $event->machineActionFailure->type,
+                $event->machineActionFailure->context,
+            )
+        );
     }
 }

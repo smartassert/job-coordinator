@@ -112,6 +112,11 @@ class Machine implements \JsonSerializable
         return $this;
     }
 
+    public function getActionFailure(): ?MachineActionFailure
+    {
+        return $this->actionFailure;
+    }
+
     public function setActionFailure(?MachineActionFailure $actionFailure): static
     {
         $this->actionFailure = $actionFailure;
