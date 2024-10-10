@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\EventDispatcher;
 
+use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -26,6 +28,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             MachineRetrievedEvent::class => [
                 ['dispatchMachineStateChangeEvent', 100],
                 ['dispatchMachineIsActiveEvent', 100],
+                ['dispatchMachineHasActionFailureEvent', 100],
             ],
         ];
     }
@@ -56,6 +59,20 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
                 $event->authenticationToken,
                 $event->current->id,
                 $primaryIpAddress
+            ));
+        }
+    }
+
+    public function dispatchMachineHasActionFailureEvent(MachineRetrievedEvent $event): void
+    {
+        if (
+            null === $event->previous->actionFailure
+            && $event->current->actionFailure instanceof ActionFailure
+        ) {
+            $this->eventDispatcher->dispatch(new MachineHasActionFailureEvent(
+                $event->authenticationToken,
+                $event->current->id,
+                $event->current->actionFailure
             ));
         }
     }

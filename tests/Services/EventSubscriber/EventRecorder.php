@@ -6,6 +6,7 @@ namespace App\Tests\Services\EventSubscriber;
 
 use App\Event\JobCreatedEvent;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
@@ -70,6 +71,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             WorkerStateRetrievedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineHasActionFailureEvent::class => [
                 ['addEvent', 1000],
             ],
         ];

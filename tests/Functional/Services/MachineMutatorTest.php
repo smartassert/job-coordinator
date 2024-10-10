@@ -6,6 +6,8 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Job;
 use App\Entity\Machine;
+use App\Entity\MachineActionFailure;
+use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Repository\MachineRepository;
@@ -14,6 +16,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -81,6 +84,10 @@ class MachineMutatorTest extends WebTestCase
             MachineIsActiveEvent::class => [
                 'expectedListenedForEvent' => MachineIsActiveEvent::class,
                 'expectedMethod' => 'setIpOnMachineIsActiveEvent',
+            ],
+            MachineHasActionFailureEvent::class => [
+                'expectedListenedForEvent' => MachineHasActionFailureEvent::class,
+                'expectedMethod' => 'setActionFailureOnMachineHasActionFailureEvent',
             ],
         ];
     }
@@ -328,6 +335,134 @@ class MachineMutatorTest extends WebTestCase
                 'expectedMachineCreator' => function (Job $job) {
                     return (new Machine($job->id, 'up/started', 'pre_active'))
                         ->setIp('127.0.0.2')
+                    ;
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @param callable(JobFactory): ?Job                   $jobCreator
+     * @param callable(?Job, MachineRepository): void      $machineCreator
+     * @param callable(?Job): MachineHasActionFailureEvent $eventCreator
+     * @param callable(?Job): ?Machine                     $expectedMachineCreator
+     */
+    #[DataProvider('setActionFailureOnMachineHasActionFailureEventDataProvider')]
+    public function testSetActionFailureOnMachineHasActionFailureEvent(
+        callable $jobCreator,
+        callable $machineCreator,
+        callable $eventCreator,
+        callable $expectedMachineCreator,
+    ): void {
+        $job = $jobCreator($this->jobFactory);
+        $machineCreator($job, $this->machineRepository);
+
+        $event = $eventCreator($job);
+
+        $this->machineMutator->setActionFailureOnMachineHasActionFailureEvent($event);
+
+        $machine = null === $job
+            ? null
+            : $this->machineRepository->find($job->id);
+
+        self::assertEquals($expectedMachineCreator($job), $machine);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function setActionFailureOnMachineHasActionFailureEventDataProvider(): array
+    {
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
+        };
+
+        return [
+            'no job' => [
+                'jobCreator' => function () {
+                    return null;
+                },
+                'machineCreator' => function () {
+                },
+                'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
+                    return new MachineHasActionFailureEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                    );
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'no machine' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function () {
+                },
+                'eventCreator' => function () {
+                    $jobId = (string) new Ulid();
+                    \assert('' !== $jobId);
+
+                    return new MachineHasActionFailureEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                    );
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'previous machine has no action failure' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, 'find/finding', 'pre_active');
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineHasActionFailureEvent(
+                        md5((string) rand()),
+                        $job->id,
+                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                    );
+                },
+                'expectedMachineCreator' => function (Job $job) {
+                    return (new Machine($job->id, 'find/finding', 'pre_active'))
+                        ->setActionFailure(
+                            new MachineActionFailure($job->id, 'find', 'vendor_authentication_failure', [])
+                        )
+                    ;
+                },
+            ],
+            'previous machine has action failure' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = (new Machine($job->id, 'find/finding', 'pre_active'))
+                        ->setActionFailure(
+                            new MachineActionFailure($job->id, 'previous_action', 'previous_type', [])
+                        )
+                    ;
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (Job $job) {
+                    return new MachineHasActionFailureEvent(
+                        md5((string) rand()),
+                        $job->id,
+                        new ActionFailure('new_action', 'new_type', [])
+                    );
+                },
+                'expectedMachineCreator' => function (Job $job) {
+                    return (new Machine($job->id, 'find/finding', 'pre_active'))
+                        ->setActionFailure(
+                            new MachineActionFailure($job->id, 'previous_action', 'previous_type', [])
+                        )
                     ;
                 },
             ],

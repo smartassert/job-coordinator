@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Application;
 
 use App\Entity\Job;
 use App\Entity\Machine;
+use App\Entity\MachineActionFailure;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
@@ -622,6 +623,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
                         ],
                         'worker_job' => [
                             'state' => 'pending',
@@ -708,6 +710,103 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
+                        ],
+                        'worker_job' => [
+                            'state' => 'running',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'complete',
+                                    'is_end_state' => true,
+                                ],
+                                'execution' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'running',
+                                    'is_end_state' => false,
+                                ],
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'has machine, has action failure' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = $machine->setIp(md5((string) rand()));
+                    $machine->setActionFailure(new MachineActionFailure(
+                        $job->id,
+                        'find',
+                        'vendor_authentication_failure'
+                    ));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                            ->setState('complete')
+                            ->setIsEndState(true)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+
+                    $repository->save(
+                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                            ->setState('running')
+                            ->setIsEndState(false)
+                    );
+                },
+                'expectedSerializedJobCreator' => function (
+                    Job $job,
+                    ?ResultsJob $resultsJob,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->getCreatedAt(),
+                        'preparation' => [
+                            'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'succeeded',
+                                'worker_job' => 'succeeded',
+                            ],
+                            'failures' => [],
+                        ],
+                        'results_job' => null,
+                        'serialized_suite' => null,
+                        'machine' => [
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                            'action_failure' => [
+                                'action' => 'find',
+                                'type' => 'vendor_authentication_failure',
+                                'context' => null,
+                            ],
                         ],
                         'worker_job' => [
                             'state' => 'running',
@@ -807,6 +906,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
                         ],
                         'worker_job' => [
                             'state' => 'running',
