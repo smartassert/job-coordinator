@@ -87,6 +87,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $job->suiteId,
             $serializedSuiteParameters,
             'requested',
+            false,
+            false,
             null,
             null,
         );

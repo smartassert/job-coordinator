@@ -167,7 +167,16 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->id,
-                        new SourcesSerializedSuite($serializedSuiteId, 'suite id', [], 'requested', null, null),
+                        new SourcesSerializedSuite(
+                            $serializedSuiteId,
+                            'suite id',
+                            [],
+                            'requested',
+                            false,
+                            false,
+                            null,
+                            null,
+                        ),
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (Job $job) use ($serializedSuiteId) {
@@ -187,7 +196,16 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->id,
-                        new SourcesSerializedSuite($serializedSuiteId, 'suite id', [], 'prepared', null, null),
+                        new SourcesSerializedSuite(
+                            $serializedSuiteId,
+                            'suite id',
+                            [],
+                            'prepared',
+                            true,
+                            true,
+                            null,
+                            null,
+                        ),
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (Job $job) use ($serializedSuiteId) {

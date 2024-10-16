@@ -116,6 +116,8 @@ class SerializedSuiteFactoryTest extends WebTestCase
             $suiteId,
             [],
             $serializedSuiteState,
+            false,
+            false,
             null,
             null
         );
