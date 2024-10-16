@@ -56,6 +56,7 @@ class MachineMutator implements EventSubscriberInterface
 
         $machineEntity->setState($machineModel->state);
         $machineEntity->setStateCategory($machineModel->stateCategory);
+        $machineEntity->setHasFailedState($machineModel->hasFailedState);
 
         $this->machineRepository->save($machineEntity);
     }

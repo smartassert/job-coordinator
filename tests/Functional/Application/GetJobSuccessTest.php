@@ -589,7 +589,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -624,6 +624,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
+                            'has_failed_state' => false,
                         ],
                         'worker_job' => [
                             'state' => 'pending',
@@ -652,7 +653,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -711,6 +712,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
+                            'has_failed_state' => false,
                         ],
                         'worker_job' => [
                             'state' => 'running',
@@ -739,7 +741,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
                     $machine->setActionFailure(new MachineActionFailure(
                         $job->id,
@@ -807,6 +809,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'type' => 'vendor_authentication_failure',
                                 'context' => null,
                             ],
+                            'has_failed_state' => false,
                         ],
                         'worker_job' => [
                             'state' => 'running',
@@ -843,7 +846,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $serializedSuite;
                 },
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()));
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -907,6 +910,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
+                            'has_failed_state' => false,
                         ],
                         'worker_job' => [
                             'state' => 'running',
@@ -1079,6 +1083,70 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                         ],
+                    ];
+                },
+            ],
+            'has machine with failed state' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $nullCreator,
+                'serializedSuiteCreator' => $nullCreator,
+                'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), true);
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => $nullCreator,
+                'expectedSerializedJobCreator' => function (
+                    Job $job,
+                    ?ResultsJob $resultsJob,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->id,
+                        'suite_id' => $job->suiteId,
+                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'created_at' => $job->getCreatedAt(),
+                        'preparation' => [
+                            'state' => 'preparing',
+                            'request_states' => [
+                                'results_job' => 'pending',
+                                'serialized_suite' => 'pending',
+                                'machine' => 'succeeded',
+                                'worker_job' => 'pending',
+                            ],
+                            'failures' => [],
+                        ],
+                        'results_job' => null,
+                        'serialized_suite' => null,
+                        'machine' => [
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
+                            'has_failed_state' => true,
+                        ],
+                        'worker_job' => [
+                            'state' => 'pending',
+                            'is_end_state' => false,
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'execution' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'pending',
+                                    'is_end_state' => false,
+                                ],
+                            ],
+                        ],
+                        'service_requests' => [],
                     ];
                 },
             ],
