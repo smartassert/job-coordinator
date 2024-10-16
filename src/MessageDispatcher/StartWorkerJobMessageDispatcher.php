@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\NotReadyToStartWorkerJobEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\StartWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,6 +26,9 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
             MachineIsActiveEvent::class => [
                 ['dispatchForMachineIsActiveEvent', 100],
             ],
+            NotReadyToStartWorkerJobEvent::class => [
+                ['dispatchForNotReadyToStartWorkerJobEvent', 100],
+            ],
         ];
     }
 
@@ -36,5 +40,13 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress)
         );
+    }
+
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
+    public function dispatchForNotReadyToStartWorkerJobEvent(NotReadyToStartWorkerJobEvent $event): void
+    {
+        $this->messageDispatcher->dispatch($event->message);
     }
 }

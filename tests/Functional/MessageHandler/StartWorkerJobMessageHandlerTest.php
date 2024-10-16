@@ -23,7 +23,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
@@ -297,9 +296,6 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
     ): StartWorkerJobMessageHandler {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
@@ -322,7 +318,6 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new StartWorkerJobMessageHandler(
-            $messageBus,
             $jobRepository,
             $serializedSuiteRepository,
             $resultsJobRepository,
