@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
+use App\Event\NotReadyToStartWorkerJobEvent;
 use App\Message\StartWorkerJobMessage;
 use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
@@ -36,6 +37,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(NotReadyToStartWorkerJobEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
@@ -62,5 +64,30 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+    }
+
+    public function testDispatchForNotReadyToStartWorkerJobEvent(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machineIpAddress = '127.0.0.1';
+        $authenticationToken = md5((string) rand());
+
+        $message = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $event = new NotReadyToStartWorkerJobEvent($message);
+
+        $this->dispatcher->dispatchForNotReadyToStartWorkerJobEvent($event);
+
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertIsArray($envelopes);
+        self::assertCount(1, $envelopes);
+
+        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+
+        $dispatchedEnvelope = $envelopes[0];
+        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
+        self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
     }
 }

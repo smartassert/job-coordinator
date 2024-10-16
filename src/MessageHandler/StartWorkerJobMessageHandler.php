@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\NotReadyToStartWorkerJobEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\WorkerJobStartException;
 use App\Message\StartWorkerJobMessage;
@@ -14,13 +15,11 @@ use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final class StartWorkerJobMessageHandler
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
@@ -42,7 +41,7 @@ final class StartWorkerJobMessageHandler
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuiteEntity) {
-            $this->messageBus->dispatch($message);
+            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
 
             return;
         }
@@ -52,12 +51,15 @@ final class StartWorkerJobMessageHandler
             return;
         }
 
+        if (in_array($serializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
+            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+
+            return;
+        }
+
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        if (
-            null === $resultsJob
-            || in_array($serializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])
-        ) {
-            $this->messageBus->dispatch($message);
+        if (null === $resultsJob) {
+            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
 
             return;
         }
