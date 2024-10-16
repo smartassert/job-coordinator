@@ -13,6 +13,15 @@ class SourcesClientSerializedSuiteFactory
      */
     public static function create(string $serializedSuiteId): SerializedSuite
     {
-        return new SerializedSuite($serializedSuiteId, md5((string) rand()), [], 'requested', null, null);
+        return new SerializedSuite(
+            $serializedSuiteId,
+            md5((string) rand()),
+            [],
+            'requested',
+            false,
+            false,
+            null,
+            null
+        );
     }
 }

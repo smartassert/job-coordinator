@@ -117,6 +117,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             md5((string) rand()),
             [],
             $newSerializedSuiteState,
+            false,
+            false,
             null,
             null
         );

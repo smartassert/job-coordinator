@@ -15,7 +15,7 @@
         "smartassert/results-client": "^8.0",
         "smartassert/service-client": "*",
         "smartassert/service-request": "^1.5",
-        "smartassert/sources-client": "^11.0",
+        "smartassert/sources-client": "^12.0",
         "smartassert/users-security-bundle": "^10.0",
         "smartassert/worker-client": "^4.1",
         "smartassert/worker-manager-client": "^10.2",

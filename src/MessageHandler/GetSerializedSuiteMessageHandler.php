@@ -7,7 +7,6 @@ namespace App\MessageHandler;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Message\GetSerializedSuiteMessage;
-use App\Model\SerializedSuiteEndStates;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -40,7 +39,7 @@ final class GetSerializedSuiteMessageHandler
             return;
         }
 
-        if (in_array($serializedSuiteEntity->getState(), SerializedSuiteEndStates::END_STATES)) {
+        if (in_array($serializedSuiteEntity->getState(), ['prepared', 'failed'])) {
             return;
         }
 

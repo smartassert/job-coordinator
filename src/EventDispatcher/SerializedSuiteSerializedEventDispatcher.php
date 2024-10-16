@@ -31,9 +31,7 @@ class SerializedSuiteSerializedEventDispatcher implements EventSubscriberInterfa
     public function dispatchSerializedSuiteSerializedEventOnSerializedSuiteRetrievedEvent(
         SerializedSuiteRetrievedEvent $event
     ): void {
-        $serializedSuiteState = $event->serializedSuite->getState();
-
-        if ('prepared' !== $serializedSuiteState) {
+        if (!$event->serializedSuite->isPrepared()) {
             return;
         }
 
