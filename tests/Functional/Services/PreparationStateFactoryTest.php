@@ -139,7 +139,7 @@ class PreparationStateFactoryTest extends WebTestCase
                     $serializedSuiteRepository->save(
                         new SerializedSuite($job->id, md5((string) rand()), md5((string) rand()))
                     );
-                    $machineRepository->save(new Machine($job->id, md5((string) rand()), md5((string) rand())));
+                    $machineRepository->save(new Machine($job->id, md5((string) rand()), md5((string) rand()), false));
                     $workerComponentStateRepository->save(
                         (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
                             ->setState('awaiting-job')

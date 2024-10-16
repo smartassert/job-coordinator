@@ -38,16 +38,20 @@ class Machine implements \JsonSerializable
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?MachineActionFailure $actionFailure = null;
 
+    #[ORM\Column(nullable: false)]
+    private bool $hasFailedState;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
      * @param non-empty-string $stateCategory
      */
-    public function __construct(string $jobId, string $state, string $stateCategory)
+    public function __construct(string $jobId, string $state, string $stateCategory, bool $hasFailedState)
     {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
+        $this->hasFailedState = $hasFailedState;
     }
 
     /**
@@ -137,6 +141,19 @@ class Machine implements \JsonSerializable
             'state_category' => $this->stateCategory,
             'ip_address' => $this->ip,
             'action_failure' => $this->actionFailure,
+            'has_failed_state' => $this->hasFailedState,
         ];
+    }
+
+    public function hasFailedState(): ?bool
+    {
+        return $this->hasFailedState;
+    }
+
+    public function setHasFailedState(bool $hasFailedState): static
+    {
+        $this->hasFailedState = $hasFailedState;
+
+        return $this;
     }
 }

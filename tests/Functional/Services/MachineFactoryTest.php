@@ -12,6 +12,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Ulid;
@@ -81,7 +82,7 @@ class MachineFactoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = WorkerMachineFactory::create($jobId, md5((string) rand()), md5((string) rand()), []);
+        $machine = WorkerMachineFactory::create($jobId, md5((string) rand()), md5((string) rand()), [], false);
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
@@ -90,21 +91,73 @@ class MachineFactoryTest extends WebTestCase
         self::assertSame(0, $this->machineRepository->count([]));
     }
 
-    public function testCreateOnMachineRetrievedEventSuccess(): void
-    {
+    /**
+     * @param callable(string): WorkerManagerClientMachine $workerManagerClientMachineCreator
+     * @param callable(string): Machine                    $expectedMachineCreator
+     */
+    #[DataProvider('createOnMachineRetrievedEventSuccessDataProvider')]
+    public function testCreateOnMachineRetrievedEventSuccess(
+        callable $workerManagerClientMachineCreator,
+        callable $expectedMachineCreator
+    ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = WorkerMachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
+        $machine = $workerManagerClientMachineCreator($job->id);
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
         $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
         $machineEntity = $this->machineRepository->find($job->id);
-        self::assertEquals(new Machine($job->id, $machine->state, $machine->stateCategory), $machineEntity);
+        self::assertEquals($expectedMachineCreator($job->id), $machineEntity);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function createOnMachineRetrievedEventSuccessDataProvider(): array
+    {
+        return [
+            'without failed state' => [
+                'workerManagerClientMachineCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return WorkerMachineFactory::create(
+                        $jobId,
+                        'find/finding',
+                        'find',
+                        [],
+                        false
+                    );
+                },
+                'expectedMachineCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return new Machine($jobId, 'find/finding', 'find', false);
+                },
+            ],
+            'with failed state' => [
+                'workerManagerClientMachineCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return WorkerMachineFactory::create(
+                        $jobId,
+                        'find/not-findable',
+                        'end',
+                        [],
+                        true
+                    );
+                },
+                'expectedMachineCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return new Machine($jobId, 'find/not-findable', 'end', true);
+                },
+            ],
+        ];
     }
 }

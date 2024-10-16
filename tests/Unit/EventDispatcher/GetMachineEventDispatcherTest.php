@@ -19,7 +19,7 @@ class GetMachineEventDispatcherTest extends WebTestCase
     public function testDispatchIfMachineNotInEndStateForMachineInEndState(): void
     {
         $machineId = md5((string) rand());
-        $machine = MachineFactory::create($machineId, 'an_end_state', 'end', []);
+        $machine = MachineFactory::create($machineId, 'an_end_state', 'end', [], false);
 
         $messageDispatcher = \Mockery::mock(JobRemoteRequestMessageDispatcher::class);
         $messageDispatcher

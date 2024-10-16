@@ -76,7 +76,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', []);
+        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', [], false);
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
@@ -84,6 +84,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'state' => $machine->state,
                 'state_category' => $machine->stateCategory,
                 'ip_addresses' => $machine->ipAddresses,
+                'has_failed_state' => $machine->hasFailedState,
             ])),
         ]);
 
@@ -98,7 +99,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $createdMachine = $machineRepository->find($job->id);
         self::assertEquals(
-            new Machine($job->id, 'create/requested', 'pre_active'),
+            new Machine($job->id, 'create/requested', 'pre_active', false),
             $createdMachine
         );
 

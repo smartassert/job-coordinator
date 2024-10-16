@@ -107,7 +107,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             new MachineRetrievedEvent(
                 'authentication token',
                 WorkerManagerClientMachineFactory::createRandom(),
-                WorkerManagerClientMachineFactory::create($jobId, 'state', 'state-category', []),
+                WorkerManagerClientMachineFactory::create($jobId, 'state', 'state-category', [], false),
             )
         );
 

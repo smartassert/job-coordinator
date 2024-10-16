@@ -133,7 +133,13 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             MachineRetrievalException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
                     return function (Job $job) use ($inner) {
-                        $machine = MachineFactory::create($job->id, md5((string) rand()), md5((string) rand()), []);
+                        $machine = MachineFactory::create(
+                            $job->id,
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            [],
+                            false
+                        );
 
                         return new MachineRetrievalException(
                             $job,
