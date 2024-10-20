@@ -44,6 +44,8 @@ class SerializedSuiteMutator implements EventSubscriberInterface
         }
 
         $serializedSuite->setState($event->serializedSuite->getState());
+        $serializedSuite->setIsPrepared($event->serializedSuite->isPrepared());
+        $serializedSuite->setHasEndState($event->serializedSuite->hasEndState());
         $this->serializedSuiteRepository->save($serializedSuite);
     }
 }

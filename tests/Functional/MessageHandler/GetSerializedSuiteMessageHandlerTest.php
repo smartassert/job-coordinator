@@ -13,7 +13,6 @@ use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -49,7 +48,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteStateIsEndState(string $state): void
     {
         $job = $this->createJob();
-        $serializedSuite = $this->createSerializedSuite($job, $state);
+        $serializedSuite = $this->createSerializedSuite($job, $state, true, true);
 
         $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuite->getId());
 
@@ -74,7 +73,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
         $job = $this->createJob();
-        $serializedSuite = $this->createSerializedSuite($job, 'requested');
+        $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
 
@@ -110,7 +109,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotEndState(string $currentSerializedSuiteState, string $newSerializedSuiteState): void
     {
         $job = $this->createJob();
-        $serializedSuite = $this->createSerializedSuite($job, $currentSerializedSuiteState);
+        $serializedSuite = $this->createSerializedSuite($job, $currentSerializedSuiteState, false, false);
 
         $serializedSuite = new SerializedSuiteModel(
             $serializedSuite->getId(),
@@ -226,20 +225,16 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     /**
      * @param non-empty-string $state
      */
-    private function createSerializedSuite(Job $job, string $state): SerializedSuite
-    {
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state);
+    private function createSerializedSuite(
+        Job $job,
+        string $state,
+        bool $isPrepared,
+        bool $hasEndState
+    ): SerializedSuite {
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, $isPrepared, $hasEndState);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-
-        foreach ($serializedSuiteRepository->findAll() as $entity) {
-            $entityManager->remove($entity);
-            $entityManager->flush();
-        }
 
         $serializedSuiteRepository->save($serializedSuite);
 

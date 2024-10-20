@@ -148,7 +148,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             return function (Job $job, SerializedSuiteRepository $serializedSuiteRepository) use ($state) {
                 \assert('' !== $state);
 
-                $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state);
+                $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, false, false);
                 $serializedSuiteRepository->save($serializedSuite);
 
                 return $serializedSuite;
@@ -240,7 +240,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
         $this->resultsJobRepository->save($resultsJob);
 
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $event = $eventCreator($job);

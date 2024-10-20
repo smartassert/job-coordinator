@@ -29,6 +29,12 @@ class SerializedSuite implements \JsonSerializable
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
 
+    #[ORM\Column(nullable: false)]
+    private bool $isPrepared;
+
+    #[ORM\Column(nullable: false)]
+    private bool $hasEndState;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
@@ -38,10 +44,14 @@ class SerializedSuite implements \JsonSerializable
         string $jobId,
         string $serializedSuiteId,
         string $state,
+        bool $isPrepared,
+        bool $hasEndState,
     ) {
         $this->jobId = $jobId;
         $this->serializedSuiteId = $serializedSuiteId;
         $this->state = $state;
+        $this->isPrepared = $isPrepared;
+        $this->hasEndState = $hasEndState;
     }
 
     /**
@@ -70,6 +80,30 @@ class SerializedSuite implements \JsonSerializable
         return $this;
     }
 
+    public function setIsPrepared(bool $isPrepared): static
+    {
+        $this->isPrepared = $isPrepared;
+
+        return $this;
+    }
+
+    public function isPrepared(): bool
+    {
+        return $this->isPrepared;
+    }
+
+    public function setHasEndState(bool $hasEndState): static
+    {
+        $this->hasEndState = $hasEndState;
+
+        return $this;
+    }
+
+    public function hasEndState(): bool
+    {
+        return $this->hasEndState;
+    }
+
     /**
      * @return array{state: ?non-empty-string}
      */
@@ -77,6 +111,8 @@ class SerializedSuite implements \JsonSerializable
     {
         return [
             'state' => $this->state,
+            'is_prepared' => $this->isPrepared,
+            'has_end_state' => $this->hasEndState,
         ];
     }
 }

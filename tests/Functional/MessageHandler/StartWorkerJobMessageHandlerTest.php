@@ -283,7 +283,7 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      */
     private function createSerializedSuite(Job $job, string $state): SerializedSuite
     {
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state);
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, false, false);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

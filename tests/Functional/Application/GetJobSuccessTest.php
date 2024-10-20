@@ -473,7 +473,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -499,6 +499,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results_job' => null,
                         'serialized_suite' => [
                             'state' => 'prepared',
+                            'is_prepared' => true,
+                            'has_end_state' => true,
                         ],
                         'machine' => null,
                         'worker_job' => [
@@ -840,7 +842,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared');
+                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -905,6 +907,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'serialized_suite' => [
                             'state' => 'prepared',
+                            'is_prepared' => true,
+                            'has_end_state' => true,
                         ],
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),

@@ -58,7 +58,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
-        if ('prepared' !== $serializedSuite->getState()) {
+        if (!$serializedSuite->isPrepared()) {
             return;
         }
 
