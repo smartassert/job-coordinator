@@ -180,7 +180,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                     return function (Job $job) use ($inner) {
                         $serializedSuiteId = md5((string) rand());
 
-                        $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
+                        $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared', true, true);
 
                         return new SerializedSuiteRetrievalException(
                             $job,

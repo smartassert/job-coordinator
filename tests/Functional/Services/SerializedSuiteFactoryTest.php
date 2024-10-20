@@ -128,7 +128,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         self::assertEquals(
-            new SerializedSuite($job->id, $serializedSuiteId, $serializedSuiteState),
+            new SerializedSuite($job->id, $serializedSuiteId, $serializedSuiteState, false, false),
             $serializedSuiteEntity
         );
     }

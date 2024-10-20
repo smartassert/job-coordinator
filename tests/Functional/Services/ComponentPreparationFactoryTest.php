@@ -127,7 +127,13 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 null
             ));
 
-            $serializedSuiteRepository->save(new SerializedSuite($job->id, md5((string) rand()), 'requested'));
+            $serializedSuiteRepository->save(new SerializedSuite(
+                $job->id,
+                md5((string) rand()),
+                'requested',
+                false,
+                false
+            ));
 
             $machineRepository->save(new Machine($job->id, md5((string) rand()), md5((string) rand()), false));
 

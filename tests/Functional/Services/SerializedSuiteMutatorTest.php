@@ -160,7 +160,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) use ($serializedSuiteId) {
-                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'requested');
+                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'requested', false, false);
                     $serializedSuiteRepository->save($serializedSuite);
                 },
                 'eventCreator' => function (Job $job) use ($serializedSuiteId) {
@@ -180,7 +180,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (Job $job) use ($serializedSuiteId) {
-                    return new SerializedSuite($job->id, $serializedSuiteId, 'requested');
+                    return new SerializedSuite($job->id, $serializedSuiteId, 'requested', false, false);
                 },
             ],
             'has state change' => [
@@ -189,7 +189,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) use ($serializedSuiteId) {
-                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'requested');
+                    $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'requested', false, false);
                     $serializedSuiteRepository->save($serializedSuite);
                 },
                 'eventCreator' => function (Job $job) use ($serializedSuiteId) {
@@ -209,7 +209,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (Job $job) use ($serializedSuiteId) {
-                    return new SerializedSuite($job->id, $serializedSuiteId, 'prepared');
+                    return new SerializedSuite($job->id, $serializedSuiteId, 'prepared', true, true);
                 },
             ],
         ];

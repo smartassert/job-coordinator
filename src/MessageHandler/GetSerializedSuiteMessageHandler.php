@@ -39,7 +39,7 @@ final class GetSerializedSuiteMessageHandler
             return;
         }
 
-        if (in_array($serializedSuiteEntity->getState(), ['prepared', 'failed'])) {
+        if ($serializedSuiteEntity->hasEndState()) {
             return;
         }
 
