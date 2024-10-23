@@ -12,7 +12,7 @@
         "doctrine/orm": "^3.1",
         "guzzlehttp/guzzle": "^7.5",
         "smartassert/health-check-bundle": "^6.1",
-        "smartassert/results-client": "^8.0",
+        "smartassert/results-client": "^8.1",
         "smartassert/service-client": "*",
         "smartassert/service-request": "^1.5",
         "smartassert/sources-client": "^12.0",
