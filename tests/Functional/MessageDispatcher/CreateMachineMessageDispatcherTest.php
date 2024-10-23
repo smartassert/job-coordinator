@@ -85,21 +85,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?Job                      $jobCreator
-     * @param callable(?Job, ResultsJobRepository): void      $resultsJobCreator
-     * @param callable(?Job, SerializedSuiteRepository): void $serializedSuiteCreator
-     * @param callable(?Job): object                          $eventCreator
+     * @param callable(JobFactory): ?Job $jobCreator
+     * @param callable(?Job): object     $eventCreator
      */
     #[DataProvider('dispatchMessageNotDispatchedDataProvider')]
-    public function testDispatchMessageNotDispatched(
-        callable $jobCreator,
-        callable $resultsJobCreator,
-        callable $serializedSuiteCreator,
-        callable $eventCreator,
-    ): void {
+    public function testDispatchMessageNotDispatched(callable $jobCreator, callable $eventCreator): void
+    {
         $job = $jobCreator($this->jobFactory);
-        $resultsJobCreator($job, $this->resultsJobRepository);
-        $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
         $event = $eventCreator($job);
         \assert($event instanceof ResultsJobCreatedEvent || $event instanceof SerializedSuiteSerializedEvent);
@@ -114,52 +106,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public static function dispatchMessageNotDispatchedDataProvider(): array
     {
-        $resultsJobCreatedEventCreator = function (Job $job) {
-            return new ResultsJobCreatedEvent(
-                md5((string) rand()),
-                $job->id,
-                ResultsClientJobFactory::createRandom()
-            );
-        };
-
-        $serializedSuiteSerializedEventCreator = function (Job $job) {
-            return new SerializedSuiteSerializedEvent(
-                md5((string) rand()),
-                $job->id,
-                md5((string) rand())
-            );
-        };
-
         $nullCreator = function () {
             return null;
-        };
-
-        $jobCreator = function (JobFactory $jobFactory) {
-            return $jobFactory->createRandom();
-        };
-
-        $resultsJobCreator = function (Job $job, ResultsJobRepository $resultsJobRepository) {
-            $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
-
-            $resultsJobRepository->save($resultsJob);
-        };
-
-        $serializedSuiteCreatorCreator = function (string $state) {
-            return function (Job $job, SerializedSuiteRepository $serializedSuiteRepository) use ($state) {
-                \assert('' !== $state);
-
-                $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, false, false);
-                $serializedSuiteRepository->save($serializedSuite);
-
-                return $serializedSuite;
-            };
         };
 
         return [
             'ResultsJobCreatedEvent, no job' => [
                 'jobCreator' => $nullCreator,
-                'resultsJobCreator' => $nullCreator,
-                'serializedSuiteCreator' => $nullCreator,
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
                     \assert('' !== $jobId);
@@ -173,8 +126,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             ],
             'SerializedSuiteSerializedEvent, no job' => [
                 'jobCreator' => $nullCreator,
-                'resultsJobCreator' => $nullCreator,
-                'serializedSuiteCreator' => $nullCreator,
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
                     \assert('' !== $jobId);
@@ -185,46 +136,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                         md5((string) rand())
                     );
                 },
-            ],
-            'ResultsJobCreatedEvent, no results job' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $nullCreator,
-                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
-                'eventCreator' => $resultsJobCreatedEventCreator,
-            ],
-            'SerializedSuiteSerializedEvent, no results job' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $nullCreator,
-                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('prepared'),
-                'eventCreator' => $serializedSuiteSerializedEventCreator,
-            ],
-            'ResultsJobCreatedEvent, no serialized suite' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $resultsJobCreator,
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
-                'eventCreator' => $resultsJobCreatedEventCreator,
-            ],
-            'SerializedSuiteSerializedEvent, no serialized suite' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $resultsJobCreator,
-                'serializedSuiteCreator' => function () {
-                    return null;
-                },
-                'eventCreator' => $serializedSuiteSerializedEventCreator,
-            ],
-            'ResultsJobCreatedEvent, serialized suite state not "prepared"' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $resultsJobCreator,
-                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'eventCreator' => $resultsJobCreatedEventCreator,
-            ],
-            'SerializedSuiteSerializedEvent, serialized suite state not "prepared"' => [
-                'jobCreator' => $jobCreator,
-                'resultsJobCreator' => $resultsJobCreator,
-                'serializedSuiteCreator' => $serializedSuiteCreatorCreator('preparing'),
-                'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
     }

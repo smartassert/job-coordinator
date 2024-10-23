@@ -9,7 +9,6 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
-use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface
@@ -17,7 +16,6 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
@@ -43,15 +41,6 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
     {
         $job = $this->jobRepository->find($event->jobId);
         if (null === $job) {
-            return;
-        }
-
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        if (null === $serializedSuite) {
-            return;
-        }
-
-        if (!$serializedSuite->isPrepared()) {
             return;
         }
 
