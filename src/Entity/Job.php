@@ -61,13 +61,6 @@ readonly class Job implements \JsonSerializable
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
     }
 
-    public function getCreatedAt(): int
-    {
-        $idAsUlid = new Ulid($this->id);
-
-        return (int) $idAsUlid->getDateTime()->format('U');
-    }
-
     /**
      * @return SerializedJob
      */
@@ -87,5 +80,12 @@ readonly class Job implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    private function getCreatedAt(): int
+    {
+        $idAsUlid = new Ulid($this->id);
+
+        return (int) $idAsUlid->getDateTime()->format('U');
     }
 }
