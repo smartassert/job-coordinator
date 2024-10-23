@@ -7,7 +7,6 @@ namespace App\Tests\Unit\EventDispatcher;
 use App\Event\MachineRetrievedEvent;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Repository\JobRepository;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,7 +28,7 @@ class GetMachineEventDispatcherTest extends WebTestCase
             ->shouldNotReceive('dispatchWithNonDelayedStamp')
         ;
 
-        $dispatcher = new GetMachineMessageDispatcher(\Mockery::mock(JobRepository::class), $messageDispatcher);
+        $dispatcher = new GetMachineMessageDispatcher($messageDispatcher);
         $event = new MachineRetrievedEvent(md5((string) rand()), $machine, $machine);
 
         $dispatcher->dispatchIfMachineNotInEndState($event);
