@@ -47,7 +47,7 @@ class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchForResultsJobStateRetrievedEvent(ResultsJobStateRetrievedEvent $event): void
     {
-        if (is_string($event->resultsJobState->endState)) {
+        if ($event->resultsJobState->hasEndState()) {
             return;
         }
 
