@@ -67,3 +67,9 @@ services:
 
     App\Tests\Services\Factory\JobFactory:
         public: true
+
+    App\Tests\Services\Factory\ResultsJobFactory:
+        public: true
+
+    App\Tests\Services\Factory\SerializedSuiteFactory:
+        public: true

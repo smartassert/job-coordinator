@@ -8,17 +8,21 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MachineCreationException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CreateMachineMessageHandler
+final readonly class CreateMachineMessageHandler
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
-        private readonly WorkerManagerClient $workerManagerClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private JobRepository $jobRepository,
+        private ResultsJobRepository $resultsJobRepository,
+        private SerializedSuiteRepository $serializedSuiteRepository,
+        private WorkerManagerClient $workerManagerClient,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -29,6 +33,20 @@ final class CreateMachineMessageHandler
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
+            return;
+        }
+
+        $resultsJob = $this->resultsJobRepository->find($job->id);
+        if (null === $resultsJob) {
+            return;
+        }
+
+        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        if (null === $serializedSuite) {
+            return;
+        }
+
+        if (!$serializedSuite->isPrepared()) {
             return;
         }
 
