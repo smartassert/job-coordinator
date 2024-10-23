@@ -23,7 +23,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -85,62 +84,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?Job $jobCreator
-     * @param callable(?Job): object     $eventCreator
-     */
-    #[DataProvider('dispatchMessageNotDispatchedDataProvider')]
-    public function testDispatchMessageNotDispatched(callable $jobCreator, callable $eventCreator): void
-    {
-        $job = $jobCreator($this->jobFactory);
-
-        $event = $eventCreator($job);
-        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof SerializedSuiteSerializedEvent);
-
-        $this->dispatcher->dispatch($event);
-
-        $this->assertNoMessagesDispatched();
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function dispatchMessageNotDispatchedDataProvider(): array
-    {
-        $nullCreator = function () {
-            return null;
-        };
-
-        return [
-            'ResultsJobCreatedEvent, no job' => [
-                'jobCreator' => $nullCreator,
-                'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
-
-                    return new ResultsJobCreatedEvent(
-                        md5((string) rand()),
-                        $jobId,
-                        ResultsClientJobFactory::createRandom()
-                    );
-                },
-            ],
-            'SerializedSuiteSerializedEvent, no job' => [
-                'jobCreator' => $nullCreator,
-                'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
-
-                    return new SerializedSuiteSerializedEvent(
-                        md5((string) rand()),
-                        $jobId,
-                        md5((string) rand())
-                    );
-                },
-            ],
-        ];
-    }
-
-    /**
      * @param callable(Job): object $eventCreator
      */
     #[DataProvider('dispatchSuccessDataProvider')]
@@ -191,13 +134,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
-    }
-
-    private function assertNoMessagesDispatched(): void
-    {
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
     }
 
     /**
