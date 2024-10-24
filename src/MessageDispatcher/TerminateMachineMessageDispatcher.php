@@ -34,7 +34,7 @@ class TerminateMachineMessageDispatcher implements EventSubscriberInterface
     public function dispatch(ResultsJobStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(new TerminateMachineMessage(
-            $event->authenticationToken,
+            $event->getAuthenticationToken(),
             $event->getJobId(),
         ));
     }
