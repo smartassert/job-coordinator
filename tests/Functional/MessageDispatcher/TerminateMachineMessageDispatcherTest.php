@@ -60,19 +60,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchMessageNotDispatched(): void
-    {
-        $event = new ResultsJobStateRetrievedEvent(
-            md5((string) rand()),
-            md5((string) rand()),
-            new ResultsJobState('started', null)
-        );
-
-        $this->dispatcher->dispatch($event);
-
-        $this->assertNoMessagesDispatched();
-    }
-
     public function testDispatchSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -88,13 +75,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatch($event);
 
         $this->assertDispatchedMessage($event->authenticationToken, $event->jobId);
-    }
-
-    private function assertNoMessagesDispatched(): void
-    {
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
     }
 
     /**
