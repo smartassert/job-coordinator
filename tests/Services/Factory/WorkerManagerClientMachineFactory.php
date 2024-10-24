@@ -39,7 +39,10 @@ class WorkerManagerClientMachineFactory
         );
     }
 
-    public static function createRandom(): Machine
+    /**
+     * @param non-empty-string $jobId
+     */
+    public static function createRandomForJob(string $jobId): Machine
     {
         $hasFailedState = (bool) rand(0, 1);
         $hasActiveState = (bool) rand(0, 1);
@@ -47,7 +50,7 @@ class WorkerManagerClientMachineFactory
         $hasEndState = (bool) rand(0, 1);
 
         return self::create(
-            md5((string) rand()),
+            $jobId,
             md5((string) rand()),
             md5((string) rand()),
             [],
