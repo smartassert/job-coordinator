@@ -47,10 +47,8 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
-        if (!$event->state->applicationState->isEndState) {
-            $this->messageDispatcher->dispatch(
-                new GetWorkerStateMessage($event->jobId, $event->machineIpAddress)
-            );
-        }
+        $this->messageDispatcher->dispatch(
+            new GetWorkerStateMessage($event->jobId, $event->machineIpAddress)
+        );
     }
 }

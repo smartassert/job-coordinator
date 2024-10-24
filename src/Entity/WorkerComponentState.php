@@ -61,6 +61,11 @@ class WorkerComponentState implements WorkerComponentStateInterface
         return $this;
     }
 
+    public function isEndState(): bool
+    {
+        return $this->isEndState;
+    }
+
     public function toArray(): array
     {
         return [

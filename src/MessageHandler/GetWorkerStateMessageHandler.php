@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\WorkerComponentState;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\WorkerStateRetrievalException;
 use App\Message\GetWorkerStateMessage;
 use App\Repository\JobRepository;
+use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -17,6 +19,7 @@ final class GetWorkerStateMessageHandler
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
+        private readonly WorkerComponentStateRepository $workerComponentStateRepository,
         private readonly WorkerClientFactory $workerClientFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -29,6 +32,11 @@ final class GetWorkerStateMessageHandler
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
+            return;
+        }
+
+        $applicationState = $this->workerComponentStateRepository->getApplicationState($job);
+        if ($applicationState instanceof WorkerComponentState && $applicationState->isEndState()) {
             return;
         }
 
