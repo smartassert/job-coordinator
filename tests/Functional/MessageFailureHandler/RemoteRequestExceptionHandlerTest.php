@@ -138,7 +138,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                             md5((string) rand()),
                             md5((string) rand()),
                             [],
-                            false
+                            false,
+                            false,
+                            false,
+                            false,
                         );
 
                         return new MachineRetrievalException(

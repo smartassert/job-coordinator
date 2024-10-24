@@ -21,15 +21,40 @@ class WorkerManagerClientMachineFactory
         string $stateCategory,
         array $ipAddresses,
         bool $hasFailedState,
+        bool $hasActiveState,
+        bool $hasEndingState,
+        bool $hasEndState,
         ?ActionFailure $actionFailure = null,
     ): Machine {
-        return new Machine($id, $state, $stateCategory, $ipAddresses, $actionFailure, $hasFailedState);
+        return new Machine(
+            $id,
+            $state,
+            $stateCategory,
+            $ipAddresses,
+            $actionFailure,
+            $hasFailedState,
+            $hasActiveState,
+            $hasEndingState,
+            $hasEndState,
+        );
     }
 
     public static function createRandom(): Machine
     {
         $hasFailedState = (bool) rand(0, 1);
+        $hasActiveState = (bool) rand(0, 1);
+        $hasEndingState = (bool) rand(0, 1);
+        $hasEndState = (bool) rand(0, 1);
 
-        return self::create(md5((string) rand()), md5((string) rand()), md5((string) rand()), [], $hasFailedState);
+        return self::create(
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+            [],
+            $hasFailedState,
+            $hasActiveState,
+            $hasEndingState,
+            $hasEndState,
+        );
     }
 }

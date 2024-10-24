@@ -148,7 +148,10 @@ class MachineMutatorTest extends WebTestCase
                             md5((string) rand()),
                             md5((string) rand()),
                             [],
-                            false
+                            false,
+                            false,
+                            false,
+                            false,
                         )
                     );
                 },
@@ -172,7 +175,10 @@ class MachineMutatorTest extends WebTestCase
                             md5((string) rand()),
                             md5((string) rand()),
                             [],
-                            false
+                            false,
+                            false,
+                            false,
+                            false,
                         )
                     );
                 },
@@ -192,7 +198,16 @@ class MachineMutatorTest extends WebTestCase
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandom(),
-                        WorkerManagerClientMachineFactory::create($job->id, 'up/started', 'pre_active', [], false)
+                        WorkerManagerClientMachineFactory::create(
+                            $job->id,
+                            'up/started',
+                            'pre_active',
+                            [],
+                            false,
+                            false,
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expectedMachineCreator' => function (Job $job) {
@@ -211,7 +226,16 @@ class MachineMutatorTest extends WebTestCase
                     return new MachineStateChangeEvent(
                         md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandom(),
-                        WorkerManagerClientMachineFactory::create($job->id, 'up/active', 'active', [], false)
+                        WorkerManagerClientMachineFactory::create(
+                            $job->id,
+                            'up/active',
+                            'active',
+                            [],
+                            false,
+                            true,
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expectedMachineCreator' => function (Job $job) {

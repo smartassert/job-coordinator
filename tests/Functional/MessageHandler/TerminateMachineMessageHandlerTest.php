@@ -76,7 +76,16 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', [], false);
+        $machine = MachineFactory::create(
+            $job->id,
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
@@ -85,6 +94,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'state_category' => $machine->stateCategory,
                 'ip_addresses' => $machine->ipAddresses,
                 'has_failed_state' => $machine->hasFailedState,
+                'has_active_state' => $machine->hasActiveState,
+                'has_ending_state' => $machine->hasEndingState,
+                'has_end_state' => $machine->hasEndState,
             ])),
         ]);
 
