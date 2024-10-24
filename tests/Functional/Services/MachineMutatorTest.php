@@ -397,7 +397,6 @@ class MachineMutatorTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return new MachineHasActionFailureEvent(
-                        md5((string) rand()),
                         $jobId,
                         new ActionFailure('find', 'vendor_authentication_failure', [])
                     );
@@ -415,7 +414,6 @@ class MachineMutatorTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return new MachineHasActionFailureEvent(
-                        md5((string) rand()),
                         $jobId,
                         new ActionFailure('find', 'vendor_authentication_failure', [])
                     );
@@ -434,7 +432,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (Job $job) {
                     return new MachineHasActionFailureEvent(
-                        md5((string) rand()),
                         $job->id,
                         new ActionFailure('find', 'vendor_authentication_failure', [])
                     );
@@ -461,7 +458,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (Job $job) {
                     return new MachineHasActionFailureEvent(
-                        md5((string) rand()),
                         $job->id,
                         new ActionFailure('new_action', 'new_type', [])
                     );

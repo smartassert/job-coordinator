@@ -75,7 +75,6 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             && $event->current->actionFailure instanceof ActionFailure
         ) {
             $this->eventDispatcher->dispatch(new MachineHasActionFailureEvent(
-                $event->authenticationToken,
                 $event->getJobId(),
                 $event->current->actionFailure
             ));
