@@ -38,7 +38,7 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
     public function dispatchForResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
-            new GetResultsJobStateMessage($event->authenticationToken, $event->jobId)
+            new GetResultsJobStateMessage($event->authenticationToken, $event->getJobId())
         );
     }
 
@@ -48,7 +48,7 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
     public function dispatchForResultsJobStateRetrievedEvent(ResultsJobStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
-            new GetResultsJobStateMessage($event->authenticationToken, $event->jobId)
+            new GetResultsJobStateMessage($event->authenticationToken, $event->getJobId())
         );
     }
 }

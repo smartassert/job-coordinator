@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineCreationRequestedEvent extends Event
+class MachineCreationRequestedEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -16,5 +16,10 @@ class MachineCreationRequestedEvent extends Event
         public readonly string $authenticationToken,
         public readonly Machine $machine,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->machine->id;
     }
 }

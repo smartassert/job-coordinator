@@ -42,28 +42,26 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setStateOnMachineStateChangeEvent(MachineStateChangeEvent $event): void
     {
-        $machineModel = $event->current;
-
-        $job = $this->jobRepository->find($machineModel->id);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }
 
-        $machineEntity = $this->machineRepository->find($job->id);
+        $machineEntity = $this->machineRepository->find($event->getJobId());
         if (!$machineEntity instanceof Machine) {
             return;
         }
 
-        $machineEntity->setState($machineModel->state);
-        $machineEntity->setStateCategory($machineModel->stateCategory);
-        $machineEntity->setHasFailedState($machineModel->hasFailedState);
+        $machineEntity->setState($event->current->state);
+        $machineEntity->setStateCategory($event->current->stateCategory);
+        $machineEntity->setHasFailedState($event->current->hasFailedState);
 
         $this->machineRepository->save($machineEntity);
     }
 
     public function setIpOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $job = $this->jobRepository->find($event->jobId);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }
@@ -80,7 +78,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
     {
-        $job = $this->jobRepository->find($event->jobId);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }

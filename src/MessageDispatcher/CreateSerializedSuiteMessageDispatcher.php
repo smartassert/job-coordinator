@@ -34,7 +34,7 @@ class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateSerializedSuiteMessage($event->authenticationToken, $event->jobId, $event->parameters)
+            new CreateSerializedSuiteMessage($event->authenticationToken, $event->getJobId(), $event->parameters)
         );
     }
 }

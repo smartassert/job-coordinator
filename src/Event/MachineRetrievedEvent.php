@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineRetrievedEvent extends Event
+class MachineRetrievedEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -17,5 +17,10 @@ class MachineRetrievedEvent extends Event
         public readonly Machine $previous,
         public readonly Machine $current,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->previous->id;
     }
 }

@@ -6,7 +6,7 @@ namespace App\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineTerminationRequestedEvent extends Event
+class MachineTerminationRequestedEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -14,7 +14,12 @@ class MachineTerminationRequestedEvent extends Event
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }
