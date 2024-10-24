@@ -102,7 +102,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage($event->authenticationToken, $job->id);
+        $this->assertDispatchedMessage($event->getAuthenticationToken(), $job->id);
     }
 
     /**

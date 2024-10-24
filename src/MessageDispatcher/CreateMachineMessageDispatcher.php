@@ -38,7 +38,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
     public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateMachineMessage($event->authenticationToken, $event->getJobId())
+            new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId())
         );
     }
 }
