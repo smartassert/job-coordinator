@@ -50,7 +50,7 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(new GetSerializedSuiteMessage(
-            $event->authenticationToken,
+            $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->serializedSuite->getId(),
         ));
