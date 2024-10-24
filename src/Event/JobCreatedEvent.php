@@ -6,7 +6,7 @@ namespace App\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class JobCreatedEvent extends Event implements JobEventInterface
+class JobCreatedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
 {
     /**
      * @param non-empty-string                          $authenticationToken
@@ -14,7 +14,7 @@ class JobCreatedEvent extends Event implements JobEventInterface
      * @param array<non-empty-string, non-empty-string> $parameters
      */
     public function __construct(
-        public readonly string $authenticationToken,
+        private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly array $parameters,
     ) {
@@ -23,5 +23,10 @@ class JobCreatedEvent extends Event implements JobEventInterface
     public function getJobId(): string
     {
         return $this->jobId;
+    }
+
+    public function getAuthenticationToken(): string
+    {
+        return $this->authenticationToken;
     }
 }
