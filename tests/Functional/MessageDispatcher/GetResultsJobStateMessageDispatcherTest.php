@@ -63,11 +63,11 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         return [
             ResultsJobCreatedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobCreatedEvent::class,
-                'expectedMethod' => 'dispatchForResultsJobCreatedEvent',
+                'expectedMethod' => 'dispatchForResultsJobEvent',
             ],
             ResultsJobStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
-                'expectedMethod' => 'dispatchForResultsJobStateRetrievedEvent',
+                'expectedMethod' => 'dispatchForResultsJobEvent',
             ],
         ];
     }
@@ -84,7 +84,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $event = new ResultsJobCreatedEvent($authenticationToken, $job->id, $resultsJob);
 
-        $this->dispatcher->dispatchForResultsJobCreatedEvent($event);
+        $this->dispatcher->dispatchForResultsJobEvent($event);
 
         $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
     }
@@ -100,7 +100,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->id, $resultsJobState);
 
-        $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
+        $this->dispatcher->dispatchForResultsJobEvent($event);
 
         $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
     }

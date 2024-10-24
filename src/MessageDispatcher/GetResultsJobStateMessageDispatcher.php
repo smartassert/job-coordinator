@@ -24,10 +24,10 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
     {
         return [
             ResultsJobCreatedEvent::class => [
-                ['dispatchForResultsJobCreatedEvent', 100],
+                ['dispatchForResultsJobEvent', 100],
             ],
             ResultsJobStateRetrievedEvent::class => [
-                ['dispatchForResultsJobStateRetrievedEvent', 100],
+                ['dispatchForResultsJobEvent', 100],
             ],
         ];
     }
@@ -35,17 +35,7 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
     /**
      * @throws NonRepeatableMessageAlreadyDispatchedException
      */
-    public function dispatchForResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
-    {
-        $this->messageDispatcher->dispatch(
-            new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId())
-        );
-    }
-
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
-    public function dispatchForResultsJobStateRetrievedEvent(ResultsJobStateRetrievedEvent $event): void
+    public function dispatchForResultsJobEvent(ResultsJobCreatedEvent|ResultsJobStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
             new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId())
