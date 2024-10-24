@@ -36,8 +36,26 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         $event = new MachineRetrievedEvent(
             md5((string) rand()),
-            MachineFactory::create($machineId, 'unchanged-state', 'active', [], false),
-            MachineFactory::create($machineId, 'unchanged-state', 'active', [], false),
+            MachineFactory::create(
+                $machineId,
+                'unchanged-state',
+                'active',
+                [],
+                false,
+                true,
+                false,
+                false,
+            ),
+            MachineFactory::create(
+                $machineId,
+                'unchanged-state',
+                'active',
+                [],
+                false,
+                true,
+                false,
+                false,
+            ),
         );
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
@@ -54,8 +72,27 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
 
-        $previousMachine = MachineFactory::create($machineId, 'previous-state', 'active', [], false);
-        $currentMachine = MachineFactory::create($machineId, 'current-state', 'active', [], false);
+        $previousMachine = MachineFactory::create(
+            $machineId,
+            'previous-state',
+            'active',
+            [],
+            false,
+            true,
+            false,
+            false,
+        );
+
+        $currentMachine = MachineFactory::create(
+            $machineId,
+            'current-state',
+            'active',
+            [],
+            false,
+            true,
+            false,
+            false,
+        );
 
         $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
 
@@ -93,29 +130,101 @@ class MachineStateEventDispatcherTest extends WebTestCase
             'unknown -> unknown' => [
                 'event' => new MachineRetrievedEvent(
                     md5((string) rand()),
-                    MachineFactory::create($machineId, 'unknown', 'unknown', [], false),
-                    MachineFactory::create($machineId, 'unknown', 'unknown', [], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'unknown',
+                        'unknown',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'unknown',
+                        'unknown',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
                 ),
             ],
             'unknown -> finding' => [
                 'event' => new MachineRetrievedEvent(
                     md5((string) rand()),
-                    MachineFactory::create($machineId, 'unknown', 'unknown', [], false),
-                    MachineFactory::create($machineId, 'find/finding', 'pre_active', [], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'unknown',
+                        'unknown',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'find/finding',
+                        'pre_active',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
                 ),
             ],
             'finding -> finding' => [
                 'event' => new MachineRetrievedEvent(
                     md5((string) rand()),
-                    MachineFactory::create($machineId, 'find/finding', 'pre_active', [], false),
-                    MachineFactory::create($machineId, 'find/finding', 'pre_active', [], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'find/finding',
+                        'pre_active',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'find/finding',
+                        'pre_active',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
                 ),
             ],
             'finding -> active without ip address' => [
                 'event' => new MachineRetrievedEvent(
                     md5((string) rand()),
-                    MachineFactory::create($machineId, 'find/finding', 'pre_active', [], false),
-                    MachineFactory::create($machineId, 'up/active', 'active', [], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'find/finding',
+                        'pre_active',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'up/active',
+                        'active',
+                        [],
+                        false,
+                        true,
+                        false,
+                        false,
+                    ),
                 ),
             ],
         ];
@@ -147,8 +256,26 @@ class MachineStateEventDispatcherTest extends WebTestCase
             'unknown -> active' => [
                 'event' => new MachineRetrievedEvent(
                     $authenticationToken,
-                    MachineFactory::create($machineId, 'unknown', 'unknown', [], false),
-                    MachineFactory::create($machineId, 'up/active', 'active', ['127.0.0.1'], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'unknown',
+                        'unknown',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'up/active',
+                        'active',
+                        ['127.0.0.1'],
+                        false,
+                        true,
+                        false,
+                        false,
+                    ),
                 ),
                 'expected' => new MachineIsActiveEvent(
                     $authenticationToken,
@@ -159,8 +286,26 @@ class MachineStateEventDispatcherTest extends WebTestCase
             'finding -> active' => [
                 'event' => new MachineRetrievedEvent(
                     $authenticationToken,
-                    MachineFactory::create($machineId, 'find/finding', 'finding', [], false),
-                    MachineFactory::create($machineId, 'up/active', 'active', ['127.0.0.2'], false),
+                    MachineFactory::create(
+                        $machineId,
+                        'find/finding',
+                        'pre_active',
+                        [],
+                        false,
+                        false,
+                        false,
+                        false,
+                    ),
+                    MachineFactory::create(
+                        $machineId,
+                        'up/active',
+                        'active',
+                        ['127.0.0.2'],
+                        false,
+                        true,
+                        false,
+                        false,
+                    ),
                 ),
                 'expected' => new MachineIsActiveEvent(
                     $authenticationToken,
@@ -178,8 +323,27 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
 
-        $previousMachine = MachineFactory::create($machineId, 'previous-state', 'active', [], false);
-        $currentMachine = MachineFactory::create($machineId, 'current-state', 'active', [], false);
+        $previousMachine = MachineFactory::create(
+            $machineId,
+            'previous-state',
+            'active',
+            [],
+            false,
+            true,
+            false,
+            false,
+        );
+
+        $currentMachine = MachineFactory::create(
+            $machineId,
+            'current-state',
+            'active',
+            [],
+            false,
+            true,
+            false,
+            false,
+        );
 
         $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
 
@@ -198,12 +362,24 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
         $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
 
-        $previousMachine = MachineFactory::create($machineId, 'find/finding', 'finding', [], false);
+        $previousMachine = MachineFactory::create(
+            $machineId,
+            'find/finding',
+            'finding',
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
         $currentMachine = MachineFactory::create(
             $machineId,
             'find/not-findable',
             'end',
             [],
+            true,
+            false,
+            false,
             true,
             $actionFailure
         );

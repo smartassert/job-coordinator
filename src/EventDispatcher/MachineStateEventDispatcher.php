@@ -46,10 +46,15 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
     public function dispatchMachineIsActiveEvent(MachineRetrievedEvent $event): void
     {
-        if (
-            in_array($event->previous->stateCategory, ['unknown', 'finding', 'pre_active'])
-            && 'active' === $event->current->stateCategory
-        ) {
+        $machineWasPreviouslyNotYetActive =
+            !$event->previous->hasActiveState
+            && !$event->previous->hasFailedState
+            && !$event->previous->hasEndingState
+            && !$event->previous->hasEndState;
+
+        $machineIsNowActive = $event->current->hasActiveState;
+
+        if ($machineWasPreviouslyNotYetActive && $machineIsNowActive) {
             $primaryIpAddress = $event->current->ipAddresses[0] ?? null;
             if (!is_string($primaryIpAddress)) {
                 return;

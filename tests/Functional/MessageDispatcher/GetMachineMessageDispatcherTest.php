@@ -71,7 +71,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', [], false);
+        $machine = MachineFactory::create(
+            $job->id,
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
 
         $authenticationToken = md5((string) rand());
 

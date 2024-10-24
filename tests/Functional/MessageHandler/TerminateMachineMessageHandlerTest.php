@@ -10,9 +10,9 @@ use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
+use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -76,16 +76,19 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create($job->id, 'create/requested', 'pre_active', [], false);
+        $machine = MachineFactory::create(
+            $job->id,
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'state_category' => $machine->stateCategory,
-                'ip_addresses' => $machine->ipAddresses,
-                'has_failed_state' => $machine->hasFailedState,
-            ])),
+            HttpResponseFactory::createForWorkerManagerMachine($machine),
         ]);
 
         $handler = $this->createHandler($jobRepository, $workerManagerClient);

@@ -82,7 +82,16 @@ class MachineFactoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = WorkerMachineFactory::create($jobId, md5((string) rand()), md5((string) rand()), [], false);
+        $machine = WorkerMachineFactory::create(
+            $jobId,
+            md5((string) rand()),
+            md5((string) rand()),
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
@@ -131,7 +140,10 @@ class MachineFactoryTest extends WebTestCase
                         'find/finding',
                         'find',
                         [],
-                        false
+                        false,
+                        false,
+                        false,
+                        false,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -149,7 +161,10 @@ class MachineFactoryTest extends WebTestCase
                         'find/not-findable',
                         'end',
                         [],
-                        true
+                        true,
+                        false,
+                        false,
+                        true,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
