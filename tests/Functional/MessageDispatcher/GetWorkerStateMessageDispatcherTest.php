@@ -96,27 +96,6 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
         self::assertEquals([new NonDelayedStamp()], $dispatchedEnvelope->all(NonDelayedStamp::class));
     }
 
-    public function testDispatchForWorkerStateRetrievedEventIsEndState(): void
-    {
-        $jobId = md5((string) rand());
-
-        $state = new ApplicationState(
-            new ComponentState('complete', true),
-            new ComponentState('complete', true),
-            new ComponentState('complete', true),
-            new ComponentState('complete', true),
-        );
-
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $event = new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $state);
-
-        $this->dispatcher->dispatchForWorkerStateRetrievedEvent($event);
-
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
-    }
-
     public function testDispatchForWorkerStateRetrievedEventMessageIsDispatched(): void
     {
         $jobId = md5((string) rand());

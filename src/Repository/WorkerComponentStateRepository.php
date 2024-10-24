@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Job;
 use App\Entity\WorkerComponentState;
+use App\Enum\WorkerComponentName;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -27,5 +29,13 @@ class WorkerComponentStateRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
+    }
+
+    public function getApplicationState(Job $job): ?WorkerComponentState
+    {
+        return $this->findOneBy([
+            'jobId' => $job->id,
+            'componentName' => WorkerComponentName::APPLICATION,
+        ]);
     }
 }
