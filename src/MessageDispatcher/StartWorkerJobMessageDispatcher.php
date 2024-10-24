@@ -38,7 +38,7 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new StartWorkerJobMessage($event->authenticationToken, $event->jobId, $event->ipAddress)
+            new StartWorkerJobMessage($event->authenticationToken, $event->getJobId(), $event->ipAddress)
         );
     }
 
