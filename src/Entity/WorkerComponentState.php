@@ -19,8 +19,12 @@ class WorkerComponentState implements WorkerComponentStateInterface
      * @var non-empty-string
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 32, unique: true)]
-    private string $id;
+    #[ORM\Column(length: 32)]
+    private readonly string $jobId;
+
+    #[ORM\Id]
+    #[ORM\Column(length: 64, nullable: false, enumType: WorkerComponentName::class)]
+    private readonly WorkerComponentName $componentName;
 
     /**
      * @var non-empty-string
@@ -36,25 +40,8 @@ class WorkerComponentState implements WorkerComponentStateInterface
      */
     public function __construct(string $jobId, WorkerComponentName $componentName)
     {
-        $this->id = static::generateId($jobId, $componentName);
-    }
-
-    /**
-     * @param non-empty-string $jobId
-     *
-     * @return non-empty-string
-     */
-    public static function generateId(string $jobId, WorkerComponentName $componentName): string
-    {
-        return md5($jobId . $componentName->value);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getState(): string
-    {
-        return $this->state;
+        $this->jobId = $jobId;
+        $this->componentName = $componentName;
     }
 
     /**
@@ -65,11 +52,6 @@ class WorkerComponentState implements WorkerComponentStateInterface
         $this->state = $state;
 
         return $this;
-    }
-
-    public function getIsEndState(): bool
-    {
-        return $this->isEndState;
     }
 
     public function setIsEndState(bool $isEndState): static

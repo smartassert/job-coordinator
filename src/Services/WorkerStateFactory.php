@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
@@ -31,9 +30,10 @@ class WorkerStateFactory
 
     private function createComponentState(Job $job, WorkerComponentName $componentName): WorkerComponentStateInterface
     {
-        $componentState = $this->workerComponentStateRepository->find(
-            WorkerComponentState::generateId($job->id, $componentName)
-        );
+        $componentState = $this->workerComponentStateRepository->findOneBy([
+            'jobId' => $job->id,
+            'componentName' => $componentName,
+        ]);
 
         if (null === $componentState) {
             $componentState = new PendingWorkerComponentState();

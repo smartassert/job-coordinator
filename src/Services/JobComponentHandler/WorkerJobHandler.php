@@ -27,7 +27,8 @@ class WorkerJobHandler implements JobComponentHandlerInterface
             return null;
         }
 
-        $componentStates = $this->entityRepository->getAllForJob($job);
+        $componentStates = $this->entityRepository->findBy(['jobId' => $job->id]);
+
         if ([] !== $componentStates) {
             return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
@@ -41,7 +42,7 @@ class WorkerJobHandler implements JobComponentHandlerInterface
             return null;
         }
 
-        $componentStates = $this->entityRepository->getAllForJob($job);
+        $componentStates = $this->entityRepository->findBy(['jobId' => $job->id]);
         if ([] !== $componentStates) {
             return RequestState::SUCCEEDED;
         }
