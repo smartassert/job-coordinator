@@ -14,10 +14,10 @@ use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
+use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine;
@@ -114,7 +114,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
 
-        $this->createMessageAndHandleMessage($previous, self::$apiToken, $this->createHttpResponseForMachine($current));
+        $this->createMessageAndHandleMessage(
+            $previous,
+            self::$apiToken,
+            HttpResponseFactory::createForWorkerManagerMachine($current),
+        );
 
         self::assertEquals(
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
@@ -180,7 +184,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
 
-        $this->createMessageAndHandleMessage($previous, self::$apiToken, $this->createHttpResponseForMachine($current));
+        $this->createMessageAndHandleMessage(
+            $previous,
+            self::$apiToken,
+            HttpResponseFactory::createForWorkerManagerMachine($current)
+        );
 
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
@@ -298,7 +306,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
 
-        $this->createMessageAndHandleMessage($previous, self::$apiToken, $this->createHttpResponseForMachine($current));
+        $this->createMessageAndHandleMessage(
+            $previous,
+            self::$apiToken,
+            HttpResponseFactory::createForWorkerManagerMachine($current)
+        );
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -384,19 +396,5 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);
-    }
-
-    private function createHttpResponseForMachine(Machine $machine): ResponseInterface
-    {
-        return new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-            'id' => $machine->id,
-            'state' => $machine->state,
-            'state_category' => $machine->stateCategory,
-            'ip_addresses' => $machine->ipAddresses,
-            'has_failed_state' => $machine->hasFailedState,
-            'has_active_state' => $machine->hasActiveState,
-            'has_ending_state' => $machine->hasEndingState,
-            'has_end_state' => $machine->hasEndState,
-        ]));
     }
 }

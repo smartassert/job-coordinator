@@ -16,11 +16,11 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
+use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\SerializedSuiteFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -229,16 +229,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-                'id' => $machine->id,
-                'state' => $machine->state,
-                'state_category' => $machine->stateCategory,
-                'ip_addresses' => $machine->ipAddresses,
-                'has_failed_state' => $machine->hasFailedState,
-                'has_active_state' => $machine->hasActiveState,
-                'has_ending_state' => $machine->hasEndingState,
-                'has_end_state' => $machine->hasEndState,
-            ])),
+            HttpResponseFactory::createForWorkerManagerMachine($machine),
         ]);
 
         $handler = $this->createHandler(
