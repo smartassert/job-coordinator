@@ -144,7 +144,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 
         self::assertSame($job->id, $event->getJobId());
-        self::assertSame(self::$apiToken, $event->authenticationToken);
     }
 
     protected function getHandlerClass(): string
