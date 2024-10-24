@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineHasActionFailureEvent extends Event
+class MachineHasActionFailureEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -15,8 +15,13 @@ class MachineHasActionFailureEvent extends Event
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
         public readonly ActionFailure $machineActionFailure,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }
