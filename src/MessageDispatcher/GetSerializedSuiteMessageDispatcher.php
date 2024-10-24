@@ -49,10 +49,6 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
     {
-        if ($event->serializedSuite->hasEndState()) {
-            return;
-        }
-
         $this->messageDispatcher->dispatch(new GetSerializedSuiteMessage(
             $event->authenticationToken,
             $event->jobId,
