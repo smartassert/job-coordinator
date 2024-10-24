@@ -6,7 +6,7 @@ namespace App\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class AbstractWorkerEvent extends Event implements JobEventInterface
+abstract class AbstractWorkerEvent extends Event implements JobEventInterface, MachineIpAddressInterface
 {
     /**
      * @param non-empty-string $jobId
@@ -14,12 +14,17 @@ abstract class AbstractWorkerEvent extends Event implements JobEventInterface
      */
     public function __construct(
         private readonly string $jobId,
-        public readonly string $machineIpAddress,
+        private readonly string $machineIpAddress,
     ) {
     }
 
     public function getJobId(): string
     {
         return $this->jobId;
+    }
+
+    public function getMachineIpAddress(): string
+    {
+        return $this->machineIpAddress;
     }
 }

@@ -38,7 +38,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public function dispatchForWorkerJobStartRequestedEvent(WorkerJobStartRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetWorkerStateMessage($event->getJobId(), $event->machineIpAddress)
+            new GetWorkerStateMessage($event->getJobId(), $event->getMachineIpAddress())
         );
     }
 
@@ -48,7 +48,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
-            new GetWorkerStateMessage($event->getJobId(), $event->machineIpAddress)
+            new GetWorkerStateMessage($event->getJobId(), $event->getMachineIpAddress())
         );
     }
 }
