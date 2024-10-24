@@ -33,13 +33,12 @@ class MachineFactory implements EventSubscriberInterface
 
     public function createOnMachineCreationRequestedEvent(MachineCreationRequestedEvent $event): void
     {
-        $machine = $event->machine;
-
-        $job = $this->jobRepository->find($machine->id);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }
 
+        $machine = $event->machine;
         $this->create($job, $machine->state, $machine->stateCategory, $machine->hasFailedState);
     }
 

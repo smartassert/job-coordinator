@@ -54,7 +54,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
     public function dispatch(MachineCreationRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetMachineMessage($event->authenticationToken, $event->machine->id, $event->machine)
+            new GetMachineMessage($event->authenticationToken, $event->getJobId(), $event->machine)
         );
     }
 }
