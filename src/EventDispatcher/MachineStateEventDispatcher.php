@@ -36,11 +36,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     public function dispatchMachineStateChangeEvent(MachineRetrievedEvent $event): void
     {
         if ($event->previous->state !== $event->current->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $event->authenticationToken,
-                $event->previous,
-                $event->current,
-            ));
+            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($event->previous, $event->current));
         }
     }
 
@@ -61,7 +57,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             }
 
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
-                $event->authenticationToken,
+                $event->getAuthenticationToken(),
                 $event->getJobId(),
                 $primaryIpAddress
             ));
@@ -75,7 +71,6 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             && $event->current->actionFailure instanceof ActionFailure
         ) {
             $this->eventDispatcher->dispatch(new MachineHasActionFailureEvent(
-                $event->authenticationToken,
                 $event->getJobId(),
                 $event->current->actionFailure
             ));

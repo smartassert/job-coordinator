@@ -9,11 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MachineStateChangeEvent extends Event implements JobEventInterface
 {
-    /**
-     * @param non-empty-string $authenticationToken
-     */
     public function __construct(
-        public readonly string $authenticationToken,
         public readonly Machine $previous,
         public readonly Machine $current,
     ) {

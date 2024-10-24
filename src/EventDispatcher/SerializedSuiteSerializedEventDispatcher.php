@@ -36,7 +36,7 @@ class SerializedSuiteSerializedEventDispatcher implements EventSubscriberInterfa
         }
 
         $this->eventDispatcher->dispatch(new SerializedSuiteSerializedEvent(
-            $event->authenticationToken,
+            $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->serializedSuite->getId()
         ));

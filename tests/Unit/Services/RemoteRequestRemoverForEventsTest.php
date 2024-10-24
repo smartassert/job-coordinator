@@ -195,7 +195,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
-            new MachineTerminationRequestedEvent('authentication token', $jobId)
+            new MachineTerminationRequestedEvent($jobId)
         );
 
         self::assertTrue(true);

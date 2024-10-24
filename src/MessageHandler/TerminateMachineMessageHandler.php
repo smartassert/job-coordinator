@@ -43,10 +43,7 @@ final class TerminateMachineMessageHandler
         try {
             $this->workerManagerClient->deleteMachine($message->authenticationToken, $job->id);
 
-            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent(
-                $message->authenticationToken,
-                $job->id
-            ));
+            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($job->id));
         } catch (\Throwable $e) {
             throw new MachineTerminationException($job, $e, $message);
         }

@@ -74,7 +74,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage($event->authenticationToken, $event->getJobId());
+        $this->assertDispatchedMessage($event->getAuthenticationToken(), $event->getJobId());
     }
 
     /**
