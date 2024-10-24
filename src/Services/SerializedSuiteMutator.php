@@ -33,7 +33,7 @@ class SerializedSuiteMutator implements EventSubscriberInterface
 
     public function setState(SerializedSuiteRetrievedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->jobId);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }
