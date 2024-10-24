@@ -78,16 +78,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
-            $job->id,
-            'unknown',
-            'unknown',
-            [],
-            false,
-            false,
-            false,
-            false,
-        );
+        $machine = MachineFactory::createRandomForJob($job->id);
 
         $workerManagerException = new \Exception('Failed to create machine');
 
