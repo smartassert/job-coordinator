@@ -35,7 +35,7 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
 
     public function setOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->jobId);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }

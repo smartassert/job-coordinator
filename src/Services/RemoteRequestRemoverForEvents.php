@@ -89,7 +89,7 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 
     public function removeWorkerJobStartRequests(WorkerJobStartRequestedEvent $event): void
     {
-        $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_START_JOB);
+        $this->remoteRequestRemover->removeForJobAndType($event->getJobId(), RemoteRequestType::MACHINE_START_JOB);
     }
 
     public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
@@ -104,6 +104,6 @@ class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 
     public function removeWorkerStateGetRequests(WorkerStateRetrievedEvent $event): void
     {
-        $this->remoteRequestRemover->removeForJobAndType($event->jobId, RemoteRequestType::MACHINE_STATE_GET);
+        $this->remoteRequestRemover->removeForJobAndType($event->getJobId(), RemoteRequestType::MACHINE_STATE_GET);
     }
 }
