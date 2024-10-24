@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SerializedSuiteCreatedEvent extends Event
+class SerializedSuiteCreatedEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -15,8 +15,13 @@ class SerializedSuiteCreatedEvent extends Event
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
         public readonly SerializedSuite $serializedSuite,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }
