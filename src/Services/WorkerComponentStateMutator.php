@@ -51,9 +51,10 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
         WorkerComponentName $componentName,
         ComponentState $componentState
     ): void {
-        $componentStateEntity = $this->workerComponentStateRepository->find(
-            WorkerComponentState::generateId($job->id, $componentName)
-        );
+        $componentStateEntity = $this->workerComponentStateRepository->findOneBy([
+            'jobId' => $job->id,
+            'componentName' => $componentName,
+        ]);
 
         if (null === $componentStateEntity) {
             $componentStateEntity = new WorkerComponentState($job->id, $componentName);

@@ -127,30 +127,34 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         self::assertEquals(
             $expectedApplicationStateCreator($job),
-            $this->workerComponentStateRepository->find(
-                WorkerComponentState::generateId($job->id, WorkerComponentName::APPLICATION)
-            )
+            $this->workerComponentStateRepository->findOneBy([
+                'jobId' => $job->id,
+                'componentName' => WorkerComponentName::APPLICATION,
+            ])
         );
 
         self::assertEquals(
             $expectedCompilationStateCreator($job),
-            $this->workerComponentStateRepository->find(
-                WorkerComponentState::generateId($job->id, WorkerComponentName::COMPILATION)
-            )
+            $this->workerComponentStateRepository->findOneBy([
+                'jobId' => $job->id,
+                'componentName' => WorkerComponentName::COMPILATION,
+            ])
         );
 
         self::assertEquals(
             $expectedExecutionStateCreator($job),
-            $this->workerComponentStateRepository->find(
-                WorkerComponentState::generateId($job->id, WorkerComponentName::EXECUTION)
-            )
+            $this->workerComponentStateRepository->findOneBy([
+                'jobId' => $job->id,
+                'componentName' => WorkerComponentName::EXECUTION,
+            ])
         );
 
         self::assertEquals(
             $expectedEventDeliveryStateCreator($job),
-            $this->workerComponentStateRepository->find(
-                WorkerComponentState::generateId($job->id, WorkerComponentName::EVENT_DELIVERY)
-            )
+            $this->workerComponentStateRepository->findOneBy([
+                'jobId' => $job->id,
+                'componentName' => WorkerComponentName::EVENT_DELIVERY,
+            ])
         );
     }
 

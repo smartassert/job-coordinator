@@ -19,10 +19,11 @@ final class Version20230710095417 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE worker_component_state (
-                id VARCHAR(32) NOT NULL,
+                job_id VARCHAR(32) NOT NULL,
+                component_name VARCHAR(64) NOT NULL,
                 state VARCHAR(64) NOT NULL,
                 is_end_state BOOLEAN NOT NULL,
-                PRIMARY KEY(id)
+                PRIMARY KEY(job_id, component_name)
             )
         ');
     }

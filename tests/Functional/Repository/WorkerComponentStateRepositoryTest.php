@@ -47,7 +47,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
         $statesCreator($job, $this->repository);
 
         self::assertEquals(
-            $this->repository->getAllForJob($job),
+            $this->repository->findBy(['jobId' => $job->id]),
             $expectedStatesCreator($job)
         );
     }
