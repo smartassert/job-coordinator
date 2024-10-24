@@ -37,7 +37,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     {
         if ($event->previous->state !== $event->current->state) {
             $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $event->authenticationToken,
+                $event->getAuthenticationToken(),
                 $event->previous,
                 $event->current,
             ));
@@ -61,7 +61,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             }
 
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
-                $event->authenticationToken,
+                $event->getAuthenticationToken(),
                 $event->getJobId(),
                 $primaryIpAddress
             ));

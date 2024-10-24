@@ -42,7 +42,7 @@ class GetMachineMessageDispatcher implements EventSubscriberInterface
         }
 
         $this->messageDispatcher->dispatch(new GetMachineMessage(
-            $event->authenticationToken,
+            $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->current
         ));
