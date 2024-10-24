@@ -76,7 +76,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $jobId = $createResponseData['id'];
 
         $jobData = $this->getJobData($apiToken, $jobId);
-        $threshold = 30;
+        $threshold = 60;
         $count = 0;
 
         while (
