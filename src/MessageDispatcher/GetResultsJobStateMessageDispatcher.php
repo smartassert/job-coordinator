@@ -10,10 +10,10 @@ use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetResultsJobStateMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
+readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
@@ -47,10 +47,6 @@ class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchForResultsJobStateRetrievedEvent(ResultsJobStateRetrievedEvent $event): void
     {
-        if ($event->resultsJobState->hasEndState()) {
-            return;
-        }
-
         $this->messageDispatcher->dispatch(
             new GetResultsJobStateMessage($event->authenticationToken, $event->jobId)
         );

@@ -89,7 +89,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
     }
 
-    public function testDispatchForResultsJobStateRetrievedEventNotEndState(): void
+    public function testDispatchForResultsJobStateRetrievedEventSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -103,22 +103,6 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
 
         $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
-    }
-
-    public function testDispatchForResultsJobStateRetrievedEventIsEndState(): void
-    {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
-
-        $authenticationToken = md5((string) rand());
-        $resultsJobState = new ResultsJobState('complete', 'ended');
-
-        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->id, $resultsJobState);
-
-        $this->dispatcher->dispatchForResultsJobStateRetrievedEvent($event);
-
-        self::assertSame([], $this->messengerTransport->getSent());
     }
 
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void

@@ -8,19 +8,21 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Message\GetResultsJobStateMessage;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GetResultsJobStateMessageHandler
+final readonly class GetResultsJobStateMessageHandler
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
-        private readonly ResultsClient $resultsClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly JobPreparationInspectorInterface $jobPreparationInspector,
+        private JobRepository $jobRepository,
+        private ResultsJobRepository $resultsJobRepository,
+        private ResultsClient $resultsClient,
+        private EventDispatcherInterface $eventDispatcher,
+        private JobPreparationInspectorInterface $jobPreparationInspector,
     ) {
     }
 
@@ -35,6 +37,11 @@ final class GetResultsJobStateMessageHandler
         }
 
         if (true === $this->jobPreparationInspector->hasFailed($job)) {
+            return;
+        }
+
+        $resultsJob = $this->resultsJobRepository->find($job->id);
+        if (null === $resultsJob || $resultsJob->hasEndState()) {
             return;
         }
 
