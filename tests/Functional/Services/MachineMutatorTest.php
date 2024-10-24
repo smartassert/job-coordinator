@@ -141,7 +141,6 @@ class MachineMutatorTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return new MachineStateChangeEvent(
-                        md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId)
                     );
@@ -159,7 +158,6 @@ class MachineMutatorTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return new MachineStateChangeEvent(
-                        md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId)
                     );
@@ -178,7 +176,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
-                        md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandomForJob($job->id),
                         WorkerManagerClientMachineFactory::create(
                             $job->id,
@@ -206,7 +203,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (Job $job) {
                     return new MachineStateChangeEvent(
-                        md5((string) rand()),
                         WorkerManagerClientMachineFactory::createRandomForJob($job->id),
                         WorkerManagerClientMachineFactory::create(
                             $job->id,

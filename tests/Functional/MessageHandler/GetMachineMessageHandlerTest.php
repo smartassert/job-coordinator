@@ -221,7 +221,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     \assert('' !== $authenticationToken);
 
                     return new MachineStateChangeEvent(
-                        $authenticationToken,
                         MachineFactory::create(
                             $job->id,
                             'unknown',
@@ -309,7 +308,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
         self::assertEquals($previous, $latestEvent->previous);
         self::assertEquals($current, $latestEvent->current);
-        self::assertEquals(self::$apiToken, $latestEvent->authenticationToken);
 
         self::assertEquals(
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],

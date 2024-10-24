@@ -36,11 +36,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     public function dispatchMachineStateChangeEvent(MachineRetrievedEvent $event): void
     {
         if ($event->previous->state !== $event->current->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent(
-                $event->getAuthenticationToken(),
-                $event->previous,
-                $event->current,
-            ));
+            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($event->previous, $event->current));
         }
     }
 
