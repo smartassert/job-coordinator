@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ResultsJobCreatedEvent extends Event
+class ResultsJobCreatedEvent extends Event implements JobEventInterface
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -15,8 +15,13 @@ class ResultsJobCreatedEvent extends Event
      */
     public function __construct(
         public readonly string $authenticationToken,
-        public readonly string $jobId,
+        private readonly string $jobId,
         public readonly ResultsJob $resultsJob,
     ) {
+    }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
     }
 }

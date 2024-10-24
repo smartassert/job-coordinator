@@ -33,7 +33,7 @@ class ResultsJobFactory implements EventSubscriberInterface
 
     public function createOnResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->jobId);
+        $job = $this->jobRepository->find($event->getJobId());
         if (!$job instanceof Job) {
             return;
         }
