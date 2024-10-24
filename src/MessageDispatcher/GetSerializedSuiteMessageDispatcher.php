@@ -24,10 +24,10 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     {
         return [
             SerializedSuiteCreatedEvent::class => [
-                ['dispatchForSerializedSuiteCreatedEvent', 100],
+                ['dispatchForSerializedSuiteEvent', 100],
             ],
             SerializedSuiteRetrievedEvent::class => [
-                ['dispatchForSerializedSuiteRetrievedEvent', 100],
+                ['dispatchForSerializedSuiteEvent', 100],
             ],
         ];
     }
@@ -35,24 +35,13 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     /**
      * @throws NonRepeatableMessageAlreadyDispatchedException
      */
-    public function dispatchForSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
-    {
+    public function dispatchForSerializedSuiteEvent(
+        SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event
+    ): void {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(new GetSerializedSuiteMessage(
             $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->serializedSuite->getId()
-        ));
-    }
-
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
-    public function dispatchForSerializedSuiteRetrievedEvent(SerializedSuiteRetrievedEvent $event): void
-    {
-        $this->messageDispatcher->dispatch(new GetSerializedSuiteMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->serializedSuite->getId(),
         ));
     }
 }

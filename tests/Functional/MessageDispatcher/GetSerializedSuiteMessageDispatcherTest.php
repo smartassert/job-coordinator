@@ -62,16 +62,16 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         return [
             SerializedSuiteCreatedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
-                'expectedMethod' => 'dispatchForSerializedSuiteCreatedEvent',
+                'expectedMethod' => 'dispatchForSerializedSuiteEvent',
             ],
             SerializedSuiteRetrievedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
-                'expectedMethod' => 'dispatchForSerializedSuiteRetrievedEvent',
+                'expectedMethod' => 'dispatchForSerializedSuiteEvent',
             ],
         ];
     }
 
-    public function testDispatchForSerializedSuiteCreatedEventSuccess(): void
+    public function testDispatchForSerializedSuiteEventSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -84,7 +84,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->id, $serializedSuite);
 
-        $this->dispatcher->dispatchForSerializedSuiteCreatedEvent($event);
+        $this->dispatcher->dispatchForSerializedSuiteEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
