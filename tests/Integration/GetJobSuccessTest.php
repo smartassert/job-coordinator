@@ -89,7 +89,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         }
 
         if ($count >= $threshold) {
-            var_dump($jobData);
             self::fail('Tried ' . $count . ' times to get expected failed serialized suite state.');
         }
 
