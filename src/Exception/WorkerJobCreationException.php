@@ -7,7 +7,7 @@ namespace App\Exception;
 use App\Entity\Job;
 use App\Message\JobRemoteRequestMessageInterface;
 
-class WorkerJobStartException extends AbstractRemoteRequestException
+class WorkerJobCreationException extends AbstractRemoteRequestException
 {
     public function __construct(
         Job $job,

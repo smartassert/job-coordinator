@@ -18,7 +18,7 @@ use App\Exception\ResultsJobCreationException;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Exception\SerializedSuiteCreationException;
 use App\Exception\SerializedSuiteRetrievalException;
-use App\Exception\WorkerJobStartException;
+use App\Exception\WorkerJobCreationException;
 use App\Message\CreateMachineMessage;
 use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
@@ -186,10 +186,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 },
                 'remoteRequestType' => RemoteRequestType::SERIALIZED_SUITE_GET,
             ],
-            WorkerJobStartException::class => [
+            WorkerJobCreationException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
                     return function (Job $job) use ($inner) {
-                        return new WorkerJobStartException(
+                        return new WorkerJobCreationException(
                             $job,
                             $inner,
                             new StartWorkerJobMessage(md5((string) rand()), $job->id, '127.0.0.1'),
