@@ -25,4 +25,9 @@ class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return RemoteRequestType::MACHINE_GET;
     }
+
+    public function isRepeatable(): bool
+    {
+        return true;
+    }
 }

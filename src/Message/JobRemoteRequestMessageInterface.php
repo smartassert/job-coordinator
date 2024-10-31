@@ -15,6 +15,8 @@ interface JobRemoteRequestMessageInterface
 
     public function getRemoteRequestType(): RemoteRequestType;
 
+    public function isRepeatable(): bool;
+
     /**
      * @return int<0, max>
      */

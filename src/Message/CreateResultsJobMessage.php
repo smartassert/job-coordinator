@@ -12,4 +12,9 @@ class CreateResultsJobMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return RemoteRequestType::RESULTS_CREATE;
     }
+
+    public function isRepeatable(): bool
+    {
+        return false;
+    }
 }

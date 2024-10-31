@@ -23,4 +23,9 @@ class GetWorkerStateMessage extends AbstractRemoteRequestMessage
     {
         return RemoteRequestType::MACHINE_STATE_GET;
     }
+
+    public function isRepeatable(): bool
+    {
+        return true;
+    }
 }
