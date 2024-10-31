@@ -25,4 +25,9 @@ class CreateSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMes
     {
         return RemoteRequestType::SERIALIZED_SUITE_CREATE;
     }
+
+    public function isRepeatable(): bool
+    {
+        return false;
+    }
 }

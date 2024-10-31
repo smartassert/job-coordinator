@@ -25,4 +25,9 @@ class StartWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return RemoteRequestType::MACHINE_START_JOB;
     }
+
+    public function isRepeatable(): bool
+    {
+        return false;
+    }
 }

@@ -12,4 +12,9 @@ class GetResultsJobStateMessage extends AbstractAuthenticatedRemoteRequestMessag
     {
         return RemoteRequestType::RESULTS_STATE_GET;
     }
+
+    public function isRepeatable(): bool
+    {
+        return true;
+    }
 }
