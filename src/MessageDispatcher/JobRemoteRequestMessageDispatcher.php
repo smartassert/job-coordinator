@@ -45,11 +45,7 @@ class JobRemoteRequestMessageDispatcher
             );
 
             if ($existingRemoteRequest instanceof RemoteRequest) {
-                throw new NonRepeatableMessageAlreadyDispatchedException(
-                    $job,
-                    $message->getRemoteRequestType(),
-                    $existingRemoteRequest
-                );
+                throw new NonRepeatableMessageAlreadyDispatchedException($job, $existingRemoteRequest);
             }
         }
 
