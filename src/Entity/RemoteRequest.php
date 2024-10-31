@@ -88,7 +88,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
         return $jobId . $type->value . $index;
     }
 
-    public function setFailure(?RemoteRequestFailure $failure): self
+    public function setFailure(RemoteRequestFailure $failure): self
     {
         $this->failure = $failure;
 

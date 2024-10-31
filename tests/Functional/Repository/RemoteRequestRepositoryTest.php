@@ -223,17 +223,11 @@ class RemoteRequestRepositoryTest extends WebTestCase
                         new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
-                'remoteRequestsCreator' => function (array $remoteRequestFailures) {
-                    $remoteRequestFailure = $remoteRequestFailures[1] ?? null;
-                    \assert($remoteRequestFailure instanceof RemoteRequestFailure);
-
+                'remoteRequestsCreator' => function () {
                     return [
-                        (new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0))
-                            ->setFailure($remoteRequestFailure),
-                        (new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0))
-                            ->setFailure($remoteRequestFailure),
-                        (new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0))
-                            ->setFailure($remoteRequestFailure),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0),
                     ];
                 },
                 'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
