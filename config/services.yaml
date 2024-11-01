@@ -130,28 +130,28 @@ services:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::RESULTS_JOB
-            $remoteRequestType: '@app.job_component.request_type.results_job_create'
+            $requestType: '@app.job_component.request_type.results_job_create'
         tags: ['app.job_components.component']
 
     app.job_components.serialized_suite:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::SERIALIZED_SUITE
-            $remoteRequestType: '@app.job_component.request_type.serialized_suite_create'
+            $requestType: '@app.job_component.request_type.serialized_suite_create'
         tags: ['app.job_components.component']
 
     app.job_components.machine:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::MACHINE
-            $remoteRequestType: '@app.job_component.request_type.machine_create'
+            $requestType: '@app.job_component.request_type.machine_create'
         tags: ['app.job_components.component']
 
     app.job_components.worker_job:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::WORKER_JOB
-            $remoteRequestType: '@app.job_component.request_type.worker_job_create'
+            $requestType: '@app.job_component.request_type.worker_job_create'
         tags: ['app.job_components.component']
 
     App\Services\ComponentPreparationFactory:

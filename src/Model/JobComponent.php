@@ -10,7 +10,7 @@ class JobComponent
 {
     public function __construct(
         public readonly JobComponentName $name,
-        public readonly RemoteRequestType $remoteRequestType,
+        public readonly RemoteRequestType $requestType,
     ) {
     }
 }
