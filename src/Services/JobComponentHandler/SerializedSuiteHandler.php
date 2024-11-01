@@ -52,7 +52,6 @@ class SerializedSuiteHandler implements JobComponentHandlerInterface
     public function hasFailed(JobComponent $jobComponent, Job $job): ?bool
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
-
         if (null === $remoteRequest) {
             return null;
         }
@@ -67,7 +66,6 @@ class SerializedSuiteHandler implements JobComponentHandlerInterface
     private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
-
         if (null === $remoteRequest) {
             return new ComponentPreparation($jobComponent, PreparationState::PENDING);
         }
