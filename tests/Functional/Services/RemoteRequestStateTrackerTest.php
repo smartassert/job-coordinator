@@ -9,6 +9,7 @@ use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestStateTracker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -104,17 +105,12 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $remoteRequest = $this->remoteRequestRepository->find(
             RemoteRequest::generateId(
                 $message->getJobId(),
-                $message->getRemoteRequestEntity(),
-                $message->getRemoteRequestAction(),
+                $message->getRemoteRequestType(),
                 $message->getIndex()
             )
         );
 
-        $expectedRemoteRequest = new RemoteRequest(
-            $message->getJobId(),
-            $message->getRemoteRequestEntity(),
-            $message->getRemoteRequestAction(),
-        );
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
         $expectedRemoteRequest->setState($expectedRequestState);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
@@ -165,17 +161,12 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $remoteRequest = $this->remoteRequestRepository->find(
             RemoteRequest::generateId(
                 $message->getJobId(),
-                $message->getRemoteRequestEntity(),
-                $message->getRemoteRequestAction(),
+                $message->getRemoteRequestType(),
                 $message->getIndex()
             )
         );
 
-        $expectedRemoteRequest = new RemoteRequest(
-            $message->getJobId(),
-            $message->getRemoteRequestEntity(),
-            $message->getRemoteRequestAction(),
-        );
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
         $expectedRemoteRequest->setState(RequestState::SUCCEEDED);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
@@ -194,17 +185,12 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $remoteRequest = $this->remoteRequestRepository->find(
             RemoteRequest::generateId(
                 $message->getJobId(),
-                $message->getRemoteRequestEntity(),
-                $message->getRemoteRequestAction(),
+                $message->getRemoteRequestType(),
                 $message->getIndex()
             )
         );
 
-        $expectedRemoteRequest = new RemoteRequest(
-            $message->getJobId(),
-            $message->getRemoteRequestEntity(),
-            $message->getRemoteRequestAction(),
-        );
+        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
 
         $expectedRemoteRequest->setState(RequestState::REQUESTING);
 
@@ -225,8 +211,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $remoteRequest = $this->remoteRequestRepository->find(
             RemoteRequest::generateId(
                 $message->getJobId(),
-                $message->getRemoteRequestEntity(),
-                $message->getRemoteRequestAction(),
+                $message->getRemoteRequestType(),
                 $message->getIndex()
             )
         );
@@ -255,13 +240,8 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         ;
 
         $message
-            ->shouldReceive('getRemoteRequestEntity')
-            ->andReturn(self::getRandomRemoteRequestEntity())
-        ;
-
-        $message
-            ->shouldReceive('getRemoteRequestAction')
-            ->andReturn(self::getRandomRemoteRequestAction())
+            ->shouldReceive('getRemoteRequestType')
+            ->andReturn(self::getRandomRemoteRequestType())
         ;
 
         $message
@@ -272,17 +252,14 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         return $message;
     }
 
-    private static function getRandomRemoteRequestEntity(): RemoteRequestEntity
+    private static function getRandomRemoteRequestType(): RemoteRequestType
     {
-        $cases = RemoteRequestEntity::cases();
+        $entityCases = RemoteRequestEntity::cases();
+        $actionCases = RemoteRequestAction::cases();
 
-        return $cases[rand(0, count($cases) - 1)];
-    }
-
-    private static function getRandomRemoteRequestAction(): RemoteRequestAction
-    {
-        $cases = RemoteRequestAction::cases();
-
-        return $cases[rand(0, count($cases) - 1)];
+        return new RemoteRequestType(
+            $entityCases[rand(0, count($entityCases) - 1)],
+            $actionCases[rand(0, count($actionCases) - 1)],
+        );
     }
 }

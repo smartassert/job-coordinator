@@ -16,6 +16,7 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Model\RemoteRequestType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
@@ -65,8 +66,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::MACHINE,
-            RemoteRequestAction::CREATE
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
         );
     }
 
@@ -74,8 +74,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::RESULTS_JOB,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
         );
     }
 
@@ -83,8 +82,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::SERIALIZED_SUITE,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
         );
     }
 
@@ -92,8 +90,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::MACHINE,
-            RemoteRequestAction::RETRIEVE,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -101,8 +98,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::SERIALIZED_SUITE,
-            RemoteRequestAction::RETRIEVE,
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -110,8 +106,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::WORKER_JOB,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
         );
     }
 
@@ -119,8 +114,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::RESULTS_JOB,
-            RemoteRequestAction::RETRIEVE,
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -128,8 +122,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::MACHINE,
-            RemoteRequestAction::TERMINATE,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE)
         );
     }
 
@@ -137,16 +130,12 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestEntity::WORKER_JOB,
-            RemoteRequestAction::RETRIEVE,
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::RETRIEVE)
         );
     }
 
-    private function removeForEventAndType(
-        JobEventInterface $event,
-        RemoteRequestEntity $entity,
-        RemoteRequestAction $action
-    ): void {
-        $this->remoteRequestRemover->removeForJobAndType($event->getJobId(), $entity, $action);
+    private function removeForEventAndType(JobEventInterface $event, RemoteRequestType $type): void
+    {
+        $this->remoteRequestRemover->removeForJobAndType($event->getJobId(), $type);
     }
 }

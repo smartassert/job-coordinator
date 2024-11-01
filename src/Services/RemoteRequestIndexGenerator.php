@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 
 class RemoteRequestIndexGenerator
@@ -18,9 +17,9 @@ class RemoteRequestIndexGenerator
     /**
      * @return int<0, max>
      */
-    public function generate(string $jobId, RemoteRequestEntity $entity, RemoteRequestAction $action): int
+    public function generate(string $jobId, RemoteRequestType $type): int
     {
-        $largestIndex = $this->remoteRequestRepository->getLargestIndex($jobId, $entity, $action);
+        $largestIndex = $this->remoteRequestRepository->getLargestIndex($jobId, $type);
 
         return null === $largestIndex ? 0 : $largestIndex + 1;
     }

@@ -21,8 +21,7 @@ class RemoteRequestFailureRecorder
     {
         $remoteRequest = $this->remoteRequestRepository->findOneBy([
             'jobId' => $throwable->getJob()->id,
-            'entity' => $throwable->getFailedMessage()->getRemoteRequestEntity(),
-            'action' => $throwable->getFailedMessage()->getRemoteRequestAction(),
+            'type' => $throwable->getFailedMessage()->getRemoteRequestType()->serialize(),
             'index' => $throwable->getFailedMessage()->getIndex(),
         ]);
 

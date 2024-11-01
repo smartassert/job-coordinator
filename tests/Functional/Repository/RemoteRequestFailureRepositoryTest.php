@@ -9,6 +9,7 @@ use App\Entity\RemoteRequestFailure;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -125,8 +126,10 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                     return [
                         (new RemoteRequest(
                             md5((string) rand()),
-                            RemoteRequestEntity::MACHINE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::MACHINE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setFailure($remoteRequestFailure),

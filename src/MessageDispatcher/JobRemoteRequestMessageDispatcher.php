@@ -41,8 +41,7 @@ class JobRemoteRequestMessageDispatcher
 
             $existingRemoteRequest = $this->remoteRequestRepository->getFirstForJobAndType(
                 $job,
-                $message->getRemoteRequestEntity(),
-                $message->getRemoteRequestAction(),
+                $message->getRemoteRequestType(),
             );
 
             if ($existingRemoteRequest instanceof RemoteRequest) {

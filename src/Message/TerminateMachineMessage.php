@@ -6,17 +6,13 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class TerminateMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
-    public function getRemoteRequestEntity(): RemoteRequestEntity
+    public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestEntity::MACHINE;
-    }
-
-    public function getRemoteRequestAction(): RemoteRequestAction
-    {
-        return RemoteRequestAction::TERMINATE;
+        return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE);
     }
 
     public function isRepeatable(): bool

@@ -6,17 +6,13 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class CreateResultsJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
-    public function getRemoteRequestEntity(): RemoteRequestEntity
+    public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestEntity::RESULTS_JOB;
-    }
-
-    public function getRemoteRequestAction(): RemoteRequestAction
-    {
-        return RemoteRequestAction::CREATE;
+        return new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE);
     }
 
     public function isRepeatable(): bool

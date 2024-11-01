@@ -6,6 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class GetWorkerStateMessage extends AbstractRemoteRequestMessage
 {
@@ -20,14 +21,9 @@ class GetWorkerStateMessage extends AbstractRemoteRequestMessage
         parent::__construct($jobId);
     }
 
-    public function getRemoteRequestEntity(): RemoteRequestEntity
+    public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestEntity::MACHINE;
-    }
-
-    public function getRemoteRequestAction(): RemoteRequestAction
-    {
-        return RemoteRequestAction::RETRIEVE;
+        return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE);
     }
 
     public function isRepeatable(): bool

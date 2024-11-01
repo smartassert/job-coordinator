@@ -6,6 +6,7 @@ namespace App\Message;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
@@ -22,14 +23,9 @@ class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessag
         parent::__construct($authenticationToken, $jobId);
     }
 
-    public function getRemoteRequestEntity(): RemoteRequestEntity
+    public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestEntity::SERIALIZED_SUITE;
-    }
-
-    public function getRemoteRequestAction(): RemoteRequestAction
-    {
-        return RemoteRequestAction::RETRIEVE;
+        return new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
     }
 
     public function isRepeatable(): bool

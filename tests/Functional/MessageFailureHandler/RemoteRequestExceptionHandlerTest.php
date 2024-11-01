@@ -29,6 +29,7 @@ use App\Message\GetSerializedSuiteMessage;
 use App\Message\StartWorkerJobMessage;
 use App\Message\TerminateMachineMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
@@ -84,8 +85,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     #[DataProvider('handleSetRemoteRequestFailureDataProvider')]
     public function testHandleSetRemoteRequestFailure(
         callable $exceptionCreator,
-        RemoteRequestEntity $remoteRequestEntity,
-        RemoteRequestAction $remoteRequestAction,
+        RemoteRequestType $type,
         RemoteRequestFailureType $expectedType,
         int $expectedCode,
         string $expectedMessage,
@@ -94,7 +94,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         $exception = $exceptionCreator($this->job);
 
-        $remoteRequest = new RemoteRequest($this->job->id, $remoteRequestEntity, $remoteRequestAction, 0);
+        $remoteRequest = new RemoteRequest($this->job->id, $type, 0);
         $this->remoteRequestRepository->save($remoteRequest);
 
         self::assertNull($remoteRequest->getFailure());
@@ -130,8 +130,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::MACHINE,
-                'remoteRequestAction' => RemoteRequestAction::CREATE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::MACHINE,
+                    RemoteRequestAction::CREATE,
+                ),
             ],
             MachineRetrievalException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -146,8 +148,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::MACHINE,
-                'remoteRequestAction' => RemoteRequestAction::RETRIEVE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::MACHINE,
+                    RemoteRequestAction::RETRIEVE,
+                ),
             ],
             ResultsJobCreationException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -159,8 +163,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::RESULTS_JOB,
-                'remoteRequestAction' => RemoteRequestAction::CREATE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::RESULTS_JOB,
+                    RemoteRequestAction::CREATE,
+                ),
             ],
             SerializedSuiteCreationException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -172,8 +178,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::SERIALIZED_SUITE,
-                'remoteRequestAction' => RemoteRequestAction::CREATE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::SERIALIZED_SUITE,
+                    RemoteRequestAction::CREATE,
+                ),
             ],
             SerializedSuiteRetrievalException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -190,8 +198,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::SERIALIZED_SUITE,
-                'remoteRequestAction' => RemoteRequestAction::RETRIEVE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::SERIALIZED_SUITE,
+                    RemoteRequestAction::RETRIEVE,
+                ),
             ],
             WorkerJobCreationException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -203,8 +213,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::WORKER_JOB,
-                'remoteRequestAction' => RemoteRequestAction::CREATE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::WORKER_JOB,
+                    RemoteRequestAction::CREATE,
+                ),
             ],
             ResultsJobStateRetrievalException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -216,8 +228,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::RESULTS_JOB,
-                'remoteRequestAction' => RemoteRequestAction::RETRIEVE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::RESULTS_JOB,
+                    RemoteRequestAction::RETRIEVE,
+                ),
             ],
             MachineTerminationException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
@@ -229,8 +243,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                         );
                     };
                 },
-                'remoteRequestEntity' => RemoteRequestEntity::MACHINE,
-                'remoteRequestAction' => RemoteRequestAction::TERMINATE,
+                'type' => new RemoteRequestType(
+                    RemoteRequestEntity::MACHINE,
+                    RemoteRequestAction::TERMINATE,
+                ),
             ],
         ];
 
@@ -253,8 +269,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 $testCase = array_merge(
                     [
                         'exceptionCreator' => ($testCaseProperties['exceptionCreator'])($inner),
-                        'remoteRequestEntity' => $testCaseProperties['remoteRequestEntity'],
-                        'remoteRequestAction' => $testCaseProperties['remoteRequestAction'],
+                        'type' => $testCaseProperties['type'],
                     ],
                     $innerExceptionCase,
                 );

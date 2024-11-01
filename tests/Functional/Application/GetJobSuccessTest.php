@@ -17,6 +17,7 @@ use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
+use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -200,8 +201,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::REQUESTING),
@@ -266,22 +269,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::HALTED),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::HALTED),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::RETRIEVE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::RETRIEVE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)
@@ -292,8 +301,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             )),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::RETRIEVE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::RETRIEVE,
+                            ),
                             1
                         ))
                             ->setState(RequestState::FAILED)
@@ -304,8 +315,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             )),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::RETRIEVE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::RETRIEVE,
+                            ),
                             2
                         ))
                             ->setState(RequestState::SUCCEEDED),
@@ -561,8 +574,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::MACHINE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::MACHINE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::REQUESTING),
@@ -979,8 +994,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)
@@ -991,8 +1008,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             )),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)
@@ -1003,8 +1022,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             )),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::MACHINE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::MACHINE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)
@@ -1015,8 +1036,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             )),
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::WORKER_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::WORKER_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)

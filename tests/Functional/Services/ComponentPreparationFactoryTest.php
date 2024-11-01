@@ -20,6 +20,7 @@ use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
+use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -147,26 +148,34 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $resultsComponent = new JobComponent(
             JobComponentName::RESULTS_JOB,
-            RemoteRequestEntity::RESULTS_JOB,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(
+                RemoteRequestEntity::RESULTS_JOB,
+                RemoteRequestAction::CREATE,
+            ),
         );
 
         $serializedSuiteComponent = new JobComponent(
             JobComponentName::SERIALIZED_SUITE,
-            RemoteRequestEntity::SERIALIZED_SUITE,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(
+                RemoteRequestEntity::SERIALIZED_SUITE,
+                RemoteRequestAction::CREATE,
+            ),
         );
 
         $machineComponent = new JobComponent(
             JobComponentName::MACHINE,
-            RemoteRequestEntity::MACHINE,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(
+                RemoteRequestEntity::MACHINE,
+                RemoteRequestAction::CREATE,
+            ),
         );
 
         $workerComponent = new JobComponent(
             JobComponentName::WORKER_JOB,
-            RemoteRequestEntity::WORKER_JOB,
-            RemoteRequestAction::CREATE,
+            new RemoteRequestType(
+                RemoteRequestEntity::WORKER_JOB,
+                RemoteRequestAction::CREATE,
+            ),
         );
 
         $expectedAllSuccess = [
@@ -220,8 +229,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::REQUESTING)
                     );
@@ -252,8 +263,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::MACHINE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::MACHINE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::REQUESTING)
                     );
@@ -284,8 +297,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::WORKER_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::WORKER_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::REQUESTING)
                     );
@@ -316,8 +331,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::REQUESTING)
                     );
@@ -348,8 +365,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::HALTED)
                     );
@@ -380,8 +399,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::PENDING)
                     );
@@ -412,8 +433,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::FAILED)
                     );
@@ -444,8 +467,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))
                             ->setState(RequestState::FAILED)
@@ -492,8 +517,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::RESULTS_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::RESULTS_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::FAILED)
                     );
@@ -501,8 +528,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::SERIALIZED_SUITE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::SERIALIZED_SUITE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::FAILED)
                     );
@@ -510,8 +539,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::MACHINE,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::MACHINE,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::FAILED)
                     );
@@ -519,8 +550,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $repository->save(
                         (new RemoteRequest(
                             $job->id,
-                            RemoteRequestEntity::WORKER_JOB,
-                            RemoteRequestAction::CREATE,
+                            new RemoteRequestType(
+                                RemoteRequestEntity::WORKER_JOB,
+                                RemoteRequestAction::CREATE,
+                            ),
                             0
                         ))->setState(RequestState::FAILED)
                     );

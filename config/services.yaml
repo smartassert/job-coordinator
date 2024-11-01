@@ -102,36 +102,56 @@ services:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
 
+    app.job_component.request_type.results_job_create:
+        class: App\Model\RemoteRequestType
+        arguments:
+            $entity: !php/enum App\Enum\RemoteRequestEntity::RESULTS_JOB
+            $action: !php/enum App\Enum\RemoteRequestAction::CREATE
+
+    app.job_component.request_type.serialized_suite_create:
+        class: App\Model\RemoteRequestType
+        arguments:
+            $entity: !php/enum App\Enum\RemoteRequestEntity::SERIALIZED_SUITE
+            $action: !php/enum App\Enum\RemoteRequestAction::CREATE
+
+    app.job_component.request_type.machine_create:
+        class: App\Model\RemoteRequestType
+        arguments:
+            $entity: !php/enum App\Enum\RemoteRequestEntity::MACHINE
+            $action: !php/enum App\Enum\RemoteRequestAction::CREATE
+
+    app.job_component.request_type.worker_job_create:
+        class: App\Model\RemoteRequestType
+        arguments:
+            $entity: !php/enum App\Enum\RemoteRequestEntity::WORKER_JOB
+            $action: !php/enum App\Enum\RemoteRequestAction::CREATE
+
     app.job_components.results_job:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::RESULTS_JOB
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::RESULTS_JOB
-            $remoteRequestAction: !php/enum App\Enum\RemoteRequestAction::CREATE
+            $remoteRequestType: '@app.job_component.request_type.results_job_create'
         tags: ['app.job_components.component']
 
     app.job_components.serialized_suite:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::SERIALIZED_SUITE
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::SERIALIZED_SUITE
-            $remoteRequestAction: !php/enum App\Enum\RemoteRequestAction::CREATE
+            $remoteRequestType: '@app.job_component.request_type.serialized_suite_create'
         tags: ['app.job_components.component']
 
     app.job_components.machine:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::MACHINE
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::MACHINE
-            $remoteRequestAction: !php/enum App\Enum\RemoteRequestAction::CREATE
+            $remoteRequestType: '@app.job_component.request_type.machine_create'
         tags: ['app.job_components.component']
 
     app.job_components.worker_job:
         class: App\Model\JobComponent
         arguments:
             $name: !php/enum App\Enum\JobComponentName::WORKER_JOB
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::WORKER_JOB
-            $remoteRequestAction: !php/enum App\Enum\RemoteRequestAction::CREATE
+            $remoteRequestType: '@app.job_component.request_type.worker_job_create'
         tags: ['app.job_components.component']
 
     App\Services\ComponentPreparationFactory:

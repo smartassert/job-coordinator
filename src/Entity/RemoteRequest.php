@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Model\RemoteRequestInterface;
+use App\Model\RemoteRequestType;
 use App\Model\TypedRemoteRequestInterface;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\DBAL\Types\Types;
@@ -17,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
  */
 #[ORM\Entity(repositoryClass: RemoteRequestRepository::class)]
-#[ORM\Index(columns: ['job_id', 'entity', 'action'], name: 'job_type_idx')]
+#[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
 class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterface
 {
     /**
@@ -33,11 +32,11 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     #[ORM\Column(type: 'string', length: 32, nullable: false)]
     private readonly string $jobId;
 
-    #[ORM\Column(length: 64, nullable: false, enumType: RemoteRequestEntity::class)]
-    private readonly RemoteRequestEntity $entity;
-
-    #[ORM\Column(length: 64, nullable: false, enumType: RemoteRequestAction::class)]
-    private readonly RemoteRequestAction $action;
+    /**
+     * @var non-empty-string
+     */
+    #[ORM\Column(nullable: false)]
+    private readonly string $type;
 
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RequestState::class)]
     private RequestState $state;
@@ -57,14 +56,12 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
      */
     public function __construct(
         string $jobId,
-        RemoteRequestEntity $entity,
-        RemoteRequestAction $action,
+        RemoteRequestType $type,
         int $index = 0
     ) {
-        $this->id = self::generateId($jobId, $entity, $action, $index);
+        $this->id = self::generateId($jobId, $type, $index);
         $this->jobId = $jobId;
-        $this->entity = $entity;
-        $this->action = $action;
+        $this->type = $type->serialize();
         $this->state = RequestState::REQUESTING;
         $this->index = $index;
     }
@@ -74,7 +71,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
      */
     public function getType(): string
     {
-        return $this->entity->value . '/' . $this->action->value;
+        return $this->type;
     }
 
     public function getState(): RequestState
@@ -95,13 +92,9 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
      *
      * @return non-empty-string
      */
-    public static function generateId(
-        string $jobId,
-        RemoteRequestEntity $entity,
-        RemoteRequestAction $action,
-        int $index
-    ): string {
-        return $jobId . $entity->value . $action->value . $index;
+    public static function generateId(string $jobId, RemoteRequestType $type, int $index): string
+    {
+        return $jobId . $type->serialize() . $index;
     }
 
     public function setFailure(RemoteRequestFailure $failure): self

@@ -21,13 +21,12 @@ final class Version20230519103636 extends AbstractMigration
             CREATE TABLE remote_request (
                 id VARCHAR(128) NOT NULL, 
                 job_id VARCHAR(32) NOT NULL,
-                entity VARCHAR(64) NOT NULL, 
-                action VARCHAR(64) NOT NULL,
+                type VARCHAR(64) NOT NULL, 
                 state VARCHAR(64) NOT NULL, 
                 index SMALLINT NOT NULL,
                 PRIMARY KEY(id))
         ');
-        $this->addSql('CREATE INDEX job_type_idx ON remote_request (job_id, entity, action)');
+        $this->addSql('CREATE INDEX job_type_idx ON remote_request (job_id, type)');
     }
 
     public function down(Schema $schema): void
