@@ -87,7 +87,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(RemoteJobActionException::class . ' not thrown');
         } catch (RemoteJobActionException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
-            self::assertSame([], $this->eventRecorder->all(RemoteJobActionException::class));
+            self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
         }
     }
 
