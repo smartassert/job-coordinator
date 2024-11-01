@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class StartWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
@@ -23,7 +25,7 @@ class StartWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestType::MACHINE_START_JOB;
+        return new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE);
     }
 
     public function isRepeatable(): bool

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
@@ -23,7 +25,7 @@ class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessag
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestType::SERIALIZED_SUITE_GET;
+        return new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
     }
 
     public function isRepeatable(): bool

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestIndexGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -61,53 +63,73 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
     {
         $jobId = md5((string) rand());
 
+        $resultsJobCreateType = new RemoteRequestType(
+            RemoteRequestEntity::RESULTS_JOB,
+            RemoteRequestAction::CREATE,
+        );
+
+        $machineCreateType = new RemoteRequestType(
+            RemoteRequestEntity::MACHINE,
+            RemoteRequestAction::CREATE,
+        );
+
+        $machineRetrieveType = new RemoteRequestType(
+            RemoteRequestEntity::MACHINE,
+            RemoteRequestAction::RETRIEVE,
+        );
+
+        $serializedSuiteRetrieveType = new RemoteRequestType(
+            RemoteRequestEntity::SERIALIZED_SUITE,
+            RemoteRequestAction::RETRIEVE,
+        );
+
         return [
             'no existing remote requests' => [
                 'existingRemoteRequests' => [],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'type' => $resultsJobCreateType,
                 'expected' => 0,
             ],
             'no existing remote requests for job' => [
-                'existingRemoteRequests' => (function () {
+                'existingRemoteRequests' => (function () use ($resultsJobCreateType) {
                     $jobId = md5((string) rand());
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 2),
+                        new RemoteRequest($jobId, $resultsJobCreateType, 0),
+                        new RemoteRequest($jobId, $resultsJobCreateType, 1),
+                        new RemoteRequest($jobId, $resultsJobCreateType, 2),
                     ];
                 })(),
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'type' => $resultsJobCreateType,
                 'expected' => 0,
             ],
             'no existing remote requests for type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::MACHINE_GET, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_GET, 0),
+                    new RemoteRequest($jobId, $machineCreateType, 0),
+                    new RemoteRequest($jobId, $machineRetrieveType, 0),
+                    new RemoteRequest($jobId, $serializedSuiteRetrieveType, 0),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'type' => $resultsJobCreateType,
                 'expected' => 0,
             ],
             'single existing request for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
+                    new RemoteRequest($jobId, $resultsJobCreateType, 0),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'type' => $resultsJobCreateType,
                 'expected' => 1,
             ],
             'multiple existing requests for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 1),
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 2),
+                    new RemoteRequest($jobId, $resultsJobCreateType, 0),
+                    new RemoteRequest($jobId, $resultsJobCreateType, 1),
+                    new RemoteRequest($jobId, $resultsJobCreateType, 2),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'type' => $resultsJobCreateType,
                 'expected' => 3,
             ],
         ];

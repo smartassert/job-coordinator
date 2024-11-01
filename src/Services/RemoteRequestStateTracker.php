@@ -96,14 +96,13 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
     private function createRemoteRequest(JobRemoteRequestMessageInterface $message): RemoteRequest
     {
         $jobId = $message->getJobId();
-        $type = $message->getRemoteRequestType();
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId($jobId, $type, $message->getIndex())
+            RemoteRequest::generateId($jobId, $message->getRemoteRequestType(), $message->getIndex())
         );
 
         return $remoteRequest instanceof RemoteRequest
             ? $remoteRequest
-            : new RemoteRequest($jobId, $type, $message->getIndex());
+            : new RemoteRequest($jobId, $message->getRemoteRequestType(), $message->getIndex());
     }
 }

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
+use App\Model\RemoteRequestType;
 
 class GetResultsJobStateMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return RemoteRequestType::RESULTS_STATE_GET;
+        return new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE);
     }
 
     public function isRepeatable(): bool

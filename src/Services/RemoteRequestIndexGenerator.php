@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\RemoteRequestType;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 
 class RemoteRequestIndexGenerator

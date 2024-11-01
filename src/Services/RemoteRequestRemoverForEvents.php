@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Event\JobEventInterface;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
@@ -15,6 +16,7 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Model\RemoteRequestType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
@@ -62,50 +64,74 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 
     public function removeMachineCreateRequests(MachineIsActiveEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::MACHINE_CREATE);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
+        );
     }
 
     public function removeResultsCreateRequests(ResultsJobCreatedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::RESULTS_CREATE);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
+        );
     }
 
     public function removeSerializedSuiteCreateRequests(SerializedSuiteCreatedEvent $event): void
     {
         $this->removeForEventAndType(
             $event,
-            RemoteRequestType::SERIALIZED_SUITE_CREATE
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
         );
     }
 
     public function removeMachineGetRequests(MachineRetrievedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::MACHINE_GET);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE)
+        );
     }
 
     public function removeSerializedSuiteGetRequests(SerializedSuiteRetrievedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::SERIALIZED_SUITE_GET);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
+        );
     }
 
     public function removeWorkerJobStartRequests(WorkerJobStartRequestedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::MACHINE_START_JOB);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
+        );
     }
 
     public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::RESULTS_STATE_GET);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
+        );
     }
 
     public function removeMachineTerminationRequests(MachineTerminationRequestedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::MACHINE_TERMINATE);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE)
+        );
     }
 
     public function removeWorkerStateGetRequests(WorkerStateRetrievedEvent $event): void
     {
-        $this->removeForEventAndType($event, RemoteRequestType::MACHINE_STATE_GET);
+        $this->removeForEventAndType(
+            $event,
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::RETRIEVE)
+        );
     }
 
     private function removeForEventAndType(JobEventInterface $event, RemoteRequestType $type): void

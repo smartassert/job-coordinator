@@ -12,10 +12,12 @@ use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
+use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -146,6 +148,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
             };
         };
 
+        $resultsJobCreateType = new RemoteRequestType(
+            RemoteRequestEntity::RESULTS_JOB,
+            RemoteRequestAction::CREATE,
+        );
+
+        $serializedSuiteCreateType = new RemoteRequestType(
+            RemoteRequestEntity::SERIALIZED_SUITE,
+            RemoteRequestAction::CREATE,
+        );
+
+        $serializedSuiteRetrieveType = new RemoteRequestType(
+            RemoteRequestEntity::SERIALIZED_SUITE,
+            RemoteRequestAction::RETRIEVE,
+        );
+
+        $machineCreateType = new RemoteRequestType(
+            RemoteRequestEntity::MACHINE,
+            RemoteRequestAction::CREATE,
+        );
+
+        $workerJobCreateType = new RemoteRequestType(
+            RemoteRequestEntity::WORKER_JOB,
+            RemoteRequestAction::CREATE,
+        );
+
         return [
             'no remote requests, no results job, no serialized suite, no machine, no worker state' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
@@ -195,9 +222,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
             ],
             'results/create: requesting' => [
-                'remoteRequestsCreator' => function (Job $job) {
+                'remoteRequestsCreator' => function (Job $job) use ($resultsJobCreateType) {
                     return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
@@ -244,7 +271,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'service_requests' => [
                             [
-                                'type' => 'results/create',
+                                'type' => 'results-job/create',
                                 'attempts' => [
                                     [
                                         'state' => 'requesting',
@@ -256,27 +283,33 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
             ],
             'results/create halted, serialized-suite/create halted, serialized-suite/g failure and success' => [
-                'remoteRequestsCreator' => function (Job $job) {
+                'remoteRequestsCreator' => function (
+                    Job $job
+                ) use (
+                    $resultsJobCreateType,
+                    $serializedSuiteCreateType,
+                    $serializedSuiteRetrieveType,
+                ) {
                     return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
                             ->setState(RequestState::HALTED),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
+                        (new RemoteRequest($job->id, $serializedSuiteCreateType, 0))
                             ->setState(RequestState::HALTED),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 0))
+                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
                                 6,
                                 'unable to resolve host "sources.example.com"'
                             )),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 1))
+                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 1))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 503,
                                 'service unavailable'
                             )),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_GET, 2))
+                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 2))
                             ->setState(RequestState::SUCCEEDED),
                     ];
                 },
@@ -323,7 +356,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'service_requests' => [
                             [
-                                'type' => 'results/create',
+                                'type' => 'results-job/create',
                                 'attempts' => [
                                     [
                                         'state' => 'halted',
@@ -339,7 +372,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             [
-                                'type' => 'serialized-suite/get',
+                                'type' => 'serialized-suite/retrieve',
                                 'attempts' => [
                                     [
                                         'state' => 'failed',
@@ -526,9 +559,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
             ],
             'requesting machine' => [
-                'remoteRequestsCreator' => function (Job $job) {
+                'remoteRequestsCreator' => function (Job $job) use ($machineCreateType) {
                     return [
-                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_CREATE, 0))
+                        (new RemoteRequest($job->id, $machineCreateType, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
@@ -939,30 +972,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
             ],
             'all preparation failed' => [
-                'remoteRequestsCreator' => function (Job $job) {
+                'remoteRequestsCreator' => function (
+                    Job $job
+                ) use (
+                    $resultsJobCreateType,
+                    $serializedSuiteCreateType,
+                    $machineCreateType,
+                    $workerJobCreateType,
+                ) {
                     return [
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 503,
                                 'service unavailable'
                             )),
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
+                        (new RemoteRequest($job->id, $serializedSuiteCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
                                 28,
                                 'connection timed out'
                             )),
-                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_CREATE, 0))
+                        (new RemoteRequest($job->id, $machineCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 500,
                                 'internal server error'
                             )),
-                        (new RemoteRequest($job->id, RemoteRequestType::MACHINE_START_JOB, 0))
+                        (new RemoteRequest($job->id, $workerJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
@@ -1048,20 +1088,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             [
-                                'type' => 'machine/start-job',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 6,
-                                            'message' => 'hostname lookup failed',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'results/create',
+                                'type' => 'results-job/create',
                                 'attempts' => [
                                     [
                                         'state' => 'failed',
@@ -1082,6 +1109,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                             'type' => 'network',
                                             'code' => 28,
                                             'message' => 'connection timed out',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'worker-job/create',
+                                'attempts' => [
+                                    [
+                                        'state' => 'failed',
+                                        'failure' => [
+                                            'type' => 'network',
+                                            'code' => 6,
+                                            'message' => 'hostname lookup failed',
                                         ],
                                     ],
                                 ],

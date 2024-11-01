@@ -6,9 +6,11 @@ namespace App\Tests\Unit\Services;
 
 use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
+use App\Model\RemoteRequestType;
 use App\Services\PreparationStateReducer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -29,13 +31,25 @@ class PreparationStateReducerTest extends TestCase
      */
     public static function reduceDataProvider(): array
     {
-        $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, RemoteRequestType::RESULTS_CREATE);
+        $resultsComponent = new JobComponent(
+            JobComponentName::RESULTS_JOB,
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
+        );
+
         $serializedSuiteComponent = new JobComponent(
             JobComponentName::SERIALIZED_SUITE,
-            RemoteRequestType::SERIALIZED_SUITE_CREATE
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
         );
-        $machineComponent = new JobComponent(JobComponentName::MACHINE, RemoteRequestType::MACHINE_CREATE);
-        $workerComponent = new JobComponent(JobComponentName::WORKER_JOB, RemoteRequestType::MACHINE_START_JOB);
+
+        $machineComponent = new JobComponent(
+            JobComponentName::MACHINE,
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
+        );
+
+        $workerComponent = new JobComponent(
+            JobComponentName::WORKER_JOB,
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
+        );
 
         return [
             'any occurrence of "failed" is "failed" (1)' => [

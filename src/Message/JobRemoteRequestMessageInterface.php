@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Model\RemoteRequestType;
 
 interface JobRemoteRequestMessageInterface
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\RemoteRequestFailure;
-use App\Enum\RemoteRequestType;
+use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;

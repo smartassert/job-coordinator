@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
@@ -13,6 +14,7 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerJobStartRequestedEvent;
+use App\Model\RemoteRequestType;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
@@ -31,7 +33,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_CREATE)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -51,7 +61,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::RESULTS_CREATE)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -73,7 +91,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -97,7 +123,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_GET)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -121,7 +155,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::SERIALIZED_SUITE_GET)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -144,7 +186,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_START_JOB)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -164,7 +214,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::RESULTS_STATE_GET)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 
@@ -188,7 +246,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_TERMINATE)
+            ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
+                self::assertSame($jobId, $passedJobId);
+                self::assertEquals(
+                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE),
+                    $passedRemoteRequestType,
+                );
+
+                return true;
+            })
             ->andReturn([])
         ;
 

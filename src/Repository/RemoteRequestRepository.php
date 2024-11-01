@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
-use App\Enum\RemoteRequestType;
+use App\Model\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;

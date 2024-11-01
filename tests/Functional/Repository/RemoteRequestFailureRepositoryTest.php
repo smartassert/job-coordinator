@@ -6,8 +6,10 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Enum\RemoteRequestType;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -122,7 +124,11 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        (new RemoteRequest(md5((string) rand()), RemoteRequestType::MACHINE_CREATE, 0))
+                        (new RemoteRequest(
+                            md5((string) rand()),
+                            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+                            0
+                        ))
                             ->setFailure($remoteRequestFailure),
                     ];
                 },

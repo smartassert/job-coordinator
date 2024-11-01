@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestStateTracker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -235,8 +237,12 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
     private static function getRandomRemoteRequestType(): RemoteRequestType
     {
-        $cases = RemoteRequestType::cases();
+        $entityCases = RemoteRequestEntity::cases();
+        $actionCases = RemoteRequestAction::cases();
 
-        return $cases[rand(0, count($cases) - 1)];
+        return new RemoteRequestType(
+            $entityCases[rand(0, count($entityCases) - 1)],
+            $actionCases[rand(0, count($actionCases) - 1)],
+        );
     }
 }
