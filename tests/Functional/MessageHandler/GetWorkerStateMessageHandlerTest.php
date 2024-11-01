@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Exception\WorkerStateRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -86,8 +86,8 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $handler($message);
-            self::fail(WorkerStateRetrievalException::class . ' not thrown');
-        } catch (WorkerStateRetrievalException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($workerClientException, $e->getPreviousException());
             self::assertCount(0, $this->eventRecorder);
         }
