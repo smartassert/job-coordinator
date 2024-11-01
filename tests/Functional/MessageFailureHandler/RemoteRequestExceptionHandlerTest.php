@@ -11,7 +11,6 @@ use App\Entity\SerializedSuite;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Exception\MachineRetrievalException;
 use App\Exception\MachineTerminationException;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
@@ -23,7 +22,6 @@ use App\Exception\WorkerJobCreationException;
 use App\Message\CreateMachineMessage;
 use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetMachineMessage;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetSerializedSuiteMessage;
 use App\Message\StartWorkerJobMessage;
@@ -34,7 +32,6 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -133,24 +130,6 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 'type' => new RemoteRequestType(
                     RemoteRequestEntity::MACHINE,
                     RemoteRequestAction::CREATE,
-                ),
-            ],
-            MachineRetrievalException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        $machine = MachineFactory::createRandomForJob($job->id);
-
-                        return new MachineRetrievalException(
-                            $job,
-                            $machine,
-                            $inner,
-                            new GetMachineMessage(md5((string) rand()), $job->id, $machine),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
-                    RemoteRequestAction::RETRIEVE,
                 ),
             ],
             ResultsJobCreationException::class => [

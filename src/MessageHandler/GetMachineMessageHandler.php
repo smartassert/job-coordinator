@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineRetrievedEvent;
-use App\Exception\MachineRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\Repository\JobRepository;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -23,7 +23,7 @@ final class GetMachineMessageHandler
     }
 
     /**
-     * @throws MachineRetrievalException
+     * @throws RemoteJobActionException
      */
     public function __invoke(GetMachineMessage $message): void
     {
@@ -43,7 +43,7 @@ final class GetMachineMessageHandler
                 $machine
             ));
         } catch (\Throwable $e) {
-            throw new MachineRetrievalException($job, $previousMachine, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }
