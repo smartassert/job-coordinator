@@ -103,11 +103,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageFailedEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId(
-                $message->getJobId(),
-                $message->getRemoteRequestType(),
-                $message->getIndex()
-            )
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
         );
 
         $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
@@ -159,11 +155,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageHandledEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId(
-                $message->getJobId(),
-                $message->getRemoteRequestType(),
-                $message->getIndex()
-            )
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
         );
 
         $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
@@ -183,11 +175,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageReceivedEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId(
-                $message->getJobId(),
-                $message->getRemoteRequestType(),
-                $message->getIndex()
-            )
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
         );
 
         $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
@@ -209,11 +197,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         self::assertSame(1, $this->remoteRequestRepository->count([]));
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId(
-                $message->getJobId(),
-                $message->getRemoteRequestType(),
-                $message->getIndex()
-            )
+            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
         );
         \assert($remoteRequest instanceof RemoteRequest);
 
