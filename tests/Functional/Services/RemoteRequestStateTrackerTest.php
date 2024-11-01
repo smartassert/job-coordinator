@@ -179,7 +179,6 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         );
 
         $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
-
         $expectedRemoteRequest->setState(RequestState::REQUESTING);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
