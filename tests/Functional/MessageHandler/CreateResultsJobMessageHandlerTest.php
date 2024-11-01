@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Event\ResultsJobCreatedEvent;
-use App\Exception\ResultsJobCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\JobRepository;
@@ -61,8 +61,8 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $handler($message);
-            self::fail(ResultsJobCreationException::class . ' not thrown');
-        } catch (ResultsJobCreationException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($resultsClientException, $e->getPreviousException());
             self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
         }

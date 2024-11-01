@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\ResultsJobCreatedEvent;
-use App\Exception\ResultsJobCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -23,7 +23,7 @@ final class CreateResultsJobMessageHandler
     }
 
     /**
-     * @throws ResultsJobCreationException
+     * @throws RemoteJobActionException
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
@@ -40,7 +40,7 @@ final class CreateResultsJobMessageHandler
                 $resultsJob
             ));
         } catch (\Throwable $e) {
-            throw new ResultsJobCreationException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }

@@ -13,13 +13,11 @@ use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
-use App\Exception\ResultsJobCreationException;
 use App\Exception\ResultsJobStateRetrievalException;
 use App\Exception\SerializedSuiteCreationException;
 use App\Exception\SerializedSuiteRetrievalException;
 use App\Exception\WorkerJobCreationException;
 use App\Message\CreateMachineMessage;
-use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetSerializedSuiteMessage;
@@ -127,21 +125,6 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 },
                 'type' => new RemoteRequestType(
                     RemoteRequestEntity::MACHINE,
-                    RemoteRequestAction::CREATE,
-                ),
-            ],
-            ResultsJobCreationException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        return new ResultsJobCreationException(
-                            $job,
-                            $inner,
-                            new CreateResultsJobMessage(md5((string) rand()), $job->id),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::RESULTS_JOB,
                     RemoteRequestAction::CREATE,
                 ),
             ],
