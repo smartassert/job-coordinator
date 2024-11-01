@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineCreationRequestedEvent;
-use App\Exception\MachineCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
@@ -27,7 +27,7 @@ final readonly class CreateMachineMessageHandler
     }
 
     /**
-     * @throws MachineCreationException
+     * @throws RemoteJobActionException
      */
     public function __invoke(CreateMachineMessage $message): void
     {
@@ -57,7 +57,7 @@ final readonly class CreateMachineMessageHandler
                 new MachineCreationRequestedEvent($message->authenticationToken, $machine)
             );
         } catch (\Throwable $e) {
-            throw new MachineCreationException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }

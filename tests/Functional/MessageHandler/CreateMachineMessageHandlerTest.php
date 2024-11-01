@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Event\MachineCreationRequestedEvent;
-use App\Exception\MachineCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\JobRepository;
@@ -187,8 +187,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $handler($message);
-            self::fail(MachineCreationException::class . ' not thrown');
-        } catch (MachineCreationException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
             self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
         }

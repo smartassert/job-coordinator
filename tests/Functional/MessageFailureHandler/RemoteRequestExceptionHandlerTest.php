@@ -11,9 +11,9 @@ use App\Entity\SerializedSuite;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Exception\MachineCreationException;
 use App\Exception\MachineRetrievalException;
 use App\Exception\MachineTerminationException;
+use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Exception\ResultsJobCreationException;
 use App\Exception\ResultsJobStateRetrievalException;
@@ -120,10 +120,10 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     public static function handleSetRemoteRequestFailureDataProvider(): array
     {
         $remoteRequestExceptionCases = [
-            MachineCreationException::class => [
+            RemoteJobActionException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
                     return function (Job $job) use ($inner) {
-                        return new MachineCreationException(
+                        return new RemoteJobActionException(
                             $job,
                             $inner,
                             new CreateMachineMessage(md5((string) rand()), $job->id),

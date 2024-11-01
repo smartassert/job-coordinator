@@ -6,7 +6,6 @@ namespace App\Exception;
 
 use App\Entity\Job;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\Model\RemoteRequestType;
 
 class RemoteJobActionException extends \Exception implements RemoteRequestExceptionInterface
 {
@@ -14,13 +13,12 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
         private readonly Job $job,
         private readonly \Throwable $previousException,
         private readonly JobRemoteRequestMessageInterface $failedMessage,
-        private readonly RemoteRequestType $remoteRequestType,
     ) {
         parent::__construct(
             sprintf(
                 'Failed to %s %s for job "%s": %s',
-                $remoteRequestType->action->value,
-                $remoteRequestType->entity->value,
+                $failedMessage->getRemoteRequestType()->action->value,
+                $failedMessage->getRemoteRequestType()->entity->value,
                 $job->id,
                 $previousException->getMessage()
             ),
@@ -42,10 +40,5 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
     public function getFailedMessage(): JobRemoteRequestMessageInterface
     {
         return $this->failedMessage;
-    }
-
-    public function getRemoteRequestType(): RemoteRequestType
-    {
-        return $this->remoteRequestType;
     }
 }
