@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\ResultsJob;
 use App\Event\MachineTerminationRequestedEvent;
-use App\Exception\MachineTerminationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
@@ -26,7 +26,7 @@ final class TerminateMachineMessageHandler
     }
 
     /**
-     * @throws MachineTerminationException
+     * @throws RemoteJobActionException
      */
     public function __invoke(TerminateMachineMessage $message): void
     {
@@ -45,7 +45,7 @@ final class TerminateMachineMessageHandler
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($job->id));
         } catch (\Throwable $e) {
-            throw new MachineTerminationException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }

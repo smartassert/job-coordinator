@@ -11,7 +11,6 @@ use App\Entity\SerializedSuite;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Exception\MachineTerminationException;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Exception\ResultsJobCreationException;
@@ -25,7 +24,6 @@ use App\Message\CreateSerializedSuiteMessage;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetSerializedSuiteMessage;
 use App\Message\StartWorkerJobMessage;
-use App\Message\TerminateMachineMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -210,21 +208,6 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 'type' => new RemoteRequestType(
                     RemoteRequestEntity::RESULTS_JOB,
                     RemoteRequestAction::RETRIEVE,
-                ),
-            ],
-            MachineTerminationException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        return new MachineTerminationException(
-                            $job,
-                            $inner,
-                            new TerminateMachineMessage(md5((string) rand()), $job->id),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
-                    RemoteRequestAction::TERMINATE,
                 ),
             ],
         ];

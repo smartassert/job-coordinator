@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Event\MachineTerminationRequestedEvent;
-use App\Exception\MachineTerminationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\Repository\JobRepository;
@@ -101,8 +101,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $handler($message);
-            self::fail(MachineTerminationException::class . ' not thrown');
-        } catch (MachineTerminationException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
             $this->assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
         }
