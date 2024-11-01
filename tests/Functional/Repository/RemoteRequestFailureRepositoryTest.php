@@ -126,10 +126,7 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                     return [
                         (new RemoteRequest(
                             md5((string) rand()),
-                            new RemoteRequestType(
-                                RemoteRequestEntity::MACHINE,
-                                RemoteRequestAction::CREATE,
-                            ),
+                            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
                             0
                         ))
                             ->setFailure($remoteRequestFailure),

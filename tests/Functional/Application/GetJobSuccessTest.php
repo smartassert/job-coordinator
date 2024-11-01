@@ -561,7 +561,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
             'requesting machine' => [
                 'remoteRequestsCreator' => function (Job $job) use ($machineCreateType) {
                     return [
-                        (new RemoteRequest($job->id, $machineCreateType, 0 ))
+                        (new RemoteRequest($job->id, $machineCreateType, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
