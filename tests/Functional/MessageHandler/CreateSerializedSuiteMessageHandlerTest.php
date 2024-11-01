@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Exception\SerializedSuiteCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
@@ -65,8 +65,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         try {
             $handler($message);
-            self::fail(SerializedSuiteCreationException::class . ' not thrown');
-        } catch (SerializedSuiteCreationException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($serializedSuiteClientException, $e->getPreviousException());
             self::assertSame([], $this->eventRecorder->all(SerializedSuiteCreatedEvent::class));
         }

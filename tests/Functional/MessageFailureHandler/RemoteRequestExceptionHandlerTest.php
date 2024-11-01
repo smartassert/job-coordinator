@@ -7,18 +7,13 @@ namespace App\Tests\Functional\MessageFailureHandler;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
-use App\Entity\SerializedSuite;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
-use App\Exception\SerializedSuiteCreationException;
-use App\Exception\SerializedSuiteRetrievalException;
 use App\Exception\WorkerJobCreationException;
 use App\Message\CreateMachineMessage;
-use App\Message\CreateSerializedSuiteMessage;
-use App\Message\GetSerializedSuiteMessage;
 use App\Message\StartWorkerJobMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use App\Model\RemoteRequestType;
@@ -124,41 +119,6 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 'type' => new RemoteRequestType(
                     RemoteRequestEntity::MACHINE,
                     RemoteRequestAction::CREATE,
-                ),
-            ],
-            SerializedSuiteCreationException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        return new SerializedSuiteCreationException(
-                            $job,
-                            $inner,
-                            new CreateSerializedSuiteMessage(md5((string) rand()), $job->id, []),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::SERIALIZED_SUITE,
-                    RemoteRequestAction::CREATE,
-                ),
-            ],
-            SerializedSuiteRetrievalException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        $serializedSuiteId = md5((string) rand());
-
-                        $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, 'prepared', true, true);
-
-                        return new SerializedSuiteRetrievalException(
-                            $job,
-                            $serializedSuite,
-                            $inner,
-                            new GetSerializedSuiteMessage(md5((string) rand()), $job->id, $serializedSuiteId),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::SERIALIZED_SUITE,
-                    RemoteRequestAction::RETRIEVE,
                 ),
             ],
             WorkerJobCreationException::class => [

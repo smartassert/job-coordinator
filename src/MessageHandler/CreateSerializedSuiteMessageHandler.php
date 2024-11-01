@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Exception\SerializedSuiteCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Repository\JobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -23,7 +23,7 @@ final class CreateSerializedSuiteMessageHandler
     }
 
     /**
-     * @throws SerializedSuiteCreationException
+     * @throws RemoteJobActionException
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
@@ -46,7 +46,7 @@ final class CreateSerializedSuiteMessageHandler
                 $serializedSuite
             ));
         } catch (\Throwable $e) {
-            throw new SerializedSuiteCreationException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }

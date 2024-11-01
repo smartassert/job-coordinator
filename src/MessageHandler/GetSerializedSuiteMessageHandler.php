@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\SerializedSuiteRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -25,7 +25,7 @@ final class GetSerializedSuiteMessageHandler
     }
 
     /**
-     * @throws SerializedSuiteRetrievalException
+     * @throws RemoteJobActionException
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
@@ -55,7 +55,7 @@ final class GetSerializedSuiteMessageHandler
                 $serializedSuiteModel
             ));
         } catch (\Throwable $e) {
-            throw new SerializedSuiteRetrievalException($job, $serializedSuiteEntity, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }
