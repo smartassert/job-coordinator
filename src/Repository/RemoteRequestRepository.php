@@ -52,7 +52,7 @@ class RemoteRequestRepository extends ServiceEntityRepository
             ->andWhere('RemoteRequest.type = :RequestType')
             ->orderBy('RemoteRequest.index', 'DESC')
             ->setParameter('JobId', $jobId)
-            ->setParameter('RequestType', $type->serialize())
+            ->setParameter('RequestType', $type)
             ->setMaxResults(1)
         ;
 
@@ -104,7 +104,7 @@ class RemoteRequestRepository extends ServiceEntityRepository
         return $this->findOneBy(
             [
                 'jobId' => $job->id,
-                'type' => $type->serialize(),
+                'type' => $type,
             ],
             [
                 'index' => 'DESC',
@@ -114,6 +114,6 @@ class RemoteRequestRepository extends ServiceEntityRepository
 
     public function getFirstForJobAndType(Job $job, RemoteRequestType $type): ?RemoteRequest
     {
-        return $this->findOneBy(['jobId' => $job->id, 'type' => $type->serialize(), 'index' => 0]);
+        return $this->findOneBy(['jobId' => $job->id, 'type' => $type, 'index' => 0]);
     }
 }

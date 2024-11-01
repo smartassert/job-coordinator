@@ -7,7 +7,7 @@ namespace App\Model;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 
-readonly class RemoteRequestType
+readonly class RemoteRequestType implements \Stringable
 {
     public function __construct(
         public RemoteRequestEntity $entity,
@@ -19,6 +19,14 @@ readonly class RemoteRequestType
      * @return non-empty-string
      */
     public function serialize(): string
+    {
+        return $this->entity->value . '/' . $this->action->value;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function __toString(): string
     {
         return $this->entity->value . '/' . $this->action->value;
     }
