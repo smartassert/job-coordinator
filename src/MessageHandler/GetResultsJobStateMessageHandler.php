@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\ResultsJobStateRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
@@ -27,7 +27,7 @@ final readonly class GetResultsJobStateMessageHandler
     }
 
     /**
-     * @throws ResultsJobStateRetrievalException
+     * @throws RemoteJobActionException
      */
     public function __invoke(GetResultsJobStateMessage $message): void
     {
@@ -53,7 +53,7 @@ final readonly class GetResultsJobStateMessageHandler
                 $resultsJobState
             ));
         } catch (\Throwable $e) {
-            throw new ResultsJobStateRetrievalException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }

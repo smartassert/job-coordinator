@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\ResultsJobStateRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
@@ -28,8 +28,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
      * @param callable(Job): JobRepository                    $jobRepositoryCreator
      * @param callable(Job): JobPreparationInspectorInterface $jobPreparationInspectorCreator
      * @param callable(Job): ResultsJobRepository             $resultsJobRepositoryCreator
-     *
-     * @throws ResultsJobStateRetrievalException
      */
     #[DataProvider('invokeIncorrectStateDataProvider')]
     public function testInvokeIncorrectState(
@@ -193,8 +191,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         try {
             $handler($message);
-            self::fail(ResultsJobStateRetrievalException::class . ' not thrown');
-        } catch (ResultsJobStateRetrievalException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($resultsClientException, $e->getPreviousException());
             self::assertCount(0, $this->eventRecorder);
         }
