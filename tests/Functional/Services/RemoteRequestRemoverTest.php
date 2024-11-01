@@ -6,8 +6,9 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Enum\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
@@ -59,7 +60,8 @@ class RemoteRequestRemoverTest extends WebTestCase
     public function testRemoveForJobAndTypeNoJob(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
-        RemoteRequestType $type,
+        RemoteRequestEntity $entity,
+        RemoteRequestAction $action,
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
@@ -71,8 +73,8 @@ class RemoteRequestRemoverTest extends WebTestCase
             $remoteRequestsCreator,
             $expectedRemoteRequestFailuresCreator,
             $expectedRemoteRequestsCreator,
-            function () use ($jobId, $type) {
-                $this->remoteRequestRemover->removeForJobAndType($jobId, $type);
+            function () use ($jobId, $entity, $action) {
+                $this->remoteRequestRemover->removeForJobAndType($jobId, $entity, $action);
             }
         );
     }
@@ -90,7 +92,8 @@ class RemoteRequestRemoverTest extends WebTestCase
     public function testRemoveForJobAndType(
         callable $remoteRequestFailuresCreator,
         callable $remoteRequestsCreator,
-        RemoteRequestType $type,
+        RemoteRequestEntity $entity,
+        RemoteRequestAction $action,
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
@@ -104,8 +107,8 @@ class RemoteRequestRemoverTest extends WebTestCase
             $remoteRequestsCreator,
             $expectedRemoteRequestFailuresCreator,
             $expectedRemoteRequestsCreator,
-            function () use ($job, $type) {
-                $this->remoteRequestRemover->removeForJobAndType($job->id, $type);
+            function () use ($job, $entity, $action) {
+                $this->remoteRequestRemover->removeForJobAndType($job->id, $entity, $action);
             }
         );
     }
@@ -123,7 +126,8 @@ class RemoteRequestRemoverTest extends WebTestCase
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -148,12 +152,28 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -161,9 +181,24 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],
@@ -184,13 +219,34 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -198,9 +254,24 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],
@@ -216,14 +287,35 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
-                        (new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0))
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
+                        (new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ))
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -231,9 +323,24 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],
@@ -254,15 +361,46 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 2),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            1
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            2
+                        ),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -270,9 +408,24 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],
@@ -288,16 +441,47 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
-                        (new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 2))
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            1
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
+                        (new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            2
+                        ))
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -305,9 +489,24 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert('' !== $jobId);
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],
@@ -323,17 +522,48 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        (new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ))
                             ->setFailure($remoteRequestFailure),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
-                        (new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 2))
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            1
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
+                        (new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::MACHINE,
+                            RemoteRequestAction::CREATE,
+                            2
+                        ))
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
-                'type' => RemoteRequestType::MACHINE_CREATE,
+                'entity' => RemoteRequestEntity::MACHINE,
+                'action' => RemoteRequestAction::CREATE,
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [
                         new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
@@ -345,10 +575,25 @@ class RemoteRequestRemoverTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        (new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ))
                             ->setFailure($remoteRequestFailure),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_READ, 0),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::RETRIEVE,
+                            0
+                        ),
                     ];
                 },
             ],

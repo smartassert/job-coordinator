@@ -7,7 +7,8 @@ namespace App\Repository;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -43,16 +44,18 @@ class RemoteRequestRepository extends ServiceEntityRepository
     /**
      * @return null|int<0, max>
      */
-    public function getLargestIndex(string $jobId, RemoteRequestType $type): ?int
+    public function getLargestIndex(string $jobId, RemoteRequestEntity $entity, RemoteRequestAction $action): ?int
     {
         $queryBuilder = $this->createQueryBuilder('RemoteRequest');
         $queryBuilder
             ->select('RemoteRequest.index')
             ->where('RemoteRequest.jobId = :JobId')
-            ->andWhere('RemoteRequest.type = :RequestType')
+            ->andWhere('RemoteRequest.entity = :RequestEntity')
+            ->andWhere('RemoteRequest.action = :RequestAction')
             ->orderBy('RemoteRequest.index', 'DESC')
             ->setParameter('JobId', $jobId)
-            ->setParameter('RequestType', $type)
+            ->setParameter('RequestEntity', $entity)
+            ->setParameter('RequestAction', $action)
             ->setMaxResults(1)
         ;
 
@@ -99,12 +102,13 @@ class RemoteRequestRepository extends ServiceEntityRepository
         return $result > 0;
     }
 
-    public function findNewest(Job $job, RemoteRequestType $type): ?RemoteRequest
+    public function findNewest(Job $job, RemoteRequestEntity $entity, RemoteRequestAction $action): ?RemoteRequest
     {
         return $this->findOneBy(
             [
                 'jobId' => $job->id,
-                'type' => $type,
+                'entity' => $entity,
+                'action' => $action,
             ],
             [
                 'index' => 'DESC',
@@ -112,8 +116,11 @@ class RemoteRequestRepository extends ServiceEntityRepository
         );
     }
 
-    public function getFirstForJobAndType(Job $job, RemoteRequestType $type): ?RemoteRequest
-    {
-        return $this->findOneBy(['jobId' => $job->id, 'type' => $type, 'index' => 0]);
+    public function getFirstForJobAndType(
+        Job $job,
+        RemoteRequestEntity $entity,
+        RemoteRequestAction $action
+    ): ?RemoteRequest {
+        return $this->findOneBy(['jobId' => $job->id, 'entity' => $entity, 'action' => $action, 'index' => 0]);
     }
 }

@@ -44,14 +44,23 @@ class ResultsJobHandler implements JobComponentHandlerInterface
             return RequestState::SUCCEEDED;
         }
 
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            $jobComponent->remoteRequestEntity,
+            $jobComponent->remoteRequestAction,
+        );
 
         return $remoteRequest?->getState();
     }
 
     public function hasFailed(JobComponent $jobComponent, Job $job): ?bool
     {
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            $jobComponent->remoteRequestEntity,
+            $jobComponent->remoteRequestAction,
+        );
+
         if (null === $remoteRequest) {
             return null;
         }
@@ -65,7 +74,12 @@ class ResultsJobHandler implements JobComponentHandlerInterface
 
     private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
     {
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            $jobComponent->remoteRequestEntity,
+            $jobComponent->remoteRequestAction,
+        );
+
         if (null === $remoteRequest) {
             return new ComponentPreparation($jobComponent, PreparationState::PENDING);
         }

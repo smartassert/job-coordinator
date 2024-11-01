@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestIndexGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,14 +45,15 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
     public function testGenerate(
         array $existingRemoteRequests,
         string $jobId,
-        RemoteRequestType $type,
+        RemoteRequestEntity $entity,
+        RemoteRequestAction $action,
         int $expected
     ): void {
         foreach ($existingRemoteRequests as $remoteRequest) {
             $this->repository->save($remoteRequest);
         }
 
-        self::assertSame($expected, $this->remoteRequestIndexGenerator->generate($jobId, $type));
+        self::assertSame($expected, $this->remoteRequestIndexGenerator->generate($jobId, $entity, $action));
     }
 
     /**
@@ -65,7 +67,8 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
             'no existing remote requests' => [
                 'existingRemoteRequests' => [],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'entity' => RemoteRequestEntity::RESULTS_JOB,
+                'action' => RemoteRequestAction::CREATE,
                 'expected' => 0,
             ],
             'no existing remote requests for job' => [
@@ -73,41 +76,95 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
                     $jobId = md5((string) rand());
 
                     return [
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 1),
-                        new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 2),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0,
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            1,
+                        ),
+                        new RemoteRequest(
+                            $jobId,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            2,
+                        ),
                     ];
                 })(),
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'entity' => RemoteRequestEntity::RESULTS_JOB,
+                'action' => RemoteRequestAction::CREATE,
                 'expected' => 0,
             ],
             'no existing remote requests for type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::MACHINE_CREATE, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::MACHINE_GET, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::SERIALIZED_SUITE_GET, 0),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::MACHINE,
+                        RemoteRequestAction::CREATE,
+                        0,
+                    ),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::MACHINE,
+                        RemoteRequestAction::RETRIEVE,
+                        0,
+                    ),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::SERIALIZED_SUITE,
+                        RemoteRequestAction::RETRIEVE,
+                        0,
+                    ),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'entity' => RemoteRequestEntity::RESULTS_JOB,
+                'action' => RemoteRequestAction::CREATE,
                 'expected' => 0,
             ],
             'single existing request for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::RESULTS_JOB,
+                        RemoteRequestAction::CREATE,
+                        0,
+                    ),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'entity' => RemoteRequestEntity::RESULTS_JOB,
+                'action' => RemoteRequestAction::CREATE,
                 'expected' => 1,
             ],
             'multiple existing requests for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 0),
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 1),
-                    new RemoteRequest($jobId, RemoteRequestType::RESULTS_CREATE, 2),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::RESULTS_JOB,
+                        RemoteRequestAction::CREATE,
+                        0,
+                    ),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::RESULTS_JOB,
+                        RemoteRequestAction::CREATE,
+                        1,
+                    ),
+                    new RemoteRequest(
+                        $jobId,
+                        RemoteRequestEntity::RESULTS_JOB,
+                        RemoteRequestAction::CREATE,
+                        2,
+                    ),
                 ],
                 'jobId' => $jobId,
-                'type' => RemoteRequestType::RESULTS_CREATE,
+                'entity' => RemoteRequestEntity::RESULTS_JOB,
+                'action' => RemoteRequestAction::CREATE,
                 'expected' => 3,
             ],
         ];

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 
 interface JobRemoteRequestMessageInterface
 {
@@ -13,7 +14,9 @@ interface JobRemoteRequestMessageInterface
      */
     public function getJobId(): string;
 
-    public function getRemoteRequestType(): RemoteRequestType;
+    public function getRemoteRequestEntity(): RemoteRequestEntity;
+
+    public function getRemoteRequestAction(): RemoteRequestAction;
 
     public function isRepeatable(): bool;
 

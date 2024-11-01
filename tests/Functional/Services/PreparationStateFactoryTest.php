@@ -12,11 +12,11 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
 use App\Enum\PreparationState as PreparationStateEnum;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
-use App\Enum\RemoteRequestType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
-// use App\Model\PreparationState as PreparationStateModel;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -170,7 +170,12 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'remoteRequestCreator' => function (Job $job, RemoteRequestRepository $remoteRequestRepository) {
                     $remoteRequestRepository->save(
-                        new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0)
+                        new RemoteRequest(
+                            $job->id,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0,
+                        )
                     );
                 },
                 'expected' => [
@@ -189,7 +194,12 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'remoteRequestCreator' => function (Job $job, RemoteRequestRepository $remoteRequestRepository) {
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0,
+                        ))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
@@ -220,7 +230,12 @@ class PreparationStateFactoryTest extends WebTestCase
                 },
                 'remoteRequestCreator' => function (Job $job, RemoteRequestRepository $remoteRequestRepository) {
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, RemoteRequestType::RESULTS_CREATE, 0))
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestEntity::RESULTS_JOB,
+                            RemoteRequestAction::CREATE,
+                            0,
+                        ))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
@@ -230,7 +245,12 @@ class PreparationStateFactoryTest extends WebTestCase
                     );
 
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, RemoteRequestType::SERIALIZED_SUITE_CREATE, 0))
+                        (new RemoteRequest(
+                            $job->id,
+                            RemoteRequestEntity::SERIALIZED_SUITE,
+                            RemoteRequestAction::CREATE,
+                            0,
+                        ))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,

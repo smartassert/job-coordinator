@@ -15,7 +15,7 @@ class NonRepeatableMessageAlreadyDispatchedException extends \Exception
     ) {
         parent::__construct(sprintf(
             'Unable to to repeat request of type "%s" for job "%s", existing request "%s" already sent',
-            $this->existingRemoteRequest->getType()->value,
+            $this->existingRemoteRequest->getType(),
             $job->id,
             $existingRemoteRequest->id,
         ));

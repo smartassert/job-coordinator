@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\RemoteRequestFailure;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -19,7 +20,7 @@ class RemoteRequestRemover
     ) {
     }
 
-    public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
+    public function removeForJobAndType(string $jobId, RemoteRequestEntity $entity, RemoteRequestAction $action): void
     {
         $job = $this->jobRepository->find($jobId);
         if (null === $job) {
@@ -28,7 +29,8 @@ class RemoteRequestRemover
 
         $remoteRequests = $this->remoteRequestRepository->findBy([
             'jobId' => $job->id,
-            'type' => $type,
+            'entity' => $entity,
+            'action' => $action,
         ]);
 
         foreach ($remoteRequests as $remoteRequest) {

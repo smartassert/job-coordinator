@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
@@ -21,9 +22,14 @@ class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
         parent::__construct($authenticationToken, $jobId);
     }
 
-    public function getRemoteRequestType(): RemoteRequestType
+    public function getRemoteRequestEntity(): RemoteRequestEntity
     {
-        return RemoteRequestType::MACHINE_GET;
+        return RemoteRequestEntity::MACHINE;
+    }
+
+    public function getRemoteRequestAction(): RemoteRequestAction
+    {
+        return RemoteRequestAction::RETRIEVE;
     }
 
     public function isRepeatable(): bool

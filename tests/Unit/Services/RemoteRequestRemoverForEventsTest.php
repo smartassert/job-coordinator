@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
@@ -31,7 +32,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_CREATE)
+            ->with($jobId, RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
             ->andReturn([])
         ;
 
@@ -51,7 +52,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::RESULTS_CREATE)
+            ->with($jobId, RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
             ->andReturn([])
         ;
 
@@ -73,7 +74,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::SERIALIZED_SUITE_CREATE)
+            ->with($jobId, RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
             ->andReturn([])
         ;
 
@@ -97,7 +98,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_GET)
+            ->with($jobId, RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE)
             ->andReturn([])
         ;
 
@@ -121,7 +122,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::SERIALIZED_SUITE_GET)
+            ->with($jobId, RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
             ->andReturn([])
         ;
 
@@ -144,7 +145,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_START_JOB)
+            ->with($jobId, RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
             ->andReturn([])
         ;
 
@@ -164,7 +165,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::RESULTS_STATE_GET)
+            ->with($jobId, RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
             ->andReturn([])
         ;
 
@@ -188,7 +189,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
             ->shouldReceive('removeForJobAndType')
-            ->with($jobId, RemoteRequestType::MACHINE_TERMINATE)
+            ->with($jobId, RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE)
             ->andReturn([])
         ;
 

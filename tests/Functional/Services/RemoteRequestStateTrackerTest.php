@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
@@ -101,10 +102,19 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageFailedEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId(
+                $message->getJobId(),
+                $message->getRemoteRequestEntity(),
+                $message->getRemoteRequestAction(),
+                $message->getIndex()
+            )
         );
 
-        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest = new RemoteRequest(
+            $message->getJobId(),
+            $message->getRemoteRequestEntity(),
+            $message->getRemoteRequestAction(),
+        );
         $expectedRemoteRequest->setState($expectedRequestState);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
@@ -153,10 +163,19 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageHandledEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId(
+                $message->getJobId(),
+                $message->getRemoteRequestEntity(),
+                $message->getRemoteRequestAction(),
+                $message->getIndex()
+            )
         );
 
-        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest = new RemoteRequest(
+            $message->getJobId(),
+            $message->getRemoteRequestEntity(),
+            $message->getRemoteRequestAction(),
+        );
         $expectedRemoteRequest->setState(RequestState::SUCCEEDED);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
@@ -173,10 +192,20 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $this->remoteRequestStateTracker->setRemoteRequestStateForMessageReceivedEvent($event);
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId(
+                $message->getJobId(),
+                $message->getRemoteRequestEntity(),
+                $message->getRemoteRequestAction(),
+                $message->getIndex()
+            )
         );
 
-        $expectedRemoteRequest = new RemoteRequest($message->getJobId(), $message->getRemoteRequestType());
+        $expectedRemoteRequest = new RemoteRequest(
+            $message->getJobId(),
+            $message->getRemoteRequestEntity(),
+            $message->getRemoteRequestAction(),
+        );
+
         $expectedRemoteRequest->setState(RequestState::REQUESTING);
 
         self::assertEquals($expectedRemoteRequest, $remoteRequest);
@@ -194,7 +223,12 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         self::assertSame(1, $this->remoteRequestRepository->count([]));
 
         $remoteRequest = $this->remoteRequestRepository->find(
-            RemoteRequest::generateId($message->getJobId(), $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId(
+                $message->getJobId(),
+                $message->getRemoteRequestEntity(),
+                $message->getRemoteRequestAction(),
+                $message->getIndex()
+            )
         );
         \assert($remoteRequest instanceof RemoteRequest);
 
@@ -221,8 +255,13 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         ;
 
         $message
-            ->shouldReceive('getRemoteRequestType')
-            ->andReturn(self::getRandomRemoteRequestType())
+            ->shouldReceive('getRemoteRequestEntity')
+            ->andReturn(self::getRandomRemoteRequestEntity())
+        ;
+
+        $message
+            ->shouldReceive('getRemoteRequestAction')
+            ->andReturn(self::getRandomRemoteRequestAction())
         ;
 
         $message
@@ -233,9 +272,16 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         return $message;
     }
 
-    private static function getRandomRemoteRequestType(): RemoteRequestType
+    private static function getRandomRemoteRequestEntity(): RemoteRequestEntity
     {
-        $cases = RemoteRequestType::cases();
+        $cases = RemoteRequestEntity::cases();
+
+        return $cases[rand(0, count($cases) - 1)];
+    }
+
+    private static function getRandomRemoteRequestAction(): RemoteRequestAction
+    {
+        $cases = RemoteRequestAction::cases();
 
         return $cases[rand(0, count($cases) - 1)];
     }

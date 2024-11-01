@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 
 class CreateMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
-    public function getRemoteRequestType(): RemoteRequestType
+    public function getRemoteRequestEntity(): RemoteRequestEntity
     {
-        return RemoteRequestType::MACHINE_CREATE;
+        return RemoteRequestEntity::MACHINE;
+    }
+
+    public function getRemoteRequestAction(): RemoteRequestAction
+    {
+        return RemoteRequestAction::CREATE;
     }
 
     public function isRepeatable(): bool
