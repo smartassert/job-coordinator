@@ -6,11 +6,11 @@ namespace App\Model;
 
 use App\Enum\JobComponentName;
 
-readonly class JobComponent
+class JobComponent
 {
     public function __construct(
-        public JobComponentName $name,
-        public RemoteRequestType $remoteRequestType,
+        public readonly JobComponentName $name,
+        public readonly RemoteRequestType $remoteRequestType,
     ) {
     }
 }
