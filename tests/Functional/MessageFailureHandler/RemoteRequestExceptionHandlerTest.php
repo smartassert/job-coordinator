@@ -12,9 +12,7 @@ use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
-use App\Exception\WorkerJobCreationException;
 use App\Message\CreateMachineMessage;
-use App\Message\StartWorkerJobMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -118,21 +116,6 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 },
                 'type' => new RemoteRequestType(
                     RemoteRequestEntity::MACHINE,
-                    RemoteRequestAction::CREATE,
-                ),
-            ],
-            WorkerJobCreationException::class => [
-                'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
-                        return new WorkerJobCreationException(
-                            $job,
-                            $inner,
-                            new StartWorkerJobMessage(md5((string) rand()), $job->id, '127.0.0.1'),
-                        );
-                    };
-                },
-                'type' => new RemoteRequestType(
-                    RemoteRequestEntity::WORKER_JOB,
                     RemoteRequestAction::CREATE,
                 ),
             ],

@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\NotReadyToStartWorkerJobEvent;
 use App\Event\WorkerJobStartRequestedEvent;
-use App\Exception\WorkerJobCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\StartWorkerJobMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
@@ -30,7 +30,7 @@ final class StartWorkerJobMessageHandler
     }
 
     /**
-     * @throws WorkerJobCreationException
+     * @throws RemoteJobActionException
      */
     public function __invoke(StartWorkerJobMessage $message): void
     {
@@ -85,7 +85,7 @@ final class StartWorkerJobMessageHandler
                 $workerJob,
             ));
         } catch (\Throwable $e) {
-            throw new WorkerJobCreationException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }
