@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\NotReadyToStartWorkerJobEvent;
-use App\Message\StartWorkerJobMessage;
+use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -57,7 +57,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
@@ -75,7 +75,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $message = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $message = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
         $event = new NotReadyToStartWorkerJobEvent($message);
 
         $this->dispatcher->dispatchForNotReadyToStartWorkerJobEvent($event);
@@ -84,7 +84,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new StartWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);

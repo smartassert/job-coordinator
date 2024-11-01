@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Event\NotReadyToStartWorkerJobEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\StartWorkerJobMessage;
+use App\Message\CreateWorkerJobMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -32,7 +32,7 @@ final class StartWorkerJobMessageHandler
     /**
      * @throws RemoteJobActionException
      */
-    public function __invoke(StartWorkerJobMessage $message): void
+    public function __invoke(CreateWorkerJobMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {

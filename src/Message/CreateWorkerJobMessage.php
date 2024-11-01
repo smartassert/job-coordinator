@@ -8,7 +8,7 @@ use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Model\RemoteRequestType;
 
-class StartWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
+class CreateWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $authenticationToken
