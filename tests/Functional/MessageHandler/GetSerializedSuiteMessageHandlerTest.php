@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\SerializedSuiteRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
@@ -84,10 +84,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             ->andThrow($serializedSuiteClientException)
         ;
 
-        self::expectException(SerializedSuiteRetrievalException::class);
+        self::expectException(RemoteJobActionException::class);
         self::expectExceptionMessage(sprintf(
-            'Failed to retrieve serialized suite "%s": %s',
-            $serializedSuite->getId(),
+            'Failed to retrieve serialized-suite for job "%s": %s',
+            $job->id,
             $serializedSuiteClientException->getMessage()
         ));
 

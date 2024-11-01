@@ -7,15 +7,24 @@ namespace App\Exception;
 use App\Entity\Job;
 use App\Message\JobRemoteRequestMessageInterface;
 
-abstract class AbstractRemoteRequestException extends \Exception implements RemoteRequestExceptionInterface
+class RemoteJobActionException extends \Exception implements RemoteRequestExceptionInterface
 {
     public function __construct(
         private readonly Job $job,
         private readonly \Throwable $previousException,
-        string $message,
         private readonly JobRemoteRequestMessageInterface $failedMessage,
     ) {
-        parent::__construct($message, 0, $previousException);
+        parent::__construct(
+            sprintf(
+                'Failed to %s %s for job "%s": %s',
+                $failedMessage->getRemoteRequestType()->action->value,
+                $failedMessage->getRemoteRequestType()->entity->value,
+                $job->id,
+                $previousException->getMessage()
+            ),
+            0,
+            $previousException
+        );
     }
 
     public function getJob(): Job

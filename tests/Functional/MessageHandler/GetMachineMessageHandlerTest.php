@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Exception\MachineRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Repository\JobRepository;
@@ -84,10 +84,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $this->createMessageAndHandleMessage($machine, self::$apiToken, $workerManagerException);
-            self::fail(MachineRetrievalException::class . ' not thrown');
-        } catch (MachineRetrievalException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($workerManagerException, $e->getPreviousException());
-            self::assertSame([], $this->eventRecorder->all(MachineRetrievalException::class));
+            self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
         }
     }
 
@@ -364,7 +364,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @param non-empty-string $authenticationToken
      *
-     * @throws \Exception|MachineRetrievalException
+     * @throws \Exception|RemoteJobActionException
      */
     private function createMessageAndHandleMessage(
         Machine $previous,

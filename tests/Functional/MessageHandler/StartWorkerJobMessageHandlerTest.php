@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Event\WorkerJobStartRequestedEvent;
-use App\Exception\WorkerJobCreationException;
+use App\Exception\RemoteJobActionException;
 use App\Message\StartWorkerJobMessage;
 use App\MessageHandler\StartWorkerJobMessageHandler;
 use App\Repository\JobRepository;
@@ -166,8 +166,8 @@ class StartWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         try {
             $handler($message);
-            self::fail(WorkerJobCreationException::class . ' not thrown');
-        } catch (WorkerJobCreationException $e) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
             self::assertSame($serializedSuiteReadException, $e->getPreviousException());
             self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
             $this->assertNoStartWorkerJobMessageDispatched();

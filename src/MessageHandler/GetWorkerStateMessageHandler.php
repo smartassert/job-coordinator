@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\WorkerComponentState;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Exception\WorkerStateRetrievalException;
+use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerStateMessage;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
@@ -26,7 +26,7 @@ final class GetWorkerStateMessageHandler
     }
 
     /**
-     * @throws WorkerStateRetrievalException
+     * @throws RemoteJobActionException
      */
     public function __invoke(GetWorkerStateMessage $message): void
     {
@@ -49,7 +49,7 @@ final class GetWorkerStateMessageHandler
                 $workerClient->getApplicationState()
             ));
         } catch (\Throwable $e) {
-            throw new WorkerStateRetrievalException($job, $e, $message);
+            throw new RemoteJobActionException($job, $e, $message);
         }
     }
 }
