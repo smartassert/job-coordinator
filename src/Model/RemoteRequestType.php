@@ -18,14 +18,6 @@ readonly class RemoteRequestType implements \Stringable
     /**
      * @return non-empty-string
      */
-    public function serialize(): string
-    {
-        return $this->entity->value . '/' . $this->action->value;
-    }
-
-    /**
-     * @return non-empty-string
-     */
     public function __toString(): string
     {
         return $this->entity->value . '/' . $this->action->value;

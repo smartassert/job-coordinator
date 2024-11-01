@@ -61,7 +61,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     ) {
         $this->id = self::generateId($jobId, $type, $index);
         $this->jobId = $jobId;
-        $this->type = $type->serialize();
+        $this->type = (string) $type;
         $this->state = RequestState::REQUESTING;
         $this->index = $index;
     }
@@ -94,7 +94,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
      */
     public static function generateId(string $jobId, RemoteRequestType $type, int $index): string
     {
-        return $jobId . $type->serialize() . $index;
+        return $jobId . $type . $index;
     }
 
     public function setFailure(RemoteRequestFailure $failure): self
