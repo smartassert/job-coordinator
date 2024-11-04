@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
@@ -11,7 +12,6 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -76,9 +76,9 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
                 'expectedMethod' => 'removeSerializedSuiteGetRequests',
             ],
-            WorkerJobStartRequestedEvent::class => [
-                'expectedListenedForEvent' => WorkerJobStartRequestedEvent::class,
-                'expectedMethod' => 'removeWorkerJobStartRequests',
+            CreateWorkerJobRequestedEvent::class => [
+                'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
+                'expectedMethod' => 'removeWorkerJobCreateRequests',
             ],
             ResultsJobStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,

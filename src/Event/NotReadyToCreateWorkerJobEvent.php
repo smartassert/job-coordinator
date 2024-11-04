@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use App\Message\StartWorkerJobMessage;
+use App\Message\CreateWorkerJobMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class NotReadyToStartWorkerJobEvent extends Event
+class NotReadyToCreateWorkerJobEvent extends Event
 {
     public function __construct(
-        public readonly StartWorkerJobMessage $message,
+        public readonly CreateWorkerJobMessage $message,
     ) {
     }
 }

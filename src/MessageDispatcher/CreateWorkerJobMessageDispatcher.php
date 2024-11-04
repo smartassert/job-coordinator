@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
-use App\Event\NotReadyToStartWorkerJobEvent;
+use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
-use App\Message\StartWorkerJobMessage;
+use App\Message\CreateWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
+class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
@@ -26,8 +26,8 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
             MachineIsActiveEvent::class => [
                 ['dispatchForMachineIsActiveEvent', 100],
             ],
-            NotReadyToStartWorkerJobEvent::class => [
-                ['dispatchForNotReadyToStartWorkerJobEvent', 100],
+            NotReadyToCreateWorkerJobEvent::class => [
+                ['dispatchForNotReadyToCreateWorkerJobEvent', 100],
             ],
         ];
     }
@@ -38,14 +38,14 @@ class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new StartWorkerJobMessage($event->getAuthenticationToken(), $event->getJobId(), $event->ipAddress)
+            new CreateWorkerJobMessage($event->getAuthenticationToken(), $event->getJobId(), $event->ipAddress)
         );
     }
 
     /**
      * @throws NonRepeatableMessageAlreadyDispatchedException
      */
-    public function dispatchForNotReadyToStartWorkerJobEvent(NotReadyToStartWorkerJobEvent $event): void
+    public function dispatchForNotReadyToCreateWorkerJobEvent(NotReadyToCreateWorkerJobEvent $event): void
     {
         $this->messageDispatcher->dispatch($event->message);
     }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\NotReadyToStartWorkerJobEvent;
-use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\CreateWorkerJobRequestedEvent;
+use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\StartWorkerJobMessage;
+use App\Message\CreateWorkerJobMessage;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -17,7 +17,7 @@ use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class StartWorkerJobMessageHandler
+final class CreateWorkerJobMessageHandler
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
@@ -32,7 +32,7 @@ final class StartWorkerJobMessageHandler
     /**
      * @throws RemoteJobActionException
      */
-    public function __invoke(StartWorkerJobMessage $message): void
+    public function __invoke(CreateWorkerJobMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
@@ -41,7 +41,7 @@ final class StartWorkerJobMessageHandler
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuiteEntity) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
@@ -52,14 +52,14 @@ final class StartWorkerJobMessageHandler
         }
 
         if (in_array($serializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
@@ -79,7 +79,7 @@ final class StartWorkerJobMessageHandler
                 $serializedSuite
             );
 
-            $this->eventDispatcher->dispatch(new WorkerJobStartRequestedEvent(
+            $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
                 $job->id,
                 $message->machineIpAddress,
                 $workerJob,

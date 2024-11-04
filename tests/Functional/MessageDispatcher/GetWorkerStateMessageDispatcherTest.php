@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerStateMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
@@ -61,9 +61,9 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
     public static function eventSubscriptionsDataProvider(): array
     {
         return [
-            WorkerJobStartRequestedEvent::class => [
-                'expectedListenedForEvent' => WorkerJobStartRequestedEvent::class,
-                'expectedMethod' => 'dispatchForWorkerJobStartRequestedEvent',
+            CreateWorkerJobRequestedEvent::class => [
+                'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
+                'expectedMethod' => 'dispatchForCreateWorkerJobRequestedEvent',
             ],
             WorkerStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
@@ -79,9 +79,9 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $machineIpAddress = '127.0.0.1';
 
-        $event = new WorkerJobStartRequestedEvent($jobId, $machineIpAddress, $workerJob);
+        $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
-        $this->dispatcher->dispatchForWorkerJobStartRequestedEvent($event);
+        $this->dispatcher->dispatchForCreateWorkerJobRequestedEvent($event);
 
         $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
 
