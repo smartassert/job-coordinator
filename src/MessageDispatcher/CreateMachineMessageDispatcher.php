@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
@@ -29,6 +30,9 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
             SerializedSuiteSerializedEvent::class => [
                 ['dispatch', 100],
             ],
+            MessageNotYetHandleableEvent::class => [
+                ['reDispatch', 100],
+            ],
         ];
     }
 
@@ -40,5 +44,18 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId())
         );
+    }
+
+    /**
+     * @throws NonRepeatableMessageAlreadyDispatchedException
+     */
+    public function reDispatch(MessageNotYetHandleableEvent $event): void
+    {
+        $message = $event->message;
+        if (!$message instanceof CreateMachineMessage) {
+            return;
+        }
+
+        $this->messageDispatcher->dispatch($message);
     }
 }

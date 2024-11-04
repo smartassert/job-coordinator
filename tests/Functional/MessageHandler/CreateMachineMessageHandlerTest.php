@@ -9,6 +9,7 @@ use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
@@ -78,6 +79,13 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler($message);
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+
+        $fooEvents = $this->eventRecorder->all(MessageNotYetHandleableEvent::class);
+        self::assertCount(1, $fooEvents);
+
+        $fooEvent = $fooEvents[0];
+        self::assertInstanceOf(MessageNotYetHandleableEvent::class, $fooEvent);
+        self::assertSame($message, $fooEvent->message);
     }
 
     /**

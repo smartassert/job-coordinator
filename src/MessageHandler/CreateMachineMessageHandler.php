@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
@@ -47,6 +48,8 @@ final readonly class CreateMachineMessageHandler
             || null === $serializedSuite
             || ($serializedSuite instanceof SerializedSuite && !$serializedSuite->isPrepared())
         ) {
+            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
+
             return;
         }
 
