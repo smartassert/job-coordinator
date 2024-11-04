@@ -9,9 +9,9 @@ use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
-use App\Message\GetWorkerStateMessage;
+use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\MessageHandler\GetWorkerStateMessageHandler;
+use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
@@ -23,7 +23,7 @@ use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\Uid\Ulid;
 
-class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
@@ -32,7 +32,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
 
-        $message = new GetWorkerStateMessage($jobId, '127.0.0.1');
+        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
 
         $handler($message);
 
@@ -55,7 +55,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
 
-        $message = new GetWorkerStateMessage($job->id, '127.0.0.1');
+        $message = new GetWorkerJobMessage($job->id, '127.0.0.1');
 
         $handler($message);
 
@@ -73,7 +73,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->id, $machineIpAddress);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
@@ -100,7 +100,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $jobFactory->createRandom();
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerStateMessage($job->id, $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->id, $machineIpAddress);
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
@@ -157,7 +157,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         return GetResultsJobStateMessage::class;
     }
 
-    private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerStateMessageHandler
+    private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerJobMessageHandler
     {
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -168,7 +168,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetWorkerStateMessageHandler(
+        return new GetWorkerJobMessageHandler(
             $jobRepository,
             $workerComponentStateRepository,
             $workerClientFactory,

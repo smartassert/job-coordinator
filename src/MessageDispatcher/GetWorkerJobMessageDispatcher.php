@@ -7,10 +7,10 @@ namespace App\MessageDispatcher;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
-use App\Message\GetWorkerStateMessage;
+use App\Message\GetWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
+class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
@@ -38,7 +38,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public function dispatchForCreateWorkerJobRequestedEvent(CreateWorkerJobRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetWorkerStateMessage($event->getJobId(), $event->getMachineIpAddress())
+            new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress())
         );
     }
 
@@ -48,7 +48,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
-            new GetWorkerStateMessage($event->getJobId(), $event->getMachineIpAddress())
+            new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress())
         );
     }
 }

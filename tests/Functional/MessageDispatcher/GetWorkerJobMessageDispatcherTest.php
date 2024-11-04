@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Message\GetWorkerStateMessage;
-use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
+use App\Message\GetWorkerJobMessage;
+use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -18,17 +18,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
-class GetWorkerStateMessageDispatcherTest extends WebTestCase
+class GetWorkerJobMessageDispatcherTest extends WebTestCase
 {
-    private GetWorkerStateMessageDispatcher $dispatcher;
+    private GetWorkerJobMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(GetWorkerStateMessageDispatcher::class);
-        \assert($dispatcher instanceof GetWorkerStateMessageDispatcher);
+        $dispatcher = self::getContainer()->get(GetWorkerJobMessageDispatcher::class);
+        \assert($dispatcher instanceof GetWorkerJobMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -83,7 +83,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForCreateWorkerJobRequestedEvent($event);
 
-        $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
@@ -112,7 +112,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForWorkerStateRetrievedEvent($event);
 
-        $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
