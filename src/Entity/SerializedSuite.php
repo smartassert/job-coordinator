@@ -63,14 +63,6 @@ class SerializedSuite implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
-     */
-    public function getState(): ?string
-    {
-        return $this->state;
-    }
-
-    /**
      * @param non-empty-string $state
      */
     public function setState(string $state): static
