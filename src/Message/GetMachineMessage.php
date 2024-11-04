@@ -27,9 +27,4 @@ class GetMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE);
     }
-
-    public function isRepeatable(): bool
-    {
-        return true;
-    }
 }

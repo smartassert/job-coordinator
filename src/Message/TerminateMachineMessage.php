@@ -14,9 +14,4 @@ class TerminateMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE);
     }
-
-    public function isRepeatable(): bool
-    {
-        return false;
-    }
 }
