@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -21,17 +22,32 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use Symfony\Component\Uid\Ulid;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
+    public function testInvokeJobNotFound(): void
+    {
+        $handler = self::getContainer()->get(GetResultsJobStateMessageHandler::class);
+        \assert($handler instanceof GetResultsJobStateMessageHandler);
+
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $message = new GetResultsJobStateMessage('api token', $jobId);
+
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job not found');
+
+        $handler($message);
+    }
+
     /**
-     * @param callable(Job): JobRepository                    $jobRepositoryCreator
      * @param callable(Job): JobPreparationInspectorInterface $jobPreparationInspectorCreator
      * @param callable(Job): ResultsJobRepository             $resultsJobRepositoryCreator
      */
     #[DataProvider('invokeIncorrectStateDataProvider')]
     public function testInvokeIncorrectState(
-        callable $jobRepositoryCreator,
         callable $jobPreparationInspectorCreator,
         callable $resultsJobRepositoryCreator,
     ): void {
@@ -39,12 +55,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $jobRepository = $jobRepositoryCreator($job);
         $jobPreparationInspector = $jobPreparationInspectorCreator($job);
         $resultsJobRepository = $resultsJobRepositoryCreator($job);
 
         $handler = $this->createHandler(
-            $jobRepository,
             $jobPreparationInspector,
             $resultsJobRepository,
             HttpMockedResultsClientFactory::create(),
@@ -62,17 +76,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
      */
     public static function invokeIncorrectStateDataProvider(): array
     {
-        $jobRepositoryCreator = function (Job $job) {
-            $jobRepository = \Mockery::mock(JobRepository::class);
-            $jobRepository
-                ->shouldReceive('find')
-                ->with($job->id)
-                ->andReturn($job)
-            ;
-
-            return $jobRepository;
-        };
-
         $nonFailedJobPreparationInspector = function (Job $job) {
             $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
             $jobPreparationInspector
@@ -85,26 +88,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         };
 
         return [
-            'no job' => [
-                'jobRepositoryCreator' => function (Job $job) {
-                    $jobRepository = \Mockery::mock(JobRepository::class);
-                    $jobRepository
-                        ->shouldReceive('find')
-                        ->with($job->id)
-                        ->andReturnNull()
-                    ;
-
-                    return $jobRepository;
-                },
-                'jobPreparationInspectorCreator' => function () {
-                    return \Mockery::mock(JobPreparationInspectorInterface::class);
-                },
-                'resultsJobRepositoryCreator' => function () {
-                    return \Mockery::mock(ResultsJobRepository::class);
-                },
-            ],
             'job preparation has failed' => [
-                'jobRepositoryCreator' => $jobRepositoryCreator,
                 'jobPreparationInspectorCreator' => function (Job $job) {
                     $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
                     $jobPreparationInspector
@@ -120,7 +104,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
                 },
             ],
             'no results job' => [
-                'jobRepositoryCreator' => $jobRepositoryCreator,
                 'jobPreparationInspectorCreator' => $nonFailedJobPreparationInspector,
                 'resultsJobRepositoryCreator' => function (Job $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
@@ -134,7 +117,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
                 },
             ],
             'results job has end state' => [
-                'jobRepositoryCreator' => $jobRepositoryCreator,
                 'jobPreparationInspectorCreator' => $nonFailedJobPreparationInspector,
                 'resultsJobRepositoryCreator' => function (Job $job) {
                     $resultsJob = new ResultsJob(
@@ -169,9 +151,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobPreparationInspector = self::getContainer()->get(JobPreparationInspectorInterface::class);
         \assert($jobPreparationInspector instanceof JobPreparationInspectorInterface);
 
@@ -180,13 +159,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
-        $handler = $this->createHandler(
-            $jobRepository,
-            $jobPreparationInspector,
-            $resultsJobRepository,
-            $resultsClient
-        );
-
+        $handler = $this->createHandler($jobPreparationInspector, $resultsJobRepository, $resultsClient);
         $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
 
         try {
@@ -200,9 +173,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     public function testInvokeSuccess(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
@@ -224,12 +194,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobPreparationInspector = self::getContainer()->get(JobPreparationInspectorInterface::class);
         \assert($jobPreparationInspector instanceof JobPreparationInspectorInterface);
 
-        $handler = $this->createHandler(
-            $jobRepository,
-            $jobPreparationInspector,
-            $resultsJobRepository,
-            $resultsClient
-        );
+        $handler = $this->createHandler($jobPreparationInspector, $resultsJobRepository, $resultsClient);
 
         $handler(new GetResultsJobStateMessage(self::$apiToken, $job->id));
 
@@ -257,11 +222,13 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     private function createHandler(
-        JobRepository $jobRepository,
         JobPreparationInspectorInterface $jobPreparationInspector,
         ResultsJobRepository $resultsJobRepository,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 

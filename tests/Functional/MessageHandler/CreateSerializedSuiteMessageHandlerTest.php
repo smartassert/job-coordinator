@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
@@ -15,29 +16,24 @@ use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
+use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
-        $jobId = md5((string) rand());
+        $handler = self::getContainer()->get(CreateSerializedSuiteMessageHandler::class);
+        \assert($handler instanceof CreateSerializedSuiteMessageHandler);
 
-        $jobRepository = \Mockery::mock(JobRepository::class);
-        $jobRepository
-            ->shouldReceive('find')
-            ->with($jobId)
-            ->andReturnNull()
-        ;
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $handler = $this->createHandler(
-            jobRepository: $jobRepository,
-        );
+        $message = new CreateSerializedSuiteMessage('api token', $jobId, []);
 
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, []);
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to create serialized-suite for job "' . $jobId . '": Job not found');
 
         $handler($message);
-
-        self::assertSame([], $this->eventRecorder->all(SerializedSuiteCreatedEvent::class));
     }
 
     public function testInvokeSerializedSuiteClientThrowsException(): void

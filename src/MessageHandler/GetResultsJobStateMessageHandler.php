@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Repository\JobRepository;
@@ -28,12 +29,13 @@ final readonly class GetResultsJobStateMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(GetResultsJobStateMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
-            return;
+            throw new MessageHandlerJobNotFoundException($message);
         }
 
         if (true === $this->jobPreparationInspector->hasFailed($job)) {
