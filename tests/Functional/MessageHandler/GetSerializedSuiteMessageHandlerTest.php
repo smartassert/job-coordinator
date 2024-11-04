@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
@@ -21,14 +22,20 @@ use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
+        $handler = self::getContainer()->get(GetSerializedSuiteMessageHandler::class);
+        \assert($handler instanceof GetSerializedSuiteMessageHandler);
+
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new GetSerializedSuiteMessage('api token', $jobId, 'serialized suite id');
 
-        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to retrieve serialized-suite for job "' . $jobId . '": Job not found');
+
+        $handler($message);
     }
 
     public function testInvokeNoSerializedSuite(): void
