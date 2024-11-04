@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -96,11 +97,18 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function () {
-                    return \Mockery::mock(SerializedSuiteRepository::class);
+                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                    $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
+                    $serializedSuiteRepository
+                        ->shouldReceive('find')
+                        ->with($job->id)
+                        ->andReturnNull()
+                    ;
+
+                    return $serializedSuiteRepository;
                 },
             ],
-            'no serialized suite job' => [
+            'no serialized suite' => [
                 'resultsJobRepositoryCreator' => function (Job $job, ResultsJob $resultsJob) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
@@ -117,6 +125,39 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         ->shouldReceive('find')
                         ->with($job->id)
                         ->andReturnNull()
+                    ;
+
+                    return $serializedSuiteRepository;
+                },
+            ],
+            'serialized suite not prepared' => [
+                'resultsJobRepositoryCreator' => function (Job $job, ResultsJob $resultsJob) {
+                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
+                    $resultsJobRepository
+                        ->shouldReceive('find')
+                        ->with($job->id)
+                        ->andReturn($resultsJob)
+                    ;
+
+                    return $resultsJobRepository;
+                },
+                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                    $serializedSuiteId = (string) new Ulid();
+                    \assert('' !== $serializedSuiteId);
+
+                    $serializedSuite = new SerializedSuite(
+                        $job->id,
+                        $serializedSuiteId,
+                        'preparing',
+                        false,
+                        false,
+                    );
+
+                    $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
+                    $serializedSuiteRepository
+                        ->shouldReceive('find')
+                        ->with($job->id)
+                        ->andReturn($serializedSuite)
                     ;
 
                     return $serializedSuiteRepository;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Entity\RemoteRequest;
+use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\JobRemoteRequestMessageInterface;
@@ -44,7 +45,10 @@ class JobRemoteRequestMessageDispatcher
                 $message->getRemoteRequestType()
             );
 
-            if ($existingRemoteRequest instanceof RemoteRequest) {
+            if (
+                $existingRemoteRequest instanceof RemoteRequest
+                && RequestState::HALTED !== $existingRemoteRequest->getState()
+            ) {
                 throw new NonRepeatableMessageAlreadyDispatchedException($job, $existingRemoteRequest);
             }
         }

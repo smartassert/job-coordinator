@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -39,16 +40,13 @@ final readonly class CreateMachineMessageHandler
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        if (null === $resultsJob) {
-            return;
-        }
-
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
-        if (null === $serializedSuite) {
-            return;
-        }
 
-        if (!$serializedSuite->isPrepared()) {
+        if (
+            null === $resultsJob
+            || null === $serializedSuite
+            || ($serializedSuite instanceof SerializedSuite && !$serializedSuite->isPrepared())
+        ) {
             return;
         }
 
