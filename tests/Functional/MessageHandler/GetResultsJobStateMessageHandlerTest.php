@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
+use App\Enum\RequestState;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
@@ -13,6 +15,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
@@ -54,12 +57,30 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $message = new GetResultsJobStateMessage('api token', $job->id);
 
-        self::expectException(MessageHandlerTargetEntityNotFoundException::class);
-        self::expectExceptionMessage(
-            'Failed to retrieve results-job for job "' . $job->id . '": ResultsJob entity not found'
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $remoteRequest = $remoteRequestRepository->find(
+            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
+        );
+        self::assertNull($remoteRequest);
+
+        $exception = null;
+
+        try {
+            $handler($message);
+            self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
+        } catch (MessageHandlerTargetEntityNotFoundException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerTargetEntityNotFoundException::class, $exception);
+
+        $remoteRequest = $remoteRequestRepository->find(
+            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
         );
 
-        $handler($message);
+        self::assertInstanceOf(RemoteRequest::class, $remoteRequest);
+        self::assertSame(RequestState::ABORTED, $remoteRequest->getState());
     }
 
     /**

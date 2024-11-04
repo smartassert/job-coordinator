@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
@@ -43,6 +44,9 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
             ],
             MessageNotYetHandleableEvent::class => [
                 ['setRemoteRequestStateForMessageNotYetHandleableEvent', 10000],
+            ],
+            MessageNotHandleableEvent::class => [
+                ['setRemoteRequestStateForMessageNotHandleableEvent', 10000],
             ],
         ];
     }
@@ -96,6 +100,16 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         }
 
         $this->setRemoteRequestForMessage($message, RequestState::HALTED);
+    }
+
+    public function setRemoteRequestStateForMessageNotHandleableEvent(MessageNotHandleableEvent $event): void
+    {
+        $message = $event->message;
+        if (!$message instanceof JobRemoteRequestMessageInterface) {
+            return;
+        }
+
+        $this->setRemoteRequestForMessage($message, RequestState::ABORTED);
     }
 
     private function setRemoteRequestForMessage(
