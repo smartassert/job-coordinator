@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Event\CreateWorkerJobRequestedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
@@ -40,18 +41,20 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
+        $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
+        \assert($handler instanceof CreateWorkerJobMessageHandler);
+
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
-        $handler = $this->createHandler();
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new CreateWorkerJobMessage('api token', $jobId, '127.0.0.1');
+
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to create worker-job for job "' . $jobId . '": Job not found');
 
         $handler($message);
-
-        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-        $this->assertNoStartWorkerJobMessageDispatched();
     }
 
     public function testInvokeNoSerializedSuite(): void

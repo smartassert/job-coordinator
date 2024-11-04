@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\NotReadyToCreateWorkerJobEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\Repository\JobRepository;
@@ -31,12 +32,13 @@ final class CreateWorkerJobMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
-            return;
+            throw new MessageHandlerJobNotFoundException($message);
         }
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
