@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Event\MachineIsActiveEvent;
 use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Message\CreateWorkerJobMessage;
-use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
+use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,17 +15,17 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
-class StartWorkerJobMessageDispatcherTest extends WebTestCase
+class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 {
-    private StartWorkerJobMessageDispatcher $dispatcher;
+    private CreateWorkerJobMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(StartWorkerJobMessageDispatcher::class);
-        \assert($dispatcher instanceof StartWorkerJobMessageDispatcher);
+        $dispatcher = self::getContainer()->get(CreateWorkerJobMessageDispatcher::class);
+        \assert($dispatcher instanceof CreateWorkerJobMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');

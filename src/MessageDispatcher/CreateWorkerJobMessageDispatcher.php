@@ -10,7 +10,7 @@ use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class StartWorkerJobMessageDispatcher implements EventSubscriberInterface
+class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
