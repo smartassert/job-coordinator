@@ -48,12 +48,11 @@ final class CreateWorkerJobMessageHandler
             return;
         }
 
-        $serializedSuiteState = $serializedSuiteEntity->getState();
-        if ('failed' === $serializedSuiteState) {
+        if ($serializedSuiteEntity->hasFailed()) {
             return;
         }
 
-        if (in_array($serializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
+        if (!$serializedSuiteEntity->isPrepared()) {
             $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;

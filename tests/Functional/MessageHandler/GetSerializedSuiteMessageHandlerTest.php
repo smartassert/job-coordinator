@@ -108,21 +108,16 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
 
-    /**
-     * @param non-empty-string $currentSerializedSuiteState
-     * @param non-empty-string $newSerializedSuiteState
-     */
-    #[DataProvider('invokeNotEndStateDataProvider')]
-    public function testInvokeNotEndState(string $currentSerializedSuiteState, string $newSerializedSuiteState): void
+    public function testInvokeNotEndState(): void
     {
         $job = $this->createJob();
-        $serializedSuite = $this->createSerializedSuite($job, $currentSerializedSuiteState, false, false);
+        $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
 
         $serializedSuite = new SerializedSuiteModel(
             $serializedSuite->getId(),
             md5((string) rand()),
             [],
-            $newSerializedSuiteState,
+            md5((string) rand()),
             false,
             false,
             null,
@@ -149,31 +144,12 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteEntity = $serializedSuiteRepository->find($job->id);
         \assert($serializedSuiteEntity instanceof SerializedSuite);
 
-        self::assertSame($newSerializedSuiteState, $serializedSuiteEntity->getState());
+        self::assertFalse($serializedSuiteEntity->hasEndState());
 
         $events = $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(new SerializedSuiteRetrievedEvent(self::$apiToken, $job->id, $serializedSuite), $event);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function invokeNotEndStateDataProvider(): array
-    {
-        $state = md5((string) rand());
-
-        return [
-            'no state change not end state' => [
-                'currentSerializedSuiteState' => $state,
-                'newSerializedSuiteState' => $state,
-            ],
-            'has state change not end state' => [
-                'currentSerializedSuiteState' => md5((string) rand()),
-                'newSerializedSuiteState' => md5((string) rand()),
-            ],
-        ];
     }
 
     protected function getHandlerClass(): string

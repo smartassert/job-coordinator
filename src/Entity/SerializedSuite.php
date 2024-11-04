@@ -63,14 +63,6 @@ class SerializedSuite implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
-     */
-    public function getState(): ?string
-    {
-        return $this->state;
-    }
-
-    /**
      * @param non-empty-string $state
      */
     public function setState(string $state): static
@@ -90,6 +82,16 @@ class SerializedSuite implements \JsonSerializable
     public function isPrepared(): bool
     {
         return $this->isPrepared;
+    }
+
+    public function isPreparing(): bool
+    {
+        return false === $this->isPrepared && false === $this->hasFailed();
+    }
+
+    public function hasFailed(): bool
+    {
+        return true === $this->hasEndState && false === $this->isPrepared;
     }
 
     public function setHasEndState(bool $hasEndState): static
