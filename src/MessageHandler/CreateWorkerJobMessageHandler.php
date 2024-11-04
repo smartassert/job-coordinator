@@ -17,7 +17,7 @@ use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class StartWorkerJobMessageHandler
+final class CreateWorkerJobMessageHandler
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
