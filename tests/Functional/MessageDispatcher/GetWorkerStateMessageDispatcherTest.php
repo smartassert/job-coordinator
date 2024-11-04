@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Message\GetWorkerStateMessage;
+use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
@@ -83,7 +83,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForCreateWorkerJobRequestedEvent($event);
 
-        $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
@@ -112,7 +112,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchForWorkerStateRetrievedEvent($event);
 
-        $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
