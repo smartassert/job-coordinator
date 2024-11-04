@@ -23,6 +23,6 @@ class GetWorkerJobMessage extends AbstractRemoteRequestMessage
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::RETRIEVE);
     }
 }

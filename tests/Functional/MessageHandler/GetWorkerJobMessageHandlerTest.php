@@ -11,7 +11,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\MessageHandler\GetWorkerStateMessageHandler;
+use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
@@ -23,7 +23,7 @@ use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\Uid\Ulid;
 
-class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNoJob(): void
     {
@@ -157,7 +157,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         return GetResultsJobStateMessage::class;
     }
 
-    private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerStateMessageHandler
+    private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerJobMessageHandler
     {
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
@@ -168,7 +168,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetWorkerStateMessageHandler(
+        return new GetWorkerJobMessageHandler(
             $jobRepository,
             $workerComponentStateRepository,
             $workerClientFactory,

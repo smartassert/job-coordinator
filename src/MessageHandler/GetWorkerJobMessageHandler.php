@@ -15,7 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GetWorkerStateMessageHandler
+final class GetWorkerJobMessageHandler
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
