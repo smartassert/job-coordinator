@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Machine[]    findAll()
  * @method Machine[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MachineRepository extends ServiceEntityRepository
+class MachineRepository extends ServiceEntityRepository implements FooRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
