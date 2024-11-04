@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ResultsJob[]    findAll()
  * @method ResultsJob[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ResultsJobRepository extends ServiceEntityRepository
+class ResultsJobRepository extends ServiceEntityRepository implements FooRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

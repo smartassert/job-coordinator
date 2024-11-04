@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method SerializedSuite[]    findAll()
  * @method SerializedSuite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SerializedSuiteRepository extends ServiceEntityRepository
+class SerializedSuiteRepository extends ServiceEntityRepository implements FooRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
