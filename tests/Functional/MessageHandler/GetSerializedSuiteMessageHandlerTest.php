@@ -34,7 +34,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $message = new GetSerializedSuiteMessage('api token', $jobId, 'serialized suite id');
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve serialized-suite for job "' . $jobId . '": Job entity not found');
+        self::expectExceptionMessage(
+            'Failed to retrieve serialized-suite for job "' . $jobId . '": Job entity not found'
+        );
 
         $handler($message);
     }
