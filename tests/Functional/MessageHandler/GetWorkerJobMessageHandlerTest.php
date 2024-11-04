@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
@@ -25,18 +26,20 @@ use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
+        $handler = self::getContainer()->get(GetWorkerJobMessageHandler::class);
+        \assert($handler instanceof GetWorkerJobMessageHandler);
+
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
-
         $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
 
-        $handler($message);
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to retrieve worker-job for job "' . $jobId . '": Job not found');
 
-        self::assertCount(0, $this->eventRecorder);
+        $handler($message);
     }
 
     public function testInvokeWorkerApplicationIsInEndState(): void

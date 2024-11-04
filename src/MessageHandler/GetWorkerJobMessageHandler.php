@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\WorkerComponentState;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\Repository\JobRepository;
@@ -27,12 +28,13 @@ final class GetWorkerJobMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(GetWorkerJobMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
-            return;
+            throw new MessageHandlerJobNotFoundException($message);
         }
 
         $applicationState = $this->workerComponentStateRepository->getApplicationState($job);
