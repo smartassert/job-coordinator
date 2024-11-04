@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineCreationRequestedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
@@ -28,12 +29,13 @@ final readonly class CreateMachineMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(CreateMachineMessage $message): void
     {
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
-            return;
+            throw new MessageHandlerJobNotFoundException($message);
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
