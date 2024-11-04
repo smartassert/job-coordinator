@@ -6,8 +6,8 @@ namespace App\Services;
 
 use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
-use App\Event\FooEvent;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,8 +41,8 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
             JobRemoteRequestMessageCreatedEvent::class => [
                 ['setRemoteRequestStateForJobRemoteRequestMessageCreatedEvent', 10000],
             ],
-            FooEvent::class => [
-                ['setRemoteRequestStateForFooEvent', 10000],
+            MessageNotYetHandleableEvent::class => [
+                ['setRemoteRequestStateForMessageNotYetHandleableEvent', 10000],
             ],
         ];
     }
@@ -88,7 +88,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         $this->setRemoteRequestForMessage($message, RequestState::REQUESTING);
     }
 
-    public function setRemoteRequestStateForFooEvent(FooEvent $event): void
+    public function setRemoteRequestStateForMessageNotYetHandleableEvent(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
         if (!$message instanceof JobRemoteRequestMessageInterface) {

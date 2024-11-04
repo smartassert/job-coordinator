@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Event\FooEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
@@ -48,7 +48,7 @@ final class CreateWorkerJobMessageHandler
             || $serializedSuiteEntity->isPreparing()
             || null === $resultsJob
         ) {
-            $this->eventDispatcher->dispatch(new FooEvent($message));
+            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
 
             return;
         }

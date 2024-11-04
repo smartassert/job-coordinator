@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Event\FooEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
@@ -37,7 +37,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(FooEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(MessageNotYetHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
@@ -76,7 +76,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
 
         $message = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
-        $event = new FooEvent($message);
+        $event = new MessageNotYetHandleableEvent($message);
 
         $this->dispatcher->reDispatch($event);
 

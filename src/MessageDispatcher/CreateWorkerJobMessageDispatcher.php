@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Event\FooEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,7 +26,7 @@ class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
             MachineIsActiveEvent::class => [
                 ['dispatchForMachineIsActiveEvent', 100],
             ],
-            FooEvent::class => [
+            MessageNotYetHandleableEvent::class => [
                 ['reDispatch', 100],
             ],
         ];
@@ -45,7 +45,7 @@ class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
     /**
      * @throws NonRepeatableMessageAlreadyDispatchedException
      */
-    public function reDispatch(FooEvent $event): void
+    public function reDispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
         if (!$message instanceof CreateWorkerJobMessage) {
