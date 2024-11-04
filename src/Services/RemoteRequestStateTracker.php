@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
+use App\Event\FooEvent;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\RemoteRequestRepository;
@@ -39,6 +40,9 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
             ],
             JobRemoteRequestMessageCreatedEvent::class => [
                 ['setRemoteRequestStateForJobRemoteRequestMessageCreatedEvent', 10000],
+            ],
+            FooEvent::class => [
+                ['setRemoteRequestStateForFooEvent', 10000],
             ],
         ];
     }
@@ -82,6 +86,16 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         );
 
         $this->setRemoteRequestForMessage($message, RequestState::REQUESTING);
+    }
+
+    public function setRemoteRequestStateForFooEvent(FooEvent $event): void
+    {
+        $message = $event->message;
+        if (!$message instanceof JobRemoteRequestMessageInterface) {
+            return;
+        }
+
+        $this->setRemoteRequestForMessage($message, RequestState::HALTED);
     }
 
     private function setRemoteRequestForMessage(
