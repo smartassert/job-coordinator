@@ -73,7 +73,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNoResultsJob(): void
     {
         $job = $this->createJob();
-        $this->createSerializedSuite($job, 'requested');
+        $this->createSerializedSuite($job, 'requested', false, false);
 
         $handler = $this->createHandler();
 
@@ -89,7 +89,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
         $this->createResultsJob($job);
-        $this->createSerializedSuite($job, 'failed');
+        $this->createSerializedSuite($job, 'failed', false, true);
 
         $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
         \assert($handler instanceof CreateWorkerJobMessageHandler);
@@ -106,10 +106,13 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      * @param non-empty-string $serializedSuiteState
      */
     #[DataProvider('invokeMessageIsRedispatchedDataProvider')]
-    public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(string $serializedSuiteState): void
-    {
+    public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(
+        string $serializedSuiteState,
+        bool $isPrepared,
+        bool $hasEndState,
+    ): void {
         $job = $this->createJob();
-        $this->createSerializedSuite($job, $serializedSuiteState);
+        $this->createSerializedSuite($job, $serializedSuiteState, $isPrepared, $hasEndState);
         $this->createResultsJob($job);
 
         $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
@@ -133,12 +136,18 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'requested' => [
                 'serializedSuiteState' => 'requested',
+                'isPrepared' => false,
+                'hasEndState' => false,
             ],
             'preparing/running' => [
                 'serializedSuiteState' => 'preparing/running',
+                'isPrepared' => false,
+                'hasEndState' => false,
             ],
             'preparing/halted' => [
                 'serializedSuiteState' => 'preparing/halted',
+                'isPrepared' => false,
+                'hasEndState' => false,
             ],
         ];
     }
@@ -147,7 +156,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared');
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
         $this->createResultsJob($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -181,7 +190,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared');
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
         $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
@@ -284,9 +293,13 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     /**
      * @param non-empty-string $state
      */
-    private function createSerializedSuite(Job $job, string $state): SerializedSuite
-    {
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, false, false);
+    private function createSerializedSuite(
+        Job $job,
+        string $state,
+        bool $isPrepared,
+        bool $hasEndState,
+    ): SerializedSuite {
+        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, $isPrepared, $hasEndState);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
