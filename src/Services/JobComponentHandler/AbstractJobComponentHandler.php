@@ -10,13 +10,13 @@ use App\Enum\PreparationState;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
-use App\Repository\FooRepositoryInterface;
+use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
 
 abstract class AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
     public function __construct(
-        protected readonly FooRepositoryInterface $entityRepository,
+        protected readonly JobComponentRepositoryInterface $entityRepository,
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {
     }
