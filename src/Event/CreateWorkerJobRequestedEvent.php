@@ -6,7 +6,7 @@ namespace App\Event;
 
 use SmartAssert\WorkerClient\Model\Job as WorkerJob;
 
-class WorkerJobStartRequestedEvent extends AbstractWorkerEvent
+class CreateWorkerJobRequestedEvent extends AbstractWorkerEvent
 {
     /**
      * @param non-empty-string $jobId

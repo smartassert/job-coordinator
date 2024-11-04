@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\NotReadyToCreateWorkerJobEvent;
-use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\Repository\JobRepository;
@@ -79,7 +79,7 @@ final class CreateWorkerJobMessageHandler
                 $serializedSuite
             );
 
-            $this->eventDispatcher->dispatch(new WorkerJobStartRequestedEvent(
+            $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
                 $job->id,
                 $message->machineIpAddress,
                 $workerJob,

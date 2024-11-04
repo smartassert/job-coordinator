@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
-use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
@@ -50,7 +50,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
         $this->assertNoStartWorkerJobMessageDispatched();
     }
 
@@ -79,7 +79,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler($message);
 
         $this->assertDispatchedMessage($message);
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
     }
 
     public function testInvokeSerializedSuiteStateIsFailed(): void
@@ -95,7 +95,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
         $this->assertNoStartWorkerJobMessageDispatched();
     }
 
@@ -118,7 +118,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
         $this->assertDispatchedMessage($message);
     }
 
@@ -169,7 +169,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(RemoteJobActionException::class . ' not thrown');
         } catch (RemoteJobActionException $e) {
             self::assertSame($serializedSuiteReadException, $e->getPreviousException());
-            self::assertEquals([], $this->eventRecorder->all(WorkerJobStartRequestedEvent::class));
+            self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
             $this->assertNoStartWorkerJobMessageDispatched();
         }
     }
@@ -221,11 +221,11 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $events = $this->eventRecorder->all(WorkerJobStartRequestedEvent::class);
+        $events = $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobStartRequestedEvent($job->id, $machineIpAddress, $workerJob),
+            new CreateWorkerJobRequestedEvent($job->id, $machineIpAddress, $workerJob),
             $event
         );
 

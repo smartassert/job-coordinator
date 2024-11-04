@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Services;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
@@ -13,7 +14,6 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\WorkerJobStartRequestedEvent;
 use App\Model\RemoteRequestType;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
@@ -200,8 +200,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
-        $remoteRequestRemoverForEvents->removeWorkerJobStartRequests(
-            new WorkerJobStartRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
+        $remoteRequestRemoverForEvents->removeWorkerJobCreateRequests(
+            new CreateWorkerJobRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
         );
 
         self::assertTrue(true);

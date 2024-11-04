@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\EventSubscriber;
 
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobCreatedEvent;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineHasActionFailureEvent;
@@ -16,7 +17,6 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
-use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -67,7 +67,7 @@ class EventRecorder implements EventSubscriberInterface, \Countable
             SerializedSuiteCreatedEvent::class => [
                 ['addEvent', 1000],
             ],
-            WorkerJobStartRequestedEvent::class => [
+            CreateWorkerJobRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
             WorkerStateRetrievedEvent::class => [

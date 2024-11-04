@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Event\WorkerJobStartRequestedEvent;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetWorkerStateMessage;
@@ -23,8 +23,8 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerJobStartRequestedEvent::class => [
-                ['dispatchForWorkerJobStartRequestedEvent', 100],
+            CreateWorkerJobRequestedEvent::class => [
+                ['dispatchForCreateWorkerJobRequestedEvent', 100],
             ],
             WorkerStateRetrievedEvent::class => [
                 ['dispatchForWorkerStateRetrievedEvent', 100],
@@ -35,7 +35,7 @@ class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
     /**
      * @throws NonRepeatableMessageAlreadyDispatchedException
      */
-    public function dispatchForWorkerJobStartRequestedEvent(WorkerJobStartRequestedEvent $event): void
+    public function dispatchForCreateWorkerJobRequestedEvent(CreateWorkerJobRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new GetWorkerStateMessage($event->getJobId(), $event->getMachineIpAddress())

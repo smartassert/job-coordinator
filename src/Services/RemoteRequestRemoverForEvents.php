@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
@@ -14,7 +15,6 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\WorkerJobStartRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Model\RemoteRequestType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -47,8 +47,8 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
             SerializedSuiteRetrievedEvent::class => [
                 ['removeSerializedSuiteGetRequests', 0],
             ],
-            WorkerJobStartRequestedEvent::class => [
-                ['removeWorkerJobStartRequests', 0],
+            CreateWorkerJobRequestedEvent::class => [
+                ['removeWorkerJobCreateRequests', 0],
             ],
             ResultsJobStateRetrievedEvent::class => [
                 ['removeResultsStateGetRequests', 0],
@@ -102,7 +102,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         );
     }
 
-    public function removeWorkerJobStartRequests(WorkerJobStartRequestedEvent $event): void
+    public function removeWorkerJobCreateRequests(CreateWorkerJobRequestedEvent $event): void
     {
         $this->removeForEventAndType(
             $event,
