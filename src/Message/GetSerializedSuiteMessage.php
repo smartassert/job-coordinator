@@ -27,9 +27,4 @@ class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessag
     {
         return new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
     }
-
-    public function isRepeatable(): bool
-    {
-        return true;
-    }
 }

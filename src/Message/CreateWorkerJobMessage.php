@@ -27,9 +27,4 @@ class CreateWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE);
     }
-
-    public function isRepeatable(): bool
-    {
-        return false;
-    }
 }

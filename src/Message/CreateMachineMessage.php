@@ -14,9 +14,4 @@ class CreateMachineMessage extends AbstractAuthenticatedRemoteRequestMessage
     {
         return new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE);
     }
-
-    public function isRepeatable(): bool
-    {
-        return false;
-    }
 }

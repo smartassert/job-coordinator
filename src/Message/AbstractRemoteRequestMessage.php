@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Enum\RemoteRequestAction;
+
 abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageInterface
 {
     /**
@@ -34,5 +36,10 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
         $this->index = $index;
 
         return $this;
+    }
+
+    public function isRepeatable(): bool
+    {
+        return RemoteRequestAction::RETRIEVE === $this->getRemoteRequestType()->action;
     }
 }
