@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Event\ResultsJobCreatedEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
@@ -19,27 +20,24 @@ use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Uid\Ulid;
 
 class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
-        $jobId = md5((string) rand());
+        $handler = self::getContainer()->get(CreateResultsJobMessageHandler::class);
+        \assert($handler instanceof CreateResultsJobMessageHandler);
 
-        $jobRepository = \Mockery::mock(JobRepository::class);
-        $jobRepository
-            ->shouldReceive('find')
-            ->with($jobId)
-            ->andReturnNull()
-        ;
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $handler = $this->createHandler($jobRepository, HttpMockedResultsClientFactory::create());
+        $message = new CreateResultsJobMessage('api token', $jobId);
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to create results-job for job "' . $jobId . '": Job not found');
 
         $handler($message);
-
-        self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
     }
 
     public function testInvokeResultsClientThrowsException(): void
