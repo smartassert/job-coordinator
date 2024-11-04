@@ -52,7 +52,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new CreateWorkerJobMessage('api token', $jobId, '127.0.0.1');
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create worker-job for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to create worker-job for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }

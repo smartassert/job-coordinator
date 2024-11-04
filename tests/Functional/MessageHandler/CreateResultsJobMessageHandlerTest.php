@@ -35,7 +35,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new CreateResultsJobMessage('api token', $jobId);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create results-job for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to create results-job for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }

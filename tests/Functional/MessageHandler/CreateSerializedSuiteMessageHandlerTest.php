@@ -31,7 +31,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $message = new CreateSerializedSuiteMessage('api token', $jobId, []);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create serialized-suite for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to create serialized-suite for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }

@@ -40,7 +40,7 @@ final class GetSerializedSuiteMessageHandler
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuiteEntity) {
-            throw new MessageHandlerTargetEntityNotFoundException($message);
+            throw new MessageHandlerTargetEntityNotFoundException($message, 'SerializedSuite');
         }
 
         if ($serializedSuiteEntity->hasEndState()) {

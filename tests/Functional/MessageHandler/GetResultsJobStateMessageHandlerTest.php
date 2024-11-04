@@ -38,7 +38,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $message = new GetResultsJobStateMessage('api token', $jobId);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }
@@ -56,7 +56,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         self::expectException(MessageHandlerTargetEntityNotFoundException::class);
         self::expectExceptionMessage(
-            'Failed to retrieve results-job for job "' . $job->id . '": results-job entity not found'
+            'Failed to retrieve results-job for job "' . $job->id . '": ResultsJob entity not found'
         );
 
         $handler($message);

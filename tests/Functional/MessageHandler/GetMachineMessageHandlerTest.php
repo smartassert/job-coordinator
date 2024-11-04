@@ -65,7 +65,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new GetMachineMessage('api token', $jobId, $machine);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve machine for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to retrieve machine for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }

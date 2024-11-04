@@ -46,7 +46,7 @@ final readonly class GetResultsJobStateMessageHandler
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
-            throw new MessageHandlerTargetEntityNotFoundException($message);
+            throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
         }
 
         if ($resultsJob->hasEndState()) {

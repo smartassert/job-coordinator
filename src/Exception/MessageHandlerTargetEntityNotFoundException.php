@@ -11,6 +11,7 @@ class MessageHandlerTargetEntityNotFoundException extends \Exception implements 
 {
     public function __construct(
         public readonly JobRemoteRequestMessageInterface $handledMessage,
+        public readonly string $targetEntity,
     ) {
         parent::__construct(
             sprintf(
@@ -18,7 +19,7 @@ class MessageHandlerTargetEntityNotFoundException extends \Exception implements 
                 $handledMessage->getRemoteRequestType()->action->value,
                 $handledMessage->getRemoteRequestType()->entity->value,
                 $handledMessage->getJobId(),
-                $handledMessage->getRemoteRequestType()->entity->value,
+                $targetEntity,
             )
         );
     }

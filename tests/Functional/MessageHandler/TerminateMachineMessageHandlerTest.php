@@ -34,7 +34,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new TerminateMachineMessage('api token', $jobId);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to terminate machine for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to terminate machine for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }
