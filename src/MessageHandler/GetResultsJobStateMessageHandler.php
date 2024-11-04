@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
+use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Repository\JobRepository;
@@ -30,6 +31,7 @@ final readonly class GetResultsJobStateMessageHandler
     /**
      * @throws RemoteJobActionException
      * @throws MessageHandlerJobNotFoundException
+     * @throws MessageHandlerTargetEntityNotFoundException
      */
     public function __invoke(GetResultsJobStateMessage $message): void
     {
@@ -43,7 +45,11 @@ final readonly class GetResultsJobStateMessageHandler
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
-        if (null === $resultsJob || $resultsJob->hasEndState()) {
+        if (null === $resultsJob) {
+            throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
+        }
+
+        if ($resultsJob->hasEndState()) {
             return;
         }
 

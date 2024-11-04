@@ -43,7 +43,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new CreateMachineMessage('api token', $jobId);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create machine for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to create machine for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }

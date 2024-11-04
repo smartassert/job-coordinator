@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
+use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
@@ -33,7 +34,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $message = new GetSerializedSuiteMessage('api token', $jobId, 'serialized suite id');
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve serialized-suite for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage(
+            'Failed to retrieve serialized-suite for job "' . $jobId . '": Job entity not found'
+        );
 
         $handler($message);
     }
@@ -43,9 +46,12 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
         $serializedSuiteId = md5((string) rand());
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId);
+        self::expectException(MessageHandlerTargetEntityNotFoundException::class);
+        self::expectExceptionMessage(
+            'Failed to retrieve serialized-suite for job "' . $job->id . '": SerializedSuite entity not found'
+        );
 
-        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
+        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId);
     }
 
     /**

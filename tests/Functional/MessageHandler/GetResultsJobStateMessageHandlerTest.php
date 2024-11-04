@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
+use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -37,7 +38,26 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $message = new GetResultsJobStateMessage('api token', $jobId);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job entity not found');
+
+        $handler($message);
+    }
+
+    public function testInvokeResultsJobNotFound(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $handler = self::getContainer()->get(GetResultsJobStateMessageHandler::class);
+        \assert($handler instanceof GetResultsJobStateMessageHandler);
+
+        $message = new GetResultsJobStateMessage('api token', $job->id);
+
+        self::expectException(MessageHandlerTargetEntityNotFoundException::class);
+        self::expectExceptionMessage(
+            'Failed to retrieve results-job for job "' . $job->id . '": ResultsJob entity not found'
+        );
 
         $handler($message);
     }
@@ -101,19 +121,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
                 },
                 'resultsJobRepositoryCreator' => function () {
                     return \Mockery::mock(ResultsJobRepository::class);
-                },
-            ],
-            'no results job' => [
-                'jobPreparationInspectorCreator' => $nonFailedJobPreparationInspector,
-                'resultsJobRepositoryCreator' => function (Job $job) {
-                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
-                    $resultsJobRepository
-                        ->shouldReceive('find')
-                        ->with($job->id)
-                        ->andReturnNull()
-                    ;
-
-                    return $resultsJobRepository;
                 },
             ],
             'results job has end state' => [

@@ -37,7 +37,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
 
         self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve worker-job for job "' . $jobId . '": Job not found');
+        self::expectExceptionMessage('Failed to retrieve worker-job for job "' . $jobId . '": Job entity not found');
 
         $handler($message);
     }
