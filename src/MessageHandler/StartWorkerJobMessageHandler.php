@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\NotReadyToStartWorkerJobEvent;
+use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Event\WorkerJobStartRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
@@ -41,7 +41,7 @@ final class StartWorkerJobMessageHandler
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuiteEntity) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
@@ -52,14 +52,14 @@ final class StartWorkerJobMessageHandler
         }
 
         if (in_array($serializedSuiteState, ['requested', 'preparing/running', 'preparing/halted'])) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
-            $this->eventDispatcher->dispatch(new NotReadyToStartWorkerJobEvent($message));
+            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }

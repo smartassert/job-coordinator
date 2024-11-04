@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
-use App\Event\NotReadyToStartWorkerJobEvent;
+use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\StartWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
@@ -37,7 +37,7 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(NotReadyToStartWorkerJobEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(NotReadyToCreateWorkerJobEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
@@ -76,9 +76,9 @@ class StartWorkerJobMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
 
         $message = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
-        $event = new NotReadyToStartWorkerJobEvent($message);
+        $event = new NotReadyToCreateWorkerJobEvent($message);
 
-        $this->dispatcher->dispatchForNotReadyToStartWorkerJobEvent($event);
+        $this->dispatcher->dispatchForNotReadyToCreateWorkerJobEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
