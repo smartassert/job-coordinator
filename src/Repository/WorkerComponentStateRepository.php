@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method WorkerComponentState[]    findAll()
  * @method WorkerComponentState[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class WorkerComponentStateRepository extends ServiceEntityRepository implements FooRepositoryInterface
+class WorkerComponentStateRepository extends ServiceEntityRepository implements JobComponentRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
