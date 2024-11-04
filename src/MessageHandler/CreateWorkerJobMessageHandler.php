@@ -42,26 +42,18 @@ final class CreateWorkerJobMessageHandler
         }
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
-        if (null === $serializedSuiteEntity) {
+        $resultsJob = $this->resultsJobRepository->find($job->id);
+        if (
+            null === $serializedSuiteEntity
+            || $serializedSuiteEntity->isPreparing()
+            || null === $resultsJob
+        ) {
             $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
 
             return;
         }
 
         if ($serializedSuiteEntity->hasFailed()) {
-            return;
-        }
-
-        if (!$serializedSuiteEntity->isPrepared()) {
-            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
-
-            return;
-        }
-
-        $resultsJob = $this->resultsJobRepository->find($job->id);
-        if (null === $resultsJob) {
-            $this->eventDispatcher->dispatch(new NotReadyToCreateWorkerJobEvent($message));
-
             return;
         }
 
