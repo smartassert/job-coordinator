@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Event\FooEvent;
 use App\Event\MachineIsActiveEvent;
-use App\Event\NotReadyToCreateWorkerJobEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
@@ -37,7 +37,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
     {
         self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(NotReadyToCreateWorkerJobEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(FooEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchForMachineIsActiveEventSuccess(): void
@@ -66,7 +66,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 
-    public function testDispatchForNotReadyToStartWorkerJobEvent(): void
+    public function testDispatchForFooEvent(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -76,9 +76,9 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
 
         $message = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
-        $event = new NotReadyToCreateWorkerJobEvent($message);
+        $event = new FooEvent($message);
 
-        $this->dispatcher->dispatchForNotReadyToCreateWorkerJobEvent($event);
+        $this->dispatcher->reDispatch($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertIsArray($envelopes);
