@@ -8,6 +8,7 @@ use App\Entity\Job;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
@@ -51,25 +52,22 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
     }
 
-    public function testInvokeNoJob(): void
+    public function testInvokeJobNotFound(): void
     {
+        $handler = self::getContainer()->get(GetMachineMessageHandler::class);
+        \assert($handler instanceof GetMachineMessageHandler);
+
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = MachineFactory::create(
-            $jobId,
-            'find/received',
-            'finding',
-            [],
-            false,
-            false,
-            false,
-            false,
-        );
+        $machine = MachineFactory::createRandomForJob($jobId);
 
-        $this->createMessageAndHandleMessage($machine, self::$apiToken, null);
+        $message = new GetMachineMessage('api token', $jobId, $machine);
 
-        self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
+        self::expectException(MessageHandlerJobNotFoundException::class);
+        self::expectExceptionMessage('Failed to retrieve machine for job "' . $jobId . '": Job not found');
+
+        $handler($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
