@@ -17,6 +17,9 @@ readonly class JobFactory
 
     public function createRandom(): Job
     {
+        $id = (string) new Ulid();
+        \assert('' !== $id);
+
         $userId = (string) new Ulid();
         \assert('' !== $userId);
 
@@ -25,7 +28,7 @@ readonly class JobFactory
 
         $maximumDurationInSeconds = rand(1, 1000);
 
-        $job = new Job($userId, $suiteId, $maximumDurationInSeconds);
+        $job = new Job($id, $userId, $suiteId, $maximumDurationInSeconds);
 
         $this->jobRepository->add($job);
 

@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -26,9 +25,7 @@ readonly class Job implements \JsonSerializable
      * @var non-empty-string
      */
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(UlidGenerator::class)]
-    #[ORM\Column(type: 'ulid', unique: true)]
+    #[ORM\Column(length: 32, unique: true, nullable: false)]
     public string $id;
 
     /**
@@ -50,12 +47,14 @@ readonly class Job implements \JsonSerializable
     public int $maximumDurationInSeconds;
 
     /**
+     * @param non-empty-string $id
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
      */
-    public function __construct(string $userId, string $suiteId, int $maximumDurationInSeconds)
+    public function __construct(string $id, string $userId, string $suiteId, int $maximumDurationInSeconds)
     {
+        $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
