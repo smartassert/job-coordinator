@@ -14,6 +14,7 @@ use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Ulid;
 
 readonly class JobController
 {
@@ -29,7 +30,12 @@ readonly class JobController
         User $user,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-        $job = new Job($user->getUserIdentifier(), $request->suiteId, $request->maximumDurationInSeconds);
+        $job = new Job(
+            $this->generateId(),
+            $user->getUserIdentifier(),
+            $request->suiteId,
+            $request->maximumDurationInSeconds
+        );
         $this->jobRepository->add($job);
 
         $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
@@ -55,5 +61,19 @@ readonly class JobController
                 'id' => 'DESC',
             ]
         ));
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function generateId(): string
+    {
+        $id = (string) new Ulid();
+
+        while ('' === $id) {
+            $id = (string) new Ulid();
+        }
+
+        return $id;
     }
 }

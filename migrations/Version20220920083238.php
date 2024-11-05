@@ -19,7 +19,7 @@ final class Version20220920083238 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE job (
-                id UUID NOT NULL, 
+                id VARCHAR(32) NOT NULL, 
                 user_id VARCHAR(32) NOT NULL, 
                 suite_id VARCHAR(32) NOT NULL, 
                 maximum_duration_in_seconds INT NOT NULL,

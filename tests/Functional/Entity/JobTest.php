@@ -16,6 +16,9 @@ class JobTest extends WebTestCase
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
 
+        $id = (string) new Ulid();
+        \assert('' !== $id);
+
         $userId = (string) new Ulid();
         \assert('' !== $userId);
 
@@ -27,7 +30,7 @@ class JobTest extends WebTestCase
 
         $maximumDurationInSeconds = 600;
 
-        $job = new Job($userId, $suiteId, $maximumDurationInSeconds);
+        $job = new Job($id, $userId, $suiteId, $maximumDurationInSeconds);
 
         $entityManager->persist($job);
         $entityManager->flush();
