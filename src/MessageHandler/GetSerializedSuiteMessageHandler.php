@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
@@ -40,6 +41,8 @@ final class GetSerializedSuiteMessageHandler
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
         if (null === $serializedSuiteEntity) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
             throw new MessageHandlerTargetEntityNotFoundException($message, 'SerializedSuite');
         }
 

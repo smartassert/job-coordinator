@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
@@ -46,6 +47,8 @@ final readonly class GetResultsJobStateMessageHandler
 
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
             throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
         }
 

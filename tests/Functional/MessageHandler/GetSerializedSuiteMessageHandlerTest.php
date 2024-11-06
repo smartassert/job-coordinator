@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
+use App\Entity\RemoteRequest;
 use App\Entity\SerializedSuite;
+use App\Enum\RequestState;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
@@ -13,6 +15,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -41,17 +44,44 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $handler($message);
     }
 
-    public function testInvokeNoSerializedSuite(): void
+    public function testInvokeSerializedSuiteNotFound(): void
     {
-        $job = $this->createJob();
-        $serializedSuiteId = md5((string) rand());
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
 
-        self::expectException(MessageHandlerTargetEntityNotFoundException::class);
-        self::expectExceptionMessage(
-            'Failed to retrieve serialized-suite for job "' . $job->id . '": SerializedSuite entity not found'
+        $handler = self::getContainer()->get(GetSerializedSuiteMessageHandler::class);
+        \assert($handler instanceof GetSerializedSuiteMessageHandler);
+
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $message = new GetSerializedSuiteMessage('api token', $job->id, $serializedSuiteId);
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $remoteRequest = $remoteRequestRepository->find(
+            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
+        );
+        self::assertNull($remoteRequest);
+
+        $exception = null;
+
+        try {
+            $handler($message);
+            self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
+        } catch (MessageHandlerTargetEntityNotFoundException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerTargetEntityNotFoundException::class, $exception);
+
+        $remoteRequest = $remoteRequestRepository->find(
+            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
         );
 
-        $this->createMessageAndHandleMessage(self::$apiToken, $job->id, $serializedSuiteId);
+        self::assertInstanceOf(RemoteRequest::class, $remoteRequest);
+        self::assertSame(RequestState::ABORTED, $remoteRequest->getState());
     }
 
     /**
