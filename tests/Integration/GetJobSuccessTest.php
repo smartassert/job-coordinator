@@ -80,7 +80,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $count = 0;
 
         while (
-            null === ($jobData['preparation']['failures']['serialized_suite'] ?? null)
+            null === ($jobData['preparation']['failures']['serialized-suite'] ?? null)
             && $count < $threshold
         ) {
             sleep(1);
@@ -95,7 +95,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertSame('failed', $jobData['preparation']['state']);
         self::assertSame(
             [
-                'serialized_suite' => [
+                'serialized-suite' => [
                     'type' => 'http',
                     'code' => 403,
                     'message' => 'Forbidden',
