@@ -55,6 +55,8 @@ final readonly class GetResultsJobStateMessageHandler
         }
 
         if ($resultsJob->hasEndState()) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
             return;
         }
 

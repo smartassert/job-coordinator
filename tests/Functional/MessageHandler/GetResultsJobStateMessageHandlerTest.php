@@ -140,6 +140,17 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'results-job/retrieve',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(0, $abortedResultsJobRetrieveRemoteRequests);
+
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
             ->shouldReceive('hasFailed')
@@ -164,7 +175,13 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler($message);
 
-        self::assertCount(0, $this->eventRecorder);
+        $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'results-job/retrieve',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(1, $abortedResultsJobRetrieveRemoteRequests);
     }
 
     public function testInvokeResultsClientThrowsException(): void
