@@ -7,12 +7,15 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
+use App\Enum\RequestState;
 use App\Event\CreateWorkerJobRequestedEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
@@ -94,12 +97,38 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
         \assert($handler instanceof CreateWorkerJobMessageHandler);
 
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $abortedWorkerJobCreateRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'worker-job/create',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(0, $abortedWorkerJobCreateRemoteRequests);
+
         $message = new CreateWorkerJobMessage(self::$apiToken, $job->id, md5((string) rand()));
 
         $handler($message);
 
         self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
+
+        self::assertEquals(
+            [
+                new MessageNotHandleableEvent($message),
+            ],
+            $this->eventRecorder->all(MessageNotHandleableEvent::class)
+        );
         $this->assertNoStartWorkerJobMessageDispatched();
+
+        $abortedWorkerJobCreateRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'worker-job/create',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(1, $abortedWorkerJobCreateRemoteRequests);
     }
 
     /**
