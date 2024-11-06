@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -125,7 +125,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'type' => new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+                'type' => new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },
@@ -142,22 +142,22 @@ class RemoteRequestRemoverTest extends WebTestCase
     public static function noRemoteRequestsForTypeDataProvider(): array
     {
         $resultsJobCreateType = new RemoteRequestType(
-            RemoteRequestEntity::RESULTS_JOB,
+            JobComponent::RESULTS_JOB,
             RemoteRequestAction::CREATE
         );
 
         $serializedSuiteCreateType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::CREATE,
         );
 
         $serializedSuiteRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::RETRIEVE,
         );
 
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 
@@ -210,22 +210,22 @@ class RemoteRequestRemoverTest extends WebTestCase
     public static function singleRequestForTypeDataProvider(): array
     {
         $resultsJobCreateType = new RemoteRequestType(
-            RemoteRequestEntity::RESULTS_JOB,
+            JobComponent::RESULTS_JOB,
             RemoteRequestAction::CREATE
         );
 
         $serializedSuiteCreateType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::CREATE,
         );
 
         $serializedSuiteRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::RETRIEVE,
         );
 
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 
@@ -327,22 +327,22 @@ class RemoteRequestRemoverTest extends WebTestCase
     public static function multipleRequestsForTypeDataProvider(): array
     {
         $resultsJobCreateType = new RemoteRequestType(
-            RemoteRequestEntity::RESULTS_JOB,
+            JobComponent::RESULTS_JOB,
             RemoteRequestAction::CREATE
         );
 
         $serializedSuiteCreateType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::CREATE,
         );
 
         $serializedSuiteRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::RETRIEVE,
         );
 
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 
@@ -420,7 +420,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
                 'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
+                    JobComponent::MACHINE,
                     RemoteRequestAction::CREATE,
                 ),
                 'expectedRemoteRequestFailuresCreator' => function () {
@@ -473,7 +473,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                     ];
                 },
                 'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
+                    JobComponent::MACHINE,
                     RemoteRequestAction::CREATE,
                 ),
                 'expectedRemoteRequestFailuresCreator' => function () {

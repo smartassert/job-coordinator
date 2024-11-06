@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Model\RemoteRequestType;
 
 class CreateSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessage
@@ -25,6 +25,6 @@ class CreateSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMes
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE);
+        return new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE);
     }
 }

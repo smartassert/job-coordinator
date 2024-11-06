@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum RemoteRequestEntity: string
+enum JobComponent: string
 {
     case MACHINE = 'machine';
     case WORKER_JOB = 'worker-job';

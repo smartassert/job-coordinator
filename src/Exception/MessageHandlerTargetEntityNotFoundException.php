@@ -17,7 +17,7 @@ class MessageHandlerTargetEntityNotFoundException extends \Exception implements 
             sprintf(
                 'Failed to %s %s for job "%s": %s entity not found',
                 $handledMessage->getRemoteRequestType()->action->value,
-                $handledMessage->getRemoteRequestType()->entity->value,
+                $handledMessage->getRemoteRequestType()->jobComponent->value,
                 $handledMessage->getJobId(),
                 $targetEntity,
             )

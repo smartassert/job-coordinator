@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -70,22 +70,22 @@ class RemoteRequestRepositoryTest extends WebTestCase
         $jobId = md5((string) rand());
 
         $resultsJobCreateType = new RemoteRequestType(
-            RemoteRequestEntity::RESULTS_JOB,
+            JobComponent::RESULTS_JOB,
             RemoteRequestAction::CREATE,
         );
 
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 
         $machineRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::RETRIEVE,
         );
 
         $serializedSuiteRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::RETRIEVE,
         );
 
@@ -174,7 +174,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
     public static function hasAnyWithFailureDataProvider(): array
     {
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 

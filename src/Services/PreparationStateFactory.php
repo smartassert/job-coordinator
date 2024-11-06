@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Entity\Job;
 use App\Entity\RemoteRequestFailure;
-use App\Enum\JobComponentName;
+use App\Enum\JobComponent;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
 
@@ -14,7 +14,7 @@ use App\Enum\RequestState;
  * @phpstan-type SerializedPreparationState array{
  *   state: PreparationStateEnum,
  *   request_states: array<RequestState>,
- *   failures: array<value-of<JobComponentName>, RemoteRequestFailure|null>
+ *   failures: array<value-of<JobComponent>, RemoteRequestFailure|null>
  * }
  */
 class PreparationStateFactory

@@ -7,8 +7,8 @@ namespace App\Tests\Functional\MessageFailureHandler;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
@@ -115,7 +115,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                     };
                 },
                 'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
+                    JobComponent::MACHINE,
                     RemoteRequestAction::CREATE,
                 ),
             ],

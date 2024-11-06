@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestIndexGenerator;
@@ -64,22 +64,22 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
         $jobId = md5((string) rand());
 
         $resultsJobCreateType = new RemoteRequestType(
-            RemoteRequestEntity::RESULTS_JOB,
+            JobComponent::RESULTS_JOB,
             RemoteRequestAction::CREATE,
         );
 
         $machineCreateType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::CREATE,
         );
 
         $machineRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::MACHINE,
+            JobComponent::MACHINE,
             RemoteRequestAction::RETRIEVE,
         );
 
         $serializedSuiteRetrieveType = new RemoteRequestType(
-            RemoteRequestEntity::SERIALIZED_SUITE,
+            JobComponent::SERIALIZED_SUITE,
             RemoteRequestAction::RETRIEVE,
         );
 

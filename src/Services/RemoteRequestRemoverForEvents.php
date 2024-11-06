@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIsActiveEvent;
@@ -66,7 +66,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
         );
     }
 
@@ -74,7 +74,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE)
         );
     }
 
@@ -82,7 +82,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
         );
     }
 
@@ -90,7 +90,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE)
+            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -98,7 +98,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
+            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -106,7 +106,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE)
         );
     }
 
@@ -114,7 +114,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
+            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
         );
     }
 
@@ -122,7 +122,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE)
+            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::TERMINATE)
         );
     }
 
@@ -130,7 +130,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
     {
         $this->removeForEventAndType(
             $event,
-            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::RETRIEVE)
+            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::RETRIEVE)
         );
     }
 

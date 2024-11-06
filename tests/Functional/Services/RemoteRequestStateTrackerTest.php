@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
@@ -237,7 +237,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
     private static function getRandomRemoteRequestType(): RemoteRequestType
     {
-        $entityCases = RemoteRequestEntity::cases();
+        $entityCases = JobComponent::cases();
         $actionCases = RemoteRequestAction::cases();
 
         return new RemoteRequestType(

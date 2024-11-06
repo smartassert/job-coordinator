@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Enum\JobComponentName;
+use App\Enum\JobComponent;
 use App\Enum\PreparationState;
-use App\Enum\RemoteRequestEntity;
 use App\Model\ComponentPreparation;
-use App\Model\JobComponent;
 use App\Services\PreparationStateReducer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -29,43 +27,23 @@ class PreparationStateReducerTest extends TestCase
      */
     public static function reduceDataProvider(): array
     {
-        $resultsComponent = new JobComponent(
-            JobComponentName::RESULTS_JOB,
-            RemoteRequestEntity::RESULTS_JOB
-        );
-
-        $serializedSuiteComponent = new JobComponent(
-            JobComponentName::SERIALIZED_SUITE,
-            RemoteRequestEntity::SERIALIZED_SUITE
-        );
-
-        $machineComponent = new JobComponent(
-            JobComponentName::MACHINE,
-            RemoteRequestEntity::MACHINE
-        );
-
-        $workerComponent = new JobComponent(
-            JobComponentName::WORKER_JOB,
-            RemoteRequestEntity::WORKER_JOB
-        );
-
         return [
             'any occurrence of "failed" is "failed" (1)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::FAILED
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -73,20 +51,20 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "failed" is "failed" (2)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::FAILED
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -94,20 +72,20 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "failed" is "failed" (3)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::FAILED
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -115,20 +93,20 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "failed" is "failed" (4)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::SUCCEEDED
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::FAILED
                     ),
                 ],
@@ -136,20 +114,20 @@ class PreparationStateReducerTest extends TestCase
             ],
             'all "succeeded" is "succeeded"' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::SUCCEEDED
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::SUCCEEDED
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::SUCCEEDED
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -157,20 +135,20 @@ class PreparationStateReducerTest extends TestCase
             ],
             'all "pending" is "pending"' => [
                 'componentPreparationStates' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        $resultsComponent,
+                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponent::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::PENDING
                     ),
                 ],
@@ -178,16 +156,16 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "preparing" without any "failure" is "preparing" (1)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -195,16 +173,16 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "preparing" without any "failure" is "preparing" (2)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::SUCCEEDED
                     ),
                 ],
@@ -212,16 +190,16 @@ class PreparationStateReducerTest extends TestCase
             ],
             'any occurrence of "preparing" without any "failure" is "preparing" (3)' => [
                 'componentPreparationStates' => [
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        $workerComponent,
+                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponent::WORKER_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        $machineComponent,
+                    JobComponent::MACHINE->value => new ComponentPreparation(
+                        JobComponent::MACHINE,
                         PreparationState::SUCCEEDED
                     ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        $serializedSuiteComponent,
+                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponent::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
                 ],

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\JobComponentHandler;
 
 use App\Entity\Job;
+use App\Enum\JobComponent;
 use App\Enum\PreparationState;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
-use App\Model\JobComponent;
 
 class FallbackHandler implements JobComponentHandlerInterface
 {
