@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Enum\RemoteRequestEntity;
+use App\Enum\JobComponent;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
 readonly class JobPreparationInspector implements JobPreparationInspectorInterface
@@ -20,9 +20,9 @@ readonly class JobPreparationInspector implements JobPreparationInspectorInterfa
 
     public function hasFailed(Job $job): bool
     {
-        foreach (RemoteRequestEntity::cases() as $remoteRequestEntity) {
+        foreach (JobComponent::cases() as $jobComponent) {
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
-                $hasJobComponentFailed = $jobComponentHandler->hasFailed($remoteRequestEntity, $job);
+                $hasJobComponentFailed = $jobComponentHandler->hasFailed($jobComponent, $job);
 
                 if (true === $hasJobComponentFailed) {
                     return true;

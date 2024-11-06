@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\JobComponentHandler;
 
-use App\Enum\RemoteRequestEntity;
+use App\Enum\JobComponent;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 
@@ -17,8 +17,8 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
-    protected function getRemoteRequestEntity(): RemoteRequestEntity
+    protected function getJobComponent(): JobComponent
     {
-        return RemoteRequestEntity::SERIALIZED_SUITE;
+        return JobComponent::SERIALIZED_SUITE;
     }
 }

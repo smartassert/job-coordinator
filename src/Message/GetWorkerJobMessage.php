@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Model\RemoteRequestType;
 
 class GetWorkerJobMessage extends AbstractRemoteRequestMessage
@@ -23,6 +23,6 @@ class GetWorkerJobMessage extends AbstractRemoteRequestMessage
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::RETRIEVE);
     }
 }

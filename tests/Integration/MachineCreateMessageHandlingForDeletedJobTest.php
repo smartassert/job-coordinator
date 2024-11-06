@@ -6,8 +6,8 @@ namespace App\Tests\Integration;
 
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
@@ -74,7 +74,7 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
                 'jobId' => $job->id,
                 'state' => RequestState::ABORTED->value,
                 'type' => new RemoteRequestType(
-                    RemoteRequestEntity::MACHINE,
+                    JobComponent::MACHINE,
                     RemoteRequestAction::CREATE,
                 ),
             ]

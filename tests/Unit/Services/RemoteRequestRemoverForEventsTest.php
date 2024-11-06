@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
@@ -36,7 +36,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+                    new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
                     $passedRemoteRequestType,
                 );
 
@@ -64,7 +64,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE),
+                    new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE),
                     $passedRemoteRequestType,
                 );
 
@@ -94,7 +94,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE),
+                    new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE),
                     $passedRemoteRequestType,
                 );
 
@@ -126,7 +126,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::RETRIEVE),
+                    new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::RETRIEVE),
                     $passedRemoteRequestType,
                 );
 
@@ -158,7 +158,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE),
+                    new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE),
                     $passedRemoteRequestType,
                 );
 
@@ -189,7 +189,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE),
+                    new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE),
                     $passedRemoteRequestType,
                 );
 
@@ -217,7 +217,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::RETRIEVE),
+                    new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE),
                     $passedRemoteRequestType,
                 );
 
@@ -249,7 +249,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
                 self::assertEquals(
-                    new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::TERMINATE),
+                    new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::TERMINATE),
                     $passedRemoteRequestType,
                 );
 

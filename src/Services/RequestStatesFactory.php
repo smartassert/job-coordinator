@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Enum\RemoteRequestEntity;
+use App\Enum\JobComponent;
 use App\Enum\RequestState;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
@@ -20,21 +20,21 @@ class RequestStatesFactory
     }
 
     /**
-     * @return array<value-of<RemoteRequestEntity>, RequestState>
+     * @return array<value-of<JobComponent>, RequestState>
      */
     public function create(Job $job): array
     {
         $requestStates = [];
 
-        foreach (RemoteRequestEntity::cases() as $remoteRequestEntity) {
+        foreach (JobComponent::cases() as $jobComponent) {
             $requestState = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
                 if (null === $requestState) {
-                    $requestState = $jobComponentHandler->getRequestState($remoteRequestEntity, $job);
+                    $requestState = $jobComponentHandler->getRequestState($jobComponent, $job);
 
                     if ($requestState instanceof RequestState) {
-                        $requestStates[$remoteRequestEntity->value] = $requestState;
+                        $requestStates[$jobComponent->value] = $requestState;
                     }
                 }
             }

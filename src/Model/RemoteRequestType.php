@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 
 readonly class RemoteRequestType implements \Stringable
 {
     public function __construct(
-        public RemoteRequestEntity $entity,
+        public JobComponent $jobComponent,
         public RemoteRequestAction $action,
     ) {
     }
@@ -20,6 +20,6 @@ readonly class RemoteRequestType implements \Stringable
      */
     public function __toString(): string
     {
-        return $this->entity->value . '/' . $this->action->value;
+        return $this->jobComponent->value . '/' . $this->action->value;
     }
 }

@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
-use App\Enum\RemoteRequestEntity;
 use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -126,7 +126,7 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                     return [
                         (new RemoteRequest(
                             md5((string) rand()),
-                            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+                            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
                             0
                         ))
                             ->setFailure($remoteRequestFailure),
