@@ -7,12 +7,22 @@ namespace App\Tests\Integration;
 use App\Entity\Job;
 use App\Repository\JobRepository;
 use App\Tests\Application\AbstractApplicationTest;
+use App\Tests\Services\EntityRemover;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
 class GetJobSuccessTest extends AbstractApplicationTest
 {
     use GetClientAdapterTrait;
+
+    public static function tearDownAfterClass(): void
+    {
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        \assert($entityRemover instanceof EntityRemover);
+
+        $entityRemover->removeAllJobs();
+        $entityRemover->removeAllRemoteRequests();
+    }
 
     public function testGetSuccess(): void
     {

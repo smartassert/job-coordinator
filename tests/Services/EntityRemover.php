@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Entity\Job;
+use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -13,6 +14,7 @@ readonly class EntityRemover
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RemoteRequestRepository $remoteRequestRepository,
+        private JobRepository $jobRepository,
     ) {
     }
 
@@ -30,6 +32,14 @@ readonly class EntityRemover
 
         $query = $queryBuilder->getQuery();
         $query->execute();
+    }
+
+    public function removeAllJobs(): void
+    {
+        foreach ($this->jobRepository->findAll() as $job) {
+            $this->entityManager->remove($job);
+            $this->entityManager->flush();
+        }
     }
 
     public function removeAllRemoteRequests(): void

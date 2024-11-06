@@ -20,10 +20,7 @@ class CreateJobSuccessTest extends AbstractCreateJobSuccessTest
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         \assert($entityRemover instanceof EntityRemover);
 
-        $jobId = self::$createResponseData['id'] ?? null;
-        \assert(is_string($jobId) && '' !== $jobId);
-
-        $entityRemover->removeJob($jobId);
+        $entityRemover->removeAllJobs();
         $entityRemover->removeAllRemoteRequests();
     }
 
