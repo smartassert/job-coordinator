@@ -11,7 +11,6 @@ class JobComponent
 {
     public function __construct(
         public readonly JobComponentName $name,
-        public readonly RemoteRequestType $requestType,
         public readonly RemoteRequestEntity $remoteRequestEntity,
     ) {
     }
