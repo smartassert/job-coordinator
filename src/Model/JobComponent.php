@@ -10,7 +10,7 @@ use App\Enum\RemoteRequestEntity;
 readonly class JobComponent
 {
     public function __construct(
-        public JobComponentName    $name,
+        public JobComponentName $name,
         public RemoteRequestEntity $remoteRequestEntity,
     ) {
     }
