@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
 use App\Enum\RequestState;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
@@ -22,7 +22,6 @@ use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -83,21 +82,77 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         self::assertSame(RequestState::ABORTED, $remoteRequest->getState());
     }
 
-    /**
-     * @param callable(Job): JobPreparationInspectorInterface $jobPreparationInspectorCreator
-     * @param callable(Job): ResultsJobRepository             $resultsJobRepositoryCreator
-     */
-    #[DataProvider('invokeIncorrectStateDataProvider')]
-    public function testInvokeIncorrectState(
-        callable $jobPreparationInspectorCreator,
-        callable $resultsJobRepositoryCreator,
-    ): void {
+    public function testInvokeJobPreparationHasFailed(): void
+    {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $jobPreparationInspector = $jobPreparationInspectorCreator($job);
-        $resultsJobRepository = $resultsJobRepositoryCreator($job);
+        $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
+        $jobPreparationInspector
+            ->shouldReceive('hasFailed')
+            ->with($job)
+            ->andReturnTrue()
+        ;
+
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'results-job/retrieve',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(0, $abortedResultsJobRetrieveRemoteRequests);
+
+        $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
+
+        $handler = $this->createHandler(
+            $jobPreparationInspector,
+            $resultsJobRepository,
+            HttpMockedResultsClientFactory::create(),
+        );
+
+        $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
+
+        $handler($message);
+
+        self::assertEquals(
+            [
+                new MessageNotHandleableEvent($message),
+            ],
+            $this->eventRecorder->all(MessageNotHandleableEvent::class)
+        );
+
+        $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
+            'jobId' => $job->id,
+            'type' => 'results-job/retrieve',
+            'state' => RequestState::ABORTED,
+        ]);
+
+        self::assertCount(1, $abortedResultsJobRetrieveRemoteRequests);
+    }
+
+    public function testInvokeResultsJobHasEndState(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
+        $jobPreparationInspector
+            ->shouldReceive('hasFailed')
+            ->with($job)
+            ->andReturnFalse()
+        ;
+
+        $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
+        $resultsJobRepository
+            ->shouldReceive('find')
+            ->with($job->id)
+            ->andReturn(new ResultsJob($job->id, 'token', 'state', 'end-state'))
+        ;
 
         $handler = $this->createHandler(
             $jobPreparationInspector,
@@ -110,61 +165,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $handler($message);
 
         self::assertCount(0, $this->eventRecorder);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function invokeIncorrectStateDataProvider(): array
-    {
-        $nonFailedJobPreparationInspector = function (Job $job) {
-            $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
-            $jobPreparationInspector
-                ->shouldReceive('hasFailed')
-                ->with($job)
-                ->andReturnFalse()
-            ;
-
-            return $jobPreparationInspector;
-        };
-
-        return [
-            'job preparation has failed' => [
-                'jobPreparationInspectorCreator' => function (Job $job) {
-                    $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
-                    $jobPreparationInspector
-                        ->shouldReceive('hasFailed')
-                        ->with($job)
-                        ->andReturnTrue()
-                    ;
-
-                    return $jobPreparationInspector;
-                },
-                'resultsJobRepositoryCreator' => function () {
-                    return \Mockery::mock(ResultsJobRepository::class);
-                },
-            ],
-            'results job has end state' => [
-                'jobPreparationInspectorCreator' => $nonFailedJobPreparationInspector,
-                'resultsJobRepositoryCreator' => function (Job $job) {
-                    $resultsJob = new ResultsJob(
-                        $job->id,
-                        'token',
-                        'state',
-                        'end-state',
-                    );
-
-                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
-                    $resultsJobRepository
-                        ->shouldReceive('find')
-                        ->with($job->id)
-                        ->andReturn($resultsJob)
-                    ;
-
-                    return $resultsJobRepository;
-                },
-            ],
-        ];
     }
 
     public function testInvokeResultsClientThrowsException(): void
