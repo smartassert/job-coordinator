@@ -41,12 +41,6 @@ final readonly class GetResultsJobStateMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        if (true === $this->jobPreparationInspector->hasFailed($job)) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
-            return;
-        }
-
         $resultsJob = $this->resultsJobRepository->find($job->id);
         if (null === $resultsJob) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
@@ -54,7 +48,10 @@ final readonly class GetResultsJobStateMessageHandler
             throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
         }
 
-        if ($resultsJob->hasEndState()) {
+        if (
+            true === $this->jobPreparationInspector->hasFailed($job)
+            || $resultsJob->hasEndState()
+        ) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;

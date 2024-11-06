@@ -107,6 +107,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         self::assertCount(0, $abortedResultsJobRetrieveRemoteRequests);
 
         $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
+        $resultsJobRepository
+            ->shouldReceive('find')
+            ->with($job->id)
+            ->andReturn(new ResultsJob($job->id, 'token', 'state', 'end-state'))
+        ;
 
         $handler = $this->createHandler(
             $jobPreparationInspector,
