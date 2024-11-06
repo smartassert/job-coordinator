@@ -31,8 +31,6 @@ services:
             tags: ['app.remote_request_failure_factory.exception_handler']
         App\Services\JobComponentHandler\JobComponentHandlerInterface:
             tags: ['app.job_component_handler.component_handler']
-#        App\Model\JobComponent:
-#            tags: ['app.job_components.component']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -102,48 +100,17 @@ services:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
 
-    app.job_components.results_job:
-        class: App\Model\JobComponent
-        arguments:
-            $name: !php/enum App\Enum\JobComponentName::RESULTS_JOB
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::RESULTS_JOB
-        tags: ['app.job_components.component']
-
-    app.job_components.serialized_suite:
-        class: App\Model\JobComponent
-        arguments:
-            $name: !php/enum App\Enum\JobComponentName::SERIALIZED_SUITE
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::SERIALIZED_SUITE
-        tags: ['app.job_components.component']
-
-    app.job_components.machine:
-        class: App\Model\JobComponent
-        arguments:
-            $name: !php/enum App\Enum\JobComponentName::MACHINE
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::MACHINE
-        tags: ['app.job_components.component']
-
-    app.job_components.worker_job:
-        class: App\Model\JobComponent
-        arguments:
-            $name: !php/enum App\Enum\JobComponentName::WORKER_JOB
-            $remoteRequestEntity: !php/enum App\Enum\RemoteRequestEntity::WORKER_JOB
-        tags: ['app.job_components.component']
-
     App\Services\ComponentPreparationFactory:
         arguments:
-            $jobComponents: !tagged_iterator 'app.job_components.component'
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
 
     App\Services\JobPreparationInspectorInterface:
         class: App\Services\JobPreparationInspector
         arguments:
-            $jobComponents: !tagged_iterator 'app.job_components.component'
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
 
     App\Services\RequestStatesFactory:
         arguments:
-            $jobComponents: !tagged_iterator 'app.job_components.component'
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
 
     SmartAssert\ServiceClient\ResponseFactory\ResponseFactory:

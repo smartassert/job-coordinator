@@ -6,9 +6,9 @@ namespace App\Services\JobComponentHandler;
 
 use App\Entity\Job;
 use App\Enum\PreparationState;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
-use App\Model\JobComponent;
 
 class FallbackHandler implements JobComponentHandlerInterface
 {
@@ -17,17 +17,17 @@ class FallbackHandler implements JobComponentHandlerInterface
         return -1;
     }
 
-    public function getComponentPreparation(JobComponent $jobComponent, Job $job): ?ComponentPreparation
+    public function getComponentPreparation(RemoteRequestEntity $remoteRequestEntity, Job $job): ?ComponentPreparation
     {
-        return new ComponentPreparation($jobComponent, PreparationState::PENDING);
+        return new ComponentPreparation($remoteRequestEntity, PreparationState::PENDING);
     }
 
-    public function getRequestState(JobComponent $jobComponent, Job $job): ?RequestState
+    public function getRequestState(RemoteRequestEntity $remoteRequestEntity, Job $job): ?RequestState
     {
         return RequestState::PENDING;
     }
 
-    public function hasFailed(JobComponent $jobComponent, Job $job): bool
+    public function hasFailed(RemoteRequestEntity $remoteRequestEntity, Job $job): bool
     {
         return false;
     }

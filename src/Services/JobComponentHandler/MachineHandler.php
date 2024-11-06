@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\JobComponentHandler;
 
-use App\Enum\JobComponentName;
+use App\Enum\RemoteRequestEntity;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 
@@ -17,8 +17,8 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
-    protected function getJobComponentName(): JobComponentName
+    protected function getRemoteRequestEntity(): RemoteRequestEntity
     {
-        return JobComponentName::MACHINE;
+        return RemoteRequestEntity::MACHINE;
     }
 }

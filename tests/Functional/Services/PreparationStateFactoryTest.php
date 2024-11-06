@@ -129,10 +129,10 @@ class PreparationStateFactoryTest extends WebTestCase
                     'state' => PreparationStateEnum::PENDING,
                     'failures' => [],
                     'request_states' => [
-                        'results_job' => RequestState::PENDING,
-                        'serialized_suite' => RequestState::PENDING,
+                        'results-job' => RequestState::PENDING,
+                        'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
-                        'worker_job' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
                     ],
                 ],
             ],
@@ -169,10 +169,10 @@ class PreparationStateFactoryTest extends WebTestCase
                     'state' => PreparationStateEnum::SUCCEEDED,
                     'failures' => [],
                     'request_states' => [
-                        'results_job' => RequestState::SUCCEEDED,
-                        'serialized_suite' => RequestState::SUCCEEDED,
+                        'results-job' => RequestState::SUCCEEDED,
+                        'serialized-suite' => RequestState::SUCCEEDED,
                         'machine' => RequestState::SUCCEEDED,
-                        'worker_job' => RequestState::SUCCEEDED,
+                        'worker-job' => RequestState::SUCCEEDED,
                     ],
                 ],
             ],
@@ -193,10 +193,10 @@ class PreparationStateFactoryTest extends WebTestCase
                     'state' => PreparationStateEnum::PREPARING,
                     'failures' => [],
                     'request_states' => [
-                        'results_job' => RequestState::REQUESTING,
-                        'serialized_suite' => RequestState::PENDING,
+                        'results-job' => RequestState::REQUESTING,
+                        'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
-                        'worker_job' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
                     ],
                 ],
             ],
@@ -222,17 +222,17 @@ class PreparationStateFactoryTest extends WebTestCase
                 'expected' => [
                     'state' => PreparationStateEnum::FAILED,
                     'failures' => [
-                        'results_job' => new RemoteRequestFailure(
+                        'results-job' => new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
                             503,
                             'service unavailable'
                         ),
                     ],
                     'request_states' => [
-                        'results_job' => RequestState::FAILED,
-                        'serialized_suite' => RequestState::PENDING,
+                        'results-job' => RequestState::FAILED,
+                        'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
-                        'worker_job' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
                     ],
                 ],
             ],
@@ -269,22 +269,22 @@ class PreparationStateFactoryTest extends WebTestCase
                 'expected' => [
                     'state' => PreparationStateEnum::FAILED,
                     'failures' => [
-                        'results_job' => new RemoteRequestFailure(
+                        'results-job' => new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
                             503,
                             'service unavailable'
                         ),
-                        'serialized_suite' => new RemoteRequestFailure(
+                        'serialized-suite' => new RemoteRequestFailure(
                             RemoteRequestFailureType::NETWORK,
                             28,
                             'connection timed out'
                         ),
                     ],
                     'request_states' => [
-                        'results_job' => RequestState::FAILED,
-                        'serialized_suite' => RequestState::FAILED,
+                        'results-job' => RequestState::FAILED,
+                        'serialized-suite' => RequestState::FAILED,
                         'machine' => RequestState::PENDING,
-                        'worker_job' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
                     ],
                 ],
             ],

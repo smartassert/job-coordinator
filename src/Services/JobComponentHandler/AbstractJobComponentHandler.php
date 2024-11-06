@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services\JobComponentHandler;
 
 use App\Entity\Job;
-use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestAction;
+use App\Enum\RemoteRequestEntity;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
-use App\Model\JobComponent;
 use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
@@ -23,22 +22,22 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     ) {
     }
 
-    public function getComponentPreparation(JobComponent $jobComponent, Job $job): ?ComponentPreparation
+    public function getComponentPreparation(RemoteRequestEntity $remoteRequestEntity, Job $job): ?ComponentPreparation
     {
-        if ($this->getJobComponentName() !== $jobComponent->name) {
+        if ($this->getRemoteRequestEntity() !== $remoteRequestEntity) {
             return null;
         }
 
         if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
-            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
+            return new ComponentPreparation($remoteRequestEntity, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, $jobComponent);
+        return $this->deriveFromRemoteRequests($job, $remoteRequestEntity);
     }
 
-    public function getRequestState(JobComponent $jobComponent, Job $job): ?RequestState
+    public function getRequestState(RemoteRequestEntity $remoteRequestEntity, Job $job): ?RequestState
     {
-        if ($this->getJobComponentName() !== $jobComponent->name) {
+        if ($this->getRemoteRequestEntity() !== $remoteRequestEntity) {
             return null;
         }
 
@@ -48,21 +47,21 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $job,
-            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+            new RemoteRequestType($remoteRequestEntity, RemoteRequestAction::CREATE),
         );
 
         return $remoteRequest?->getState();
     }
 
-    public function hasFailed(JobComponent $jobComponent, Job $job): ?bool
+    public function hasFailed(RemoteRequestEntity $remoteRequestEntity, Job $job): ?bool
     {
-        if ($this->getJobComponentName() !== $jobComponent->name) {
+        if ($this->getRemoteRequestEntity() !== $remoteRequestEntity) {
             return null;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $job,
-            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+            new RemoteRequestType($remoteRequestEntity, RemoteRequestAction::CREATE),
         );
 
         if (null === $remoteRequest) {
@@ -76,23 +75,27 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         return false;
     }
 
-    abstract protected function getJobComponentName(): JobComponentName;
+    abstract protected function getRemoteRequestEntity(): RemoteRequestEntity;
 
-    private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
+    private function deriveFromRemoteRequests(Job $job, RemoteRequestEntity $remoteRequestEntity): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $job,
-            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+            new RemoteRequestType($remoteRequestEntity, RemoteRequestAction::CREATE),
         );
 
         if (null === $remoteRequest) {
-            return new ComponentPreparation($jobComponent, PreparationState::PENDING);
+            return new ComponentPreparation($remoteRequestEntity, PreparationState::PENDING);
         }
 
         if (RequestState::FAILED === $remoteRequest->getState()) {
-            return new ComponentPreparation($jobComponent, PreparationState::FAILED, $remoteRequest->getFailure());
+            return new ComponentPreparation(
+                $remoteRequestEntity,
+                PreparationState::FAILED,
+                $remoteRequest->getFailure()
+            );
         }
 
-        return new ComponentPreparation($jobComponent, PreparationState::PREPARING);
+        return new ComponentPreparation($remoteRequestEntity, PreparationState::PREPARING);
     }
 }

@@ -5,39 +5,36 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Job;
-use App\Enum\JobComponentName;
+use App\Enum\RemoteRequestEntity;
 use App\Model\ComponentPreparation;
-use App\Model\JobComponent;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
-class ComponentPreparationFactory
+readonly class ComponentPreparationFactory
 {
     /**
      * @param JobComponentHandlerInterface[] $jobComponentHandlers
-     * @param JobComponent[]                 $jobComponents
      */
     public function __construct(
-        private readonly iterable $jobComponents,
-        private readonly iterable $jobComponentHandlers,
+        private iterable $jobComponentHandlers,
     ) {
     }
 
     /**
-     * @return array<value-of<JobComponentName>, ComponentPreparation>
+     * @return array<value-of<RemoteRequestEntity>, ComponentPreparation>
      */
     public function getAll(Job $job): array
     {
         $componentPreparations = [];
 
-        foreach ($this->jobComponents as $jobComponent) {
+        foreach (RemoteRequestEntity::cases() as $remoteRequestEntity) {
             $componentPreparation = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
                 if (null === $componentPreparation) {
-                    $componentPreparation = $jobComponentHandler->getComponentPreparation($jobComponent, $job);
+                    $componentPreparation = $jobComponentHandler->getComponentPreparation($remoteRequestEntity, $job);
 
                     if ($componentPreparation instanceof ComponentPreparation) {
-                        $componentPreparations[$jobComponent->name->value] = $componentPreparation;
+                        $componentPreparations[$remoteRequestEntity->value] = $componentPreparation;
                     }
                 }
             }

@@ -8,7 +8,7 @@ use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
-use App\Enum\JobComponentName;
+use App\Enum\RemoteRequestEntity;
 use App\Services\PreparationStateFactory;
 
 /**
@@ -40,10 +40,10 @@ readonly class JobStatus implements \JsonSerializable
             $this->job->toArray(),
             [
                 'preparation' => $this->preparationState,
-                JobComponentName::RESULTS_JOB->value => $this->resultsJob,
-                JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite,
-                JobComponentName::MACHINE->value => $this->machine,
-                JobComponentName::WORKER_JOB->value => $this->workerState,
+                RemoteRequestEntity::RESULTS_JOB->value => $this->resultsJob,
+                RemoteRequestEntity::SERIALIZED_SUITE->value => $this->serializedSuite,
+                RemoteRequestEntity::MACHINE->value => $this->machine,
+                RemoteRequestEntity::WORKER_JOB->value => $this->workerState,
                 'service_requests' => $this->serviceRequests,
             ]
         );
