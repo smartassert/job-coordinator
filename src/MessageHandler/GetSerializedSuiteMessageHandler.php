@@ -47,6 +47,8 @@ final class GetSerializedSuiteMessageHandler
         }
 
         if ($serializedSuiteEntity->hasEndState()) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
             return;
         }
 
