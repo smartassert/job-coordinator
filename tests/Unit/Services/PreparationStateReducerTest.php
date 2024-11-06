@@ -6,11 +6,9 @@ namespace App\Tests\Unit\Services;
 
 use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestEntity;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
-use App\Model\RemoteRequestType;
 use App\Services\PreparationStateReducer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -33,22 +31,22 @@ class PreparationStateReducerTest extends TestCase
     {
         $resultsComponent = new JobComponent(
             JobComponentName::RESULTS_JOB,
-            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
+            RemoteRequestEntity::RESULTS_JOB
         );
 
         $serializedSuiteComponent = new JobComponent(
             JobComponentName::SERIALIZED_SUITE,
-            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+            RemoteRequestEntity::SERIALIZED_SUITE
         );
 
         $machineComponent = new JobComponent(
             JobComponentName::MACHINE,
-            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
+            RemoteRequestEntity::MACHINE
         );
 
         $workerComponent = new JobComponent(
             JobComponentName::WORKER_JOB,
-            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
+            RemoteRequestEntity::WORKER_JOB
         );
 
         return [

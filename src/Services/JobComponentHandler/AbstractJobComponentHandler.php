@@ -7,9 +7,11 @@ namespace App\Services\JobComponentHandler;
 use App\Entity\Job;
 use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
+use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
 use App\Model\JobComponent;
+use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
 
@@ -44,7 +46,10 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return RequestState::SUCCEEDED;
         }
 
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+        );
 
         return $remoteRequest?->getState();
     }
@@ -55,7 +60,11 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return null;
         }
 
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+        );
+
         if (null === $remoteRequest) {
             return null;
         }
@@ -71,7 +80,11 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
 
     private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
     {
-        $remoteRequest = $this->remoteRequestRepository->findNewest($job, $jobComponent->requestType);
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $job,
+            new RemoteRequestType($jobComponent->remoteRequestEntity, RemoteRequestAction::CREATE),
+        );
+
         if (null === $remoteRequest) {
             return new ComponentPreparation($jobComponent, PreparationState::PENDING);
         }
