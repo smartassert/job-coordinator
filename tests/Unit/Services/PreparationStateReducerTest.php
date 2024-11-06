@@ -33,22 +33,26 @@ class PreparationStateReducerTest extends TestCase
     {
         $resultsComponent = new JobComponent(
             JobComponentName::RESULTS_JOB,
-            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(RemoteRequestEntity::RESULTS_JOB, RemoteRequestAction::CREATE),
+            RemoteRequestEntity::RESULTS_JOB,
         );
 
         $serializedSuiteComponent = new JobComponent(
             JobComponentName::SERIALIZED_SUITE,
-            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(RemoteRequestEntity::SERIALIZED_SUITE, RemoteRequestAction::CREATE),
+            RemoteRequestEntity::SERIALIZED_SUITE,
         );
 
         $machineComponent = new JobComponent(
             JobComponentName::MACHINE,
-            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(RemoteRequestEntity::MACHINE, RemoteRequestAction::CREATE),
+            RemoteRequestEntity::MACHINE,
         );
 
         $workerComponent = new JobComponent(
             JobComponentName::WORKER_JOB,
-            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(RemoteRequestEntity::WORKER_JOB, RemoteRequestAction::CREATE),
+            RemoteRequestEntity::WORKER_JOB,
         );
 
         return [

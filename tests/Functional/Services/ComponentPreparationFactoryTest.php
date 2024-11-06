@@ -166,10 +166,29 @@ class ComponentPreparationFactoryTest extends WebTestCase
             RemoteRequestAction::CREATE,
         );
 
-        $resultsComponent = new JobComponent(JobComponentName::RESULTS_JOB, $resultsCreateType);
-        $serializedSuiteComponent = new JobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuiteCreateType);
-        $machineComponent = new JobComponent(JobComponentName::MACHINE, $machineCreateType);
-        $workerComponent = new JobComponent(JobComponentName::WORKER_JOB, $workerJobCreateType);
+        $resultsComponent = new JobComponent(
+            JobComponentName::RESULTS_JOB,
+            $resultsCreateType,
+            RemoteRequestEntity::RESULTS_JOB,
+        );
+
+        $serializedSuiteComponent = new JobComponent(
+            JobComponentName::SERIALIZED_SUITE,
+            $serializedSuiteCreateType,
+            RemoteRequestEntity::SERIALIZED_SUITE,
+        );
+
+        $machineComponent = new JobComponent(
+            JobComponentName::MACHINE,
+            $machineCreateType,
+            RemoteRequestEntity::MACHINE,
+        );
+
+        $workerComponent = new JobComponent(
+            JobComponentName::WORKER_JOB,
+            $workerJobCreateType,
+            RemoteRequestEntity::WORKER_JOB,
+        );
 
         $expectedAllSuccess = [
             JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
