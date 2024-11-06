@@ -20,10 +20,9 @@ abstract class AbstractApplicationTest extends WebTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$kernelBrowser = self::createClient();
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
+        if (!isset(static::$kernelBrowser)) {
+            static::$kernelBrowser = self::createClient();
+        }
 
         $factory = self::getContainer()->get(ClientFactory::class);
         \assert($factory instanceof ClientFactory);
