@@ -19,7 +19,7 @@ abstract class AbstractApplicationTest extends WebTestCase
     {
         parent::setUpBeforeClass();
 
-        if (!isset(static::$kernelBrowser)) {
+        if (!static::$booted) {
             static::$kernelBrowser = self::createClient();
         }
 
