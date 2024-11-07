@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
 use App\Enum\RequestState;
 use App\Event\MessageNotHandleableEvent;
