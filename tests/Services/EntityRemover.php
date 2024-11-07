@@ -38,15 +38,17 @@ readonly class EntityRemover
     {
         foreach ($this->jobRepository->findAll() as $job) {
             $this->entityManager->remove($job);
-            $this->entityManager->flush();
         }
+
+        $this->entityManager->flush();
     }
 
     public function removeAllRemoteRequests(): void
     {
         foreach ($this->remoteRequestRepository->findAll() as $remoteRequest) {
             $this->entityManager->remove($remoteRequest);
-            $this->entityManager->flush();
         }
+
+        $this->entityManager->flush();
     }
 }
