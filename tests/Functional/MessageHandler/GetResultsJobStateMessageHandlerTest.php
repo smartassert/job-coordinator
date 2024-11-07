@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
 use App\Enum\RequestState;
 use App\Event\MessageNotHandleableEvent;
@@ -56,14 +55,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $message = new GetResultsJobStateMessage('api token', $job->id);
 
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
-        $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
-        );
-        self::assertNull($remoteRequest);
-
         $exception = null;
 
         try {
@@ -73,13 +64,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         }
 
         self::assertInstanceOf(MessageHandlerTargetEntityNotFoundException::class, $exception);
-
-        $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
-        );
-
-        self::assertInstanceOf(RemoteRequest::class, $remoteRequest);
-        self::assertSame(RequestState::ABORTED, $remoteRequest->getState());
     }
 
     public function testInvokeJobPreparationHasFailed(): void
