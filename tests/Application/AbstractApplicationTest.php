@@ -6,7 +6,6 @@ namespace App\Tests\Application;
 
 use App\Tests\Services\ApplicationClient\Client;
 use App\Tests\Services\ApplicationClient\ClientFactory;
-use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\SymfonyTestClient\ClientInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,10 +19,9 @@ abstract class AbstractApplicationTest extends WebTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$kernelBrowser = self::createClient();
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
+        if (!static::$booted) {
+            static::$kernelBrowser = self::createClient();
+        }
 
         $factory = self::getContainer()->get(ClientFactory::class);
         \assert($factory instanceof ClientFactory);

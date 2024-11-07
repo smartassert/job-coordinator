@@ -13,6 +13,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Application\AbstractApplicationTest;
+use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
@@ -22,6 +23,15 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
     use GetClientAdapterTrait;
 
     private const int MICROSECONDS_PER_SECOND = 1000000;
+
+    public static function tearDownAfterClass(): void
+    {
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        \assert($entityRemover instanceof EntityRemover);
+
+        $entityRemover->removeAllJobs();
+        $entityRemover->removeAllRemoteRequests();
+    }
 
     public function testAbortedMachineCreateRequestExists(): void
     {
@@ -41,10 +51,10 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
-        foreach ($remoteRequestRepository->findAll() as $remoteRequest) {
-            $entityManager->remove($remoteRequest);
-            $entityManager->flush();
-        }
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        \assert($entityRemover instanceof EntityRemover);
+
+        $entityRemover->removeAllRemoteRequests();
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
 
@@ -62,7 +72,7 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
 
         $this->waitUntilMachineCreateRemoteRequestExists($jobId);
 
-        $this->removeJob($jobId);
+        $entityRemover->removeAllJobs();
 
         $entityManager->clear();
         $entityManager->flush();
@@ -136,21 +146,5 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
         }
 
         return $remoteRequestRepository->findBy($criteria, ['index' => 'ASC']);
-    }
-
-    private function removeJob(string $jobId): void
-    {
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-
-        $queryBuilder = $entityManager->createQueryBuilder();
-        $queryBuilder
-            ->delete(Job::class, 'j')
-            ->where('j.id = :id')
-            ->setParameter('id', $jobId)
-        ;
-
-        $query = $queryBuilder->getQuery();
-        $query->execute();
     }
 }
