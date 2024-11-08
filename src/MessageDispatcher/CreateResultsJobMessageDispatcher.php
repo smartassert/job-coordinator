@@ -7,12 +7,14 @@ namespace App\MessageDispatcher;
 use App\Event\JobCreatedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateResultsJobMessage;
+use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private readonly ResultsJobRepository $resultsJobRepository,
     ) {
     }
 
@@ -33,6 +35,10 @@ class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
+        if ($this->resultsJobRepository->has($event->getJobId())) {
+            return;
+        }
+
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId())
         );

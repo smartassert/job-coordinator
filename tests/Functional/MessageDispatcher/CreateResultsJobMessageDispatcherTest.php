@@ -8,6 +8,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -61,5 +62,22 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+    }
+
+    public function testDispatchResultsJobAlreadyExists(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+
+        $event = new JobCreatedEvent('api token', $job->id, []);
+
+        $this->dispatcher->dispatchForJobCreatedEvent($event);
+
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 }
