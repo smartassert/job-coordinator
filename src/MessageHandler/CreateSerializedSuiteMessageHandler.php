@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Repository\JobRepository;
+use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,6 +22,7 @@ final class CreateSerializedSuiteMessageHandler
         private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
@@ -32,6 +35,12 @@ final class CreateSerializedSuiteMessageHandler
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
+        }
+
+        if ($this->serializedSuiteRepository->has($job->id)) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
+            return;
         }
 
         try {
