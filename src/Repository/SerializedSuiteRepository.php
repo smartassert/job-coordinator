@@ -28,4 +28,9 @@ class SerializedSuiteRepository extends ServiceEntityRepository implements JobCo
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
     }
+
+    public function has(string $jobId): bool
+    {
+        return $this->count(['jobId' => $jobId]) > 0;
+    }
 }
