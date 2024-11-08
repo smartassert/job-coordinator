@@ -6,7 +6,6 @@ namespace App\MessageDispatcher;
 
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetSerializedSuiteMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,9 +31,6 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchForSerializedSuiteEvent(
         SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event
     ): void {

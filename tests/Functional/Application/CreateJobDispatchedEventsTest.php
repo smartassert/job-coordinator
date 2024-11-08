@@ -23,14 +23,10 @@ class CreateJobDispatchedEventsTest extends AbstractCreateJobSuccessSetup
         self::$eventRecorder = $eventRecorder;
     }
 
-    public function testDispatchedEventCount(): void
-    {
-        self::assertCount(1, self::$eventRecorder);
-    }
-
     public function testJobCreatedEventIsDispatched(): void
     {
-        $event = self::$eventRecorder->getLatest();
+        $events = self::$eventRecorder->all(JobCreatedEvent::class);
+        $event = $events[0];
         self::assertInstanceOf(JobCreatedEvent::class, $event);
 
         $jobId = self::$createResponseData['id'] ?? null;

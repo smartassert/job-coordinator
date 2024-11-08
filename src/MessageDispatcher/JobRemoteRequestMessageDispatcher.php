@@ -7,12 +7,12 @@ namespace App\MessageDispatcher;
 use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -24,13 +24,12 @@ class JobRemoteRequestMessageDispatcher
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly JobRepository $jobRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     /**
      * @param StampInterface[] $stamps
-     *
-     * @throws NonRepeatableMessageAlreadyDispatchedException
      */
     public function dispatch(JobRemoteRequestMessageInterface $message, array $stamps = []): ?Envelope
     {
@@ -40,16 +39,27 @@ class JobRemoteRequestMessageDispatcher
                 return null;
             }
 
-            $existingRemoteRequest = $this->remoteRequestRepository->getFirstForJobAndType(
-                $job,
-                $message->getRemoteRequestType()
-            );
+            $type = $message->getRemoteRequestType();
 
-            if (
-                $existingRemoteRequest instanceof RemoteRequest
-                && RequestState::HALTED !== $existingRemoteRequest->getState()
-            ) {
-                throw new NonRepeatableMessageAlreadyDispatchedException($job, $existingRemoteRequest);
+            $latestRemoteRequest = $this->remoteRequestRepository->findNewest($job, $type);
+            $hasSuccessfulRequest = $this->remoteRequestRepository->hasSuccessful($job, $type);
+            $latestRemoteRequestHasDisallowedState =
+                $latestRemoteRequest instanceof RemoteRequest
+                && in_array($latestRemoteRequest->getState(), [RequestState::REQUESTING, RequestState::PENDING]);
+
+            // @todo test
+            if ($hasSuccessfulRequest || $latestRemoteRequestHasDisallowedState) {
+                $this->logger->notice(
+                    'Disallow dispatch of message.',
+                    [
+                        'job_id' => $message->getJobId(),
+                        'request_type' => (string) $type,
+                        'has_existing_successful_request' => $hasSuccessfulRequest,
+                        'latest_has_disallowed_state' => $latestRemoteRequestHasDisallowedState,
+                    ]
+                );
+
+                return null;
             }
         }
 
@@ -58,9 +68,6 @@ class JobRemoteRequestMessageDispatcher
         return $this->messageBus->dispatch(new Envelope($message, $stamps));
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchWithNonDelayedStamp(JobRemoteRequestMessageInterface $message): ?Envelope
     {
         return $this->dispatch($message, [new NonDelayedStamp()]);

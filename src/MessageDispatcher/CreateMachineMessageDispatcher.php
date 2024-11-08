@@ -7,7 +7,6 @@ namespace App\MessageDispatcher;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateMachineMessage;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,9 +37,6 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
         if ($this->machineRepository->has($event->getJobId())) {
@@ -52,9 +48,6 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function reDispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
