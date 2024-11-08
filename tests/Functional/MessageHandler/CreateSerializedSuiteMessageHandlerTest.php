@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -55,8 +56,20 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             ->andThrow($serializedSuiteClientException)
         ;
 
-        $handler = $this->createHandler(
-            serializedSuiteClient: $serializedSuiteClient,
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $handler = new CreateSerializedSuiteMessageHandler(
+            $jobRepository,
+            $serializedSuiteClient,
+            $eventDispatcher,
+            $serializedSuiteRepository,
         );
 
         $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteCreateParameters);
@@ -98,8 +111,20 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             ->andReturn($serializedSuiteModel)
         ;
 
-        $handler = $this->createHandler(
-            serializedSuiteClient: $serializedSuiteClient,
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $handler = new CreateSerializedSuiteMessageHandler(
+            $jobRepository,
+            $serializedSuiteClient,
+            $eventDispatcher,
+            $serializedSuiteRepository,
         );
 
         $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters));
@@ -118,6 +143,47 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         self::assertEquals(new SerializedSuiteCreatedEvent(self::$apiToken, $job->id, $serializedSuiteModel), $event);
     }
 
+    public function testInvokeNotHandleable(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $serializedSuiteParameters = [
+            md5((string) rand()) => md5((string) rand()),
+        ];
+
+        $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
+        $serializedSuiteRepository
+            ->shouldReceive('has')
+            ->with($job->id)
+            ->andReturnTrue()
+        ;
+
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $handler = new CreateSerializedSuiteMessageHandler(
+            $jobRepository,
+            \Mockery::mock(SerializedSuiteClient::class),
+            $eventDispatcher,
+            $serializedSuiteRepository,
+        );
+
+        $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteParameters);
+        $handler($message);
+
+        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
+        self::assertCount(1, $messageNotHandleableEvents);
+
+        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
+        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
+        self::assertSame($message, $messageNotHandleableEvent->message);
+    }
+
     protected function getHandlerClass(): string
     {
         return CreateSerializedSuiteMessageHandler::class;
@@ -126,24 +192,5 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     protected function getHandledMessageClass(): string
     {
         return CreateSerializedSuiteMessage::class;
-    }
-
-    private function createHandler(
-        ?JobRepository $jobRepository = null,
-        ?SerializedSuiteClient $serializedSuiteClient = null,
-    ): CreateSerializedSuiteMessageHandler {
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
-
-        if (null === $jobRepository) {
-            $jobRepository = self::getContainer()->get(JobRepository::class);
-            \assert($jobRepository instanceof JobRepository);
-        }
-
-        if (null === $serializedSuiteClient) {
-            $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
-        }
-
-        return new CreateSerializedSuiteMessageHandler($jobRepository, $serializedSuiteClient, $eventDispatcher);
     }
 }
