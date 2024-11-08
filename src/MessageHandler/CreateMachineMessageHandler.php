@@ -40,11 +40,10 @@ final readonly class CreateMachineMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $resultsJob = $this->resultsJobRepository->find($job->id);
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
 
         if (
-            null === $resultsJob
+            !$this->resultsJobRepository->has($job->id)
             || null === $serializedSuite
             || ($serializedSuite instanceof SerializedSuite && !$serializedSuite->isPrepared())
         ) {
