@@ -8,6 +8,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\SerializedSuiteFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -66,5 +67,22 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+    }
+
+    public function testDispatchResultsJobAlreadyExists(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
+        \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
+        $serializedSuiteFactory->createPreparedForJob($job);
+
+        $event = new JobCreatedEvent('api token', $job->id, []);
+
+        $this->dispatcher->dispatchForJobCreatedEvent($event);
+
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 }
