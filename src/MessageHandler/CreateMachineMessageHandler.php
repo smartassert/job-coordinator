@@ -6,11 +6,13 @@ namespace App\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -26,6 +28,7 @@ final readonly class CreateMachineMessageHandler
         private SerializedSuiteRepository $serializedSuiteRepository,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
+        private MachineRepository $machineRepository,
     ) {
     }
 
@@ -38,6 +41,12 @@ final readonly class CreateMachineMessageHandler
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
+        }
+
+        if ($this->machineRepository->has($job->id)) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
+            return;
         }
 
         $serializedSuite = $this->serializedSuiteRepository->find($job->id);
