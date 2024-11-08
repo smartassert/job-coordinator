@@ -6,7 +6,6 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Job;
 use App\Entity\Machine;
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotYetHandleableEvent;
@@ -49,8 +48,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(Job, ResultsJob): ResultsJobRepository $resultsJobRepositoryCreator
-     * @param callable(Job): SerializedSuiteRepository        $serializedSuiteRepositoryCreator
+     * @param callable(Job): ResultsJobRepository      $resultsJobRepositoryCreator
+     * @param callable(Job): SerializedSuiteRepository $serializedSuiteRepositoryCreator
      */
     #[DataProvider('invokeIncorrectStateDataProvider')]
     public function testInvokeIncorrectState(
@@ -63,9 +62,9 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->createRandomForJob($job);
 
-        $resultsJobRepository = $resultsJobRepositoryCreator($job, $resultsJob);
+        $resultsJobRepository = $resultsJobRepositoryCreator($job);
         $serializedSuiteRepository = $serializedSuiteRepositoryCreator($job);
 
         $handler = $this->createHandler(
@@ -98,9 +97,9 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'resultsJobRepositoryCreator' => function (Job $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
-                        ->shouldReceive('find')
+                        ->shouldReceive('has')
                         ->with($job->id)
-                        ->andReturnNull()
+                        ->andReturnFalse()
                     ;
 
                     return $resultsJobRepository;
@@ -117,12 +116,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'no serialized suite' => [
-                'resultsJobRepositoryCreator' => function (Job $job, ResultsJob $resultsJob) {
+                'resultsJobRepositoryCreator' => function (Job $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
-                        ->shouldReceive('find')
+                        ->shouldReceive('has')
                         ->with($job->id)
-                        ->andReturn($resultsJob)
+                        ->andReturnTrue()
                     ;
 
                     return $resultsJobRepository;
@@ -139,12 +138,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'serialized suite not prepared' => [
-                'resultsJobRepositoryCreator' => function (Job $job, ResultsJob $resultsJob) {
+                'resultsJobRepositoryCreator' => function (Job $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
-                        ->shouldReceive('find')
+                        ->shouldReceive('has')
                         ->with($job->id)
-                        ->andReturn($resultsJob)
+                        ->andReturnTrue()
                     ;
 
                     return $resultsJobRepository;
