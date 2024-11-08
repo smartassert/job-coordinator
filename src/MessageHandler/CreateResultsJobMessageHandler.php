@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\Repository\JobRepository;
+use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,6 +22,7 @@ final class CreateResultsJobMessageHandler
         private readonly JobRepository $jobRepository,
         private readonly ResultsClient $resultsClient,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ResultsJobRepository $resultsJobRepository,
     ) {
     }
 
@@ -32,6 +35,12 @@ final class CreateResultsJobMessageHandler
         $job = $this->jobRepository->find($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
+        }
+
+        if ($this->resultsJobRepository->has($job->id)) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
+            return;
         }
 
         try {
