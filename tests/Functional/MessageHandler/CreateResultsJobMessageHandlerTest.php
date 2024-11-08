@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob as ResultsJobEntity;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -49,11 +50,14 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+
         $resultsClientException = new \Exception('Failed to create results job');
 
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
-        $handler = $this->createHandler($jobRepository, $resultsClient);
+        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
 
         $message = new CreateResultsJobMessage(self::$apiToken, $job->id);
 
@@ -75,6 +79,9 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+
         $resultsJobModel = new ResultsJobModel($job->id, md5((string) rand()), new JobState('awaiting-events', null));
 
         $resultsClient = HttpMockedResultsClientFactory::create([
@@ -86,7 +93,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ])),
         ]);
 
-        $handler = $this->createHandler($jobRepository, $resultsClient);
+        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -113,6 +120,40 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $job->id, $resultsJobModel), $event);
     }
 
+    public function testInvokeNotHandleable(): void
+    {
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
+        $resultsJobRepository
+            ->shouldReceive('has')
+            ->with($job->id)
+            ->andReturnTrue()
+        ;
+
+        $resultsClient = HttpMockedResultsClientFactory::create();
+
+        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
+
+        $message = new CreateResultsJobMessage(self::$apiToken, $job->id);
+
+        $handler($message);
+
+        self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
+
+        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
+        self::assertCount(1, $messageNotHandleableEvents);
+
+        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
+        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
+        self::assertSame($message, $messageNotHandleableEvent->message);
+    }
+
     protected function getHandlerClass(): string
     {
         return CreateResultsJobMessageHandler::class;
@@ -126,6 +167,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         JobRepository $jobRepository,
         ResultsClient $resultsClient,
+        ResultsJobRepository $resultsJobRepository,
     ): CreateResultsJobMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -133,6 +175,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateResultsJobMessageHandler($jobRepository, $resultsClient, $eventDispatcher);
+        return new CreateResultsJobMessageHandler(
+            $jobRepository,
+            $resultsClient,
+            $eventDispatcher,
+            $resultsJobRepository
+        );
     }
 }
