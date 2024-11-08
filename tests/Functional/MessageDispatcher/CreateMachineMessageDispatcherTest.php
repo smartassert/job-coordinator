@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Job;
+use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -134,6 +137,43 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
                 'eventCreator' => $serializedSuiteSerializedEventCreator,
             ],
         ];
+    }
+
+    public function testDispatchMachineAlreadyExists(): void
+    {
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $job = $this->jobFactory->createRandom();
+        $machine = new Machine($job->id, 'up/active', 'active', false);
+        $machineRepository->save($machine);
+
+        $event = new ResultsJobCreatedEvent(
+            'api token',
+            $job->id,
+            ResultsClientJobFactory::createRandom()
+        );
+
+        $this->dispatcher->dispatch($event);
+
+        self::assertSame([], $this->messengerTransport->getSent());
+    }
+
+    public function testReDispatchMachineAlreadyExists(): void
+    {
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $job = $this->jobFactory->createRandom();
+        $machine = new Machine($job->id, 'up/active', 'active', false);
+        $machineRepository->save($machine);
+
+        $message = new CreateMachineMessage('api token', $job->id);
+        $event = new MessageNotYetHandleableEvent($message);
+
+        $this->dispatcher->reDispatch($event);
+
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 
     /**
