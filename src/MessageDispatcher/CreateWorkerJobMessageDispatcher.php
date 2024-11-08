@@ -6,7 +6,6 @@ namespace App\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotYetHandleableEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,9 +31,6 @@ class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
@@ -42,9 +38,6 @@ class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function reDispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;

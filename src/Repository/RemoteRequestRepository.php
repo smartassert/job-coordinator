@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -112,8 +113,14 @@ class RemoteRequestRepository extends ServiceEntityRepository
         );
     }
 
-    public function getFirstForJobAndType(Job $job, RemoteRequestType $type): ?RemoteRequest
+    public function hasSuccessful(Job $job, RemoteRequestType $type): bool
     {
-        return $this->findOneBy(['jobId' => $job->id, 'type' => $type, 'index' => 0]);
+        $criteria = [
+            'jobId' => $job->id,
+            'type' => $type,
+            'state' => RequestState::SUCCEEDED,
+        ];
+
+        return $this->count($criteria) > 0;
     }
 }

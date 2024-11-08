@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\JobCreatedEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,9 +29,6 @@ class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
         if ($this->serializedSuiteRepository->has($event->getJobId())) {

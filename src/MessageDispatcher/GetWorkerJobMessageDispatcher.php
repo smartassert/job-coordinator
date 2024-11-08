@@ -6,7 +6,6 @@ namespace App\MessageDispatcher;
 
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\GetWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,9 +31,6 @@ class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchForCreateWorkerJobRequestedEvent(CreateWorkerJobRequestedEvent $event): void
     {
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
@@ -42,9 +38,6 @@ class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @throws NonRepeatableMessageAlreadyDispatchedException
-     */
     public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
         $this->messageDispatcher->dispatch(
