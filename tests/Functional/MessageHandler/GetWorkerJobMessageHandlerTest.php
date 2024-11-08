@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -62,7 +63,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        self::assertCount(0, $this->eventRecorder);
+        $events = $this->eventRecorder->all(MessageNotHandleableEvent::class);
+        self::assertEquals([new MessageNotHandleableEvent($message)], $events);
     }
 
     public function testInvokeWorkerClientThrowsException(): void

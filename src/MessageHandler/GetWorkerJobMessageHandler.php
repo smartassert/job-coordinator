@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\WorkerComponentState;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -39,6 +40,8 @@ final class GetWorkerJobMessageHandler
 
         $applicationState = $this->workerComponentStateRepository->getApplicationState($job);
         if ($applicationState instanceof WorkerComponentState && $applicationState->isEndState()) {
+            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
             return;
         }
 
