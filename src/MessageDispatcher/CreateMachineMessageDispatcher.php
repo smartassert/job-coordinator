@@ -9,12 +9,14 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Exception\NonRepeatableMessageAlreadyDispatchedException;
 use App\Message\CreateMachineMessage;
+use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private readonly MachineRepository $machineRepository,
     ) {
     }
 
@@ -41,6 +43,10 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
      */
     public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
+        if ($this->machineRepository->has($event->getJobId())) {
+            return;
+        }
+
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId())
         );
@@ -52,7 +58,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
     public function reDispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
-        if (!$message instanceof CreateMachineMessage) {
+        if (!$message instanceof CreateMachineMessage || $this->machineRepository->has($event->message->getJobId())) {
             return;
         }
 

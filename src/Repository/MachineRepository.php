@@ -28,4 +28,9 @@ class MachineRepository extends ServiceEntityRepository implements JobComponentR
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
     }
+
+    public function has(string $jobId): bool
+    {
+        return $this->count(['jobId' => $jobId]) > 0;
+    }
 }
