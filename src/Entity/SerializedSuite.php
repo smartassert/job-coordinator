@@ -20,9 +20,6 @@ class SerializedSuite implements \JsonSerializable
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $serializedSuiteId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
 
@@ -109,7 +106,7 @@ class SerializedSuite implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state' => $this->state,
+            'state' => '' === $this->state ? null : $this->state,
             'is_prepared' => $this->isPrepared,
             'has_end_state' => $this->hasEndState,
         ];
