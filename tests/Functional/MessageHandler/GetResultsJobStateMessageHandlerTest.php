@@ -216,11 +216,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->create($job);
+        $resultsJobState = md5((string) rand());
+        $resultsJob = $resultsJobFactory->create(job: $job, state: $resultsJobState);
 
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-                'state' => $resultsJob->getState(),
+                'state' => $resultsJobState,
                 'end_state' => $resultsJob->getEndState(),
             ])),
         ]);
@@ -239,7 +240,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             new ResultsJobStateRetrievedEvent(
                 self::$apiToken,
                 $job->id,
-                new ResultsJobState($resultsJob->getState(), $resultsJob->getEndState())
+                new ResultsJobState($resultsJobState, $resultsJob->getEndState())
             ),
             $event
         );

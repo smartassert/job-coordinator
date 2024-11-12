@@ -36,12 +36,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
     use GetClientAdapterTrait;
 
     /**
-     * @param callable(Job): RemoteRequest[]                                       $remoteRequestsCreator
-     * @param callable(Job, ResultsJobRepository): ?ResultsJob                     $resultsJobCreator
-     * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite           $serializedSuiteCreator
-     * @param callable(Job, MachineRepository): ?Machine                           $machineCreator
-     * @param callable(Job, WorkerComponentStateRepository): void                  $workerComponentStatesCreator
-     * @param callable(Job, ?ResultsJob, ?SerializedSuite, ?Machine): array<mixed> $expectedSerializedJobCreator
+     * @param callable(Job): RemoteRequest[]                             $remoteRequestsCreator
+     * @param callable(Job, ResultsJobRepository): ?ResultsJob           $resultsJobCreator
+     * @param callable(Job, SerializedSuiteRepository): ?SerializedSuite $serializedSuiteCreator
+     * @param callable(Job, MachineRepository): ?Machine                 $machineCreator
+     * @param callable(Job, WorkerComponentStateRepository): void        $workerComponentStatesCreator
+     * @param callable(Job, ?SerializedSuite, ?Machine): array<mixed>    $expectedSerializedJobCreator
      */
     #[DataProvider('getDataProvider')]
     public function testGetSuccess(
@@ -90,7 +90,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $job = $jobRepository->find($jobId);
         self::assertInstanceOf(Job::class, $job);
 
-        $resultsJob = $resultsJobCreator($job, $resultsJobRepository);
+        $resultsJobCreator($job, $resultsJobRepository);
         $serializedSuite = $serializedSuiteCreator($job, $serializedSuiteRepository);
         $machine = $machineCreator($job, $machineRepository);
 
@@ -120,7 +120,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 
-        self::assertEquals($expectedSerializedJobCreator($job, $resultsJob, $serializedSuite, $machine), $responseData);
+        self::assertEquals($expectedSerializedJobCreator($job, $serializedSuite, $machine), $responseData);
     }
 
     /**
@@ -401,11 +401,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ],
             'has results state, no results end state' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
-                'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), null),
+                'resultsJobCreator' => $resultsJobCreatorCreator('results-state-1', null),
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
-                'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
+                'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
@@ -422,7 +422,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results-job' => [
-                            'state' => $resultsJob->getState(),
+                            'state' => 'results-state-1',
                             'end_state' => null,
                         ],
                         'serialized-suite' => null,
@@ -451,11 +451,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ],
             'has results state, has results end state' => [
                 'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
-                'resultsJobCreator' => $resultsJobCreatorCreator(md5((string) rand()), md5((string) rand())),
+                'resultsJobCreator' => $resultsJobCreatorCreator('results-state-2', 'results-end-state-2'),
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
-                'expectedSerializedJobCreator' => function (Job $job, ResultsJob $resultsJob) {
+                'expectedSerializedJobCreator' => function (Job $job) {
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
@@ -472,8 +472,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'results-job' => [
-                            'state' => $resultsJob->getState(),
-                            'end_state' => $resultsJob->getEndState(),
+                            'state' => 'results-state-2',
+                            'end_state' => 'results-end-state-2',
                         ],
                         'serialized-suite' => null,
                         'machine' => null,
@@ -634,7 +634,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     Job $job,
-                    ?ResultsJob $resultsJob,
                     ?SerializedSuite $serializedSuite,
                     Machine $machine,
                 ) {
@@ -722,7 +721,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
                 'expectedSerializedJobCreator' => function (
                     Job $job,
-                    ?ResultsJob $resultsJob,
                     ?SerializedSuite $serializedSuite,
                     Machine $machine,
                 ) {
@@ -815,7 +813,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
                 'expectedSerializedJobCreator' => function (
                     Job $job,
-                    ?ResultsJob $resultsJob,
                     ?SerializedSuite $serializedSuite,
                     Machine $machine,
                 ) {
@@ -915,7 +912,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
                 'expectedSerializedJobCreator' => function (
                     Job $job,
-                    ?ResultsJob $resultsJob,
                     ?SerializedSuite $serializedSuite,
                     Machine $machine,
                 ) {
@@ -1145,7 +1141,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     Job $job,
-                    ?ResultsJob $resultsJob,
                     ?SerializedSuite $serializedSuite,
                     Machine $machine,
                 ) {
