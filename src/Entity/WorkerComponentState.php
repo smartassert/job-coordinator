@@ -62,10 +62,8 @@ class WorkerComponentState implements WorkerComponentStateInterface
 
     public function toArray(): array
     {
-        $state = trim($this->state);
-
         return [
-            'state' => '' === $state ? null : $state,
+            'state' => '' === $this->state ? null : $this->state,
             'is_end_state' => $this->isEndState,
         ];
     }
