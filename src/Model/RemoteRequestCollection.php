@@ -32,12 +32,13 @@ class RemoteRequestCollection implements \JsonSerializable
         $requestsByType = [];
         foreach ($this->requests as $request) {
             $requestType = $request->getType();
+            if (null !== $requestType) {
+                if (!isset($requestsByType[$requestType])) {
+                    $requestsByType[$requestType] = [];
+                }
 
-            if (!isset($requestsByType[$requestType])) {
-                $requestsByType[$requestType] = [];
+                $requestsByType[$requestType][] = $request->toArray();
             }
-
-            $requestsByType[$requestType][] = $request->toArray();
         }
 
         $data = [];

@@ -7,7 +7,7 @@ namespace App\Model;
 interface TypedRemoteRequestInterface
 {
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getType(): string;
+    public function getType(): ?string;
 }
