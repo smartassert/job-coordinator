@@ -45,6 +45,6 @@ class JobTest extends WebTestCase
         self::assertTrue(Ulid::isValid($retrievedJob->id));
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
-        self::assertSame($maximumDurationInSeconds, $retrievedJob->maximumDurationInSeconds);
+        self::assertSame($maximumDurationInSeconds, $retrievedJob->getMaximumDurationInSeconds());
     }
 }
