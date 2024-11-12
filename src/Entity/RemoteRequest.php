@@ -24,7 +24,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 128, unique: true)]
-    public readonly string $id;
+    private readonly string $id;
 
     /**
      * @var non-empty-string
