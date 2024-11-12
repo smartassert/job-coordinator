@@ -184,7 +184,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'pending',
@@ -236,7 +236,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -321,7 +321,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -409,7 +409,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -459,7 +459,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -517,7 +517,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -573,7 +573,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -640,7 +640,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -727,7 +727,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -819,7 +819,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',
@@ -918,7 +918,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'succeeded',
@@ -1015,7 +1015,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'failed',
@@ -1147,7 +1147,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return [
                         'id' => $job->id,
                         'suite_id' => $job->suiteId,
-                        'maximum_duration_in_seconds' => $job->maximumDurationInSeconds,
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => self::getJobCreatedAt($job),
                         'preparation' => [
                             'state' => 'preparing',

@@ -44,7 +44,7 @@ readonly class Job implements \JsonSerializable
      * @var positive-int
      */
     #[ORM\Column]
-    public int $maximumDurationInSeconds;
+    private int $maximumDurationInSeconds;
 
     /**
      * @param non-empty-string $id
@@ -61,6 +61,14 @@ readonly class Job implements \JsonSerializable
     }
 
     /**
+     * @return positive-int
+     */
+    public function getMaximumDurationInSeconds(): int
+    {
+        return $this->maximumDurationInSeconds;
+    }
+
+    /**
      * @return SerializedJob
      */
     public function toArray(): array
@@ -68,7 +76,7 @@ readonly class Job implements \JsonSerializable
         return [
             'id' => $this->id,
             'suite_id' => $this->suiteId,
-            'maximum_duration_in_seconds' => $this->maximumDurationInSeconds,
+            'maximum_duration_in_seconds' => $this->getMaximumDurationInSeconds(),
             'created_at' => max($this->getCreatedAt(), 1),
         ];
     }

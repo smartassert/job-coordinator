@@ -60,7 +60,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         self::assertSame($job->id, $responseData['id']);
         self::assertSame($job->suiteId, $responseData['suite_id']);
-        self::assertSame($job->maximumDurationInSeconds, $responseData['maximum_duration_in_seconds']);
+        self::assertSame($job->getMaximumDurationInSeconds(), $responseData['maximum_duration_in_seconds']);
     }
 
     public function testGetForInvalidSerializedSuiteId(): void

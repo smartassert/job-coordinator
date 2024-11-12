@@ -70,7 +70,7 @@ final class CreateWorkerJobMessageHandler
             $workerJob = $workerClient->createJob(
                 $job->id,
                 $resultsJob->token,
-                $job->maximumDurationInSeconds,
+                $job->getMaximumDurationInSeconds(),
                 $serializedSuite
             );
 
