@@ -19,22 +19,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['job_id', 'type'], name: 'job_type_idx')]
 class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterface
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 128, unique: true)]
     private readonly string $id;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(type: 'string', length: 32, nullable: false)]
     private readonly string $jobId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(nullable: false)]
     private readonly string $type;
 
@@ -44,9 +35,6 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     #[ORM\ManyToOne(cascade: ['persist'])]
     private ?RemoteRequestFailure $failure = null;
 
-    /**
-     * @var int<0, max>
-     */
     #[ORM\Column(type: Types::SMALLINT, nullable: false)]
     private readonly int $index;
 
@@ -67,11 +55,11 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     }
 
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getType(): string
+    public function getType(): ?string
     {
-        return $this->type;
+        return '' === $this->type ? null : $this->type;
     }
 
     public function getState(): RequestState
