@@ -10,28 +10,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
 class Machine implements \JsonSerializable
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private readonly string $jobId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: false)]
     private string $stateCategory;
 
-    /**
-     * @var ?non-empty-string
-     */
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ip = null;
 
@@ -55,22 +43,6 @@ class Machine implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
-     */
-    public function getId(): string
-    {
-        return $this->jobId;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getState(): string
-    {
-        return $this->state;
-    }
-
-    /**
      * @param non-empty-string $state
      */
     public function setState(string $state): static
@@ -81,11 +53,11 @@ class Machine implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getStateCategory(): string
+    public function getStateCategory(): ?string
     {
-        return $this->stateCategory;
+        return '' === $this->stateCategory ? null : $this->stateCategory;
     }
 
     /**
@@ -103,7 +75,7 @@ class Machine implements \JsonSerializable
      */
     public function getIp(): ?string
     {
-        return $this->ip;
+        return '' === $this->ip ? null : $this->ip;
     }
 
     /**
@@ -130,7 +102,7 @@ class Machine implements \JsonSerializable
 
     /**
      * @return array{
-     *   state_category: non-empty-string,
+     *   state_category: ?non-empty-string,
      *   ip_address: ?non-empty-string,
      *   action_failure: ?MachineActionFailure
      * }
@@ -138,8 +110,8 @@ class Machine implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state_category' => $this->stateCategory,
-            'ip_address' => $this->ip,
+            'state_category' => '' === $this->stateCategory ? null : $this->stateCategory,
+            'ip_address' => $this->getIp(),
             'action_failure' => $this->actionFailure,
             'has_failed_state' => $this->hasFailedState,
         ];
