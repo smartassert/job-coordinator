@@ -36,7 +36,7 @@ class ResultsJobRepositoryTest extends WebTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+        $resultsJob = $resultsJobFactory->create($job);
 
         $this->resultsJobRepository->save($resultsJob);
 

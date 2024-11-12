@@ -72,7 +72,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+        $resultsJob = $resultsJobFactory->create($job);
 
         $event = new JobCreatedEvent('api token', $job->id, []);
 

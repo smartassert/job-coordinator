@@ -50,7 +50,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+        $resultsJob = $resultsJobFactory->create($job);
         $resultsJob->setState('end');
         $resultsJob->setEndState('end');
         $resultsJobRepository->save($resultsJob);

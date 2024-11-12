@@ -63,7 +63,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->create($job);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -186,7 +186,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->create($job);
 
         $machineRepository = \Mockery::mock(MachineRepository::class);
         $machineRepository
@@ -236,7 +236,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->create($job);
 
         $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
         \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
@@ -278,7 +278,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->create($job);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

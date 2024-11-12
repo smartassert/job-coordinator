@@ -181,7 +181,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->createRandomForJob($job);
+        $resultsJobFactory->create($job);
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
@@ -216,7 +216,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->createRandomForJob($job);
+        $resultsJob = $resultsJobFactory->create($job);
 
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([

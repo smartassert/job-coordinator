@@ -15,15 +15,19 @@ readonly class ResultsJobFactory
     ) {
     }
 
-    public function createRandomForJob(Job $job): ResultsJob
+    /**
+     * @param null|non-empty-string $state
+     * @param null|non-empty-string $endState
+     */
+    public function create(Job $job, ?string $state = null, ?string $endState = null): ResultsJob
     {
         $token = md5((string) rand());
         \assert('' !== $token);
 
-        $state = md5((string) rand());
+        $state = is_string($state) ? $state : md5((string) rand());
         \assert('' !== $state);
 
-        $resultsJob = new ResultsJob($job->id, $token, $state, null);
+        $resultsJob = new ResultsJob($job->id, $token, $state, $endState);
 
         $this->resultsJobRepository->save($resultsJob);
 
