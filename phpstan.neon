@@ -5,3 +5,5 @@ parameters:
     - src
     - tests
   inferPrivatePropertyTypeFromConstructor: true
+includes:
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
