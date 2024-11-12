@@ -54,7 +54,9 @@ final class CreateWorkerJobMessageHandler
             return;
         }
 
-        if ($serializedSuiteEntity->hasFailed()) {
+        $serializedSuiteId = $serializedSuiteEntity->getId();
+
+        if (null === $serializedSuiteId || $serializedSuiteEntity->hasFailed()) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;
@@ -63,10 +65,7 @@ final class CreateWorkerJobMessageHandler
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
 
         try {
-            $serializedSuite = $this->serializedSuiteClient->read(
-                $message->authenticationToken,
-                $serializedSuiteEntity->getId()
-            );
+            $serializedSuite = $this->serializedSuiteClient->read($message->authenticationToken, $serializedSuiteId);
 
             $workerJob = $workerClient->createJob(
                 $job->id,

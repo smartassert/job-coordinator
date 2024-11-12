@@ -17,9 +17,6 @@ class SerializedSuite implements \JsonSerializable
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $jobId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $serializedSuiteId;
 
@@ -55,11 +52,11 @@ class SerializedSuite implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getId(): string
+    public function getId(): ?string
     {
-        return $this->serializedSuiteId;
+        return '' === $this->serializedSuiteId ? null : $this->serializedSuiteId;
     }
 
     /**
