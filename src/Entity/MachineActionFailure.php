@@ -17,15 +17,9 @@ class MachineActionFailure implements \JsonSerializable
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $id;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 255)]
     private string $action;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 255)]
     private string $type;
 
@@ -55,16 +49,16 @@ class MachineActionFailure implements \JsonSerializable
 
     /**
      * @return array{
-     *   action: non-empty-string,
-     *   type: non-empty-string,
+     *   action: ?non-empty-string,
+     *   type: ?non-empty-string,
      *   context: array<mixed>|null
      * }
      */
     public function jsonSerialize(): array
     {
         return [
-            'action' => $this->action,
-            'type' => $this->type,
+            'action' => '' === $this->action ? null : $this->action,
+            'type' => '' === $this->type ? null : $this->type,
             'context' => $this->context,
         ];
     }
