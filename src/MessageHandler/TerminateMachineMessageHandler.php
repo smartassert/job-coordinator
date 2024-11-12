@@ -37,15 +37,17 @@ final class TerminateMachineMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
+        $jobId = $message->getJobId();
+
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if ($resultsJob instanceof ResultsJob && $resultsJob->hasEndState()) {
             return;
         }
 
         try {
-            $this->workerManagerClient->deleteMachine($message->authenticationToken, $job->id);
+            $this->workerManagerClient->deleteMachine($message->authenticationToken, $jobId);
 
-            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($job->id));
+            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($jobId));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($job, $e, $message);
         }

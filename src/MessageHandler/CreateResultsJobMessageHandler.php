@@ -37,17 +37,19 @@ final class CreateResultsJobMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        if ($this->resultsJobRepository->has($job->id)) {
+        $jobId = $message->getJobId();
+
+        if ($this->resultsJobRepository->has($jobId)) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;
         }
 
         try {
-            $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $job->id);
+            $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $jobId);
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
                 $message->authenticationToken,
-                $job->id,
+                $jobId,
                 $resultsJob
             ));
         } catch (\Throwable $e) {

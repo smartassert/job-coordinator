@@ -53,7 +53,7 @@ readonly class Job implements \JsonSerializable
      */
     public function getMaximumDurationInSeconds(): int
     {
-        return $this->maximumDurationInSeconds;
+        return max($this->maximumDurationInSeconds, 1);
     }
 
     /**

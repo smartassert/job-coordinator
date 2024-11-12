@@ -39,21 +39,13 @@ class MachineFactory implements EventSubscriberInterface
         }
 
         $machine = $event->machine;
-        $this->create($job, $machine->state, $machine->stateCategory, $machine->hasFailedState);
-    }
+        $machineEntity = $this->machineRepository->find($event->getJobId());
 
-    /**
-     * @param non-empty-string $state
-     * @param non-empty-string $stateCategory
-     */
-    public function create(Job $job, string $state, string $stateCategory, bool $hasFailedState): Machine
-    {
-        $machine = $this->machineRepository->find($job->id);
-        if (null === $machine) {
-            $machine = new Machine($job->id, $state, $stateCategory, $hasFailedState);
-            $this->machineRepository->save($machine);
+        if ($machineEntity instanceof Machine) {
+            return;
         }
 
-        return $machine;
+        $machine = new Machine($event->getJobId(), $machine->state, $machine->stateCategory, $machine->hasFailedState);
+        $this->machineRepository->save($machine);
     }
 }

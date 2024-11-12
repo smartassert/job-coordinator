@@ -43,16 +43,18 @@ final readonly class CreateMachineMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        if ($this->machineRepository->has($job->id)) {
+        $jobId = $message->getJobId();
+
+        if ($this->machineRepository->has($jobId)) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        $serializedSuite = $this->serializedSuiteRepository->find($jobId);
 
         if (
-            !$this->resultsJobRepository->has($job->id)
+            !$this->resultsJobRepository->has($jobId)
             || null === $serializedSuite
             || ($serializedSuite instanceof SerializedSuite && !$serializedSuite->isPrepared())
         ) {
@@ -62,7 +64,7 @@ final readonly class CreateMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $job->id);
+            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $jobId);
 
             $this->eventDispatcher->dispatch(
                 new MachineCreationRequestedEvent($message->authenticationToken, $machine)

@@ -38,32 +38,16 @@ class SerializedSuiteFactory implements EventSubscriberInterface
             return;
         }
 
-        $this->create(
-            $job,
-            $event->serializedSuite->getId(),
-            $event->serializedSuite->getState(),
-            $event->serializedSuite->isPrepared(),
-            $event->serializedSuite->hasEndState(),
-        );
-    }
-
-    /**
-     * @param non-empty-string $serializedSuiteId
-     * @param non-empty-string $state
-     */
-    public function create(
-        Job $job,
-        string $serializedSuiteId,
-        string $state,
-        bool $isPrepared,
-        bool $hasEndState
-    ): SerializedSuite {
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        $serializedSuite = $this->serializedSuiteRepository->find($event->getJobId());
         if (null === $serializedSuite) {
-            $serializedSuite = new SerializedSuite($job->id, $serializedSuiteId, $state, $isPrepared, $hasEndState);
+            $serializedSuite = new SerializedSuite(
+                $event->getJobId(),
+                $event->serializedSuite->getId(),
+                $event->serializedSuite->getState(),
+                $event->serializedSuite->isPrepared(),
+                $event->serializedSuite->hasEndState(),
+            );
             $this->serializedSuiteRepository->save($serializedSuite);
         }
-
-        return $serializedSuite;
     }
 }

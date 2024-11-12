@@ -30,15 +30,17 @@ readonly class JobController
         User $user,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
+        $jobId = $this->generateId();
+
         $job = new Job(
-            $this->generateId(),
+            $jobId,
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds
         );
         $this->jobRepository->add($job);
 
-        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $job->id, $request->parameters));
+        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $jobId, $request->parameters));
 
         return new JsonResponse($this->jobStatusFactory->create($job));
     }
