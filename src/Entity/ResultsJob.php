@@ -10,15 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
 class ResultsJob implements \JsonSerializable
 {
+    #[ORM\Column(length: 32)]
+    public readonly string $token;
+
     /**
      * @var non-empty-string
      */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
-    public readonly string $jobId;
-
-    #[ORM\Column(length: 32)]
-    public readonly string $token;
+    private readonly string $jobId;
 
     /**
      * @var non-empty-string
