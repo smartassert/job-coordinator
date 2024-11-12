@@ -13,22 +13,13 @@ class ResultsJob implements \JsonSerializable
     #[ORM\Column(length: 32)]
     public readonly string $token;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
     private readonly string $jobId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 128)]
     private string $state;
 
-    /**
-     * @var ?non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: true)]
     private ?string $endState;
 
@@ -77,8 +68,8 @@ class ResultsJob implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state' => $this->state ?? null,
-            'end_state' => $this->endState ?? null,
+            'state' => '' === $this->state ? null : $this->state,
+            'end_state' => '' === $this->endState ? null : $this->endState,
         ];
     }
 }
