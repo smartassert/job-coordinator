@@ -15,9 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WorkerComponentStateRepository::class)]
 class WorkerComponentState implements WorkerComponentStateInterface
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32)]
     private readonly string $jobId;
@@ -26,9 +23,6 @@ class WorkerComponentState implements WorkerComponentStateInterface
     #[ORM\Column(length: 64, nullable: false, enumType: WorkerComponentName::class)]
     private readonly WorkerComponentName $componentName;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 64)]
     private string $state;
 
@@ -69,7 +63,7 @@ class WorkerComponentState implements WorkerComponentStateInterface
     public function toArray(): array
     {
         return [
-            'state' => $this->state,
+            'state' => '' === $this->state ? null : $this->state,
             'is_end_state' => $this->isEndState,
         ];
     }
