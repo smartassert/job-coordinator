@@ -6,7 +6,7 @@ namespace App\Model;
 
 /**
  * @phpstan-type SerializedWorkerComponentState array{
- *   state: non-empty-string,
+ *   state: ?non-empty-string,
  *   is_end_state: bool
  * }
  */
