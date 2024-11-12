@@ -56,14 +56,6 @@ class ResultsJob implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getEndState(): ?string
-    {
-        return $this->endState;
-    }
-
     public function hasEndState(): bool
     {
         return null !== $this->endState;
