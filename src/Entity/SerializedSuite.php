@@ -10,9 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
 class SerializedSuite implements \JsonSerializable
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $jobId;
