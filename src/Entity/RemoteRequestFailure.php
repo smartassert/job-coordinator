@@ -28,9 +28,6 @@ class RemoteRequestFailure implements \JsonSerializable
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private readonly ?string $message;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
     private readonly string $id;
