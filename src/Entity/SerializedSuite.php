@@ -10,22 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
 class SerializedSuite implements \JsonSerializable
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $jobId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $serializedSuiteId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
 
@@ -55,11 +46,11 @@ class SerializedSuite implements \JsonSerializable
     }
 
     /**
-     * @return non-empty-string
+     * @return ?non-empty-string
      */
-    public function getId(): string
+    public function getId(): ?string
     {
-        return $this->serializedSuiteId;
+        return '' === $this->serializedSuiteId ? null : $this->serializedSuiteId;
     }
 
     /**
@@ -112,7 +103,7 @@ class SerializedSuite implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state' => $this->state,
+            'state' => '' === $this->state ? null : $this->state,
             'is_prepared' => $this->isPrepared,
             'has_end_state' => $this->hasEndState,
         ];

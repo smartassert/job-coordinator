@@ -88,6 +88,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $job = $this->createJob();
         $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
+        $serializedSuiteId = $serializedSuite->getId();
+        \assert(null !== $serializedSuiteId);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -117,7 +119,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClient,
             $eventDispatcher
         );
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuite->getId());
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteId);
 
         ($handler)($message);
 
@@ -143,6 +145,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $job = $this->createJob();
         $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
+        $serializedSuiteId = $serializedSuite->getId();
+        \assert(null !== $serializedSuiteId);
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
 
@@ -175,7 +179,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClient,
             $eventDispatcher
         );
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuite->getId());
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteId);
 
         ($handler)($message);
 
@@ -186,9 +190,11 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $job = $this->createJob();
         $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
+        $serializedSuiteId = $serializedSuite->getId();
+        \assert(null !== $serializedSuiteId);
 
         $serializedSuite = new SerializedSuiteModel(
-            $serializedSuite->getId(),
+            $serializedSuiteId,
             md5((string) rand()),
             [],
             md5((string) rand()),
