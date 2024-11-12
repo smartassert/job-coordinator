@@ -10,8 +10,8 @@ use Symfony\Component\Uid\Ulid;
 
 /**
  * @phpstan-type SerializedJob array{
- *   id: non-empty-string,
- *   suite_id: non-empty-string,
+ *   id: ?non-empty-string,
+ *   suite_id: ?non-empty-string,
  *   maximum_duration_in_seconds: positive-int,
  *   created_at: positive-int
  *  }
@@ -21,28 +21,16 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
 readonly class Job implements \JsonSerializable
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     public string $id;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 32)]
     public string $userId;
 
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Column(length: 32)]
     public string $suiteId;
 
-    /**
-     * @var positive-int
-     */
     #[ORM\Column]
     private int $maximumDurationInSeconds;
 
@@ -74,8 +62,8 @@ readonly class Job implements \JsonSerializable
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'suite_id' => $this->suiteId,
+            'id' => '' === $this->id ? null : $this->id,
+            'suite_id' => '' === $this->suiteId ? null : $this->suiteId,
             'maximum_duration_in_seconds' => $this->getMaximumDurationInSeconds(),
             'created_at' => max($this->getCreatedAt(), 1),
         ];
