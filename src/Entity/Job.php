@@ -25,7 +25,8 @@ readonly class Job implements \JsonSerializable
     public string $userId;
 
     #[ORM\Column(length: 32)]
-    public string $suiteId;
+    private string $suiteId;
+
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $id;
@@ -50,6 +51,11 @@ readonly class Job implements \JsonSerializable
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getSuiteId(): string
+    {
+        return $this->suiteId;
     }
 
     /**

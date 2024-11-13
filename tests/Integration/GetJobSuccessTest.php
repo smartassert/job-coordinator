@@ -59,7 +59,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertIsArray($responseData);
 
         self::assertSame($job->getId(), $responseData['id']);
-        self::assertSame($job->suiteId, $responseData['suite_id']);
+        self::assertSame($job->getSuiteId(), $responseData['suite_id']);
         self::assertSame($job->getMaximumDurationInSeconds(), $responseData['maximum_duration_in_seconds']);
     }
 

@@ -53,7 +53,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->getId(), $job->suiteId, $serializedSuiteCreateParameters)
+            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), $serializedSuiteCreateParameters)
             ->andThrow($serializedSuiteClientException)
         ;
 
@@ -90,7 +90,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
         \assert('' !== $job->getId());
-        \assert('' !== $job->suiteId);
+        \assert('' !== $job->getSuiteId());
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),
@@ -98,7 +98,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $serializedSuiteModel = new SerializedSuiteModel(
             $job->getId(),
-            $job->suiteId,
+            $job->getSuiteId(),
             $serializedSuiteParameters,
             'requested',
             false,
@@ -110,7 +110,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->getId(), $job->suiteId, $serializedSuiteParameters)
+            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), $serializedSuiteParameters)
             ->andReturn($serializedSuiteModel)
         ;
 

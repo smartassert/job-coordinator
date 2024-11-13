@@ -38,7 +38,7 @@ final class CreateSerializedSuiteMessageHandler
         }
 
         $jobId = $message->getJobId();
-        $suiteId = $job->suiteId;
+        $suiteId = $job->getSuiteId();
 
         if ('' === $suiteId || $this->serializedSuiteRepository->has($jobId)) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
