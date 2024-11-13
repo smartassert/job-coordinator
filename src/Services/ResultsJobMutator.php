@@ -38,7 +38,7 @@ class ResultsJobMutator implements EventSubscriberInterface
             return;
         }
 
-        $resultsJob = $this->resultsJobRepository->find($job->id);
+        $resultsJob = $this->resultsJobRepository->find($job->getId());
         if (!$resultsJob instanceof ResultsJob) {
             return;
         }

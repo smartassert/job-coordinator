@@ -42,19 +42,19 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $event = new MachineIsActiveEvent($authenticationToken, $job->id, $machineIpAddress);
+        $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress);
 
         $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->getId(), $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -67,12 +67,12 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $message = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $message = new CreateWorkerJobMessage($authenticationToken, $job->getId(), $machineIpAddress);
         $event = new MessageNotYetHandleableEvent($message);
 
         $this->dispatcher->reDispatch($event);
@@ -80,7 +80,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
+        $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->getId(), $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());

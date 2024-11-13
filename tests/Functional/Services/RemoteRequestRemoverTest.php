@@ -101,13 +101,13 @@ class RemoteRequestRemoverTest extends WebTestCase
         $job = $jobFactory->createRandom();
 
         $this->doRemoteRequestRemoverTest(
-            $job->id,
+            $job->getId(),
             $remoteRequestFailuresCreator,
             $remoteRequestsCreator,
             $expectedRemoteRequestFailuresCreator,
             $expectedRemoteRequestsCreator,
             function () use ($job, $type) {
-                $this->remoteRequestRemover->removeForJobAndType($job->id, $type);
+                $this->remoteRequestRemover->removeForJobAndType($job->getId(), $type);
             }
         );
     }

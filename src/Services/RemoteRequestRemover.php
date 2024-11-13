@@ -27,7 +27,7 @@ class RemoteRequestRemover
         }
 
         $remoteRequests = $this->remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => $type,
         ]);
 

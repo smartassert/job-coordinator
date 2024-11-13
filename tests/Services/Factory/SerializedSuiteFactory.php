@@ -17,12 +17,12 @@ readonly class SerializedSuiteFactory
 
     public function createPreparedForJob(Job $job): SerializedSuite
     {
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $serializedSuiteId = md5((string) rand());
         $state = md5((string) rand());
 
-        $resultsJob = new SerializedSuite($job->id, $serializedSuiteId, $state, true, true);
+        $resultsJob = new SerializedSuite($job->getId(), $serializedSuiteId, $state, true, true);
 
         $this->serializedSuiteRepository->save($resultsJob);
 

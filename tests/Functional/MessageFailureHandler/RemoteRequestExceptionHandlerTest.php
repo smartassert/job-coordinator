@@ -78,8 +78,8 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         $exception = $exceptionCreator($this->job);
 
-        \assert('' !== $this->job->id);
-        $remoteRequest = new RemoteRequest($this->job->id, $type, 0);
+        \assert('' !== $this->job->getId());
+        $remoteRequest = new RemoteRequest($this->job->getId(), $type, 0);
         $this->remoteRequestRepository->save($remoteRequest);
 
         self::assertNull($remoteRequest->getFailure());
@@ -105,12 +105,12 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
             RemoteJobActionException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
                     return function (Job $job) use ($inner) {
-                        \assert('' !== $job->id);
+                        \assert('' !== $job->getId());
 
                         return new RemoteJobActionException(
                             $job,
                             $inner,
-                            new CreateMachineMessage(md5((string) rand()), $job->id),
+                            new CreateMachineMessage(md5((string) rand()), $job->getId()),
                         );
                     };
                 },

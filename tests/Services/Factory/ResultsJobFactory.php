@@ -21,12 +21,12 @@ readonly class ResultsJobFactory
      */
     public function create(Job $job, ?string $state = null, ?string $endState = null): ResultsJob
     {
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $token = md5((string) rand());
         $state = is_string($state) ? $state : md5((string) rand());
 
-        $resultsJob = new ResultsJob($job->id, $token, $state, $endState);
+        $resultsJob = new ResultsJob($job->getId(), $token, $state, $endState);
 
         $this->resultsJobRepository->save($resultsJob);
 

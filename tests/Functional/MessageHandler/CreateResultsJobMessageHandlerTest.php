@@ -49,7 +49,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -60,7 +60,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $job->id);
+        $message = new CreateResultsJobMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -79,12 +79,16 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $resultsJobModel = new ResultsJobModel($job->id, md5((string) rand()), new JobState('awaiting-events', null));
+        $resultsJobModel = new ResultsJobModel(
+            $job->getId(),
+            md5((string) rand()),
+            new JobState('awaiting-events', null)
+        );
 
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
@@ -99,13 +103,13 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
-        $resultsJob = $resultsJobRepository->find($job->id);
+        $resultsJob = $resultsJobRepository->find($job->getId());
 
         self::assertNull($resultsJob);
 
-        $handler(new CreateResultsJobMessage(self::$apiToken, $job->id));
+        $handler(new CreateResultsJobMessage(self::$apiToken, $job->getId()));
 
-        $resultsJob = $resultsJobRepository->find($job->id);
+        $resultsJob = $resultsJobRepository->find($job->getId());
         self::assertEquals(
             new ResultsJobEntity(
                 $resultsJobModel->label,
@@ -119,7 +123,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $job->id, $resultsJobModel), $event);
+        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $job->getId(), $resultsJobModel), $event);
     }
 
     public function testInvokeNotHandleable(): void
@@ -130,12 +134,12 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
         $resultsJobRepository
             ->shouldReceive('has')
-            ->with($job->id)
+            ->with($job->getId())
             ->andReturnTrue()
         ;
 
@@ -143,7 +147,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $job->id);
+        $message = new CreateResultsJobMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 

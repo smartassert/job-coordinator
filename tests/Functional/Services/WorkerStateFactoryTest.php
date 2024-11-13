@@ -82,11 +82,11 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'application component state entity only' => [
                 'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::APPLICATION,
                         ))
                             ->setState('awaiting-job')
@@ -94,11 +94,11 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new WorkerState(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::APPLICATION,
                         ))
                             ->setState('awaiting-job')
@@ -111,11 +111,11 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'execution component state entity only' => [
                 'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EXECUTION,
                         ))
                             ->setState('awaiting')
@@ -123,13 +123,13 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new WorkerState(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EXECUTION,
                         ))
                             ->setState('awaiting')
@@ -140,11 +140,11 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'all component states' => [
                 'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::APPLICATION,
                         ))
                             ->setState('executing')
@@ -153,7 +153,7 @@ class WorkerStateFactoryTest extends WebTestCase
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::COMPILATION,
                         ))
                             ->setState('complete')
@@ -162,7 +162,7 @@ class WorkerStateFactoryTest extends WebTestCase
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EXECUTION,
                         ))
                             ->setState('running')
@@ -171,7 +171,7 @@ class WorkerStateFactoryTest extends WebTestCase
 
                     $repository->save(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EVENT_DELIVERY,
                         ))
                             ->setState('running')
@@ -179,29 +179,29 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new WorkerState(
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::APPLICATION,
                         ))
                             ->setState('executing')
                             ->setIsEndState(false),
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::COMPILATION,
                         ))
                             ->setState('complete')
                             ->setIsEndState(true),
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EXECUTION,
                         ))
                             ->setState('running')
                             ->setIsEndState(false),
                         (new WorkerComponentState(
-                            $job->id,
+                            $job->getId(),
                             WorkerComponentName::EVENT_DELIVERY,
                         ))
                             ->setState('running')

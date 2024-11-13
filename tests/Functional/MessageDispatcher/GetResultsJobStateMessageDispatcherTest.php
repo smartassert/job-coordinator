@@ -69,17 +69,17 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $authenticationToken = md5((string) rand());
         $resultsToken = md5((string) rand());
-        $resultsJob = new ResultsJob($job->id, $resultsToken, new JobState('awaiting-events', null));
+        $resultsJob = new ResultsJob($job->getId(), $resultsToken, new JobState('awaiting-events', null));
 
-        $event = new ResultsJobCreatedEvent($authenticationToken, $job->id, $resultsJob);
+        $event = new ResultsJobCreatedEvent($authenticationToken, $job->getId(), $resultsJob);
 
         $this->dispatcher->dispatchForResultsJobEvent($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
+        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->getId()));
     }
 
     public function testDispatchForResultsJobStateRetrievedEventSuccess(): void
@@ -87,16 +87,16 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $authenticationToken = md5((string) rand());
         $resultsJobState = new ResultsJobState('started', null);
 
-        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->id, $resultsJobState);
+        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->getId(), $resultsJobState);
 
         $this->dispatcher->dispatchForResultsJobEvent($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->id));
+        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->getId()));
     }
 
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void

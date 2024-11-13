@@ -35,13 +35,13 @@ class JobTest extends WebTestCase
         $entityManager->persist($job);
         $entityManager->flush();
 
-        $jobId = $job->id;
+        $jobId = $job->getId();
 
         $entityManager->clear();
 
         $retrievedJob = $entityManager->find(Job::class, $jobId);
         self::assertInstanceOf(Job::class, $retrievedJob);
-        self::assertTrue(Ulid::isValid($retrievedJob->id));
+        self::assertTrue(Ulid::isValid($retrievedJob->getId()));
         self::assertSame($userId, $retrievedJob->userId);
         self::assertSame($suiteId, $retrievedJob->suiteId);
         self::assertSame($maximumDurationInSeconds, $retrievedJob->getMaximumDurationInSeconds());

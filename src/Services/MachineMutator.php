@@ -66,7 +66,7 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineEntity = $this->machineRepository->find($job->id);
+        $machineEntity = $this->machineRepository->find($job->getId());
         if (!$machineEntity instanceof Machine) {
             return;
         }

@@ -13,7 +13,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
     {
         $job = $this->getJob();
 
-        self::assertSame($job?->id, self::$createResponseData['id']);
+        self::assertSame($job?->getId(), self::$createResponseData['id']);
         self::assertSame($job?->suiteId, self::$createResponseData['suite_id']);
         self::assertSame(
             $job?->getMaximumDurationInSeconds(),

@@ -29,12 +29,12 @@ readonly class JobStatusFactory
         return new JobStatus(
             $job,
             $this->preparationStateFactory->create($job),
-            $this->resultsJobRepository->find($job->id),
-            $this->serializedSuiteRepository->find($job->id),
-            $this->machineRepository->find($job->id),
+            $this->resultsJobRepository->find($job->getId()),
+            $this->serializedSuiteRepository->find($job->getId()),
+            $this->machineRepository->find($job->getId()),
             $this->workerStateFactory->createForJob($job),
             new RemoteRequestCollection(
-                $this->remoteRequestRepository->findBy(['jobId' => $job->id], ['id' => 'ASC'])
+                $this->remoteRequestRepository->findBy(['jobId' => $job->getId()], ['id' => 'ASC'])
             ),
         );
     }

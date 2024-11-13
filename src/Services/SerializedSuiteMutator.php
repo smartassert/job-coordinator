@@ -38,7 +38,7 @@ class SerializedSuiteMutator implements EventSubscriberInterface
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        $serializedSuite = $this->serializedSuiteRepository->find($job->getId());
         if (!$serializedSuite instanceof SerializedSuite) {
             return;
         }

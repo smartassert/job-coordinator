@@ -68,21 +68,21 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $authenticationToken = md5((string) rand());
 
         $serializedSuiteId = md5((string) rand());
         $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId);
 
-        $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->id, $serializedSuite);
+        $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuite);
 
         $this->dispatcher->dispatchForSerializedSuiteEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetSerializedSuiteMessage($authenticationToken, $job->id, $serializedSuiteId);
+        $expectedMessage = new GetSerializedSuiteMessage($authenticationToken, $job->getId(), $serializedSuiteId);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());

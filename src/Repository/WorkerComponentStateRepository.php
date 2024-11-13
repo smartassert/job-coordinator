@@ -29,7 +29,7 @@ class WorkerComponentStateRepository extends ServiceEntityRepository implements 
     public function getApplicationState(Job $job): ?WorkerComponentState
     {
         return $this->findOneBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'componentName' => WorkerComponentName::APPLICATION,
         ]);
     }

@@ -99,14 +99,14 @@ class MachineFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = $workerManagerClientMachineCreator($job->id);
+        $machine = $workerManagerClientMachineCreator($job->getId());
 
         $event = new MachineCreationRequestedEvent('authentication token', $machine);
 
         $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
-        $machineEntity = $this->machineRepository->find($job->id);
-        self::assertEquals($expectedMachineCreator($job->id), $machineEntity);
+        $machineEntity = $this->machineRepository->find($job->getId());
+        self::assertEquals($expectedMachineCreator($job->getId()), $machineEntity);
     }
 
     /**
