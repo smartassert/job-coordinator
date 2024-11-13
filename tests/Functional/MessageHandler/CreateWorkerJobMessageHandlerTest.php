@@ -26,7 +26,6 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
@@ -295,11 +294,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function assertDispatchedMessage(CreateWorkerJobMessage $message): void
     {
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals($message, $envelope->getMessage());
 
         $messageDelays = self::getContainer()->getParameter('message_delays');
@@ -387,10 +384,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function assertNoStartWorkerJobMessageDispatched(): void
     {
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
-
-        foreach ($envelopes as $envelope) {
+        foreach ($this->messengerTransport->getSent() as $envelope) {
             self::assertFalse($envelope->getMessage() instanceof CreateWorkerJobMessage);
         }
     }

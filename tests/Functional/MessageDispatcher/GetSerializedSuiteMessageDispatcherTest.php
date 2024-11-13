@@ -12,8 +12,6 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -35,11 +33,6 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testIsEventSubscriber(): void
-    {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-    }
-
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
@@ -47,7 +40,6 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
-        self::assertIsArray($eventSubscriptions);
         self::assertIsArray($eventSubscriptions[0]);
 
         $eventSubscription = $eventSubscriptions[0];
@@ -88,13 +80,11 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatchForSerializedSuiteEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new GetSerializedSuiteMessage($authenticationToken, $job->id, $serializedSuiteId);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));

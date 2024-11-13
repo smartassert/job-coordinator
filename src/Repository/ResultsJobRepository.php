@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<ResultsJob>
- *
- * @method null|ResultsJob find($id, $lockMode = null, $lockVersion = null)
- * @method null|ResultsJob findOneBy(array $criteria, array $orderBy = null)
- * @method ResultsJob[]    findAll()
- * @method ResultsJob[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class ResultsJobRepository extends ServiceEntityRepository implements JobComponentRepositoryInterface
 {

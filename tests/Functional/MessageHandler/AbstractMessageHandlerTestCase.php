@@ -55,11 +55,9 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
         $invokeMethod = (new \ReflectionClass($handler::class))->getMethod('__invoke');
 
         $invokeMethodParameters = $invokeMethod->getParameters();
-        self::assertIsArray($invokeMethodParameters);
         self::assertCount(1, $invokeMethodParameters);
 
         $messageParameter = $invokeMethodParameters[0];
-        \assert($messageParameter instanceof \ReflectionParameter);
 
         $messageParameterType = $messageParameter->getType();
         \assert($messageParameterType instanceof \ReflectionNamedType);

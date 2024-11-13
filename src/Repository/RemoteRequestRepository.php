@@ -16,11 +16,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<RemoteRequest>
- *
- * @method null|RemoteRequest find($id, $lockMode = null, $lockVersion = null)
- * @method null|RemoteRequest findOneBy(array $criteria, array $orderBy = null)
- * @method RemoteRequest[]    findAll()
- * @method RemoteRequest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class RemoteRequestRepository extends ServiceEntityRepository
 {

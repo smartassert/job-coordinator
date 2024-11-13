@@ -16,7 +16,6 @@ use App\Event\WorkerStateRetrievedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RemoteRequestRemoverForEventsTest extends WebTestCase
 {
@@ -31,11 +30,6 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
         $this->remoteRequestRemoverForEvents = $remoteRequestRemoverForEvents;
     }
 
-    public function testIsEventSubscriber(): void
-    {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->remoteRequestRemoverForEvents);
-    }
-
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
@@ -43,7 +37,6 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
-        self::assertIsArray($eventSubscriptions);
         self::assertIsArray($eventSubscriptions[0]);
 
         $eventSubscription = $eventSubscriptions[0];

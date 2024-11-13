@@ -10,8 +10,6 @@ use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -35,7 +33,6 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
     public function testIsEventSubscriber(): void
     {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(JobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
@@ -53,13 +50,11 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateResultsJobMessage($authenticationToken, $job->id);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));

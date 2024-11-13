@@ -17,6 +17,8 @@ class StatusTest extends AbstractStatusTest
 
     protected function getExpectedVersion(): string
     {
-        return $_SERVER['EXPECTED_VERSION'] ?? 'docker_compose_version';
+        $expectedVersion = $_SERVER['EXPECTED_VERSION'] ?? null;
+
+        return is_string($expectedVersion) ? $expectedVersion : 'docker_compose_version';
     }
 }

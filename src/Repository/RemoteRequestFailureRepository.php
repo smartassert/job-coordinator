@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<RemoteRequestFailure>
- *
- * @method null|RemoteRequestFailure find($id, $lockMode = null, $lockVersion = null)
- * @method null|RemoteRequestFailure findOneBy(array $criteria, array $orderBy = null)
- * @method RemoteRequestFailure[]    findAll()
- * @method RemoteRequestFailure[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class RemoteRequestFailureRepository extends ServiceEntityRepository
 {

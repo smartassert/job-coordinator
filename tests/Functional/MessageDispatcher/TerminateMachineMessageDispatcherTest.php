@@ -12,7 +12,6 @@ use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class TerminateMachineMessageDispatcherTest extends WebTestCase
@@ -40,7 +39,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
-        self::assertIsArray($eventSubscriptions);
         self::assertIsArray($eventSubscriptions[0]);
 
         $eventSubscription = $eventSubscriptions[0];
@@ -85,11 +83,9 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
     private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
     {
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
             new TerminateMachineMessage($authenticationToken, $jobId),
             $envelope->getMessage()

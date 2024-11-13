@@ -21,7 +21,6 @@ use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -71,11 +70,9 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         );
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
         self::assertSame($envelope->getMessage(), $message);
 
         foreach ($stamps as $stamp) {
@@ -141,10 +138,7 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         \assert($eventRecorder instanceof EventRecorder);
 
         self::assertEquals([], $eventRecorder->all(JobRemoteRequestMessageCreatedEvent::class));
-
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
-        self::assertCount(0, $envelopes);
+        self::assertCount(0, $this->messengerTransport->getSent());
     }
 
     /**

@@ -14,8 +14,6 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class GetResultsJobStateMessageDispatcherTest extends WebTestCase
@@ -36,11 +34,6 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testIsEventSubscriber(): void
-    {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-    }
-
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
@@ -48,7 +41,6 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
-        self::assertIsArray($eventSubscriptions);
         self::assertIsArray($eventSubscriptions[0]);
 
         $eventSubscription = $eventSubscriptions[0];
@@ -110,11 +102,9 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void
     {
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expected, $dispatchedEnvelope->getMessage());
     }
 }
