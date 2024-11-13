@@ -10,8 +10,6 @@ use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -35,7 +33,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testIsEventSubscriber(): void
     {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
         self::assertArrayHasKey(MessageNotYetHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
     }
@@ -55,13 +52,11 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
@@ -83,13 +78,11 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $this->dispatcher->reDispatch($event);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage($authenticationToken, $job->id, $machineIpAddress);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
     }
 }

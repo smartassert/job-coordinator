@@ -50,8 +50,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
             new MachineIsActiveEvent('authentication token', $jobId, '127.0.0.1')
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveResultsCreateRequests(): void
@@ -80,8 +78,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeResultsCreateRequests(
             new ResultsJobCreatedEvent('authentication token', $jobId, $resultsClientJob)
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveSerializedSuiteCreateRequests(): void
@@ -112,8 +108,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
             )
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveMachineGetRequests(): void
@@ -144,8 +138,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 WorkerManagerClientMachineFactory::createRandomForJob($jobId),
             )
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveSerializedSuiteGetRequests(): void
@@ -175,8 +167,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
             )
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveWorkerJobStartRequests(): void
@@ -203,8 +193,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeWorkerJobCreateRequests(
             new CreateWorkerJobRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveResultsStateGetRequests(): void
@@ -235,8 +223,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 new ResultsJobState('irrelevant', 'irrelevant')
             )
         );
-
-        self::assertTrue(true);
     }
 
     public function testRemoveMachineTerminationRequests(): void
@@ -263,7 +249,5 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
             new MachineTerminationRequestedEvent($jobId)
         );
-
-        self::assertTrue(true);
     }
 }

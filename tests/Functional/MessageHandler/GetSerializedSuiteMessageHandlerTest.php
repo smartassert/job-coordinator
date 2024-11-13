@@ -67,15 +67,11 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         );
         self::assertNull($remoteRequest);
 
-        $exception = null;
-
         try {
             $handler($message);
             self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
-        } catch (MessageHandlerTargetEntityNotFoundException $exception) {
+        } catch (MessageHandlerTargetEntityNotFoundException) {
         }
-
-        self::assertInstanceOf(MessageHandlerTargetEntityNotFoundException::class, $exception);
 
         $remoteRequest = $remoteRequestRepository->find(
             RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())

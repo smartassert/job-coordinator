@@ -56,15 +56,13 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $message = new GetResultsJobStateMessage('api token', $job->id);
 
-        $exception = null;
-
         try {
             $handler($message);
             self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
-        } catch (MessageHandlerTargetEntityNotFoundException $exception) {
+        } catch (MessageHandlerTargetEntityNotFoundException) {
         }
 
-        self::assertInstanceOf(MessageHandlerTargetEntityNotFoundException::class, $exception);
+        self::expectNotToPerformAssertions();
     }
 
     public function testInvokeJobPreparationHasFailed(): void

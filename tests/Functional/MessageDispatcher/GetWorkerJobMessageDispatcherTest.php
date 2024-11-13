@@ -14,8 +14,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class GetWorkerJobMessageDispatcherTest extends WebTestCase
@@ -36,11 +34,6 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testIsEventSubscriber(): void
-    {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
-    }
-
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
@@ -48,7 +41,6 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
-        self::assertIsArray($eventSubscriptions);
         self::assertIsArray($eventSubscriptions[0]);
 
         $eventSubscription = $eventSubscriptions[0];
@@ -86,11 +78,9 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertEquals([new NonDelayedStamp()], $dispatchedEnvelope->all(NonDelayedStamp::class));
@@ -115,11 +105,9 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $dispatchedEnvelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $dispatchedEnvelope);
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(NonDelayedStamp::class));

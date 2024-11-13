@@ -90,12 +90,9 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
 
         self::assertSame(1, $this->remoteRequestFailureRepository->count([]));
 
-        $remoteRequestFailure = $this->remoteRequestFailureRepository->findAll()[0];
-        self::assertInstanceOf(RemoteRequestFailure::class, $remoteRequestFailure);
-
         self::assertEquals(
             new RemoteRequestFailure($expectedType, $expectedCode, $expectedMessage),
-            $remoteRequestFailure
+            $this->remoteRequestFailureRepository->findAll()[0]
         );
     }
 

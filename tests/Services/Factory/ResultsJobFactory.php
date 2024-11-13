@@ -24,10 +24,7 @@ readonly class ResultsJobFactory
         \assert('' !== $job->id);
 
         $token = md5((string) rand());
-        \assert('' !== $token);
-
         $state = is_string($state) ? $state : md5((string) rand());
-        \assert('' !== $state);
 
         $resultsJob = new ResultsJob($job->id, $token, $state, $endState);
 

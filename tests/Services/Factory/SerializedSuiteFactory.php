@@ -20,10 +20,7 @@ readonly class SerializedSuiteFactory
         \assert('' !== $job->id);
 
         $serializedSuiteId = md5((string) rand());
-        \assert('' !== $serializedSuiteId);
-
         $state = md5((string) rand());
-        \assert('' !== $state);
 
         $resultsJob = new SerializedSuite($job->id, $serializedSuiteId, $state, true, true);
 

@@ -23,8 +23,6 @@ use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
@@ -81,7 +79,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testIsEventSubscriber(): void
     {
-        self::assertInstanceOf(EventSubscriberInterface::class, $this->dispatcher);
         self::assertArrayHasKey(ResultsJobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
         self::assertArrayHasKey(SerializedSuiteSerializedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
@@ -192,11 +189,9 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
     {
         $envelopes = $this->messengerTransport->getSent();
-        self::assertIsArray($envelopes);
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
-        self::assertInstanceOf(Envelope::class, $envelope);
         self::assertEquals(
             new CreateMachineMessage($authenticationToken, $jobId),
             $envelope->getMessage()
