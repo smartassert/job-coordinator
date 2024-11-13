@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
+use App\Model\JobInterface;
 
 interface JobPreparationInspectorInterface
 {
-    public function hasFailed(Job $job): bool;
+    public function hasFailed(JobInterface $job): bool;
 }
