@@ -10,11 +10,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<SerializedSuite>
- *
- * @method null|SerializedSuite find($id, $lockMode = null, $lockVersion = null)
- * @method null|SerializedSuite findOneBy(array $criteria, array $orderBy = null)
- * @method SerializedSuite[]    findAll()
- * @method SerializedSuite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SerializedSuiteRepository extends ServiceEntityRepository implements JobComponentRepositoryInterface
 {
