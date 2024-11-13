@@ -47,7 +47,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -58,7 +58,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, HttpMockedWorkerManagerClientFactory::create());
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->id);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
@@ -73,7 +73,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $workerManagerException = new \Exception('Failed to terminate machine');
 
@@ -81,7 +81,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, $workerManagerClient);
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->id);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -100,10 +100,10 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $machine = MachineFactory::create(
-            $job->id,
+            $job->getId(),
             'create/requested',
             'pre_active',
             [],
@@ -119,13 +119,13 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, $workerManagerClient);
 
-        $handler(new TerminateMachineMessage(self::$apiToken, $job->id));
+        $handler(new TerminateMachineMessage(self::$apiToken, $job->getId()));
 
         $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 
-        self::assertSame($job->id, $event->getJobId());
+        self::assertSame($job->getId(), $event->getJobId());
     }
 
     protected function getHandlerClass(): string

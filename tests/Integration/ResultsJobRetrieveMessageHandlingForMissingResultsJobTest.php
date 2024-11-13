@@ -82,7 +82,7 @@ class ResultsJobRetrieveMessageHandlingForMissingResultsJobTest extends Abstract
 
         $abortedResultsJobRetrieveRequestCount = $remoteRequestRepository->count(
             [
-                'jobId' => $job->id,
+                'jobId' => $job->getId(),
                 'state' => RequestState::ABORTED->value,
                 'type' => new RemoteRequestType(
                     JobComponent::RESULTS_JOB,

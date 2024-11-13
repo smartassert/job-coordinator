@@ -97,7 +97,7 @@ class ResultsJobFactoryTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         self::assertSame(0, $this->resultsJobRepository->count([]));
 
@@ -106,18 +106,18 @@ class ResultsJobFactoryTest extends WebTestCase
         $resultsJobEndState = null;
 
         $resultsJob = new ResultsClientJob(
-            $job->id,
+            $job->getId(),
             $resultsJobToken,
             new ResultsJobState($resultsJobState, $resultsJobEndState)
         );
 
-        $event = new ResultsJobCreatedEvent('authentication token', $job->id, $resultsJob);
+        $event = new ResultsJobCreatedEvent('authentication token', $job->getId(), $resultsJob);
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 
-        $resultsJobEntity = $this->resultsJobRepository->find($job->id);
+        $resultsJobEntity = $this->resultsJobRepository->find($job->getId());
         self::assertEquals(
-            new ResultsJob($job->id, $resultsJobToken, $resultsJobState, $resultsJobEndState),
+            new ResultsJob($job->getId(), $resultsJobToken, $resultsJobState, $resultsJobEndState),
             $resultsJobEntity
         );
     }

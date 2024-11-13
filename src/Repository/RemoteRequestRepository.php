@@ -99,7 +99,7 @@ class RemoteRequestRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(
             [
-                'jobId' => $job->id,
+                'jobId' => $job->getId(),
                 'type' => $type,
             ],
             [
@@ -111,7 +111,7 @@ class RemoteRequestRepository extends ServiceEntityRepository
     public function hasSuccessful(Job $job, RemoteRequestType $type): bool
     {
         $criteria = [
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => $type,
             'state' => RequestState::SUCCEEDED,
         ];

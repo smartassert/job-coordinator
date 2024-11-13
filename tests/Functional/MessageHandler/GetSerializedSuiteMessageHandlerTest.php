@@ -49,7 +49,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $handler = self::getContainer()->get(GetSerializedSuiteMessageHandler::class);
         \assert($handler instanceof GetSerializedSuiteMessageHandler);
@@ -57,13 +57,13 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
-        $message = new GetSerializedSuiteMessage('api token', $job->id, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage('api token', $job->getId(), $serializedSuiteId);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
         $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId($job->getId(), $message->getRemoteRequestType(), $message->getIndex())
         );
         self::assertNull($remoteRequest);
 
@@ -74,7 +74,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         }
 
         $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->id, $message->getRemoteRequestType(), $message->getIndex())
+            RemoteRequest::generateId($job->getId(), $message->getRemoteRequestType(), $message->getIndex())
         );
 
         self::assertInstanceOf(RemoteRequest::class, $remoteRequest);
@@ -84,7 +84,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteStateIsEndState(): void
     {
         $job = $this->createJob();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
         $serializedSuiteId = $serializedSuite->getId();
@@ -94,7 +94,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
         $abortedSerializedSuiteRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'serialized-suite/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -118,7 +118,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClient,
             $eventDispatcher
         );
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuiteId);
 
         ($handler)($message);
 
@@ -132,7 +132,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         );
 
         $abortedSerializedSuiteRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'serialized-suite/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -143,7 +143,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
         $job = $this->createJob();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
         $serializedSuiteId = $serializedSuite->getId();
@@ -161,7 +161,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         self::expectException(RemoteJobActionException::class);
         self::expectExceptionMessage(sprintf(
             'Failed to retrieve serialized-suite for job "%s": %s',
-            $job->id,
+            $job->getId(),
             $serializedSuiteClientException->getMessage()
         ));
 
@@ -180,7 +180,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $serializedSuiteClient,
             $eventDispatcher
         );
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuiteId);
 
         ($handler)($message);
 
@@ -190,7 +190,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotEndState(): void
     {
         $job = $this->createJob();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
         $serializedSuiteId = $serializedSuite->getId();
@@ -230,14 +230,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $eventDispatcher
         );
 
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->id, $serializedSuite->getId());
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuite->getId());
 
         ($handler)($message);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-        $serializedSuiteEntity = $serializedSuiteRepository->find($job->id);
+        $serializedSuiteEntity = $serializedSuiteRepository->find($job->getId());
         \assert($serializedSuiteEntity instanceof SerializedSuite);
 
         self::assertFalse($serializedSuiteEntity->hasEndState());
@@ -245,7 +245,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $events = $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new SerializedSuiteRetrievedEvent(self::$apiToken, $job->id, $serializedSuite), $event);
+        self::assertEquals(new SerializedSuiteRetrievedEvent(self::$apiToken, $job->getId(), $serializedSuite), $event);
     }
 
     protected function getHandlerClass(): string
@@ -275,9 +275,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         bool $isPrepared,
         bool $hasEndState
     ): SerializedSuite {
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, $isPrepared, $hasEndState);
+        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), $state, $isPrepared, $hasEndState);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

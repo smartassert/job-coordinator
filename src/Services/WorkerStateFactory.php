@@ -31,7 +31,7 @@ class WorkerStateFactory
     private function createComponentState(Job $job, WorkerComponentName $componentName): WorkerComponentStateInterface
     {
         $componentState = $this->workerComponentStateRepository->findOneBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'componentName' => $componentName,
         ]);
 

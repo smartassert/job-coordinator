@@ -28,7 +28,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
             return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
@@ -41,7 +41,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
             return RequestState::SUCCEEDED;
         }
 

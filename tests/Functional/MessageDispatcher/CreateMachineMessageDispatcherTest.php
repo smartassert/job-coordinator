@@ -90,12 +90,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function testDispatchSuccess(callable $eventCreator): void
     {
         $job = $this->jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
-        $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
+        $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), 'awaiting-events', null);
         $this->resultsJobRepository->save($resultsJob);
 
-        $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
+        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $event = $eventCreator($job);
@@ -103,7 +103,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage($event->getAuthenticationToken(), $job->id);
+        $this->assertDispatchedMessage($event->getAuthenticationToken(), $job->getId());
     }
 
     /**
@@ -112,21 +112,21 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public static function dispatchSuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
-            \assert('' !== $job->id);
+            \assert('' !== $job->getId());
 
             return new ResultsJobCreatedEvent(
                 md5((string) rand()),
-                $job->id,
+                $job->getId(),
                 ResultsClientJobFactory::createRandom()
             );
         };
 
         $serializedSuiteSerializedEventCreator = function (Job $job) {
-            \assert('' !== $job->id);
+            \assert('' !== $job->getId());
 
             return new SerializedSuiteSerializedEvent(
                 md5((string) rand()),
-                $job->id,
+                $job->getId(),
                 md5((string) rand())
             );
         };
@@ -147,14 +147,14 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($machineRepository instanceof MachineRepository);
 
         $job = $this->jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
-        $machine = new Machine($job->id, 'up/active', 'active', false);
+        $machine = new Machine($job->getId(), 'up/active', 'active', false);
         $machineRepository->save($machine);
 
         $event = new ResultsJobCreatedEvent(
             'api token',
-            $job->id,
+            $job->getId(),
             ResultsClientJobFactory::createRandom()
         );
 
@@ -169,12 +169,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($machineRepository instanceof MachineRepository);
 
         $job = $this->jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
-        $machine = new Machine($job->id, 'up/active', 'active', false);
+        $machine = new Machine($job->getId(), 'up/active', 'active', false);
         $machineRepository->save($machine);
 
-        $message = new CreateMachineMessage('api token', $job->id);
+        $message = new CreateMachineMessage('api token', $job->getId());
         $event = new MessageNotYetHandleableEvent($message);
 
         $this->dispatcher->reDispatch($event);

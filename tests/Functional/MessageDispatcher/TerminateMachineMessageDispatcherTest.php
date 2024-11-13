@@ -63,11 +63,11 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
-            $job->id,
+            $job->getId(),
             new ResultsJobState('complete', 'ended')
         );
 

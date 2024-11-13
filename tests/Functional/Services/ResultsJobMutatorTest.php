@@ -95,7 +95,7 @@ class ResultsJobMutatorTest extends WebTestCase
 
         $resultsJob = null === $job
             ? null
-            : $this->resultsJobRepository->find($job->id);
+            : $this->resultsJobRepository->find($job->getId());
 
         self::assertEquals($expectedResultsJobCreator($job), $resultsJob);
     }
@@ -136,11 +136,11 @@ class ResultsJobMutatorTest extends WebTestCase
                 'resultsJobCreator' => function () {
                 },
                 'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('awaiting-events', null),
                     );
                 },
@@ -156,24 +156,24 @@ class ResultsJobMutatorTest extends WebTestCase
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $resultsJob = new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                    $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
                 'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('awaiting-events', null),
                     );
                 },
                 'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    return new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                    return new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                 },
             ],
             'has state change' => [
@@ -184,24 +184,24 @@ class ResultsJobMutatorTest extends WebTestCase
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $resultsJob = new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                    $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
                 'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('complete', 'ended'),
                     );
                 },
                 'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    return new ResultsJob($job->id, $resultsJobToken, 'complete', 'ended');
+                    return new ResultsJob($job->getId(), $resultsJobToken, 'complete', 'ended');
                 },
             ],
         ];

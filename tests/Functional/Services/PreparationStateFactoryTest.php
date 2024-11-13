@@ -144,23 +144,28 @@ class PreparationStateFactoryTest extends WebTestCase
                     MachineRepository $machineRepository,
                     WorkerComponentStateRepository $workerComponentStateRepository
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $resultsJobRepository->save(
-                        new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), null)
+                        new ResultsJob($job->getId(), md5((string) rand()), md5((string) rand()), null)
                     );
                     $serializedSuiteRepository->save(
                         new SerializedSuite(
-                            $job->id,
+                            $job->getId(),
                             md5((string) rand()),
                             md5((string) rand()),
                             false,
                             false
                         )
                     );
-                    $machineRepository->save(new Machine($job->id, md5((string) rand()), md5((string) rand()), false));
+                    $machineRepository->save(new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        false
+                    ));
                     $workerComponentStateRepository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('awaiting-job')
                             ->setIsEndState(false)
                     );
@@ -187,10 +192,10 @@ class PreparationStateFactoryTest extends WebTestCase
                 ) use (
                     $resultsJobCreateType
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $remoteRequestRepository->save(
-                        new RemoteRequest($job->id, $resultsJobCreateType, 0)
+                        new RemoteRequest($job->getId(), $resultsJobCreateType, 0)
                     );
                 },
                 'expected' => [
@@ -213,10 +218,10 @@ class PreparationStateFactoryTest extends WebTestCase
                 ) use (
                     $resultsJobCreateType
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
@@ -252,10 +257,10 @@ class PreparationStateFactoryTest extends WebTestCase
                     $resultsJobCreateType,
                     $serializedSuiteCreateType,
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
@@ -265,7 +270,7 @@ class PreparationStateFactoryTest extends WebTestCase
                     );
 
                     $remoteRequestRepository->save(
-                        (new RemoteRequest($job->id, $serializedSuiteCreateType, 0))
+                        (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,

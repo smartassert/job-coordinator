@@ -140,9 +140,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
             return function (Job $job, ResultsJobRepository $resultsJobRepository) use ($state, $endState) {
                 \assert('' !== $state);
                 \assert('' !== $endState);
-                \assert('' !== $job->id);
+                \assert('' !== $job->getId());
 
-                $resultsJob = new ResultsJob($job->id, md5((string) rand()), $state, $endState);
+                $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), $state, $endState);
                 $resultsJobRepository->save($resultsJob);
 
                 return $resultsJob;
@@ -183,8 +183,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -224,10 +224,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ],
             'results/create: requesting' => [
                 'remoteRequestsCreator' => function (Job $job) use ($resultsJobCreateType) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return [
-                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $resultsJobCreateType, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
@@ -237,8 +237,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -293,28 +293,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     $serializedSuiteCreateType,
                     $serializedSuiteRetrieveType,
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return [
-                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $resultsJobCreateType, 0))
                             ->setState(RequestState::HALTED),
-                        (new RemoteRequest($job->id, $serializedSuiteCreateType, 0))
+                        (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
                             ->setState(RequestState::HALTED),
-                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 0))
+                        (new RemoteRequest($job->getId(), $serializedSuiteRetrieveType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
                                 6,
                                 'unable to resolve host "sources.example.com"'
                             )),
-                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 1))
+                        (new RemoteRequest($job->getId(), $serializedSuiteRetrieveType, 1))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 503,
                                 'service unavailable'
                             )),
-                        (new RemoteRequest($job->id, $serializedSuiteRetrieveType, 2))
+                        (new RemoteRequest($job->getId(), $serializedSuiteRetrieveType, 2))
                             ->setState(RequestState::SUCCEEDED),
                     ];
                 },
@@ -324,8 +324,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -412,8 +412,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -462,8 +462,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -511,9 +511,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -522,8 +522,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -567,10 +567,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ],
             'requesting machine' => [
                 'remoteRequestsCreator' => function (Job $job) use ($machineCreateType) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return [
-                        (new RemoteRequest($job->id, $machineCreateType, 0))
+                        (new RemoteRequest($job->getId(), $machineCreateType, 0))
                             ->setState(RequestState::REQUESTING),
                     ];
                 },
@@ -580,8 +580,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -633,9 +633,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -649,8 +649,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Machine $machine,
                 ) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -698,9 +698,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -708,28 +708,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $machine;
                 },
                 'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                             ->setState('complete')
                             ->setIsEndState(true)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
@@ -740,8 +740,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Machine $machine,
                 ) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -789,12 +789,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
                     $machine->setActionFailure(new MachineActionFailure(
-                        $job->id,
+                        $job->getId(),
                         'find',
                         'vendor_authentication_failure'
                     ));
@@ -804,28 +804,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $machine;
                 },
                 'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                             ->setState('complete')
                             ->setIsEndState(true)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
@@ -836,8 +836,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Machine $machine,
                 ) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -891,17 +891,17 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Job $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
                 },
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -909,28 +909,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $machine;
                 },
                 'workerComponentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                             ->setState('complete')
                             ->setIsEndState(true)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EXECUTION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::EVENT_DELIVERY))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                             ->setState('running')
                             ->setIsEndState(false)
                     );
@@ -941,8 +941,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Machine $machine,
                 ) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -1001,31 +1001,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     $machineCreateType,
                     $workerJobCreateType,
                 ) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
                     return [
-                        (new RemoteRequest($job->id, $resultsJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 503,
                                 'service unavailable'
                             )),
-                        (new RemoteRequest($job->id, $serializedSuiteCreateType, 0))
+                        (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
                                 28,
                                 'connection timed out'
                             )),
-                        (new RemoteRequest($job->id, $machineCreateType, 0))
+                        (new RemoteRequest($job->getId(), $machineCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
                                 500,
                                 'internal server error'
                             )),
-                        (new RemoteRequest($job->id, $workerJobCreateType, 0))
+                        (new RemoteRequest($job->getId(), $workerJobCreateType, 0))
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::NETWORK,
@@ -1040,8 +1040,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'workerComponentStatesCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (Job $job) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
@@ -1158,9 +1158,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (Job $job, MachineRepository $machineRepository) {
-                    \assert('' !== $job->id);
+                    \assert('' !== $job->getId());
 
-                    $machine = new Machine($job->id, md5((string) rand()), md5((string) rand()), true);
+                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), true);
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -1174,8 +1174,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     Machine $machine,
                 ) {
                     return [
-                        'id' => $job->id,
-                        'suite_id' => $job->suiteId,
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [

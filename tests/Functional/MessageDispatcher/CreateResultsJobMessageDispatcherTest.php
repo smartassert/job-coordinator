@@ -41,18 +41,18 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $authenticationToken = md5((string) rand());
 
-        $event = new JobCreatedEvent($authenticationToken, $job->id, []);
+        $event = new JobCreatedEvent($authenticationToken, $job->getId(), []);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $job->id);
+        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $job->getId());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -65,13 +65,13 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
+        \assert('' !== $job->getId());
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
         $resultsJobFactory->create($job);
 
-        $event = new JobCreatedEvent('api token', $job->id, []);
+        $event = new JobCreatedEvent('api token', $job->getId(), []);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 

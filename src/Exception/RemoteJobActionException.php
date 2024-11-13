@@ -19,7 +19,7 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
                 'Failed to %s %s for job "%s": %s',
                 $failedMessage->getRemoteRequestType()->action->value,
                 $failedMessage->getRemoteRequestType()->jobComponent->value,
-                $job->id,
+                $job->getId(),
                 $previousException->getMessage()
             ),
             0,

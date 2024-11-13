@@ -81,7 +81,7 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
 
         $abortedMachineCreateRequestCount = $remoteRequestRepository->count(
             [
-                'jobId' => $job->id,
+                'jobId' => $job->getId(),
                 'state' => RequestState::ABORTED->value,
                 'type' => new RemoteRequestType(
                     JobComponent::MACHINE,

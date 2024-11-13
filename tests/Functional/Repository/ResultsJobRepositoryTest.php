@@ -40,6 +40,6 @@ class ResultsJobRepositoryTest extends WebTestCase
 
         $this->resultsJobRepository->save($resultsJob);
 
-        self::assertTrue($this->resultsJobRepository->has($job->id));
+        self::assertTrue($this->resultsJobRepository->has($job->getId()));
     }
 }
