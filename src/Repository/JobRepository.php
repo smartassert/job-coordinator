@@ -23,4 +23,17 @@ class JobRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
     }
+
+    public function store(\App\Model\Job $job): void
+    {
+        $this->getEntityManager()->persist(
+            new Job(
+                $job->getId(),
+                $job->getUserId(),
+                $job->getSuiteId(),
+                $job->getMaximumDurationInSeconds()
+            )
+        );
+        $this->getEntityManager()->flush();
+    }
 }
