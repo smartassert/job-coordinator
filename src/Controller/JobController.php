@@ -44,8 +44,6 @@ readonly class JobController
             $jobModel->getMaximumDurationInSeconds(),
         );
 
-        $this->jobRepository->add($job);
-
         $eventDispatcher->dispatch(
             new JobCreatedEvent($user->getSecurityToken(), $jobModel->getId(), $request->parameters)
         );
