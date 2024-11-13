@@ -41,7 +41,9 @@ final readonly class GetResultsJobStateMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $resultsJob = $this->resultsJobRepository->find($job->id);
+        $jobId = $message->getJobId();
+
+        $resultsJob = $this->resultsJobRepository->find($jobId);
         if (null === $resultsJob) {
             throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
         }
@@ -56,10 +58,10 @@ final readonly class GetResultsJobStateMessageHandler
         }
 
         try {
-            $resultsJobState = $this->resultsClient->getJobStatus($message->authenticationToken, $job->id);
+            $resultsJobState = $this->resultsClient->getJobStatus($message->authenticationToken, $jobId);
             $this->eventDispatcher->dispatch(new ResultsJobStateRetrievedEvent(
                 $message->authenticationToken,
-                $job->id,
+                $jobId,
                 $resultsJobState
             ));
         } catch (\Throwable $e) {

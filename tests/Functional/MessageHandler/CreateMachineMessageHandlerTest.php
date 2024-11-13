@@ -60,6 +60,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -154,6 +155,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     return $resultsJobRepository;
                 },
                 'serializedSuiteRepositoryCreator' => function (Job $job) {
+                    \assert('' !== $job->id);
+
                     $serializedSuiteId = (string) new Ulid();
                     \assert('' !== $serializedSuiteId);
 
@@ -183,6 +186,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -233,6 +237,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -272,6 +277,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);

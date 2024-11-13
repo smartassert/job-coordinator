@@ -97,6 +97,8 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
             ],
             'single matching state' => [
                 'statesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    \assert('' !== $job->id);
+
                     $repository->save(
                         (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
                             ->setState('executing')
@@ -104,6 +106,8 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                     );
                 },
                 'expectedStatesCreator' => function (Job $job) {
+                    \assert('' !== $job->id);
+
                     return [
                         (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
                             ->setState('executing')
@@ -113,6 +117,8 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
             ],
             'multiple matching state' => [
                 'statesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                    \assert('' !== $job->id);
+
                     $repository->save(
                         (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
                             ->setState('executing')
@@ -138,6 +144,8 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                     );
                 },
                 'expectedStatesCreator' => function (Job $job) {
+                    \assert('' !== $job->id);
+
                     return [
                         (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
                             ->setState('executing')

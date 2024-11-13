@@ -17,6 +17,8 @@ readonly class SerializedSuiteFactory
 
     public function createPreparedForJob(Job $job): SerializedSuite
     {
+        \assert('' !== $job->id);
+
         $serializedSuiteId = md5((string) rand());
         \assert('' !== $serializedSuiteId);
 

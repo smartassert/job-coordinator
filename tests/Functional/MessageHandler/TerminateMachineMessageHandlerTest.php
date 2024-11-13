@@ -47,6 +47,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -72,6 +73,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $workerManagerException = new \Exception('Failed to terminate machine');
 
@@ -98,6 +100,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $machine = MachineFactory::create(
             $job->id,

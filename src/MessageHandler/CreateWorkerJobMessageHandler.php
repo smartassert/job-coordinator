@@ -42,8 +42,10 @@ final class CreateWorkerJobMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
-        $resultsJob = $this->resultsJobRepository->find($job->id);
+        $jobId = $message->getJobId();
+
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($jobId);
+        $resultsJob = $this->resultsJobRepository->find($jobId);
         if (
             null === $serializedSuiteEntity
             || $serializedSuiteEntity->isPreparing()
@@ -68,14 +70,14 @@ final class CreateWorkerJobMessageHandler
             $serializedSuite = $this->serializedSuiteClient->read($message->authenticationToken, $serializedSuiteId);
 
             $workerJob = $workerClient->createJob(
-                $job->id,
+                $jobId,
                 $resultsJob->token,
                 $job->getMaximumDurationInSeconds(),
                 $serializedSuite
             );
 
             $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
-                $job->id,
+                $jobId,
                 $message->machineIpAddress,
                 $workerJob,
             ));

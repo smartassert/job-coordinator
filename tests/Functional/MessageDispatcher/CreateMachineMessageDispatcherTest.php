@@ -93,6 +93,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function testDispatchSuccess(callable $eventCreator): void
     {
         $job = $this->jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $resultsJob = new ResultsJob($job->id, md5((string) rand()), 'awaiting-events', null);
         $this->resultsJobRepository->save($resultsJob);
@@ -114,6 +115,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public static function dispatchSuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (Job $job) {
+            \assert('' !== $job->id);
+
             return new ResultsJobCreatedEvent(
                 md5((string) rand()),
                 $job->id,
@@ -122,6 +125,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         };
 
         $serializedSuiteSerializedEventCreator = function (Job $job) {
+            \assert('' !== $job->id);
+
             return new SerializedSuiteSerializedEvent(
                 md5((string) rand()),
                 $job->id,
@@ -145,6 +150,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($machineRepository instanceof MachineRepository);
 
         $job = $this->jobFactory->createRandom();
+        \assert('' !== $job->id);
+
         $machine = new Machine($job->id, 'up/active', 'active', false);
         $machineRepository->save($machine);
 
@@ -165,6 +172,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($machineRepository instanceof MachineRepository);
 
         $job = $this->jobFactory->createRandom();
+        \assert('' !== $job->id);
+
         $machine = new Machine($job->id, 'up/active', 'active', false);
         $machineRepository->save($machine);
 

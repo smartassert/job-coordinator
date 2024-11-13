@@ -144,6 +144,8 @@ class PreparationStateFactoryTest extends WebTestCase
                     MachineRepository $machineRepository,
                     WorkerComponentStateRepository $workerComponentStateRepository
                 ) {
+                    \assert('' !== $job->id);
+
                     $resultsJobRepository->save(
                         new ResultsJob($job->id, md5((string) rand()), md5((string) rand()), null)
                     );
@@ -185,6 +187,8 @@ class PreparationStateFactoryTest extends WebTestCase
                 ) use (
                     $resultsJobCreateType
                 ) {
+                    \assert('' !== $job->id);
+
                     $remoteRequestRepository->save(
                         new RemoteRequest($job->id, $resultsJobCreateType, 0)
                     );
@@ -209,6 +213,8 @@ class PreparationStateFactoryTest extends WebTestCase
                 ) use (
                     $resultsJobCreateType
                 ) {
+                    \assert('' !== $job->id);
+
                     $remoteRequestRepository->save(
                         (new RemoteRequest($job->id, $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
@@ -246,6 +252,8 @@ class PreparationStateFactoryTest extends WebTestCase
                     $resultsJobCreateType,
                     $serializedSuiteCreateType,
                 ) {
+                    \assert('' !== $job->id);
+
                     $remoteRequestRepository->save(
                         (new RemoteRequest($job->id, $resultsJobCreateType, 0))
                             ->setState(RequestState::FAILED)
