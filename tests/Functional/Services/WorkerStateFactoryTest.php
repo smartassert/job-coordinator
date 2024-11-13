@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
+use App\Model\JobInterface;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerState;
 use App\Repository\WorkerComponentStateRepository;
@@ -43,8 +43,8 @@ class WorkerStateFactoryTest extends WebTestCase
     }
 
     /**
-     * @param callable(Job, WorkerComponentStateRepository): void $componentStatesCreator
-     * @param callable(Job): WorkerState                          $expectedWorkerStateCreator
+     * @param callable(JobInterface, WorkerComponentStateRepository): void $componentStatesCreator
+     * @param callable(JobInterface): WorkerState                          $expectedWorkerStateCreator
      */
     #[DataProvider('createForJobDataProvider')]
     public function testCreateForJob(
@@ -81,7 +81,7 @@ class WorkerStateFactoryTest extends WebTestCase
                 },
             ],
             'application component state entity only' => [
-                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     \assert('' !== $job->getId());
 
                     $repository->save(
@@ -93,7 +93,7 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setIsEndState(false)
                     );
                 },
-                'expectedWorkerStateCreator' => function (Job $job) {
+                'expectedWorkerStateCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new WorkerState(
@@ -110,7 +110,7 @@ class WorkerStateFactoryTest extends WebTestCase
                 },
             ],
             'execution component state entity only' => [
-                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     \assert('' !== $job->getId());
 
                     $repository->save(
@@ -122,7 +122,7 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setIsEndState(false)
                     );
                 },
-                'expectedWorkerStateCreator' => function (Job $job) {
+                'expectedWorkerStateCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new WorkerState(
@@ -139,7 +139,7 @@ class WorkerStateFactoryTest extends WebTestCase
                 },
             ],
             'all component states' => [
-                'componentStatesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     \assert('' !== $job->getId());
 
                     $repository->save(
@@ -178,7 +178,7 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setIsEndState(false)
                     );
                 },
-                'expectedWorkerStateCreator' => function (Job $job) {
+                'expectedWorkerStateCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new WorkerState(

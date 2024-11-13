@@ -13,6 +13,7 @@ use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -75,7 +76,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
             ->shouldReceive('hasFailed')
-            ->with($job)
+            ->withArgs(function (JobInterface $passedJob) use ($job) {
+                self::assertSame($job->getId(), $passedJob->getId());
+
+                return true;
+            })
             ->andReturnTrue()
         ;
 
@@ -144,7 +149,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
             ->shouldReceive('hasFailed')
-            ->with($job)
+            ->withArgs(function (JobInterface $passedJob) use ($job) {
+                self::assertSame($job->getId(), $passedJob->getId());
+
+                return true;
+            })
             ->andReturnFalse()
         ;
 

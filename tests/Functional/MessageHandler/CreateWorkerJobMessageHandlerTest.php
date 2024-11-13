@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\RequestState;
@@ -14,6 +13,7 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -312,7 +312,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
     }
 
-    private function createJob(): Job
+    private function createJob(): JobInterface
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -320,7 +320,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return $jobFactory->createRandom();
     }
 
-    private function createResultsJob(Job $job): void
+    private function createResultsJob(JobInterface $job): void
     {
         \assert('' !== $job->getId());
 
@@ -335,7 +335,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
      * @param non-empty-string $state
      */
     private function createSerializedSuite(
-        Job $job,
+        JobInterface $job,
         string $state,
         bool $isPrepared,
         bool $hasEndState,

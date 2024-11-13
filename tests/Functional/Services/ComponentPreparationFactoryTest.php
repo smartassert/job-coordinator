@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
@@ -18,6 +17,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
+use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -64,14 +64,14 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
     /**
      * @param callable(
-     *   Job,
+     *   JobInterface,
      *   ResultsJobRepository,
      *   SerializedSuiteRepository,
      *   MachineRepository,
      *   WorkerComponentStateRepository,
      * ): void    $entityCreator
-     * @param callable(Job, RemoteRequestRepository): void $remoteRequestsCreator
-     * @param ComponentPreparation[]                       $expected
+     * @param callable(JobInterface, RemoteRequestRepository): void $remoteRequestsCreator
+     * @param ComponentPreparation[]                                $expected
      */
     #[DataProvider('getAllDataProvider')]
     public function testGetAll(
@@ -114,7 +114,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
     public static function getAllDataProvider(): array
     {
         $allEntitiesCreator = function (
-            Job $job,
+            JobInterface $job,
             ResultsJobRepository $resultsJobRepository,
             SerializedSuiteRepository $serializedSuiteRepository,
             MachineRepository $machineRepository,
@@ -214,7 +214,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $serializedSuiteCreateType
@@ -249,7 +249,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use ($machineCreateType) {
                     \assert('' !== $job->getId());
@@ -282,7 +282,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $workerJobCreateType
@@ -317,7 +317,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType
@@ -352,7 +352,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType
@@ -387,7 +387,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType,
@@ -422,7 +422,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType
@@ -457,7 +457,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {
                 },
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType
@@ -507,7 +507,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
             'has results job entity, has failed request for all components' => [
                 'entityCreator' => $allEntitiesCreator,
                 'remoteRequestsCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use (
                     $resultsCreateType,

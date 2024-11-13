@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\Job;
-use App\Repository\JobRepository;
+use App\Model\JobInterface;
+use App\Services\JobStore;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
@@ -70,11 +70,16 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
         return $suiteId;
     }
 
-    protected function getJob(): ?Job
+    protected function getJob(): ?JobInterface
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
-        return $jobRepository->find(self::$createResponseData['id'] ?? null);
+        $jobId = self::$createResponseData['id'];
+        if (!is_string($jobId)) {
+            return null;
+        }
+
+        return $jobStore->retrieve($jobId);
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\Job;
-use App\Repository\JobRepository;
+use App\Model\JobInterface;
+use App\Services\JobStore;
 use App\Tests\Application\AbstractApplicationTest;
 use App\Tests\Services\EntityRemover;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
@@ -33,8 +33,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
 
@@ -47,8 +47,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($createResponseData['id']));
         $jobId = $createResponseData['id'];
 
-        $job = $jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $job);
+        $job = $jobStore->retrieve($jobId);
+        self::assertInstanceOf(JobInterface::class, $job);
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
 
@@ -71,9 +71,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
-
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
         self::assertSame(200, $createResponse->getStatusCode());

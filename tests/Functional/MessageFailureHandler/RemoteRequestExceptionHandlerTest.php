@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageFailureHandler;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\JobComponent;
@@ -14,6 +13,7 @@ use App\Exception\RemoteJobActionException;
 use App\Exception\RemoteRequestExceptionInterface;
 use App\Message\CreateMachineMessage;
 use App\MessageFailureHandler\RemoteRequestExceptionHandler;
+use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -30,7 +30,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     use MockeryPHPUnitIntegration;
 
     private RemoteRequestExceptionHandler $handler;
-    private Job $job;
+    private JobInterface $job;
     private RemoteRequestRepository $remoteRequestRepository;
     private RemoteRequestFailureRepository $remoteRequestFailureRepository;
 
@@ -64,7 +64,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
     }
 
     /**
-     * @param callable(Job): RemoteRequestExceptionInterface $exceptionCreator
+     * @param callable(JobInterface): RemoteRequestExceptionInterface $exceptionCreator
      */
     #[DataProvider('handleSetRemoteRequestFailureDataProvider')]
     public function testHandleSetRemoteRequestFailure(
@@ -104,7 +104,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
         $remoteRequestExceptionCases = [
             RemoteJobActionException::class => [
                 'exceptionCreator' => function (\Throwable $inner) {
-                    return function (Job $job) use ($inner) {
+                    return function (JobInterface $job) use ($inner) {
                         \assert('' !== $job->getId());
 
                         return new RemoteJobActionException(

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
@@ -14,6 +13,7 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
@@ -49,8 +49,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(Job): ResultsJobRepository      $resultsJobRepositoryCreator
-     * @param callable(Job): SerializedSuiteRepository $serializedSuiteRepositoryCreator
+     * @param callable(JobInterface): ResultsJobRepository      $resultsJobRepositoryCreator
+     * @param callable(JobInterface): SerializedSuiteRepository $serializedSuiteRepositoryCreator
      */
     #[DataProvider('invokeNotYetHandleableDataProvider')]
     public function testInvokeNotYetHandleable(
@@ -100,7 +100,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         return [
             'no results job' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
@@ -110,7 +110,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
                     $serializedSuiteRepository
                         ->shouldReceive('find')
@@ -122,7 +122,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'no serialized suite' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
@@ -132,7 +132,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
                     $serializedSuiteRepository
                         ->shouldReceive('find')
@@ -144,7 +144,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'serialized suite not prepared' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
@@ -154,7 +154,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     $serializedSuiteId = (string) new Ulid();

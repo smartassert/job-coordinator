@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\Job;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetup
@@ -23,7 +23,7 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
 
     public function testJobIsCreated(): void
     {
-        self::assertInstanceOf(Job::class, $this->getJob());
+        self::assertInstanceOf(JobInterface::class, $this->getJob());
     }
 
     public function testJobUser(): void

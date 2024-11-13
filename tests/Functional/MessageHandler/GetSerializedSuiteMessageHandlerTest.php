@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Entity\SerializedSuite;
 use App\Enum\RequestState;
@@ -15,6 +14,7 @@ use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -258,7 +258,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         return GetSerializedSuiteMessage::class;
     }
 
-    private function createJob(): Job
+    private function createJob(): JobInterface
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -270,7 +270,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
      * @param non-empty-string $state
      */
     private function createSerializedSuite(
-        Job $job,
+        JobInterface $job,
         string $state,
         bool $isPrepared,
         bool $hasEndState
