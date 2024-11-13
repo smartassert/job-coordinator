@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Enum\JobComponent;
 use App\Model\ComponentPreparation;
+use App\Model\JobInterface;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
 readonly class ComponentPreparationFactory
@@ -22,7 +22,7 @@ readonly class ComponentPreparationFactory
     /**
      * @return array<value-of<JobComponent>, ComponentPreparation>
      */
-    public function getAll(Job $job): array
+    public function getAll(JobInterface $job): array
     {
         $componentPreparations = [];
 

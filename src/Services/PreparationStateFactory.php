@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\JobComponent;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
+use App\Model\JobInterface;
 
 /**
  * @phpstan-type SerializedPreparationState array{
@@ -29,7 +29,7 @@ class PreparationStateFactory
     /**
      * @return SerializedPreparationState
      */
-    public function create(Job $job): array
+    public function create(JobInterface $job): array
     {
         $componentPreparationStates = $this->componentPreparationFactory->getAll($job);
 

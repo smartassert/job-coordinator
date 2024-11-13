@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Enum\JobComponent;
 use App\Enum\RequestState;
+use App\Model\JobInterface;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
 class RequestStatesFactory
@@ -22,7 +22,7 @@ class RequestStatesFactory
     /**
      * @return array<value-of<JobComponent>, RequestState>
      */
-    public function create(Job $job): array
+    public function create(JobInterface $job): array
     {
         $requestStates = [];
 
