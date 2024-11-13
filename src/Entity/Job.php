@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Ulid;
@@ -19,7 +20,7 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-readonly class Job implements \JsonSerializable
+readonly class Job implements JobInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]

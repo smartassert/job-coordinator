@@ -14,7 +14,7 @@ use Symfony\Component\Uid\Ulid;
  *   created_at: positive-int
  *  }
  */
-readonly class Job implements \JsonSerializable
+readonly class Job implements JobInterface
 {
     /**
      * @param non-empty-string $id
