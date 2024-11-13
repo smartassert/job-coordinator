@@ -49,6 +49,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $handler = self::getContainer()->get(GetSerializedSuiteMessageHandler::class);
         \assert($handler instanceof GetSerializedSuiteMessageHandler);
@@ -87,6 +88,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteStateIsEndState(): void
     {
         $job = $this->createJob();
+        \assert('' !== $job->id);
+
         $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
         $serializedSuiteId = $serializedSuite->getId();
         \assert(null !== $serializedSuiteId);
@@ -144,6 +147,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
         $job = $this->createJob();
+        \assert('' !== $job->id);
+
         $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
         $serializedSuiteId = $serializedSuite->getId();
         \assert(null !== $serializedSuiteId);
@@ -189,6 +194,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotEndState(): void
     {
         $job = $this->createJob();
+        \assert('' !== $job->id);
+
         $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
         $serializedSuiteId = $serializedSuite->getId();
         \assert(null !== $serializedSuiteId);
@@ -272,6 +279,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         bool $isPrepared,
         bool $hasEndState
     ): SerializedSuite {
+        \assert('' !== $job->id);
+
         $serializedSuite = new SerializedSuite($job->id, md5((string) rand()), $state, $isPrepared, $hasEndState);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);

@@ -45,6 +45,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
@@ -71,6 +72,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());

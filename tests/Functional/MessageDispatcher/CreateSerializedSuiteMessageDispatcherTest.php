@@ -44,6 +44,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $authenticationToken = md5((string) rand());
         $parameters = [
@@ -74,6 +75,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
         \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);

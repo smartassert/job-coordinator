@@ -76,6 +76,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         $authenticationToken = md5((string) rand());
 

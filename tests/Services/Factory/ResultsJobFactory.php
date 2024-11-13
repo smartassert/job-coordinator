@@ -21,6 +21,8 @@ readonly class ResultsJobFactory
      */
     public function create(Job $job, ?string $state = null, ?string $endState = null): ResultsJob
     {
+        \assert('' !== $job->id);
+
         $token = md5((string) rand());
         \assert('' !== $token);
 

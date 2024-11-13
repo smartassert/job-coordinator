@@ -98,6 +98,7 @@ class ResultsJobFactoryTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         self::assertSame(0, $this->resultsJobRepository->count([]));
 

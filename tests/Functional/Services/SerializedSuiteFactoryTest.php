@@ -104,6 +104,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+        \assert('' !== $job->id);
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
 
