@@ -94,22 +94,12 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
 
     public function setRemoteRequestStateForMessageNotYetHandleableEvent(MessageNotYetHandleableEvent $event): void
     {
-        $message = $event->message;
-        if (!$message instanceof JobRemoteRequestMessageInterface) {
-            return;
-        }
-
-        $this->setRemoteRequestForMessage($message, RequestState::HALTED);
+        $this->setRemoteRequestForMessage($event->message, RequestState::HALTED);
     }
 
     public function setRemoteRequestStateForMessageNotHandleableEvent(MessageNotHandleableEvent $event): void
     {
-        $message = $event->message;
-        if (!$message instanceof JobRemoteRequestMessageInterface) {
-            return;
-        }
-
-        $this->setRemoteRequestForMessage($message, RequestState::ABORTED);
+        $this->setRemoteRequestForMessage($event->message, RequestState::ABORTED);
     }
 
     private function setRemoteRequestForMessage(
