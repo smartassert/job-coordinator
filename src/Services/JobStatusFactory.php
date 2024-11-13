@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
+use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\RemoteRequestCollection;
 use App\Repository\MachineRepository;
@@ -24,7 +24,7 @@ readonly class JobStatusFactory
     ) {
     }
 
-    public function create(Job $job): JobStatus
+    public function create(JobInterface $job): JobStatus
     {
         return new JobStatus(
             $job,
