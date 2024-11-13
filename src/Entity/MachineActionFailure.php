@@ -10,9 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
 class MachineActionFailure implements \JsonSerializable
 {
-    /**
-     * @var non-empty-string
-     */
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $id;
