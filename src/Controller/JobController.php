@@ -9,18 +9,19 @@ use App\Event\JobCreatedEvent;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\JobStatusFactory;
+use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Uid\Ulid;
 
 readonly class JobController
 {
     public function __construct(
         private JobRepository $jobRepository,
         private JobStatusFactory $jobStatusFactory,
+        private JobStore $jobStore,
     ) {
     }
 
@@ -30,18 +31,22 @@ readonly class JobController
         User $user,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-        $jobId = $this->generateId();
-
-        $job = new Job(
-            $jobId,
+        $jobModel = $this->jobStore->create(
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds
         );
 
-        $this->jobRepository->add($job);
+        $job = new Job(
+            $jobModel->getId(),
+            $jobModel->getUserId(),
+            $jobModel->getSuiteId(),
+            $jobModel->getMaximumDurationInSeconds(),
+        );
 
-        $eventDispatcher->dispatch(new JobCreatedEvent($user->getSecurityToken(), $jobId, $request->parameters));
+        $eventDispatcher->dispatch(
+            new JobCreatedEvent($user->getSecurityToken(), $jobModel->getId(), $request->parameters)
+        );
 
         return new JsonResponse($this->jobStatusFactory->create($job));
     }
@@ -64,19 +69,5 @@ readonly class JobController
                 'id' => 'DESC',
             ]
         ));
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function generateId(): string
-    {
-        $id = (string) new Ulid();
-
-        while ('' === $id) {
-            $id = (string) new Ulid();
-        }
-
-        return $id;
     }
 }
