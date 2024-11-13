@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Job;
 use App\Event\JobCreatedEvent;
+use App\Model\Job;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\JobStatusFactory;
@@ -31,21 +31,14 @@ readonly class JobController
         User $user,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-        $jobModel = $this->jobStore->create(
+        $job = $this->jobStore->create(
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds
         );
 
-        $job = new Job(
-            $jobModel->getId(),
-            $jobModel->getUserId(),
-            $jobModel->getSuiteId(),
-            $jobModel->getMaximumDurationInSeconds(),
-        );
-
         $eventDispatcher->dispatch(
-            new JobCreatedEvent($user->getSecurityToken(), $jobModel->getId(), $request->parameters)
+            new JobCreatedEvent($user->getSecurityToken(), $job->getId(), $request->parameters)
         );
 
         return new JsonResponse($this->jobStatusFactory->create($job));
