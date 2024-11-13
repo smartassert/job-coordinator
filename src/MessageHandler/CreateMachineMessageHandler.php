@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
@@ -52,11 +51,10 @@ final readonly class CreateMachineMessageHandler
         }
 
         $serializedSuite = $this->serializedSuiteRepository->find($jobId);
-
         if (
             !$this->resultsJobRepository->has($jobId)
             || null === $serializedSuite
-            || ($serializedSuite instanceof SerializedSuite && !$serializedSuite->isPrepared())
+            || !$serializedSuite->isPrepared()
         ) {
             $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
 
