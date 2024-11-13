@@ -21,15 +21,15 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
 readonly class Job implements \JsonSerializable
 {
-    #[ORM\Column(length: 32)]
-    public string $userId;
-
-    #[ORM\Column(length: 32)]
-    private string $suiteId;
-
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $id;
+
+    #[ORM\Column(length: 32)]
+    private string $userId;
+
+    #[ORM\Column(length: 32)]
+    private string $suiteId;
 
     #[ORM\Column]
     private int $maximumDurationInSeconds;
@@ -51,6 +51,11 @@ readonly class Job implements \JsonSerializable
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getUserId(): string
+    {
+        return $this->userId;
     }
 
     public function getSuiteId(): string

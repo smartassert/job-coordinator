@@ -42,7 +42,7 @@ readonly class JobResolver implements ValueResolverInterface
             throw new AccessDeniedException();
         }
 
-        if ($job->userId !== $user->getUserIdentifier()) {
+        if ($job->getUserId() !== $user->getUserIdentifier()) {
             throw new AccessDeniedException();
         }
 
