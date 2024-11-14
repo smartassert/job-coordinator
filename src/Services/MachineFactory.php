@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
-use App\Model\JobInterface;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -33,7 +32,7 @@ class MachineFactory implements EventSubscriberInterface
     public function createOnMachineCreationRequestedEvent(MachineCreationRequestedEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
-        if (!$job instanceof JobInterface) {
+        if (null === $job) {
             return;
         }
 
