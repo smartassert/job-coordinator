@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
-use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -136,43 +137,47 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchMachineAlreadyExists(): void
+    public function testDispatchNotReady(): void
     {
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $readinessAssessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $readinessAssessor
+            ->shouldReceive('isReady')
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $job = $this->jobFactory->createRandom();
+        $dispatcher = $this->createDispatcher($readinessAssessor);
 
-        $machine = new Machine($job->getId(), 'up/active', 'active', false, false);
-        $machineRepository->save($machine);
+        $event = new SerializedSuiteSerializedEvent('api token', 'job id', 'serialized suite id');
 
-        $event = new ResultsJobCreatedEvent(
-            'api token',
-            $job->getId(),
-            ResultsClientJobFactory::createRandom()
-        );
-
-        $this->dispatcher->dispatch($event);
+        $dispatcher->dispatch($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }
 
-    public function testReDispatchMachineAlreadyExists(): void
+    public function testReDispatchNotReady(): void
     {
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $readinessAssessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $readinessAssessor
+            ->shouldReceive('isReady')
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $job = $this->jobFactory->createRandom();
+        $dispatcher = $this->createDispatcher($readinessAssessor);
 
-        $machine = new Machine($job->getId(), 'up/active', 'active', false, false);
-        $machineRepository->save($machine);
-
-        $message = new CreateMachineMessage('api token', $job->getId());
+        $message = new CreateMachineMessage('api token', 'job id');
         $event = new MessageNotYetHandleableEvent($message);
 
-        $this->dispatcher->reDispatch($event);
+        $dispatcher->reDispatch($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
+    }
+
+    private function createDispatcher(CreateMachineReadinessAssessor $readinessAssessor): CreateMachineMessageDispatcher
+    {
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        return new CreateMachineMessageDispatcher($messageDispatcher, $readinessAssessor);
     }
 
     /**
