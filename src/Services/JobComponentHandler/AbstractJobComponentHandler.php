@@ -46,7 +46,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job,
+            $job->getId(),
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 
@@ -60,7 +60,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job,
+            $job->getId(),
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 
@@ -80,7 +80,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     private function deriveFromRemoteRequests(JobInterface $job, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job,
+            $job->getId(),
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 

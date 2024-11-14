@@ -41,8 +41,8 @@ class JobRemoteRequestMessageDispatcher
 
             $type = $message->getRemoteRequestType();
 
-            $latestRemoteRequest = $this->remoteRequestRepository->findNewest($job, $type);
-            $hasSuccessfulRequest = $this->remoteRequestRepository->hasSuccessful($job, $type);
+            $latestRemoteRequest = $this->remoteRequestRepository->findNewest($job->getId(), $type);
+            $hasSuccessfulRequest = $this->remoteRequestRepository->hasSuccessful($job->getId(), $type);
             $latestRemoteRequestHasDisallowedState =
                 $latestRemoteRequest instanceof RemoteRequest
                 && in_array($latestRemoteRequest->getState(), [RequestState::REQUESTING, RequestState::PENDING]);

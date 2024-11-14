@@ -7,7 +7,6 @@ namespace App\Repository;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Enum\RequestState;
-use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -95,11 +94,11 @@ class RemoteRequestRepository extends ServiceEntityRepository
         return $result > 0;
     }
 
-    public function findNewest(JobInterface $job, RemoteRequestType $type): ?RemoteRequest
+    public function findNewest(string $jobId, RemoteRequestType $type): ?RemoteRequest
     {
         return $this->findOneBy(
             [
-                'jobId' => $job->getId(),
+                'jobId' => $jobId,
                 'type' => $type,
             ],
             [
@@ -108,10 +107,10 @@ class RemoteRequestRepository extends ServiceEntityRepository
         );
     }
 
-    public function hasSuccessful(JobInterface $job, RemoteRequestType $type): bool
+    public function hasSuccessful(string $jobId, RemoteRequestType $type): bool
     {
         $criteria = [
-            'jobId' => $job->getId(),
+            'jobId' => $jobId,
             'type' => $type,
             'state' => RequestState::SUCCEEDED,
         ];
