@@ -45,7 +45,7 @@ final class GetMachineMessageHandler
                 $machine
             ));
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($job, $e, $message);
+            throw new RemoteJobActionException($message->getJobId(), $e, $message);
         }
     }
 }
