@@ -47,7 +47,7 @@ final readonly class GetResultsJobStateMessageHandler
         }
 
         if (
-            true === $this->jobPreparationInspector->hasFailed($job)
+            true === $this->jobPreparationInspector->hasFailed($job->getId())
             || $resultsJob->hasEndState()
         ) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));

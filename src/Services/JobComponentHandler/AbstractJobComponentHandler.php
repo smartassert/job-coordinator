@@ -9,7 +9,6 @@ use App\Enum\PreparationState;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
-use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
@@ -22,45 +21,45 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     ) {
     }
 
-    public function getComponentPreparation(JobComponent $jobComponent, JobInterface $job): ?ComponentPreparation
+    public function getComponentPreparation(JobComponent $jobComponent, string $jobId): ?ComponentPreparation
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
             return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($job, $jobComponent);
+        return $this->deriveFromRemoteRequests($jobId, $jobComponent);
     }
 
-    public function getRequestState(JobComponent $jobComponent, JobInterface $job): ?RequestState
+    public function getRequestState(JobComponent $jobComponent, string $jobId): ?RequestState
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
             return RequestState::SUCCEEDED;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job->getId(),
+            $jobId,
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 
         return $remoteRequest?->getState();
     }
 
-    public function hasFailed(JobComponent $jobComponent, JobInterface $job): ?bool
+    public function hasFailed(JobComponent $jobComponent, string $jobId): ?bool
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job->getId(),
+            $jobId,
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 
@@ -77,10 +76,10 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
 
     abstract protected function getJobComponent(): JobComponent;
 
-    private function deriveFromRemoteRequests(JobInterface $job, JobComponent $jobComponent): ComponentPreparation
+    private function deriveFromRemoteRequests(string $jobId, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job->getId(),
+            $jobId,
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 
