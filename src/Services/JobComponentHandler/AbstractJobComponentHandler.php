@@ -53,14 +53,14 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         return $remoteRequest?->getState();
     }
 
-    public function hasFailed(JobComponent $jobComponent, JobInterface $job): ?bool
+    public function hasFailed(JobComponent $jobComponent, string $jobId): ?bool
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $job->getId(),
+            $jobId,
             new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
         );
 

@@ -15,5 +15,5 @@ interface JobComponentHandlerInterface
 
     public function getRequestState(JobComponent $jobComponent, JobInterface $job): ?RequestState;
 
-    public function hasFailed(JobComponent $jobComponent, JobInterface $job): ?bool;
+    public function hasFailed(JobComponent $jobComponent, string $jobId): ?bool;
 }
