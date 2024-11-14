@@ -72,7 +72,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $authenticationToken = md5((string) rand());
 
         $serializedSuiteId = md5((string) rand());
-        $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId);
+        $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $job->getSuiteId());
 
         $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuite);
 

@@ -10,12 +10,15 @@ class SourcesClientSerializedSuiteFactory
 {
     /**
      * @param non-empty-string $serializedSuiteId
+     * @param non-empty-string $suiteId
      */
-    public static function create(string $serializedSuiteId): SerializedSuite
-    {
+    public static function create(
+        string $serializedSuiteId,
+        string $suiteId,
+    ): SerializedSuite {
         return new SerializedSuite(
             $serializedSuiteId,
-            md5((string) rand()),
+            $suiteId,
             [],
             'requested',
             false,
