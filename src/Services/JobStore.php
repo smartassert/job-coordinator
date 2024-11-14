@@ -24,24 +24,7 @@ readonly class JobStore
             return null;
         }
 
-        if ('' === $entity->getId()) {
-            return null;
-        }
-
-        if ('' === $entity->getUserId()) {
-            return null;
-        }
-
-        if ('' === $entity->getSuiteId()) {
-            return null;
-        }
-
-        return new Job(
-            $entity->getId(),
-            $entity->getUserId(),
-            $entity->getSuiteId(),
-            $entity->getMaximumDurationInSeconds(),
-        );
+        return $this->hydrateFromJobEntity($entity);
     }
 
     /**
@@ -84,24 +67,23 @@ readonly class JobStore
 
     private function hydrateFromJobEntity(JobEntity $entity): ?Job
     {
-        if ('' === $entity->getId()) {
+        if ('' === $entity->id) {
             return null;
         }
 
-        if ('' === $entity->getUserId()) {
+        if ('' === $entity->userId) {
             return null;
         }
 
-        if ('' === $entity->getSuiteId()) {
+        if ('' === $entity->suiteId) {
             return null;
         }
 
-        return new Job(
-            $entity->getId(),
-            $entity->getUserId(),
-            $entity->getSuiteId(),
-            $entity->getMaximumDurationInSeconds(),
-        );
+        if ($entity->maximumDurationInSeconds < 1) {
+            return null;
+        }
+
+        return new Job($entity->id, $entity->userId, $entity->suiteId, $entity->maximumDurationInSeconds);
     }
 
     /**

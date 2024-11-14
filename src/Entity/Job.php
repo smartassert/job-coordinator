@@ -14,16 +14,16 @@ readonly class Job
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
-    private string $id;
+    public string $id;
 
     #[ORM\Column(length: 32)]
-    private string $userId;
+    public string $userId;
 
     #[ORM\Column(length: 32)]
-    private string $suiteId;
+    public string $suiteId;
 
     #[ORM\Column]
-    private int $maximumDurationInSeconds;
+    public int $maximumDurationInSeconds;
 
     /**
      * @param non-empty-string $id
@@ -37,28 +37,5 @@ readonly class Job
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getUserId(): string
-    {
-        return $this->userId;
-    }
-
-    public function getSuiteId(): string
-    {
-        return $this->suiteId;
-    }
-
-    /**
-     * @return positive-int
-     */
-    public function getMaximumDurationInSeconds(): int
-    {
-        return max($this->maximumDurationInSeconds, 1);
     }
 }

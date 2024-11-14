@@ -108,7 +108,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $filteredJobs = [];
         foreach ($jobs as $job) {
-            if (in_array($job->getId(), $createdJobIds)) {
+            if (in_array($job->id, $createdJobIds)) {
                 $filteredJobs[] = $job;
             }
         }
@@ -167,7 +167,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                 },
                 'expectedCreator' => function (array $jobs, JobStore $jobStore) {
                     $serializedJobs = [];
-                    $job = $jobStore->retrieve($jobs[0]->getId());
+                    $job = $jobStore->retrieve($jobs[0]->id);
                     if (null !== $job) {
                         $serializedJobs[] = $job->toArray();
                     }
@@ -205,7 +205,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                 'expectedCreator' => function (array $jobs, JobStore $jobStore) {
                     $serializedJobs = [];
                     foreach ([$jobs[2], $jobs[0]] as $jobEntity) {
-                        $job = $jobStore->retrieve($jobEntity->getId());
+                        $job = $jobStore->retrieve($jobEntity->id);
                         if (null !== $job) {
                             $serializedJobs[] = $job->toArray();
                         }
@@ -243,7 +243,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                 },
                 'expectedCreator' => function (array $jobs, JobStore $jobStore) {
                     $serializedJobs = [];
-                    $job = $jobStore->retrieve($jobs[1]->getId());
+                    $job = $jobStore->retrieve($jobs[1]->id);
                     if (null !== $job) {
                         $serializedJobs[] = $job->toArray();
                     }
@@ -286,7 +286,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                 'expectedCreator' => function (array $jobs, JobStore $jobStore) {
                     $serializedJobs = [];
                     foreach ([$jobs[3], $jobs[0]] as $jobEntity) {
-                        $job = $jobStore->retrieve($jobEntity->getId());
+                        $job = $jobStore->retrieve($jobEntity->id);
                         if (null !== $job) {
                             $serializedJobs[] = $job->toArray();
                         }
