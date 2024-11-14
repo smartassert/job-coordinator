@@ -53,7 +53,7 @@ readonly class JobController
     #[Route('/{suiteId<[A-Z90-9]{26}>}/list', name: 'job_list', methods: ['GET'])]
     public function list(User $user, string $suiteId): Response
     {
-        return new JsonResponse($this->jobRepository->findBy(
+        $jobEntities = $this->jobRepository->findBy(
             [
                 'userId' => $user->getUserIdentifier(),
                 'suiteId' => $suiteId,
@@ -61,6 +61,8 @@ readonly class JobController
             [
                 'id' => 'DESC',
             ]
-        ));
+        );
+
+        return new JsonResponse($this->jobStore->hydrateFromJobEntities($jobEntities));
     }
 }

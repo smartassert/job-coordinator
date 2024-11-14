@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\Job as JobEntity;
 use App\Model\Job;
 use App\Repository\JobRepository;
 use Symfony\Component\Uid\Ulid;
@@ -43,6 +44,25 @@ readonly class JobStore
     }
 
     /**
+     * @param JobEntity[] $jobEntities
+     *
+     * @return Job[]
+     */
+    public function hydrateFromJobEntities(array $jobEntities): array
+    {
+        $jobs = [];
+
+        foreach ($jobEntities as $entity) {
+            $job = $this->hydrateFromJobEntity($entity);
+            if (null !== $job) {
+                $jobs[] = $job;
+            }
+        }
+
+        return $jobs;
+    }
+
+    /**
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
@@ -59,6 +79,28 @@ readonly class JobStore
         $this->jobRepository->store($job);
 
         return $job;
+    }
+
+    private function hydrateFromJobEntity(JobEntity $entity): ?Job
+    {
+        if ('' === $entity->getId()) {
+            return null;
+        }
+
+        if ('' === $entity->getUserId()) {
+            return null;
+        }
+
+        if ('' === $entity->getSuiteId()) {
+            return null;
+        }
+
+        return new Job(
+            $entity->getId(),
+            $entity->getUserId(),
+            $entity->getSuiteId(),
+            $entity->getMaximumDurationInSeconds(),
+        );
     }
 
     /**
