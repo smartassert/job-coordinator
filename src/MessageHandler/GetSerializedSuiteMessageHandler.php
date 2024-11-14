@@ -11,7 +11,6 @@ use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,7 +19,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class GetSerializedSuiteMessageHandler
 {
     public function __construct(
-        private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -34,12 +32,7 @@ final class GetSerializedSuiteMessageHandler
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
-        $job = $this->jobStore->retrieve($message->getJobId());
-        if (null === $job) {
-            throw new MessageHandlerJobNotFoundException($message);
-        }
-
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->getId());
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($message->getJobId());
         if (null === $serializedSuiteEntity) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
@@ -60,7 +53,7 @@ final class GetSerializedSuiteMessageHandler
 
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
                 $message->authenticationToken,
-                $job->getId(),
+                $message->getJobId(),
                 $serializedSuiteModel
             ));
         } catch (\Throwable $e) {

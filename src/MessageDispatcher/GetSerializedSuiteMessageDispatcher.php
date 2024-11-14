@@ -37,6 +37,7 @@ class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
         $this->messageDispatcher->dispatchWithNonDelayedStamp(new GetSerializedSuiteMessage(
             $event->getAuthenticationToken(),
             $event->getJobId(),
+            $event->serializedSuite->getSuiteId(),
             $event->serializedSuite->getId()
         ));
     }
