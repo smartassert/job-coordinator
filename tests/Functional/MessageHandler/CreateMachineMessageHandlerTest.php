@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
@@ -14,10 +13,11 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
-use App\Repository\JobRepository;
+use App\Model\JobInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -49,8 +49,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(Job): ResultsJobRepository      $resultsJobRepositoryCreator
-     * @param callable(Job): SerializedSuiteRepository $serializedSuiteRepositoryCreator
+     * @param callable(JobInterface): ResultsJobRepository      $resultsJobRepositoryCreator
+     * @param callable(JobInterface): SerializedSuiteRepository $serializedSuiteRepositoryCreator
      */
     #[DataProvider('invokeNotYetHandleableDataProvider')]
     public function testInvokeNotYetHandleable(
@@ -60,7 +60,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -79,7 +78,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $machineRepository,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $job->id);
+        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
@@ -100,21 +99,21 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         return [
             'no results job' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturnFalse()
                     ;
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
                     $serializedSuiteRepository
                         ->shouldReceive('find')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturnNull()
                     ;
 
@@ -122,21 +121,21 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'no serialized suite' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturnTrue()
                     ;
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
                     $serializedSuiteRepository
                         ->shouldReceive('find')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturnNull()
                     ;
 
@@ -144,24 +143,22 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 },
             ],
             'serialized suite not prepared' => [
-                'resultsJobRepositoryCreator' => function (Job $job) {
+                'resultsJobRepositoryCreator' => function (JobInterface $job) {
                     $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
                     $resultsJobRepository
                         ->shouldReceive('has')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturnTrue()
                     ;
 
                     return $resultsJobRepository;
                 },
-                'serializedSuiteRepositoryCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'serializedSuiteRepositoryCreator' => function (JobInterface $job) {
                     $serializedSuiteId = (string) new Ulid();
                     \assert('' !== $serializedSuiteId);
 
                     $serializedSuite = new SerializedSuite(
-                        $job->id,
+                        $job->getId(),
                         $serializedSuiteId,
                         'preparing',
                         false,
@@ -171,7 +168,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
                     $serializedSuiteRepository
                         ->shouldReceive('find')
-                        ->with($job->id)
+                        ->with($job->getId())
                         ->andReturn($serializedSuite)
                     ;
 
@@ -186,7 +183,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -195,7 +191,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $machineRepository = \Mockery::mock(MachineRepository::class);
         $machineRepository
             ->shouldReceive('has')
-            ->with($job->id)
+            ->with($job->getId())
             ->andReturnTrue()
         ;
 
@@ -212,7 +208,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $machineRepository,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $job->id);
+        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
@@ -237,7 +233,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -261,7 +256,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $machineRepository,
         );
 
-        $message = new CreateMachineMessage(self::$apiToken, $job->id);
+        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -277,7 +272,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -297,7 +291,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($machineRepository instanceof MachineRepository);
 
         $machine = MachineFactory::create(
-            $job->id,
+            $job->getId(),
             'create/requested',
             'pre_active',
             [],
@@ -321,13 +315,13 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        self::assertNull($machineRepository->find($job->id));
+        self::assertNull($machineRepository->find($job->getId()));
 
-        $handler(new CreateMachineMessage(self::$apiToken, $job->id));
+        $handler(new CreateMachineMessage(self::$apiToken, $job->getId()));
 
-        $createdMachine = $machineRepository->find($job->id);
+        $createdMachine = $machineRepository->find($job->getId());
         self::assertEquals(
-            new Machine($job->id, 'create/requested', 'pre_active', false),
+            new Machine($job->getId(), 'create/requested', 'pre_active', false),
             $createdMachine
         );
 
@@ -356,8 +350,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         WorkerManagerClient $workerManagerClient,
         MachineRepository $machineRepository,
     ): CreateMachineMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -366,7 +360,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateMachineMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $serializedSuiteRepository,
             $workerManagerClient,

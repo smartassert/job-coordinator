@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ResultsJobMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly ResultsJobRepository $resultsJobRepository,
     ) {
     }
@@ -33,12 +31,12 @@ class ResultsJobMutator implements EventSubscriberInterface
 
     public function setState(ResultsJobStateRetrievedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $resultsJob = $this->resultsJobRepository->find($job->id);
+        $resultsJob = $this->resultsJobRepository->find($job->getId());
         if (!$resultsJob instanceof ResultsJob) {
             return;
         }

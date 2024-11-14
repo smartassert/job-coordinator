@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SerializedSuiteFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
@@ -33,15 +31,15 @@ class SerializedSuiteFactory implements EventSubscriberInterface
 
     public function createOnSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($event->getJobId());
+        $serializedSuite = $this->serializedSuiteRepository->find($job->getId());
         if (null === $serializedSuite) {
             $serializedSuite = new SerializedSuite(
-                $event->getJobId(),
+                $job->getId(),
                 $event->serializedSuite->getId(),
                 $event->serializedSuite->getState(),
                 $event->serializedSuite->isPrepared(),

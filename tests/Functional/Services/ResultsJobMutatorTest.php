@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
 use App\Tests\Services\Factory\JobFactory;
@@ -74,10 +74,10 @@ class ResultsJobMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?Job                    $jobCreator
-     * @param callable(?Job, ResultsJobRepository): void    $resultsJobCreator
-     * @param callable(?Job): ResultsJobStateRetrievedEvent $eventCreator
-     * @param callable(?Job): ?ResultsJob                   $expectedResultsJobCreator
+     * @param callable(JobFactory): ?JobInterface                    $jobCreator
+     * @param callable(?JobInterface, ResultsJobRepository): void    $resultsJobCreator
+     * @param callable(?JobInterface): ResultsJobStateRetrievedEvent $eventCreator
+     * @param callable(?JobInterface): ?ResultsJob                   $expectedResultsJobCreator
      */
     #[DataProvider('setStateSuccessDataProvider')]
     public function testSetStateSuccess(
@@ -95,7 +95,7 @@ class ResultsJobMutatorTest extends WebTestCase
 
         $resultsJob = null === $job
             ? null
-            : $this->resultsJobRepository->find($job->id);
+            : $this->resultsJobRepository->find($job->getId());
 
         self::assertEquals($expectedResultsJobCreator($job), $resultsJob);
     }
@@ -135,12 +135,10 @@ class ResultsJobMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function () {
                 },
-                'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('awaiting-events', null),
                     );
                 },
@@ -151,57 +149,45 @@ class ResultsJobMutatorTest extends WebTestCase
             'no state change' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     ResultsJobRepository $resultsJobRepository
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->id);
-
-                    $resultsJob = new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                    $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
-                'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('awaiting-events', null),
                     );
                 },
-                'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
-                    \assert('' !== $job->id);
-
-                    return new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
+                    return new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                 },
             ],
             'has state change' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     ResultsJobRepository $resultsJobRepository
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->id);
-
-                    $resultsJob = new ResultsJob($job->id, $resultsJobToken, 'awaiting-events', null);
+                    $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
-                'eventCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
-                        $job->id,
+                        $job->getId(),
                         new ResultsJobState('complete', 'ended'),
                     );
                 },
-                'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
-                    \assert('' !== $job->id);
-
-                    return new ResultsJob($job->id, $resultsJobToken, 'complete', 'ended');
+                'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
+                    return new ResultsJob($job->getId(), $resultsJobToken, 'complete', 'ended');
                 },
             ],
         ];

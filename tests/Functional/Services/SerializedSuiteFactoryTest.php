@@ -97,7 +97,6 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
 
@@ -116,13 +115,13 @@ class SerializedSuiteFactoryTest extends WebTestCase
             null
         );
 
-        $event = new SerializedSuiteCreatedEvent('authentication token', $job->id, $sourcesSerializedSuite);
+        $event = new SerializedSuiteCreatedEvent('authentication token', $job->getId(), $sourcesSerializedSuite);
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);
 
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->id);
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->getId());
         self::assertEquals(
-            new SerializedSuite($job->id, $serializedSuiteId, $serializedSuiteState, false, false),
+            new SerializedSuite($job->getId(), $serializedSuiteId, $serializedSuiteState, false, false),
             $serializedSuiteEntity
         );
     }

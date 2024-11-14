@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\JobComponentHandler;
 
-use App\Entity\Job;
 use App\Enum\JobComponent;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
+use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
@@ -22,26 +22,26 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     ) {
     }
 
-    public function getComponentPreparation(JobComponent $jobComponent, Job $job): ?ComponentPreparation
+    public function getComponentPreparation(JobComponent $jobComponent, JobInterface $job): ?ComponentPreparation
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
             return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
         }
 
         return $this->deriveFromRemoteRequests($job, $jobComponent);
     }
 
-    public function getRequestState(JobComponent $jobComponent, Job $job): ?RequestState
+    public function getRequestState(JobComponent $jobComponent, JobInterface $job): ?RequestState
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
         }
 
-        if ($this->entityRepository->count(['jobId' => $job->id]) > 0) {
+        if ($this->entityRepository->count(['jobId' => $job->getId()]) > 0) {
             return RequestState::SUCCEEDED;
         }
 
@@ -53,7 +53,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         return $remoteRequest?->getState();
     }
 
-    public function hasFailed(JobComponent $jobComponent, Job $job): ?bool
+    public function hasFailed(JobComponent $jobComponent, JobInterface $job): ?bool
     {
         if ($this->getJobComponent() !== $jobComponent) {
             return null;
@@ -77,7 +77,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
 
     abstract protected function getJobComponent(): JobComponent;
 
-    private function deriveFromRemoteRequests(Job $job, JobComponent $jobComponent): ComponentPreparation
+    private function deriveFromRemoteRequests(JobInterface $job, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $job,

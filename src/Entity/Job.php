@@ -6,20 +6,11 @@ namespace App\Entity;
 
 use App\Repository\JobRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Uid\Ulid;
 
-/**
- * @phpstan-type SerializedJob array{
- *   id: ?non-empty-string,
- *   suite_id: ?non-empty-string,
- *   maximum_duration_in_seconds: positive-int,
- *   created_at: positive-int
- *  }
- */
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 #[ORM\Index(name: 'user_idx', columns: ['user_id'])]
 #[ORM\Index(name: 'user_suite_idx', columns: ['user_id', 'suite_id'])]
-readonly class Job implements \JsonSerializable
+readonly class Job
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -32,7 +23,7 @@ readonly class Job implements \JsonSerializable
     public string $suiteId;
 
     #[ORM\Column]
-    private int $maximumDurationInSeconds;
+    public int $maximumDurationInSeconds;
 
     /**
      * @param non-empty-string $id
@@ -46,41 +37,5 @@ readonly class Job implements \JsonSerializable
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-    }
-
-    /**
-     * @return positive-int
-     */
-    public function getMaximumDurationInSeconds(): int
-    {
-        return max($this->maximumDurationInSeconds, 1);
-    }
-
-    /**
-     * @return SerializedJob
-     */
-    public function toArray(): array
-    {
-        return [
-            'id' => '' === $this->id ? null : $this->id,
-            'suite_id' => '' === $this->suiteId ? null : $this->suiteId,
-            'maximum_duration_in_seconds' => $this->getMaximumDurationInSeconds(),
-            'created_at' => max($this->getCreatedAt(), 1),
-        ];
-    }
-
-    /**
-     * @return SerializedJob
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
-    }
-
-    private function getCreatedAt(): int
-    {
-        $idAsUlid = new Ulid($this->id);
-
-        return (int) $idAsUlid->getDateTime()->format('U');
     }
 }

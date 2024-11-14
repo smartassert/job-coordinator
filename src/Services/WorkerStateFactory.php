@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Enum\WorkerComponentName;
+use App\Model\JobInterface;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
 use App\Model\WorkerState;
@@ -18,7 +18,7 @@ class WorkerStateFactory
     ) {
     }
 
-    public function createForJob(Job $job): WorkerState
+    public function createForJob(JobInterface $job): WorkerState
     {
         return new WorkerState(
             $this->createComponentState($job, WorkerComponentName::APPLICATION),
@@ -28,10 +28,12 @@ class WorkerStateFactory
         );
     }
 
-    private function createComponentState(Job $job, WorkerComponentName $componentName): WorkerComponentStateInterface
-    {
+    private function createComponentState(
+        JobInterface $job,
+        WorkerComponentName $componentName,
+    ): WorkerComponentStateInterface {
         $componentState = $this->workerComponentStateRepository->findOneBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'componentName' => $componentName,
         ]);
 

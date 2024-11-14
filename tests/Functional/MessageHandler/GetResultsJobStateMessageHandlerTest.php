@@ -13,10 +13,11 @@ use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\Repository\JobRepository;
+use App\Model\JobInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -49,12 +50,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $handler = self::getContainer()->get(GetResultsJobStateMessageHandler::class);
         \assert($handler instanceof GetResultsJobStateMessageHandler);
 
-        $message = new GetResultsJobStateMessage('api token', $job->id);
+        $message = new GetResultsJobStateMessage('api token', $job->getId());
 
         try {
             $handler($message);
@@ -70,12 +70,15 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
             ->shouldReceive('hasFailed')
-            ->with($job)
+            ->withArgs(function (JobInterface $passedJob) use ($job) {
+                self::assertSame($job->getId(), $passedJob->getId());
+
+                return true;
+            })
             ->andReturnTrue()
         ;
 
@@ -83,7 +86,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
         $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'results-job/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -93,8 +96,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
         $resultsJobRepository
             ->shouldReceive('find')
-            ->with($job->id)
-            ->andReturn(new ResultsJob($job->id, 'token', 'state', 'end-state'))
+            ->with($job->getId())
+            ->andReturn(new ResultsJob($job->getId(), 'token', 'state', 'end-state'))
         ;
 
         $handler = $this->createHandler(
@@ -103,7 +106,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             HttpMockedResultsClientFactory::create(),
         );
 
-        $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
@@ -115,7 +118,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         );
 
         $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'results-job/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -128,13 +131,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
         $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'results-job/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -144,15 +146,19 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
             ->shouldReceive('hasFailed')
-            ->with($job)
+            ->withArgs(function (JobInterface $passedJob) use ($job) {
+                self::assertSame($job->getId(), $passedJob->getId());
+
+                return true;
+            })
             ->andReturnFalse()
         ;
 
         $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
         $resultsJobRepository
             ->shouldReceive('find')
-            ->with($job->id)
-            ->andReturn(new ResultsJob($job->id, 'token', 'state', 'end-state'))
+            ->with($job->getId())
+            ->andReturn(new ResultsJob($job->getId(), 'token', 'state', 'end-state'))
         ;
 
         $handler = $this->createHandler(
@@ -161,12 +167,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             HttpMockedResultsClientFactory::create(),
         );
 
-        $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
         $abortedResultsJobRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->id,
+            'jobId' => $job->getId(),
             'type' => 'results-job/retrieve',
             'state' => RequestState::ABORTED,
         ]);
@@ -179,7 +185,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -196,7 +201,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
         $handler = $this->createHandler($jobPreparationInspector, $resultsJobRepository, $resultsClient);
-        $message = new GetResultsJobStateMessage(self::$apiToken, $job->id);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -215,7 +220,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -234,7 +238,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler = $this->createHandler($jobPreparationInspector, $resultsJobRepository, $resultsClient);
 
-        $handler(new GetResultsJobStateMessage(self::$apiToken, $job->id));
+        $handler(new GetResultsJobStateMessage(self::$apiToken, $job->getId()));
 
         $events = $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class);
         $event = $events[0] ?? null;
@@ -242,7 +246,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         self::assertEquals(
             new ResultsJobStateRetrievedEvent(
                 self::$apiToken,
-                $job->id,
+                $job->getId(),
                 new ResultsJobState($resultsJobState, null)
             ),
             $event
@@ -264,14 +268,14 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         ResultsJobRepository $resultsJobRepository,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new GetResultsJobStateMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $resultsClient,
             $eventDispatcher,

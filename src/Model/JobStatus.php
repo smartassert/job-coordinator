@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
@@ -21,7 +20,7 @@ readonly class JobStatus implements \JsonSerializable
      * @param SerializedPreparationState $preparationState
      */
     public function __construct(
-        private Job $job,
+        private JobInterface $job,
         private array $preparationState,
         private ?ResultsJob $resultsJob,
         private ?SerializedSuite $serializedSuite,

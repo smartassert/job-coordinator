@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Entity\Job;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
+use App\Services\JobStore;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -84,7 +86,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
     /**
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
-     * @param callable(Job[]): array<mixed>                                  $expectedCreator
+     * @param callable(Job[], JobStore): JobInterface[]                      $expectedCreator
      */
     #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void
@@ -121,7 +123,10 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $responseData = json_decode($response->getBody()->getContents(), true);
 
-        self::assertSame($expectedCreator($filteredJobs), $responseData);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
+
+        self::assertSame($expectedCreator($filteredJobs, $jobStore), $responseData);
     }
 
     /**
@@ -160,19 +165,14 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId,
                     ];
                 },
-                'expectedCreator' => function (array $jobs) {
-                    $expectedJobs = [
-                        $jobs[0],
-                    ];
-
-                    $expected = [];
-                    foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
-                        $expected[] = $expectedJob->toArray();
+                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                    $serializedJobs = [];
+                    $job = $jobStore->retrieve($jobs[0]->id);
+                    if (null !== $job) {
+                        $serializedJobs[] = $job->toArray();
                     }
 
-                    return $expected;
+                    return $serializedJobs;
                 },
             ],
             'multiple jobs for user across suites (1)' => [
@@ -202,20 +202,16 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId1,
                     ];
                 },
-                'expectedCreator' => function (array $jobs) {
-                    $expectedJobs = [
-                        $jobs[2],
-                        $jobs[0],
-                    ];
-
-                    $expected = [];
-                    foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
-                        $expected[] = $expectedJob->toArray();
+                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                    $serializedJobs = [];
+                    foreach ([$jobs[2], $jobs[0]] as $jobEntity) {
+                        $job = $jobStore->retrieve($jobEntity->id);
+                        if (null !== $job) {
+                            $serializedJobs[] = $job->toArray();
+                        }
                     }
 
-                    return $expected;
+                    return $serializedJobs;
                 },
             ],
             'multiple jobs for user across suites (2)' => [
@@ -245,19 +241,14 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId2,
                     ];
                 },
-                'expectedCreator' => function (array $jobs) {
-                    $expectedJobs = [
-                        $jobs[1],
-                    ];
-
-                    $expected = [];
-                    foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
-                        $expected[] = $expectedJob->toArray();
+                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                    $serializedJobs = [];
+                    $job = $jobStore->retrieve($jobs[1]->id);
+                    if (null !== $job) {
+                        $serializedJobs[] = $job->toArray();
                     }
 
-                    return $expected;
+                    return $serializedJobs;
                 },
             ],
             'multiple jobs for user across suites for multiple users' => [
@@ -292,20 +283,16 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId1,
                     ];
                 },
-                'expectedCreator' => function (array $jobs) {
-                    $expectedJobs = [
-                        $jobs[3],
-                        $jobs[0],
-                    ];
-
-                    $expected = [];
-                    foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
-                        $expected[] = $expectedJob->toArray();
+                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                    $serializedJobs = [];
+                    foreach ([$jobs[3], $jobs[0]] as $jobEntity) {
+                        $job = $jobStore->retrieve($jobEntity->id);
+                        if (null !== $job) {
+                            $serializedJobs[] = $job->toArray();
+                        }
                     }
 
-                    return $expected;
+                    return $serializedJobs;
                 },
             ],
         ];

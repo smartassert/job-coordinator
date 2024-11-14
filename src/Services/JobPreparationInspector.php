@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Enum\JobComponent;
+use App\Model\JobInterface;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
 readonly class JobPreparationInspector implements JobPreparationInspectorInterface
@@ -18,7 +18,7 @@ readonly class JobPreparationInspector implements JobPreparationInspectorInterfa
     ) {
     }
 
-    public function hasFailed(Job $job): bool
+    public function hasFailed(JobInterface $job): bool
     {
         foreach (JobComponent::cases() as $jobComponent) {
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {

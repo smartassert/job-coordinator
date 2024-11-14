@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SerializedSuiteMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
@@ -33,12 +31,12 @@ class SerializedSuiteMutator implements EventSubscriberInterface
 
     public function setState(SerializedSuiteRetrievedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($job->id);
+        $serializedSuite = $this->serializedSuiteRepository->find($job->getId());
         if (!$serializedSuite instanceof SerializedSuite) {
             return;
         }

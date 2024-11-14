@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\MachineActionFailure;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MachineMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly MachineRepository $machineRepository,
     ) {
     }
@@ -42,12 +40,12 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setStateOnMachineStateChangeEvent(MachineStateChangeEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $machineEntity = $this->machineRepository->find($event->getJobId());
+        $machineEntity = $this->machineRepository->find($job->getId());
         if (!$machineEntity instanceof Machine) {
             return;
         }
@@ -61,12 +59,12 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setIpOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $machineEntity = $this->machineRepository->find($job->id);
+        $machineEntity = $this->machineRepository->find($job->getId());
         if (!$machineEntity instanceof Machine) {
             return;
         }
@@ -78,12 +76,12 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $machineEntity = $this->machineRepository->find($event->getJobId());
+        $machineEntity = $this->machineRepository->find($job->getId());
         if (!$machineEntity instanceof Machine) {
             return;
         }
@@ -94,7 +92,7 @@ class MachineMutator implements EventSubscriberInterface
 
         $machineEntity->setActionFailure(
             new MachineActionFailure(
-                $event->getJobId(),
+                $job->getId(),
                 $event->machineActionFailure->action,
                 $event->machineActionFailure->type,
                 $event->machineActionFailure->context,

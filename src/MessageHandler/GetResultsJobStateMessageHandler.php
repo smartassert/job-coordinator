@@ -10,9 +10,9 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
+use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class GetResultsJobStateMessageHandler
 {
     public function __construct(
-        private JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private ResultsJobRepository $resultsJobRepository,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
@@ -36,14 +36,12 @@ final readonly class GetResultsJobStateMessageHandler
      */
     public function __invoke(GetResultsJobStateMessage $message): void
     {
-        $job = $this->jobRepository->find($message->getJobId());
+        $job = $this->jobStore->retrieve($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $jobId = $message->getJobId();
-
-        $resultsJob = $this->resultsJobRepository->find($jobId);
+        $resultsJob = $this->resultsJobRepository->find($job->getId());
         if (null === $resultsJob) {
             throw new MessageHandlerTargetEntityNotFoundException($message, 'ResultsJob');
         }
@@ -58,10 +56,10 @@ final readonly class GetResultsJobStateMessageHandler
         }
 
         try {
-            $resultsJobState = $this->resultsClient->getJobStatus($message->authenticationToken, $jobId);
+            $resultsJobState = $this->resultsClient->getJobStatus($message->authenticationToken, $job->getId());
             $this->eventDispatcher->dispatch(new ResultsJobStateRetrievedEvent(
                 $message->authenticationToken,
-                $jobId,
+                $job->getId(),
                 $resultsJobState
             ));
         } catch (\Throwable $e) {

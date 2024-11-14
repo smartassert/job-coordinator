@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Repository;
 
-use App\Entity\Job;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
+use App\Model\JobInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,8 +34,8 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
     }
 
     /**
-     * @param callable(Job, WorkerComponentStateRepository): void $statesCreator
-     * @param callable(Job): WorkerComponentState[]               $expectedStatesCreator
+     * @param callable(JobInterface, WorkerComponentStateRepository): void $statesCreator
+     * @param callable(JobInterface): WorkerComponentState[]               $expectedStatesCreator
      */
     #[DataProvider('getAllForJobDataProvider')]
     public function testGetAllForJob(callable $statesCreator, callable $expectedStatesCreator): void
@@ -47,7 +47,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
         $statesCreator($job, $this->repository);
 
         self::assertEquals(
-            $this->repository->findBy(['jobId' => $job->id]),
+            $this->repository->findBy(['jobId' => $job->getId()]),
             $expectedStatesCreator($job)
         );
     }
@@ -66,7 +66,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                 },
             ],
             'no matching states' => [
-                'statesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
+                'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         (new WorkerComponentState(md5((string) rand()), WorkerComponentName::APPLICATION))
                             ->setState('compiling')
@@ -96,37 +96,31 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                 },
             ],
             'single matching state' => [
-                'statesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
-
+                'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('executing')
                             ->setIsEndState(false)
                     );
                 },
-                'expectedStatesCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'expectedStatesCreator' => function (JobInterface $job) {
                     return [
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('executing')
                             ->setIsEndState(false),
                     ];
                 },
             ],
             'multiple matching state' => [
-                'statesCreator' => function (Job $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->id);
-
+                'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('executing')
                             ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                             ->setState('complete')
                             ->setIsEndState(true)
                     );
@@ -143,14 +137,12 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                             ->setIsEndState(false)
                     );
                 },
-                'expectedStatesCreator' => function (Job $job) {
-                    \assert('' !== $job->id);
-
+                'expectedStatesCreator' => function (JobInterface $job) {
                     return [
-                        (new WorkerComponentState($job->id, WorkerComponentName::APPLICATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState('executing')
                             ->setIsEndState(false),
-                        (new WorkerComponentState($job->id, WorkerComponentName::COMPILATION))
+                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                             ->setState('complete')
                             ->setIsEndState(true),
                     ];

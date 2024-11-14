@@ -68,10 +68,9 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $machine = MachineFactory::create(
-            $job->id,
+            $job->getId(),
             'create/requested',
             'pre_active',
             [],

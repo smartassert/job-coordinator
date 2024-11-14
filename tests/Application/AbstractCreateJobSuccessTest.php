@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\Job;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 
 abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetup
@@ -13,8 +13,8 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
     {
         $job = $this->getJob();
 
-        self::assertSame($job?->id, self::$createResponseData['id']);
-        self::assertSame($job?->suiteId, self::$createResponseData['suite_id']);
+        self::assertSame($job?->getId(), self::$createResponseData['id']);
+        self::assertSame($job?->getSuiteId(), self::$createResponseData['suite_id']);
         self::assertSame(
             $job?->getMaximumDurationInSeconds(),
             self::$createResponseData['maximum_duration_in_seconds']
@@ -23,12 +23,12 @@ abstract class AbstractCreateJobSuccessTest extends AbstractCreateJobSuccessSetu
 
     public function testJobIsCreated(): void
     {
-        self::assertInstanceOf(Job::class, $this->getJob());
+        self::assertInstanceOf(JobInterface::class, $this->getJob());
     }
 
     public function testJobUser(): void
     {
-        self::assertSame($this->getJob()?->userId, self::$user['id']);
+        self::assertSame($this->getJob()?->getUserId(), self::$user['id']);
     }
 
     public function testJobResultsTokenIsNotSet(): void

@@ -20,7 +20,7 @@ class RemoteRequestFailureRecorder
     public function record(RemoteRequestExceptionInterface $throwable): void
     {
         $remoteRequest = $this->remoteRequestRepository->findOneBy([
-            'jobId' => $throwable->getJob()->id,
+            'jobId' => $throwable->getJob()->getId(),
             'type' => $throwable->getFailedMessage()->getRemoteRequestType(),
             'index' => $throwable->getFailedMessage()->getIndex(),
         ]);

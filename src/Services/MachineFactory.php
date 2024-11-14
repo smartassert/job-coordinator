@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MachineFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly MachineRepository $machineRepository,
     ) {
     }
@@ -33,19 +31,19 @@ class MachineFactory implements EventSubscriberInterface
 
     public function createOnMachineCreationRequestedEvent(MachineCreationRequestedEvent $event): void
     {
-        $job = $this->jobRepository->find($event->getJobId());
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
         $machine = $event->machine;
-        $machineEntity = $this->machineRepository->find($event->getJobId());
+        $machineEntity = $this->machineRepository->find($job->getId());
 
         if ($machineEntity instanceof Machine) {
             return;
         }
 
-        $machine = new Machine($event->getJobId(), $machine->state, $machine->stateCategory, $machine->hasFailedState);
+        $machine = new Machine($job->getId(), $machine->state, $machine->stateCategory, $machine->hasFailedState);
         $this->machineRepository->save($machine);
     }
 }

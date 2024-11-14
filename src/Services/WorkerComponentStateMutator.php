@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Job;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WorkerComponentStateMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
     ) {
     }
@@ -35,16 +33,15 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
 
     public function setOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
-        $jobId = $event->getJobId();
-        $job = $this->jobRepository->find($jobId);
-        if (!$job instanceof Job) {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
             return;
         }
 
-        $this->setComponentState($jobId, WorkerComponentName::APPLICATION, $event->state->applicationState);
-        $this->setComponentState($jobId, WorkerComponentName::COMPILATION, $event->state->compilationState);
-        $this->setComponentState($jobId, WorkerComponentName::EXECUTION, $event->state->executionState);
-        $this->setComponentState($jobId, WorkerComponentName::EVENT_DELIVERY, $event->state->eventDeliveryState);
+        $this->setComponentState($job->getId(), WorkerComponentName::APPLICATION, $event->state->applicationState);
+        $this->setComponentState($job->getId(), WorkerComponentName::COMPILATION, $event->state->compilationState);
+        $this->setComponentState($job->getId(), WorkerComponentName::EXECUTION, $event->state->executionState);
+        $this->setComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY, $event->state->eventDeliveryState);
     }
 
     /**

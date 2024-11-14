@@ -9,8 +9,8 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -47,7 +47,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -58,7 +57,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, HttpMockedWorkerManagerClientFactory::create());
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->id);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
 
         $handler($message);
 
@@ -73,7 +72,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $workerManagerException = new \Exception('Failed to terminate machine');
 
@@ -81,7 +79,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, $workerManagerClient);
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->id);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -100,10 +98,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->id);
 
         $machine = MachineFactory::create(
-            $job->id,
+            $job->getId(),
             'create/requested',
             'pre_active',
             [],
@@ -119,13 +116,13 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($resultsJobRepository, $workerManagerClient);
 
-        $handler(new TerminateMachineMessage(self::$apiToken, $job->id));
+        $handler(new TerminateMachineMessage(self::$apiToken, $job->getId()));
 
         $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 
-        self::assertSame($job->id, $event->getJobId());
+        self::assertSame($job->getId(), $event->getJobId());
     }
 
     protected function getHandlerClass(): string
@@ -142,8 +139,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         ResultsJobRepository $resultsJobRepository,
         WorkerManagerClient $workerManagerClient,
     ): TerminateMachineMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -152,7 +149,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new TerminateMachineMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $workerManagerClient,
             $eventDispatcher
