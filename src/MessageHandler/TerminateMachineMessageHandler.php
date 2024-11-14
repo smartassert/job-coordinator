@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineTerminationRequestedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\Repository\ResultsJobRepository;
@@ -25,7 +24,6 @@ final class TerminateMachineMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(TerminateMachineMessage $message): void
     {

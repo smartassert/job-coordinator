@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
@@ -29,7 +28,6 @@ final readonly class GetResultsJobStateMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerJobNotFoundException
      * @throws MessageHandlerTargetEntityNotFoundException
      */
     public function __invoke(GetResultsJobStateMessage $message): void
