@@ -33,16 +33,15 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
 
     public function setOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
     {
-        $jobId = $event->getJobId();
-        $job = $this->jobStore->retrieve($jobId);
+        $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {
             return;
         }
 
-        $this->setComponentState($jobId, WorkerComponentName::APPLICATION, $event->state->applicationState);
-        $this->setComponentState($jobId, WorkerComponentName::COMPILATION, $event->state->compilationState);
-        $this->setComponentState($jobId, WorkerComponentName::EXECUTION, $event->state->executionState);
-        $this->setComponentState($jobId, WorkerComponentName::EVENT_DELIVERY, $event->state->eventDeliveryState);
+        $this->setComponentState($job->getId(), WorkerComponentName::APPLICATION, $event->state->applicationState);
+        $this->setComponentState($job->getId(), WorkerComponentName::COMPILATION, $event->state->compilationState);
+        $this->setComponentState($job->getId(), WorkerComponentName::EXECUTION, $event->state->executionState);
+        $this->setComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY, $event->state->eventDeliveryState);
     }
 
     /**
