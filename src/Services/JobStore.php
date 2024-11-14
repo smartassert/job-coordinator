@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\Job as JobEntity;
 use App\Model\Job;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use Symfony\Component\Uid\Ulid;
 
@@ -16,7 +17,7 @@ readonly class JobStore
     ) {
     }
 
-    public function retrieve(string $jobId): ?Job
+    public function retrieve(string $jobId): ?JobInterface
     {
         $entity = $this->jobRepository->find($jobId);
         if (null === $entity) {
@@ -46,7 +47,7 @@ readonly class JobStore
     /**
      * @param JobEntity[] $jobEntities
      *
-     * @return Job[]
+     * @return JobInterface[]
      */
     public function hydrateFromJobEntities(array $jobEntities): array
     {

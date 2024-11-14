@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ValueResolver;
 
 use App\Model\Job;
+use App\Model\JobInterface;
 use App\Services\JobStore;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ readonly class JobResolver implements ValueResolverInterface
     }
 
     /**
-     * @return Job[]
+     * @return JobInterface[]
      *
      * @throws AccessDeniedException
      */
