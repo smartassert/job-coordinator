@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
@@ -27,7 +26,6 @@ final class GetSerializedSuiteMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerJobNotFoundException
      * @throws MessageHandlerTargetEntityNotFoundException
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
