@@ -7,13 +7,11 @@ namespace App\MessageHandler;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -22,7 +20,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class CreateMachineMessageHandler
 {
     public function __construct(
-        private JobStore $jobStore,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private WorkerManagerClient $workerManagerClient,
@@ -33,24 +30,18 @@ final readonly class CreateMachineMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        $job = $this->jobStore->retrieve($message->getJobId());
-        if (null === $job) {
-            throw new MessageHandlerJobNotFoundException($message);
-        }
-
-        if ($this->machineRepository->has($job->getId())) {
+        if ($this->machineRepository->has($message->getJobId())) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($job->getId());
+        $serializedSuite = $this->serializedSuiteRepository->find($message->getJobId());
         if (
-            !$this->resultsJobRepository->has($job->getId())
+            !$this->resultsJobRepository->has($message->getJobId())
             || null === $serializedSuite
             || !$serializedSuite->isPrepared()
         ) {
@@ -60,7 +51,7 @@ final readonly class CreateMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $job->getId());
+            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(
                 new MachineCreationRequestedEvent($message->authenticationToken, $machine)

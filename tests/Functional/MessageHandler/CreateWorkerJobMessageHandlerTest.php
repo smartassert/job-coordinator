@@ -9,7 +9,6 @@ use App\Entity\SerializedSuite;
 use App\Enum\RequestState;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
@@ -17,7 +16,6 @@ use App\Model\JobInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -28,7 +26,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -43,29 +40,18 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
-        \assert($handler instanceof CreateWorkerJobMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $message = new CreateWorkerJobMessage('api token', $jobId, '127.0.0.1');
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create worker-job for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
-    }
-
     public function testInvokeNoSerializedSuite(): void
     {
         $job = $this->createJob();
 
         $handler = $this->createHandler();
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $job->getId(), md5((string) rand()));
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $job->getId(),
+            $job->getMaximumDurationInSeconds(),
+            md5((string) rand())
+        );
 
         $handler($message);
 
@@ -79,7 +65,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler();
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $job->getId(), md5((string) rand()));
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $job->getId(),
+            $job->getMaximumDurationInSeconds(),
+            md5((string) rand())
+        );
 
         $handler($message);
 
@@ -109,7 +100,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertCount(0, $abortedWorkerJobCreateRemoteRequests);
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, md5((string) rand()));
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $jobId,
+            $job->getMaximumDurationInSeconds(),
+            md5((string) rand())
+        );
 
         $handler($message);
 
@@ -152,7 +148,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $jobId,
+            $job->getMaximumDurationInSeconds(),
+            $machineIpAddress
+        );
 
         $handler($message);
 
@@ -207,7 +208,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $jobId,
+            $job->getMaximumDurationInSeconds(),
+            $machineIpAddress
+        );
 
         try {
             $handler($message);
@@ -263,7 +269,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, $machineIpAddress);
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $jobId,
+            $job->getMaximumDurationInSeconds(),
+            $machineIpAddress
+        );
 
         $handler($message);
 
@@ -344,9 +355,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
     ): CreateWorkerJobMessageHandler {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
@@ -366,7 +374,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateWorkerJobMessageHandler(
-            $jobStore,
             $serializedSuiteRepository,
             $resultsJobRepository,
             $serializedSuiteClient,

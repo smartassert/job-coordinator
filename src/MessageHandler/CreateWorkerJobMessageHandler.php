@@ -7,12 +7,10 @@ namespace App\MessageHandler;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -22,7 +20,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class CreateWorkerJobMessageHandler
 {
     public function __construct(
-        private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
@@ -33,17 +30,11 @@ final class CreateWorkerJobMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerJobNotFoundException
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        $job = $this->jobStore->retrieve($message->getJobId());
-        if (null === $job) {
-            throw new MessageHandlerJobNotFoundException($message);
-        }
-
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->getId());
-        $resultsJob = $this->resultsJobRepository->find($job->getId());
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($message->getJobId());
+        $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if (
             null === $serializedSuiteEntity
             || $serializedSuiteEntity->isPreparing()
@@ -68,14 +59,14 @@ final class CreateWorkerJobMessageHandler
             $serializedSuite = $this->serializedSuiteClient->read($message->authenticationToken, $serializedSuiteId);
 
             $workerJob = $workerClient->createJob(
-                $job->getId(),
+                $message->getJobId(),
                 $resultsJob->token,
-                $job->getMaximumDurationInSeconds(),
+                $message->maximumDurationInSeconds,
                 $serializedSuite
             );
 
             $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
-                $job->getId(),
+                $message->getJobId(),
                 $message->machineIpAddress,
                 $workerJob,
             ));

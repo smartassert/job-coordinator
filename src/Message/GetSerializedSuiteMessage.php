@@ -18,6 +18,7 @@ class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessag
     public function __construct(
         string $authenticationToken,
         string $jobId,
+        public readonly string $suiteId,
         public readonly string $serializedSuiteId,
     ) {
         parent::__construct($authenticationToken, $jobId);

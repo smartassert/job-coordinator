@@ -74,7 +74,11 @@ class CreateJobDispatchedMessagesTest extends AbstractCreateJobSuccessSetup
                     \assert(is_string($jobId));
                     \assert('' !== $jobId);
 
-                    return new CreateSerializedSuiteMessage(self::$apiToken, $jobId, []);
+                    $suiteId = self::$createResponseData['suite_id'] ?? null;
+                    \assert(is_string($suiteId));
+                    \assert('' !== $suiteId);
+
+                    return new CreateSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, []);
                 },
             ],
         ];

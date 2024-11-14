@@ -8,14 +8,12 @@ use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\JobStore;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -23,26 +21,9 @@ use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
-use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(GetWorkerJobMessageHandler::class);
-        \assert($handler instanceof GetWorkerJobMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve worker-job for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
-    }
-
     public function testInvokeWorkerApplicationIsInEndState(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -167,20 +148,12 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerJobMessageHandler
     {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetWorkerJobMessageHandler(
-            $jobStore,
-            $workerComponentStateRepository,
-            $workerClientFactory,
-            $eventDispatcher
-        );
+        return new GetWorkerJobMessageHandler($workerComponentStateRepository, $workerClientFactory, $eventDispatcher);
     }
 }

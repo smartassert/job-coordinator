@@ -7,6 +7,7 @@ namespace App\MessageDispatcher;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
@@ -14,6 +15,7 @@ class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
+        private readonly JobStore $jobStore,
     ) {
     }
 
@@ -35,8 +37,18 @@ class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
             return;
         }
 
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
+            return;
+        }
+
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateSerializedSuiteMessage($event->getAuthenticationToken(), $event->getJobId(), $event->parameters)
+            new CreateSerializedSuiteMessage(
+                $event->getAuthenticationToken(),
+                $job->getId(),
+                $job->getSuiteId(),
+                $event->parameters
+            )
         );
     }
 }

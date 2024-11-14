@@ -56,7 +56,12 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateSerializedSuiteMessage($authenticationToken, $job->getId(), $parameters);
+        $expectedMessage = new CreateSerializedSuiteMessage(
+            $authenticationToken,
+            $job->getId(),
+            $job->getSuiteId(),
+            $parameters
+        );
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());

@@ -7,13 +7,11 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
 use App\Repository\RemoteRequestRepository;
-use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -24,7 +22,6 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -50,24 +47,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = self::getContainer()->get(GetMachineMessageHandler::class);
         self::assertInstanceOf(GetMachineMessageHandler::class, $handler);
         self::assertCount(1, (new \ReflectionClass($handler::class))->getAttributes(AsMessageHandler::class));
-    }
-
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(GetMachineMessageHandler::class);
-        \assert($handler instanceof GetMachineMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $machine = MachineFactory::createRandomForJob($jobId);
-
-        $message = new GetMachineMessage('api token', $jobId, $machine);
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve machine for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
@@ -369,9 +348,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         string $authenticationToken,
         null|ResponseInterface|\Throwable $httpFixture,
     ): void {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $httpFixtures = null === $httpFixture ? [] : [$httpFixture];
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create($httpFixtures);
@@ -379,7 +355,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $handler = new GetMachineMessageHandler($jobStore, $workerManagerClient, $eventDispatcher);
+        $handler = new GetMachineMessageHandler($workerManagerClient, $eventDispatcher);
         $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);

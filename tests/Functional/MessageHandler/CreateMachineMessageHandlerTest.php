@@ -9,7 +9,6 @@ use App\Entity\SerializedSuite;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
@@ -17,7 +16,6 @@ use App\Model\JobInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -32,22 +30,6 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(CreateMachineMessageHandler::class);
-        \assert($handler instanceof CreateMachineMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $message = new CreateMachineMessage('api token', $jobId);
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create machine for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
-    }
-
     /**
      * @param callable(JobInterface): ResultsJobRepository      $resultsJobRepositoryCreator
      * @param callable(JobInterface): SerializedSuiteRepository $serializedSuiteRepositoryCreator
@@ -350,9 +332,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         WorkerManagerClient $workerManagerClient,
         MachineRepository $machineRepository,
     ): CreateMachineMessageHandler {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
@@ -360,7 +339,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateMachineMessageHandler(
-            $jobStore,
             $resultsJobRepository,
             $serializedSuiteRepository,
             $workerManagerClient,
