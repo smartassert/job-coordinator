@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Event\JobCreatedEvent;
-use App\Model\Job;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\JobStatusFactory;
@@ -45,7 +45,7 @@ readonly class JobController
     }
 
     #[Route('/{jobId<[A-Z90-9]{26}>}', name: 'job_get', methods: ['GET'])]
-    public function get(Job $job): Response
+    public function get(JobInterface $job): Response
     {
         return new JsonResponse($this->jobStatusFactory->create($job));
     }
