@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Job;
+use App\Model\Job as JobModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,13 +19,7 @@ class JobRepository extends ServiceEntityRepository
         parent::__construct($registry, Job::class);
     }
 
-    public function add(Job $entity): void
-    {
-        $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
-    }
-
-    public function store(\App\Model\Job $job): void
+    public function store(JobModel $job): void
     {
         $this->getEntityManager()->persist(
             new Job(
