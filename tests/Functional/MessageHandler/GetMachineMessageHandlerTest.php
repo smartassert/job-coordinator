@@ -12,8 +12,8 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -388,8 +388,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         string $authenticationToken,
         null|ResponseInterface|\Throwable $httpFixture,
     ): void {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $httpFixtures = null === $httpFixture ? [] : [$httpFixture];
 
@@ -398,7 +398,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $handler = new GetMachineMessageHandler($jobRepository, $workerManagerClient, $eventDispatcher);
+        $handler = new GetMachineMessageHandler($jobStore, $workerManagerClient, $eventDispatcher);
         $message = new GetMachineMessage($authenticationToken, $previous->id, $previous);
 
         ($handler)($message);

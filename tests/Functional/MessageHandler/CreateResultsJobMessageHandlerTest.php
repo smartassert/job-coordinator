@@ -11,8 +11,8 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use GuzzleHttp\Psr7\Response;
@@ -43,9 +43,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeResultsClientThrowsException(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
@@ -58,7 +55,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
-        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
+        $handler = $this->createHandler($resultsClient, $resultsJobRepository);
 
         $message = new CreateResultsJobMessage(self::$apiToken, $job->getId());
 
@@ -73,9 +70,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
@@ -99,7 +93,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ])),
         ]);
 
-        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
+        $handler = $this->createHandler($resultsClient, $resultsJobRepository);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -128,9 +122,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotHandleable(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
@@ -145,7 +136,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsClient = HttpMockedResultsClientFactory::create();
 
-        $handler = $this->createHandler($jobRepository, $resultsClient, $resultsJobRepository);
+        $handler = $this->createHandler($resultsClient, $resultsJobRepository);
 
         $message = new CreateResultsJobMessage(self::$apiToken, $job->getId());
 
@@ -172,21 +163,18 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        JobRepository $jobRepository,
         ResultsClient $resultsClient,
         ResultsJobRepository $resultsJobRepository,
     ): CreateResultsJobMessageHandler {
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
+
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateResultsJobMessageHandler(
-            $jobRepository,
-            $resultsClient,
-            $eventDispatcher,
-            $resultsJobRepository
-        );
+        return new CreateResultsJobMessageHandler($jobStore, $resultsClient, $eventDispatcher, $resultsJobRepository);
     }
 }

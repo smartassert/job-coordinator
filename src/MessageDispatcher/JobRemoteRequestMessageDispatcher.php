@@ -9,8 +9,8 @@ use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Messenger\NonDelayedStamp;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -23,7 +23,7 @@ class JobRemoteRequestMessageDispatcher
         private readonly MessageBusInterface $messageBus,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RemoteRequestRepository $remoteRequestRepository,
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -34,7 +34,7 @@ class JobRemoteRequestMessageDispatcher
     public function dispatch(JobRemoteRequestMessageInterface $message, array $stamps = []): ?Envelope
     {
         if (false === $message->isRepeatable()) {
-            $job = $this->jobRepository->find($message->getJobId());
+            $job = $this->jobStore->retrieve($message->getJobId());
             if (null === $job) {
                 return null;
             }
