@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\ValueResolver;
 
-use App\Model\Job;
 use App\Model\JobInterface;
 use App\Services\JobStore;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -28,7 +27,7 @@ readonly class JobResolver implements ValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        if (Job::class !== $argument->getType()) {
+        if (JobInterface::class !== $argument->getType()) {
             return [];
         }
 
