@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\ResultsJob;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
@@ -38,7 +37,7 @@ final class TerminateMachineMessageHandler
         }
 
         $resultsJob = $this->resultsJobRepository->find($job->getId());
-        if ($resultsJob instanceof ResultsJob && $resultsJob->hasEndState()) {
+        if (null === $resultsJob || !$resultsJob->hasEndState()) {
             return;
         }
 
