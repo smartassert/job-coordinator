@@ -29,7 +29,10 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $message = new CreateSerializedSuiteMessage('api token', $jobId, []);
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
+        $message = new CreateSerializedSuiteMessage('api token', $jobId, $suiteId, []);
 
         self::expectException(MessageHandlerJobNotFoundException::class);
         self::expectExceptionMessage(
@@ -72,7 +75,12 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $serializedSuiteRepository,
         );
 
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuiteCreateParameters);
+        $message = new CreateSerializedSuiteMessage(
+            self::$apiToken,
+            $job->getId(),
+            $job->getSuiteId(),
+            $serializedSuiteCreateParameters
+        );
 
         try {
             $handler($message);
@@ -127,7 +135,12 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $serializedSuiteRepository,
         );
 
-        $handler(new CreateSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuiteParameters));
+        $handler(new CreateSerializedSuiteMessage(
+            self::$apiToken,
+            $job->getId(),
+            $job->getSuiteId(),
+            $serializedSuiteParameters
+        ));
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
@@ -176,7 +189,12 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $serializedSuiteRepository,
         );
 
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $job->getId(), $serializedSuiteParameters);
+        $message = new CreateSerializedSuiteMessage(
+            self::$apiToken,
+            $job->getId(),
+            $job->getSuiteId(),
+            $serializedSuiteParameters
+        );
         $handler($message);
 
         $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
