@@ -8,7 +8,6 @@ use App\Entity\ResultsJob;
 use App\Enum\RequestState;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
@@ -16,7 +15,6 @@ use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
-use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -24,26 +22,9 @@ use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use Symfony\Component\Uid\Ulid;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(GetResultsJobStateMessageHandler::class);
-        \assert($handler instanceof GetResultsJobStateMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $message = new GetResultsJobStateMessage('api token', $jobId);
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to retrieve results-job for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
-    }
-
     public function testInvokeResultsJobNotFound(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -259,14 +240,10 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         ResultsJobRepository $resultsJobRepository,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new GetResultsJobStateMessageHandler(
-            $jobStore,
             $resultsJobRepository,
             $resultsClient,
             $eventDispatcher,
