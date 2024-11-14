@@ -9,7 +9,6 @@ use App\Entity\MachineActionFailure;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Model\JobInterface;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -42,7 +41,7 @@ class MachineMutator implements EventSubscriberInterface
     public function setStateOnMachineStateChangeEvent(MachineStateChangeEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
-        if (!$job instanceof JobInterface) {
+        if (null === $job) {
             return;
         }
 
@@ -61,7 +60,7 @@ class MachineMutator implements EventSubscriberInterface
     public function setIpOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
-        if (!$job instanceof JobInterface) {
+        if (null === $job) {
             return;
         }
 
@@ -78,7 +77,7 @@ class MachineMutator implements EventSubscriberInterface
     public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
-        if (!$job instanceof JobInterface) {
+        if (null === $job) {
             return;
         }
 
