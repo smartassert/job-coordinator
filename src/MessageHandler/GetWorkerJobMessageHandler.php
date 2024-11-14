@@ -38,8 +38,6 @@ final class GetWorkerJobMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $jobId = $message->getJobId();
-
         $applicationState = $this->workerComponentStateRepository->getApplicationState($job);
         if ($applicationState instanceof WorkerComponentState && $applicationState->isEndState()) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
@@ -51,7 +49,7 @@ final class GetWorkerJobMessageHandler
 
         try {
             $this->eventDispatcher->dispatch(new WorkerStateRetrievedEvent(
-                $jobId,
+                $job->getId(),
                 $message->machineIpAddress,
                 $workerClient->getApplicationState()
             ));

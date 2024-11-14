@@ -39,9 +39,7 @@ final class GetSerializedSuiteMessageHandler
             throw new MessageHandlerJobNotFoundException($message);
         }
 
-        $jobId = $message->getJobId();
-
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($jobId);
+        $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->getId());
         if (null === $serializedSuiteEntity) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
@@ -62,7 +60,7 @@ final class GetSerializedSuiteMessageHandler
 
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
                 $message->authenticationToken,
-                $jobId,
+                $job->getId(),
                 $serializedSuiteModel
             ));
         } catch (\Throwable $e) {
