@@ -108,7 +108,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $filteredJobs = [];
         foreach ($jobs as $job) {
-            if (in_array($job->getId(), $createdJobIds)) {
+            if (in_array($job->id, $createdJobIds)) {
                 $filteredJobs[] = $job;
             }
         }
