@@ -7,12 +7,10 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
-use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Repository\ResultsJobRepository;
-use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use GuzzleHttp\Psr7\Response;
@@ -21,26 +19,9 @@ use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeJobNotFound(): void
-    {
-        $handler = self::getContainer()->get(CreateResultsJobMessageHandler::class);
-        \assert($handler instanceof CreateResultsJobMessageHandler);
-
-        $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
-        $message = new CreateResultsJobMessage('api token', $jobId);
-
-        self::expectException(MessageHandlerJobNotFoundException::class);
-        self::expectExceptionMessage('Failed to create results-job for job "' . $jobId . '": Job entity not found');
-
-        $handler($message);
-    }
-
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -163,15 +144,12 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ResultsClient $resultsClient,
         ResultsJobRepository $resultsJobRepository,
     ): CreateResultsJobMessageHandler {
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateResultsJobMessageHandler($jobStore, $resultsClient, $eventDispatcher, $resultsJobRepository);
+        return new CreateResultsJobMessageHandler($resultsClient, $eventDispatcher, $resultsJobRepository);
     }
 }
