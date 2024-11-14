@@ -6,14 +6,13 @@ namespace App\Services;
 
 use App\Entity\RemoteRequestFailure;
 use App\Model\RemoteRequestType;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 
 class RemoteRequestRemover
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestFailureRepository $remoteRequestFailureRepository,
     ) {
@@ -21,7 +20,7 @@ class RemoteRequestRemover
 
     public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
     {
-        $job = $this->jobRepository->find($jobId);
+        $job = $this->jobStore->retrieve($jobId);
         if (null === $job) {
             return;
         }
