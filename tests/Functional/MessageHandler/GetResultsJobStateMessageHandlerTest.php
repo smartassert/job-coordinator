@@ -14,10 +14,10 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Model\JobInterface;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobPreparationInspectorInterface;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -273,14 +273,14 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         ResultsJobRepository $resultsJobRepository,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new GetResultsJobStateMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $resultsClient,
             $eventDispatcher,

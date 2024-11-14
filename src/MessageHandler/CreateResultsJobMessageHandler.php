@@ -9,8 +9,8 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class CreateResultsJobMessageHandler
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly ResultsClient $resultsClient,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ResultsJobRepository $resultsJobRepository,
@@ -32,7 +32,7 @@ final class CreateResultsJobMessageHandler
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        $job = $this->jobRepository->find($message->getJobId());
+        $job = $this->jobStore->retrieve($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
         }

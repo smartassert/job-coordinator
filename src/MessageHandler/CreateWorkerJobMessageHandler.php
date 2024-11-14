@@ -10,9 +10,9 @@ use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\JobStore;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class CreateWorkerJobMessageHandler
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
         private readonly SerializedSuiteClient $serializedSuiteClient,
@@ -37,7 +37,7 @@ final class CreateWorkerJobMessageHandler
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        $job = $this->jobRepository->find($message->getJobId());
+        $job = $this->jobStore->retrieve($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
         }

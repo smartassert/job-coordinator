@@ -14,8 +14,8 @@ use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
-use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
+use App\Services\JobStore;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -170,8 +170,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerJobMessageHandler
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
@@ -180,7 +180,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new GetWorkerJobMessageHandler(
-            $jobRepository,
+            $jobStore,
             $workerComponentStateRepository,
             $workerClientFactory,
             $eventDispatcher

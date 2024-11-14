@@ -14,10 +14,10 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Model\JobInterface;
-use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -356,8 +356,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         WorkerManagerClient $workerManagerClient,
         MachineRepository $machineRepository,
     ): CreateMachineMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -366,7 +366,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateMachineMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $serializedSuiteRepository,
             $workerManagerClient,

@@ -9,8 +9,8 @@ use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
-use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
+use App\Services\JobStore;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -142,8 +142,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         ResultsJobRepository $resultsJobRepository,
         WorkerManagerClient $workerManagerClient,
     ): TerminateMachineMessageHandler {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -152,7 +152,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new TerminateMachineMessageHandler(
-            $jobRepository,
+            $jobStore,
             $resultsJobRepository,
             $workerManagerClient,
             $eventDispatcher

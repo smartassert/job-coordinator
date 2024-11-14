@@ -8,7 +8,7 @@ use App\Event\MachineRetrievedEvent;
 use App\Exception\MessageHandlerJobNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
-use App\Repository\JobRepository;
+use App\Services\JobStore;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class GetMachineMessageHandler
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
+        private readonly JobStore $jobStore,
         private readonly WorkerManagerClient $workerManagerClient,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -29,7 +29,7 @@ final class GetMachineMessageHandler
      */
     public function __invoke(GetMachineMessage $message): void
     {
-        $job = $this->jobRepository->find($message->getJobId());
+        $job = $this->jobStore->retrieve($message->getJobId());
         if (null === $job) {
             throw new MessageHandlerJobNotFoundException($message);
         }
