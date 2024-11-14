@@ -88,16 +88,12 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         return [
             'without stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new GetResultsJobStateMessage('api token', $job->getId());
                 },
                 'stamps' => [],
             ],
             'with stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new GetResultsJobStateMessage('api token', $job->getId());
                 },
                 'stamps' => [
@@ -106,8 +102,6 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
             ],
             'repeatable message with no existing requests' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new CreateMachineMessage('api token', $job->getId());
                 },
                 'stamps' => [],
@@ -149,16 +143,12 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         return [
             'has existing successful request' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new CreateMachineMessage('api token', $job->getId());
                 },
                 'remoteRequestCreator' => function (
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    \assert('' !== $job->getId());
-
                     $remoteRequest = new RemoteRequest(
                         $job->getId(),
                         new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
@@ -169,16 +159,12 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
             ],
             'newest remote request has requesting state' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new CreateMachineMessage('api token', $job->getId());
                 },
                 'remoteRequestCreator' => function (
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    \assert('' !== $job->getId());
-
                     $remoteRequest = new RemoteRequest(
                         $job->getId(),
                         new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
@@ -190,16 +176,12 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
             ],
             'newest remote request has pending state' => [
                 'messageCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new CreateMachineMessage('api token', $job->getId());
                 },
                 'remoteRequestCreator' => function (
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    \assert('' !== $job->getId());
-
                     $remoteRequest = new RemoteRequest(
                         $job->getId(),
                         new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),

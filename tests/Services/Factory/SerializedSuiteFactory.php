@@ -17,8 +17,6 @@ readonly class SerializedSuiteFactory
 
     public function createPreparedForJob(JobInterface $job): SerializedSuite
     {
-        \assert('' !== $job->getId());
-
         $serializedSuiteId = md5((string) rand());
         $state = md5((string) rand());
 

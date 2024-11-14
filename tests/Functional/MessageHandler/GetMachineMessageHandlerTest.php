@@ -75,7 +75,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $machine = MachineFactory::createRandomForJob($job->getId());
 
@@ -129,8 +128,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'find/received => find/received' => [
                 'previousMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'find/received',
@@ -143,8 +140,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'find/received',
@@ -197,8 +192,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'unknown => find/received' => [
                 'previousMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'unknown',
@@ -211,8 +204,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'find/received',
@@ -225,7 +216,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
-                    \assert('' !== $job->getId());
                     \assert('' !== $authenticationToken);
 
                     return new MachineStateChangeEvent(
@@ -254,8 +244,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ],
             'unknown => active' => [
                 'previousMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'unknown',
@@ -268,8 +256,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'up/active',
@@ -282,7 +268,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
-                    \assert('' !== $job->getId());
                     \assert('' !== $authenticationToken);
 
                     return new MachineIsActiveEvent($authenticationToken, $job->getId(), '127.0.0.1');
@@ -336,8 +321,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return [
             'up/active => delete/deleted' => [
                 'previousMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'up/active',
@@ -350,8 +333,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return MachineFactory::create(
                         $job->getId(),
                         'delete/deleted',

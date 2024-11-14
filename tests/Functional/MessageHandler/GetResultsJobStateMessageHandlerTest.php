@@ -50,7 +50,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $handler = self::getContainer()->get(GetResultsJobStateMessageHandler::class);
         \assert($handler instanceof GetResultsJobStateMessageHandler);
@@ -71,7 +70,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $jobPreparationInspector = \Mockery::mock(JobPreparationInspectorInterface::class);
         $jobPreparationInspector
@@ -133,7 +131,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -188,7 +185,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
@@ -224,7 +220,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);

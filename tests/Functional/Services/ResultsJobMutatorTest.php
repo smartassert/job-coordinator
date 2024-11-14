@@ -136,8 +136,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 'resultsJobCreator' => function () {
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -156,14 +154,10 @@ class ResultsJobMutatorTest extends WebTestCase
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->getId());
-
                     $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -171,8 +165,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     );
                 },
                 'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
-                    \assert('' !== $job->getId());
-
                     return new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                 },
             ],
@@ -184,14 +176,10 @@ class ResultsJobMutatorTest extends WebTestCase
                 ) use (
                     $resultsJobToken
                 ) {
-                    \assert('' !== $job->getId());
-
                     $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -199,8 +187,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     );
                 },
                 'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
-                    \assert('' !== $job->getId());
-
                     return new ResultsJob($job->getId(), $resultsJobToken, 'complete', 'ended');
                 },
             ],

@@ -137,8 +137,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 'serializedSuiteCreator' => function () {
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -155,8 +153,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -167,8 +163,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     $serializedSuiteRepository->save($serializedSuite);
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -185,8 +179,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     return new SerializedSuite($job->getId(), $serializedSuiteId, 'requested', false, false);
                 },
             ],
@@ -196,8 +188,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -208,8 +198,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     $serializedSuiteRepository->save($serializedSuite);
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
@@ -226,8 +214,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    \assert('' !== $job->getId());
-
                     return new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true);
                 },
             ],

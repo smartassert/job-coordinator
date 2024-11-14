@@ -7,12 +7,7 @@ namespace App\Model;
 use Symfony\Component\Uid\Ulid;
 
 /**
- * @phpstan-type SerializedJob array{
- *   id: ?non-empty-string,
- *   suite_id: ?non-empty-string,
- *   maximum_duration_in_seconds: positive-int,
- *   created_at: positive-int
- *  }
+ * @phpstan-import-type SerializedJob from JobInterface
  */
 readonly class Job implements JobInterface
 {
