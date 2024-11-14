@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 
 readonly class ResultsJobFactory
@@ -19,7 +19,7 @@ readonly class ResultsJobFactory
      * @param null|non-empty-string $state
      * @param null|non-empty-string $endState
      */
-    public function create(Job $job, ?string $state = null, ?string $endState = null): ResultsJob
+    public function create(JobInterface $job, ?string $state = null, ?string $endState = null): ResultsJob
     {
         \assert('' !== $job->getId());
 

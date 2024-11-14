@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
-use App\Entity\Job;
 use App\Entity\SerializedSuite;
+use App\Model\JobInterface;
 use App\Repository\SerializedSuiteRepository;
 
 readonly class SerializedSuiteFactory
@@ -15,7 +15,7 @@ readonly class SerializedSuiteFactory
     ) {
     }
 
-    public function createPreparedForJob(Job $job): SerializedSuite
+    public function createPreparedForJob(JobInterface $job): SerializedSuite
     {
         \assert('' !== $job->getId());
 

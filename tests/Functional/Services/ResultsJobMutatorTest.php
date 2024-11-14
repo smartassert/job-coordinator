@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Job;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
 use App\Tests\Services\Factory\JobFactory;
@@ -74,10 +74,10 @@ class ResultsJobMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?Job                    $jobCreator
-     * @param callable(?Job, ResultsJobRepository): void    $resultsJobCreator
-     * @param callable(?Job): ResultsJobStateRetrievedEvent $eventCreator
-     * @param callable(?Job): ?ResultsJob                   $expectedResultsJobCreator
+     * @param callable(JobFactory): ?JobInterface                    $jobCreator
+     * @param callable(?JobInterface, ResultsJobRepository): void    $resultsJobCreator
+     * @param callable(?JobInterface): ResultsJobStateRetrievedEvent $eventCreator
+     * @param callable(?JobInterface): ?ResultsJob                   $expectedResultsJobCreator
      */
     #[DataProvider('setStateSuccessDataProvider')]
     public function testSetStateSuccess(
@@ -135,7 +135,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function () {
                 },
-                'eventCreator' => function (Job $job) {
+                'eventCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
@@ -151,7 +151,7 @@ class ResultsJobMutatorTest extends WebTestCase
             'no state change' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     ResultsJobRepository $resultsJobRepository
                 ) use (
                     $resultsJobToken
@@ -161,7 +161,7 @@ class ResultsJobMutatorTest extends WebTestCase
                     $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
-                'eventCreator' => function (Job $job) {
+                'eventCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
@@ -170,7 +170,7 @@ class ResultsJobMutatorTest extends WebTestCase
                         new ResultsJobState('awaiting-events', null),
                     );
                 },
-                'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
+                'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
                     \assert('' !== $job->getId());
 
                     return new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
@@ -179,7 +179,7 @@ class ResultsJobMutatorTest extends WebTestCase
             'has state change' => [
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function (
-                    Job $job,
+                    JobInterface $job,
                     ResultsJobRepository $resultsJobRepository
                 ) use (
                     $resultsJobToken
@@ -189,7 +189,7 @@ class ResultsJobMutatorTest extends WebTestCase
                     $resultsJob = new ResultsJob($job->getId(), $resultsJobToken, 'awaiting-events', null);
                     $resultsJobRepository->save($resultsJob);
                 },
-                'eventCreator' => function (Job $job) {
+                'eventCreator' => function (JobInterface $job) {
                     \assert('' !== $job->getId());
 
                     return new ResultsJobStateRetrievedEvent(
@@ -198,7 +198,7 @@ class ResultsJobMutatorTest extends WebTestCase
                         new ResultsJobState('complete', 'ended'),
                     );
                 },
-                'expectedResultsJobCreator' => function (Job $job) use ($resultsJobToken) {
+                'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
                     \assert('' !== $job->getId());
 
                     return new ResultsJob($job->getId(), $resultsJobToken, 'complete', 'ended');

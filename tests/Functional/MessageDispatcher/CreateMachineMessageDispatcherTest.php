@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Job;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
@@ -14,6 +13,7 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\Model\JobInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -84,7 +84,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @param callable(Job): object $eventCreator
+     * @param callable(JobInterface): object $eventCreator
      */
     #[DataProvider('dispatchSuccessDataProvider')]
     public function testDispatchSuccess(callable $eventCreator): void
@@ -111,7 +111,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
      */
     public static function dispatchSuccessDataProvider(): array
     {
-        $resultsJobCreatedEventCreator = function (Job $job) {
+        $resultsJobCreatedEventCreator = function (JobInterface $job) {
             \assert('' !== $job->getId());
 
             return new ResultsJobCreatedEvent(
@@ -121,7 +121,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             );
         };
 
-        $serializedSuiteSerializedEventCreator = function (Job $job) {
+        $serializedSuiteSerializedEventCreator = function (JobInterface $job) {
             \assert('' !== $job->getId());
 
             return new SerializedSuiteSerializedEvent(

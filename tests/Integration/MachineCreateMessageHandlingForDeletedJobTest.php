@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\Job;
 use App\Entity\RemoteRequest;
 use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
+use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\JobStore;
 use App\Tests\Application\AbstractApplicationTest;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,8 +42,8 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
         $suiteId = (string) new Ulid();
         \assert('' !== $suiteId);
 
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
+        $jobStore = self::getContainer()->get(JobStore::class);
+        \assert($jobStore instanceof JobStore);
 
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         \assert($entityManager instanceof EntityManagerInterface);
@@ -67,8 +67,8 @@ class MachineCreateMessageHandlingForDeletedJobTest extends AbstractApplicationT
         self::assertTrue(Ulid::isValid($createResponseData['id']));
         $jobId = $createResponseData['id'];
 
-        $job = $jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $job);
+        $job = $jobStore->retrieve($jobId);
+        self::assertInstanceOf(JobInterface::class, $job);
 
         $this->waitUntilMachineCreateRemoteRequestExists($jobId);
 

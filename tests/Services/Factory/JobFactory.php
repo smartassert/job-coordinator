@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
-use App\Entity\Job;
-use App\Repository\JobRepository;
+use App\Model\JobInterface;
+use App\Services\JobStore;
 use Symfony\Component\Uid\Ulid;
 
 readonly class JobFactory
 {
     public function __construct(
-        private JobRepository $jobRepository,
+        private JobStore $jobStore,
     ) {
     }
 
-    public function createRandom(): Job
+    public function createRandom(): JobInterface
     {
         $id = (string) new Ulid();
         \assert('' !== $id);
@@ -28,10 +28,6 @@ readonly class JobFactory
 
         $maximumDurationInSeconds = rand(1, 1000);
 
-        $job = new Job($id, $userId, $suiteId, $maximumDurationInSeconds);
-
-        $this->jobRepository->add($job);
-
-        return $job;
+        return $this->jobStore->create($userId, $suiteId, $maximumDurationInSeconds);
     }
 }

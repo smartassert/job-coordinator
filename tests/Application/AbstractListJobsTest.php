@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
-use App\Entity\Job;
+use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -84,7 +84,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
     /**
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
-     * @param callable(Job[]): array<mixed>                                  $expectedCreator
+     * @param callable(JobInterface[]): array<mixed>                         $expectedCreator
      */
     #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void
@@ -167,8 +167,6 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $expected = [];
                     foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
                         $expected[] = $expectedJob->toArray();
                     }
 
@@ -210,8 +208,6 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $expected = [];
                     foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
                         $expected[] = $expectedJob->toArray();
                     }
 
@@ -252,8 +248,6 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $expected = [];
                     foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
                         $expected[] = $expectedJob->toArray();
                     }
 
@@ -300,8 +294,6 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
                     $expected = [];
                     foreach ($expectedJobs as $expectedJob) {
-                        \assert($expectedJob instanceof Job);
-
                         $expected[] = $expectedJob->toArray();
                     }
 
