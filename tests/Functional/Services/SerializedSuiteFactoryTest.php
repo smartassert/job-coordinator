@@ -81,10 +81,16 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
         $event = new SerializedSuiteCreatedEvent(
             'authentication token',
             $jobId,
-            SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
+            SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
         );
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);

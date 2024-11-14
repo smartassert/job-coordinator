@@ -23,6 +23,7 @@ use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRemoverForEventsTest extends TestCase
 {
@@ -101,11 +102,17 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
             new SerializedSuiteCreatedEvent(
                 'authentication token',
                 $jobId,
-                SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
+                SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
             )
         );
     }
@@ -159,12 +166,18 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->andReturn([])
         ;
 
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
+
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(
             new SerializedSuiteRetrievedEvent(
                 'authentication token',
                 $jobId,
-                SourcesClientSerializedSuiteFactory::create(md5((string) rand()))
+                SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
             )
         );
     }
