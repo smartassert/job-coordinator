@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
-use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
-use App\Services\SerializedSuiteStore;
+use App\Services\ReadinessAssessor\CreateMachineReadinessAssessor;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,11 +19,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class CreateMachineMessageHandler
 {
     public function __construct(
-        private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteStore $serializedSuiteStore,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
-        private MachineRepository $machineRepository,
+        private CreateMachineReadinessAssessor $readinessAssessor,
     ) {
     }
 
@@ -33,18 +30,15 @@ final readonly class CreateMachineMessageHandler
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        if ($this->machineRepository->has($message->getJobId())) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteStore->retrieve($message->getJobId());
-        if (
-            !$this->resultsJobRepository->has($message->getJobId())
-            || null === $serializedSuite
-            || !$serializedSuite->isPrepared()
-        ) {
+        if (MessageHandlingReadiness::EVENTUALLY === $readiness) {
             $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
 
             return;
