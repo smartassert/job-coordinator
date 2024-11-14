@@ -7,12 +7,14 @@ namespace App\MessageDispatcher;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
+use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private readonly JobStore $jobStore,
     ) {
     }
 
@@ -33,8 +35,18 @@ class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
+            return;
+        }
+
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateWorkerJobMessage($event->getAuthenticationToken(), $event->getJobId(), $event->ipAddress)
+            new CreateWorkerJobMessage(
+                $event->getAuthenticationToken(),
+                $job->getId(),
+                $job->getMaximumDurationInSeconds(),
+                $event->ipAddress
+            )
         );
     }
 

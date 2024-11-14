@@ -13,11 +13,13 @@ class CreateWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
+     * @param positive-int     $maximumDurationInSeconds
      * @param non-empty-string $machineIpAddress
      */
     public function __construct(
         string $authenticationToken,
         string $jobId,
+        public readonly int $maximumDurationInSeconds,
         public readonly string $machineIpAddress,
     ) {
         parent::__construct($authenticationToken, $jobId);
