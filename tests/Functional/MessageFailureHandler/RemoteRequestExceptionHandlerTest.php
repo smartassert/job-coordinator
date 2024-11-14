@@ -105,7 +105,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                 'exceptionCreator' => function (\Throwable $inner) {
                     return function (JobInterface $job) use ($inner) {
                         return new RemoteJobActionException(
-                            $job,
+                            $job->getId(),
                             $inner,
                             new CreateMachineMessage(md5((string) rand()), $job->getId()),
                         );

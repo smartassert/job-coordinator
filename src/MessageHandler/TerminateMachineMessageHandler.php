@@ -46,7 +46,7 @@ final class TerminateMachineMessageHandler
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($job->getId()));
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($job, $e, $message);
+            throw new RemoteJobActionException($message->getJobId(), $e, $message);
         }
     }
 }
