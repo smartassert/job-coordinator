@@ -82,8 +82,6 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'application component state entity only' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new WorkerComponentState(
                             $job->getId(),
@@ -94,8 +92,6 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new WorkerState(
                         (new WorkerComponentState(
                             $job->getId(),
@@ -111,8 +107,6 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'execution component state entity only' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new WorkerComponentState(
                             $job->getId(),
@@ -123,8 +117,6 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new WorkerState(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
@@ -140,8 +132,6 @@ class WorkerStateFactoryTest extends WebTestCase
             ],
             'all component states' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new WorkerComponentState(
                             $job->getId(),
@@ -179,8 +169,6 @@ class WorkerStateFactoryTest extends WebTestCase
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    \assert('' !== $job->getId());
-
                     return new WorkerState(
                         (new WorkerComponentState(
                             $job->getId(),

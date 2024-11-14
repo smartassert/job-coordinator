@@ -48,7 +48,6 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $applicationState = new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION);
         $applicationState->setState('end');
@@ -73,7 +72,6 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $workerClientException = new \Exception('Failed to get worker state');
 
@@ -105,7 +103,6 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);

@@ -44,7 +44,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $serializedSuiteCreateParameters = [];
 
@@ -89,8 +88,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
-        \assert('' !== $job->getSuiteId());
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),
@@ -154,7 +151,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),

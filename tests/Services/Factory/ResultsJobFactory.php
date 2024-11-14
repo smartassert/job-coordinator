@@ -21,8 +21,6 @@ readonly class ResultsJobFactory
      */
     public function create(JobInterface $job, ?string $state = null, ?string $endState = null): ResultsJob
     {
-        \assert('' !== $job->getId());
-
         $token = md5((string) rand());
         $state = is_string($state) ? $state : md5((string) rand());
 

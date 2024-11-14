@@ -117,7 +117,6 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
-        \assert('' !== $job->getId());
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
@@ -184,32 +183,24 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 },
                 'retrievedApplicationState' => $applicationStates[0],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                         ->setState($applicationStates[0]->applicationState->state)
                         ->setIsEndState($applicationStates[0]->applicationState->isEndState)
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                         ->setState($applicationStates[0]->compilationState->state)
                         ->setIsEndState($applicationStates[0]->compilationState->isEndState)
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                         ->setState($applicationStates[0]->executionState->state)
                         ->setIsEndState($applicationStates[0]->executionState->isEndState)
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                         ->setState($applicationStates[0]->eventDeliveryState->state)
                         ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
@@ -223,8 +214,6 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 ) use (
                     $applicationStates
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState($applicationStates[0]->applicationState->state)
@@ -251,32 +240,24 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 },
                 'retrievedApplicationState' => $applicationStates[0],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                         ->setState($applicationStates[0]->applicationState->state)
                         ->setIsEndState($applicationStates[0]->applicationState->isEndState)
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                         ->setState($applicationStates[0]->compilationState->state)
                         ->setIsEndState($applicationStates[0]->compilationState->isEndState)
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                         ->setState($applicationStates[0]->executionState->state)
                         ->setIsEndState($applicationStates[0]->executionState->isEndState)
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                         ->setState($applicationStates[0]->eventDeliveryState->state)
                         ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
@@ -290,8 +271,6 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 ) use (
                     $applicationStates
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                             ->setState($applicationStates[0]->applicationState->state)
@@ -318,32 +297,24 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 },
                 'retrievedApplicationState' => $applicationStates[1],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
                         ->setState($applicationStates[1]->applicationState->state)
                         ->setIsEndState($applicationStates[1]->applicationState->isEndState)
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
                         ->setState($applicationStates[1]->compilationState->state)
                         ->setIsEndState($applicationStates[1]->compilationState->isEndState)
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
                         ->setState($applicationStates[1]->executionState->state)
                         ->setIsEndState($applicationStates[1]->executionState->isEndState)
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    \assert('' !== $job->getId());
-
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
                         ->setState($applicationStates[1]->eventDeliveryState->state)
                         ->setIsEndState($applicationStates[1]->eventDeliveryState->isEndState)

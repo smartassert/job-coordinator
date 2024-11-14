@@ -120,8 +120,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
             MachineRepository $machineRepository,
             WorkerComponentStateRepository $workerComponentStateRepository,
         ) {
-            \assert('' !== $job->getId());
-
             $resultsJobRepository->save(new ResultsJob(
                 $job->getId(),
                 'results job token',
@@ -219,8 +217,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $serializedSuiteCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
                             ->setState(RequestState::REQUESTING)
@@ -252,8 +248,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     JobInterface $job,
                     RemoteRequestRepository $repository
                 ) use ($machineCreateType) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $machineCreateType, 0))
                             ->setState(RequestState::REQUESTING)
@@ -287,8 +281,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $workerJobCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $workerJobCreateType, 0))
                             ->setState(RequestState::REQUESTING)
@@ -322,8 +314,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $resultsCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::REQUESTING)
@@ -357,8 +347,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $resultsCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::HALTED)
@@ -392,8 +380,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $resultsCreateType,
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::PENDING)
@@ -427,8 +413,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $resultsCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::FAILED)
@@ -462,8 +446,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ) use (
                     $resultsCreateType
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::FAILED)
@@ -515,8 +497,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     $machineCreateType,
                     $workerJobCreateType,
                 ) {
-                    \assert('' !== $job->getId());
-
                     $repository->save(
                         (new RemoteRequest($job->getId(), $resultsCreateType, 0))
                             ->setState(RequestState::FAILED)
