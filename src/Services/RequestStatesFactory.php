@@ -31,7 +31,7 @@ class RequestStatesFactory
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
                 if (null === $requestState) {
-                    $requestState = $jobComponentHandler->getRequestState($jobComponent, $job);
+                    $requestState = $jobComponentHandler->getRequestState($jobComponent, $job->getId());
 
                     if ($requestState instanceof RequestState) {
                         $requestStates[$jobComponent->value] = $requestState;
