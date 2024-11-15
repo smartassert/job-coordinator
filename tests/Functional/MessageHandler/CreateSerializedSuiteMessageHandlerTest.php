@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
+use App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
+use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -41,10 +45,13 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
+        $readinessAssessor = self::getContainer()->get(CreateSerializedSuiteReadinessAssessor::class);
+        \assert($readinessAssessor instanceof CreateSerializedSuiteReadinessAssessor);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
             $eventDispatcher,
-            $serializedSuiteRepository,
+            $readinessAssessor,
         );
 
         $message = new CreateSerializedSuiteMessage(
@@ -97,10 +104,13 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
+        $readinessAssessor = self::getContainer()->get(CreateSerializedSuiteReadinessAssessor::class);
+        \assert($readinessAssessor instanceof CreateSerializedSuiteReadinessAssessor);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
             $eventDispatcher,
-            $serializedSuiteRepository,
+            $readinessAssessor,
         );
 
         $handler(new CreateSerializedSuiteMessage(
@@ -129,9 +139,11 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
     public function testInvokeNotHandleable(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),
@@ -140,25 +152,27 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
         $serializedSuiteRepository
             ->shouldReceive('has')
-            ->with($job->getId())
+            ->with($jobId)
             ->andReturnTrue()
         ;
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
         $handler = new CreateSerializedSuiteMessageHandler(
             \Mockery::mock(SerializedSuiteClient::class),
             $eventDispatcher,
-            $serializedSuiteRepository,
+            $assessor,
         );
 
-        $message = new CreateSerializedSuiteMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuiteParameters
-        );
+        $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteParameters);
         $handler($message);
 
         $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);

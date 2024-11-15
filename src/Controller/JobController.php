@@ -38,7 +38,7 @@ readonly class JobController
         );
 
         $eventDispatcher->dispatch(
-            new JobCreatedEvent($user->getSecurityToken(), $job->getId(), $request->parameters)
+            new JobCreatedEvent($user->getSecurityToken(), $job->getId(), $job->getSuiteId(), $request->parameters)
         );
 
         return new JsonResponse($this->jobStatusFactory->create($job));

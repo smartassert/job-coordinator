@@ -46,7 +46,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
 
-        $event = new JobCreatedEvent($authenticationToken, $job->getId(), []);
+        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), []);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -74,7 +74,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new CreateResultsJobMessageDispatcher($messageDispatcher, $readinessAssessor);
 
-        $event = new JobCreatedEvent('api token', 'job id', []);
+        $event = new JobCreatedEvent('api token', 'job id', 'suite id', []);
 
         $dispatcher->dispatchForJobCreatedEvent($event);
 

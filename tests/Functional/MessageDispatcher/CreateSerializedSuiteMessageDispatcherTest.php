@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\SerializedSuiteFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -49,7 +51,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
             md5((string) rand()) => md5((string) rand()),
         ];
 
-        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $parameters);
+        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), $parameters);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -69,19 +71,22 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 
-    public function testDispatchResultsJobAlreadyExists(): void
+    public function testDispatchNotReady(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $readinessAssessor
+            ->shouldReceive('isReady')
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
-        \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
-        $serializedSuiteFactory->createPreparedForJob($job);
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $event = new JobCreatedEvent('api token', $job->getId(), []);
+        $dispatcher = new CreateSerializedSuiteMessageDispatcher($messageDispatcher, $readinessAssessor);
 
-        $this->dispatcher->dispatchForJobCreatedEvent($event);
+        $event = new JobCreatedEvent('api token', 'job id', 'suite id', []);
+
+        $dispatcher->dispatchForJobCreatedEvent($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }
