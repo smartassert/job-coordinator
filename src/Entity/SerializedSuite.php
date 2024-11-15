@@ -72,11 +72,6 @@ class SerializedSuite
         return $this->isPrepared;
     }
 
-    public function isPreparing(): bool
-    {
-        return false === $this->isPrepared && false === $this->hasFailed();
-    }
-
     public function hasFailed(): bool
     {
         return true === $this->hasEndState && false === $this->isPrepared;
