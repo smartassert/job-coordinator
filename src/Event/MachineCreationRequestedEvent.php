@@ -16,7 +16,7 @@ class MachineCreationRequestedEvent extends Event implements JobEventInterface, 
      */
     public function __construct(
         private readonly string $authenticationToken,
-        public readonly Machine $machine,
+        private readonly Machine $machine,
     ) {
     }
 
