@@ -9,12 +9,12 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
-class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
+readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
-        private readonly MachineRepository $machineRepository,
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
-        private readonly ResultsJobRepository $resultsJobRepository,
+        private MachineRepository $machineRepository,
+        private SerializedSuiteRepository $serializedSuiteRepository,
+        private ResultsJobRepository $resultsJobRepository,
     ) {
     }
 

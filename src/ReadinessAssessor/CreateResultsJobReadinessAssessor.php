@@ -7,10 +7,10 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Repository\ResultsJobRepository;
 
-class CreateResultsJobReadinessAssessor implements ReadinessAssessorInterface
+readonly class CreateResultsJobReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
-        private readonly ResultsJobRepository $resultsJobRepository,
+        private ResultsJobRepository $resultsJobRepository,
     ) {
     }
 
