@@ -81,6 +81,11 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
+        $machine = $event->getMachine();
+        if (null === $machine->actionFailure) {
+            return;
+        }
+
         $machineEntity = $this->machineRepository->find($job->getId());
         if (!$machineEntity instanceof Machine) {
             return;
@@ -93,9 +98,9 @@ class MachineMutator implements EventSubscriberInterface
         $machineEntity->setActionFailure(
             new MachineActionFailure(
                 $job->getId(),
-                $event->machineActionFailure->action,
-                $event->machineActionFailure->type,
-                $event->machineActionFailure->context,
+                $machine->actionFailure->action,
+                $machine->actionFailure->type,
+                $machine->actionFailure->context,
             )
         );
     }

@@ -412,7 +412,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         self::assertEquals(
             [
-                new MachineHasActionFailureEvent($machineId, $actionFailure, $currentMachine),
+                new MachineHasActionFailureEvent($machineId, $currentMachine),
             ],
             $this->eventRecorder->all(MachineHasActionFailureEvent::class)
         );

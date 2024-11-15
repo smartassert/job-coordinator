@@ -427,7 +427,6 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
-                        new ActionFailure('find', 'vendor_authentication_failure', []),
                         MachineFactory::create(
                             $jobId,
                             md5((string) rand()),
@@ -437,6 +436,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
                 },
@@ -454,7 +454,6 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
-                        new ActionFailure('find', 'vendor_authentication_failure', []),
                         MachineFactory::create(
                             $jobId,
                             md5((string) rand()),
@@ -464,7 +463,8 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                        )
+                            new ActionFailure('find', 'vendor_authentication_failure', []),
+                        ),
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -482,7 +482,6 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
-                        new ActionFailure('find', 'vendor_authentication_failure', []),
                         MachineFactory::create(
                             $job->getId(),
                             md5((string) rand()),
@@ -492,7 +491,8 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                        )
+                            new ActionFailure('find', 'vendor_authentication_failure', []),
+                        ),
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
@@ -518,7 +518,6 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
-                        new ActionFailure('new_action', 'new_type', []),
                         MachineFactory::create(
                             $job->getId(),
                             md5((string) rand()),
@@ -528,7 +527,8 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                        )
+                            new ActionFailure('new_action', 'new_type', []),
+                        ),
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
