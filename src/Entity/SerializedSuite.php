@@ -8,7 +8,7 @@ use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements \JsonSerializable
+class SerializedSuite
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -100,17 +100,5 @@ class SerializedSuite implements \JsonSerializable
     public function hasEndState(): bool
     {
         return $this->hasEndState;
-    }
-
-    /**
-     * @return array{state: ?non-empty-string}
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state' => '' === $this->state ? null : $this->state,
-            'is_prepared' => $this->isPrepared,
-            'has_end_state' => $this->hasEndState,
-        ];
     }
 }
