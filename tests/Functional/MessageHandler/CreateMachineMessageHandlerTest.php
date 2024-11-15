@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
@@ -13,6 +15,8 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Repository\MachineRepository;
+use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use App\Services\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
@@ -117,12 +121,25 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $assessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $serializedSuiteRepository->save(
+            new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+        );
+
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+
+        $resultsJobRepository->save(
+            new ResultsJob($job->getId(), 'token', 'state', null)
+        );
+
+        $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
+        \assert($assessor instanceof CreateMachineReadinessAssessor);
 
         $machine = MachineFactory::create(
             $job->getId(),
