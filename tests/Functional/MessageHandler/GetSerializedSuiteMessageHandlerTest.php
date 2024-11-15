@@ -71,8 +71,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
-        $serializedSuiteId = $serializedSuite->getId();
-        \assert(null !== $serializedSuiteId);
+        \assert('' !== $serializedSuite->serializedSuiteId);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -102,7 +101,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
-            $serializedSuiteId
+            $serializedSuite->serializedSuiteId
         );
 
         ($handler)($message);
@@ -130,15 +129,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
-        $serializedSuiteId = $serializedSuite->getId();
-        \assert(null !== $serializedSuiteId);
+        \assert('' !== $serializedSuite->serializedSuiteId);
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with(self::$apiToken, $serializedSuite->getId())
+            ->with(self::$apiToken, $serializedSuite->serializedSuiteId)
             ->andThrow($serializedSuiteClientException)
         ;
 
@@ -164,7 +162,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
-            $serializedSuiteId
+            $serializedSuite->serializedSuiteId
         );
 
         ($handler)($message);
@@ -177,11 +175,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
-        $serializedSuiteId = $serializedSuite->getId();
-        \assert(null !== $serializedSuiteId);
+        \assert('' !== $serializedSuite->serializedSuiteId);
 
         $serializedSuite = new SerializedSuiteModel(
-            $serializedSuiteId,
+            $serializedSuite->serializedSuiteId,
             md5((string) rand()),
             [],
             md5((string) rand()),

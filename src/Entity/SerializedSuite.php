@@ -10,12 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
 class SerializedSuite
 {
+    #[ORM\Column(length: 32, unique: true, nullable: false)]
+    public string $serializedSuiteId;
+
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $jobId;
-
-    #[ORM\Column(length: 32, unique: true, nullable: false)]
-    private string $serializedSuiteId;
 
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
@@ -43,14 +43,6 @@ class SerializedSuite
         $this->state = $state;
         $this->isPrepared = $isPrepared;
         $this->hasEndState = $hasEndState;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    public function getId(): ?string
-    {
-        return '' === $this->serializedSuiteId ? null : $this->serializedSuiteId;
     }
 
     public function getState(): string

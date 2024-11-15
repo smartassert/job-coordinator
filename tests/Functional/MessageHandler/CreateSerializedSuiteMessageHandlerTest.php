@@ -116,7 +116,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteEntity = $serializedSuiteRepository->find($job->getId());
         self::assertInstanceOf(SerializedSuite::class, $serializedSuiteEntity);
 
-        self::assertSame($serializedSuiteModel->getId(), $serializedSuiteEntity->getId());
+        self::assertSame($serializedSuiteModel->getId(), $serializedSuiteEntity->serializedSuiteId);
 
         $events = $this->eventRecorder->all(SerializedSuiteCreatedEvent::class);
         $event = $events[0] ?? null;
