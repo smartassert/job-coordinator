@@ -199,7 +199,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $serializedSuite->serializedSuiteId)
+            ->with(self::$apiToken, $serializedSuite->id)
             ->andThrow($serializedSuiteReadException)
         ;
 
@@ -239,7 +239,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('read')
-            ->with(self::$apiToken, $serializedSuite->serializedSuiteId)
+            ->with(self::$apiToken, $serializedSuite->id)
             ->andReturn($serializedSuiteContent)
         ;
 

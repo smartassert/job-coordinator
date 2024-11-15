@@ -27,7 +27,7 @@ class SerializedSuiteStore
 
     private function hydrateFromEntity(SerializedSuiteEntity $entity): ?SerializedSuite
     {
-        $id = $entity->serializedSuiteId;
+        $id = $entity->id;
         if ('' === $id) {
             return null;
         }

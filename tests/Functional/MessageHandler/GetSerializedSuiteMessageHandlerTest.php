@@ -71,7 +71,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
-        \assert('' !== $serializedSuite->serializedSuiteId);
+        \assert('' !== $serializedSuite->id);
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -101,7 +101,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
-            $serializedSuite->serializedSuiteId
+            $serializedSuite->id
         );
 
         ($handler)($message);
@@ -129,14 +129,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
-        \assert('' !== $serializedSuite->serializedSuiteId);
+        \assert('' !== $serializedSuite->id);
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
             ->shouldReceive('get')
-            ->with(self::$apiToken, $serializedSuite->serializedSuiteId)
+            ->with(self::$apiToken, $serializedSuite->id)
             ->andThrow($serializedSuiteClientException)
         ;
 
@@ -162,7 +162,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
-            $serializedSuite->serializedSuiteId
+            $serializedSuite->id
         );
 
         ($handler)($message);
@@ -175,10 +175,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $job = $this->createJob();
 
         $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
-        \assert('' !== $serializedSuite->serializedSuiteId);
+        \assert('' !== $serializedSuite->id);
 
         $serializedSuite = new SerializedSuiteModel(
-            $serializedSuite->serializedSuiteId,
+            $serializedSuite->id,
             md5((string) rand()),
             [],
             md5((string) rand()),

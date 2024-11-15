@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 class SerializedSuite
 {
     #[ORM\Column(length: 32, unique: true, nullable: false)]
-    public string $serializedSuiteId;
+    public string $id;
 
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -39,7 +39,7 @@ class SerializedSuite
         bool $hasEndState,
     ) {
         $this->jobId = $jobId;
-        $this->serializedSuiteId = $serializedSuiteId;
+        $this->id = $serializedSuiteId;
         $this->state = $state;
         $this->isPrepared = $isPrepared;
         $this->hasEndState = $hasEndState;
