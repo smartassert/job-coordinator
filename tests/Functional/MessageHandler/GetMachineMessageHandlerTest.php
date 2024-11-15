@@ -298,7 +298,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertInstanceOf($expectedEventClass, $latestEvent);
         self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
         self::assertEquals($previous, $latestEvent->previous);
-        self::assertEquals($current, $latestEvent->current);
+        self::assertEquals($current, $latestEvent->getMachine());
 
         self::assertEquals(
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],

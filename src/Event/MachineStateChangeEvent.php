@@ -11,7 +11,7 @@ class MachineStateChangeEvent extends Event implements JobEventInterface, Machin
 {
     public function __construct(
         public readonly Machine $previous,
-        public readonly Machine $current,
+        private readonly Machine $machine,
     ) {
     }
 
@@ -22,6 +22,6 @@ class MachineStateChangeEvent extends Event implements JobEventInterface, Machin
 
     public function getMachine(): Machine
     {
-        return $this->current;
+        return $this->machine;
     }
 }
