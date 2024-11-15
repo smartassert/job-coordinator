@@ -17,7 +17,7 @@ class MachineRetrievedEvent extends Event implements JobEventInterface, Authenti
     public function __construct(
         private readonly string $authenticationToken,
         public readonly Machine $previous,
-        public readonly Machine $current,
+        private readonly Machine $machine,
     ) {
     }
 
@@ -33,6 +33,6 @@ class MachineRetrievedEvent extends Event implements JobEventInterface, Authenti
 
     public function getMachine(): Machine
     {
-        return $this->current;
+        return $this->machine;
     }
 }

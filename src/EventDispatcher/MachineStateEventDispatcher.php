@@ -35,8 +35,8 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
     public function dispatchMachineStateChangeEvent(MachineRetrievedEvent $event): void
     {
-        if ($event->previous->state !== $event->current->state) {
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($event->previous, $event->current));
+        if ($event->previous->state !== $event->getMachine()->state) {
+            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($event->previous, $event->getMachine()));
         }
     }
 
@@ -48,10 +48,10 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             && !$event->previous->hasEndingState
             && !$event->previous->hasEndState;
 
-        $machineIsNowActive = $event->current->hasActiveState;
+        $machineIsNowActive = $event->getMachine()->hasActiveState;
 
         if ($machineWasPreviouslyNotYetActive && $machineIsNowActive) {
-            $primaryIpAddress = $event->current->ipAddresses[0] ?? null;
+            $primaryIpAddress = $event->getMachine()->ipAddresses[0] ?? null;
             if (!is_string($primaryIpAddress)) {
                 return;
             }
@@ -60,7 +60,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
                 $event->getAuthenticationToken(),
                 $event->getJobId(),
                 $primaryIpAddress,
-                $event->current,
+                $event->getMachine(),
             ));
         }
     }
@@ -69,9 +69,11 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     {
         if (
             null === $event->previous->actionFailure
-            && $event->current->actionFailure instanceof ActionFailure
+            && $event->getMachine()->actionFailure instanceof ActionFailure
         ) {
-            $this->eventDispatcher->dispatch(new MachineHasActionFailureEvent($event->getJobId(), $event->current));
+            $this->eventDispatcher->dispatch(
+                new MachineHasActionFailureEvent($event->getJobId(), $event->getMachine())
+            );
         }
     }
 }
