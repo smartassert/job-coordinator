@@ -8,10 +8,10 @@ use App\Entity\SerializedSuite as SerializedSuiteEntity;
 use App\Model\SerializedSuite;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class SerializedSuiteStore
+class SerializedSuiteStore
 {
     public function __construct(
-        private SerializedSuiteRepository $serializedSuiteRepository,
+        private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {
     }
 
