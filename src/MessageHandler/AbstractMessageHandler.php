@@ -21,7 +21,7 @@ abstract readonly class AbstractMessageHandler
     ) {
     }
 
-    public function isReady(JobRemoteRequestMessageInterface $message): bool
+    protected function isReady(JobRemoteRequestMessageInterface $message): bool
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
 
@@ -32,11 +32,16 @@ abstract readonly class AbstractMessageHandler
         }
 
         if (MessageHandlingReadiness::EVENTUALLY === $readiness) {
-            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
+            $this->isNotYetReady($message);
 
             return false;
         }
 
         return true;
+    }
+
+    protected function isNotYetReady(JobRemoteRequestMessageInterface $message): void
+    {
+        $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
     }
 }
