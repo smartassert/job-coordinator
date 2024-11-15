@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineStateChangeEvent extends Event implements JobEventInterface
+class MachineStateChangeEvent extends Event implements JobEventInterface, MachineEventInterface
 {
     public function __construct(
         public readonly Machine $previous,
@@ -18,5 +18,10 @@ class MachineStateChangeEvent extends Event implements JobEventInterface
     public function getJobId(): string
     {
         return $this->previous->id;
+    }
+
+    public function getMachine(): Machine
+    {
+        return $this->current;
     }
 }

@@ -21,6 +21,7 @@ use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Component\Uid\Ulid;
@@ -49,7 +50,21 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
-            new MachineIsActiveEvent('authentication token', $jobId, '127.0.0.1')
+            new MachineIsActiveEvent(
+                'authentication token',
+                $jobId,
+                '127.0.0.1',
+                MachineFactory::create(
+                    $jobId,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    [md5((string) rand())],
+                    false,
+                    true,
+                    false,
+                    false,
+                )
+            )
         );
     }
 
@@ -260,7 +275,19 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
-            new MachineTerminationRequestedEvent($jobId)
+            new MachineTerminationRequestedEvent(
+                $jobId,
+                MachineFactory::create(
+                    $jobId,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    [md5((string) rand())],
+                    false,
+                    true,
+                    false,
+                    false,
+                )
+            )
         );
     }
 }

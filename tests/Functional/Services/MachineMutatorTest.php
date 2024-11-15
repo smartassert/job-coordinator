@@ -14,6 +14,7 @@ use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
@@ -252,6 +253,20 @@ class MachineMutatorTest extends WebTestCase
             return $jobFactory->createRandom();
         };
 
+        $machineId = (string) new Ulid();
+        \assert('' !== $machineId);
+
+        $arbitraryMachine = MachineFactory::create(
+            $machineId,
+            md5((string) rand()),
+            md5((string) rand()),
+            [md5((string) rand())],
+            false,
+            true,
+            false,
+            false,
+        );
+
         return [
             'no job' => [
                 'jobCreator' => function () {
@@ -259,11 +274,16 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'machineCreator' => function () {
                 },
-                'eventCreator' => function () {
+                'eventCreator' => function () use ($arbitraryMachine) {
                     $jobId = (string) new Ulid();
                     \assert('' !== $jobId);
 
-                    return new MachineIsActiveEvent(md5((string) rand()), $jobId, '127.0.0.1');
+                    return new MachineIsActiveEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -273,8 +293,13 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {
                 },
-                'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsActiveEvent(md5((string) rand()), $job->getId(), '127.0.0.1');
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsActiveEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -290,8 +315,13 @@ class MachineMutatorTest extends WebTestCase
 
                     return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsActiveEvent(md5((string) rand()), $job->getId(), '127.0.0.1');
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsActiveEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return (new Machine($job->getId(), 'up/started', 'pre_active', false))
@@ -307,8 +337,13 @@ class MachineMutatorTest extends WebTestCase
 
                     return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsActiveEvent(md5((string) rand()), $job->getId(), '127.0.0.1');
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsActiveEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return (new Machine($job->getId(), 'up/started', 'pre_active', false))
@@ -326,8 +361,13 @@ class MachineMutatorTest extends WebTestCase
 
                     return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsActiveEvent(md5((string) rand()), $job->getId(), '127.0.0.2');
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsActiveEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.2',
+                        $arbitraryMachine,
+                    );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return (new Machine($job->getId(), 'up/started', 'pre_active', false))
@@ -387,7 +427,17 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
-                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                        new ActionFailure('find', 'vendor_authentication_failure', []),
+                        MachineFactory::create(
+                            $jobId,
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            [md5((string) rand())],
+                            false,
+                            true,
+                            false,
+                            false,
+                        ),
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -404,7 +454,17 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
-                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                        new ActionFailure('find', 'vendor_authentication_failure', []),
+                        MachineFactory::create(
+                            $jobId,
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            [md5((string) rand())],
+                            false,
+                            true,
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -422,7 +482,17 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
-                        new ActionFailure('find', 'vendor_authentication_failure', [])
+                        new ActionFailure('find', 'vendor_authentication_failure', []),
+                        MachineFactory::create(
+                            $job->getId(),
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            [md5((string) rand())],
+                            false,
+                            true,
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
@@ -448,7 +518,17 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
-                        new ActionFailure('new_action', 'new_type', [])
+                        new ActionFailure('new_action', 'new_type', []),
+                        MachineFactory::create(
+                            $job->getId(),
+                            md5((string) rand()),
+                            md5((string) rand()),
+                            [md5((string) rand())],
+                            false,
+                            true,
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {

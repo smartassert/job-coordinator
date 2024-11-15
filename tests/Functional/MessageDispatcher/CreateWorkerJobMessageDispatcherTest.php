@@ -9,6 +9,7 @@ use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -46,7 +47,18 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress);
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'find/not-findable',
+            'end',
+            [],
+            true,
+            false,
+            false,
+            true,
+        );
+
+        $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
 
         $this->dispatcher->dispatchForMachineIsActiveEvent($event);
 

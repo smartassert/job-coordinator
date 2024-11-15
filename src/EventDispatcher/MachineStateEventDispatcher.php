@@ -59,7 +59,8 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
                 $event->getAuthenticationToken(),
                 $event->getJobId(),
-                $primaryIpAddress
+                $primaryIpAddress,
+                $event->current,
             ));
         }
     }
@@ -72,7 +73,8 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
         ) {
             $this->eventDispatcher->dispatch(new MachineHasActionFailureEvent(
                 $event->getJobId(),
-                $event->current->actionFailure
+                $event->current->actionFailure,
+                $event->current,
             ));
         }
     }
