@@ -9,7 +9,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Services\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;

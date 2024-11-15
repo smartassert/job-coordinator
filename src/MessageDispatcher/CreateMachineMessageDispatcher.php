@@ -9,7 +9,7 @@ use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
-use App\Services\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface

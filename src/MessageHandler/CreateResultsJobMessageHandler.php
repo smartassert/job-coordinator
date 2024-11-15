@@ -10,7 +10,7 @@ use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
-use App\Services\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

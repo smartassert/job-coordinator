@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\ReadinessAssessor;
+namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

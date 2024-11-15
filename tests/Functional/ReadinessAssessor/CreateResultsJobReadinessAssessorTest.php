@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\ReadinessAssessor;
+namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\Repository\ResultsJobRepository;
-use App\Services\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

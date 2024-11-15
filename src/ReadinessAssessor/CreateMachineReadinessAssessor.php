@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\ReadinessAssessor;
+namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Repository\MachineRepository;

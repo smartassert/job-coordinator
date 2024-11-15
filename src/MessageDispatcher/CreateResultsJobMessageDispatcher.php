@@ -7,7 +7,7 @@ namespace App\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
-use App\Services\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
