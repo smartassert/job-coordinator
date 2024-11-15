@@ -9,10 +9,10 @@ use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetMachineMessageDispatcher implements EventSubscriberInterface
+readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 

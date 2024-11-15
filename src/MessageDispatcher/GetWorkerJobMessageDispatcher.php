@@ -9,10 +9,10 @@ use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
+readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 

@@ -9,10 +9,10 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
+readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 

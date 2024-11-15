@@ -12,11 +12,11 @@ use App\Message\CreateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateMachineMessageDispatcher implements EventSubscriberInterface
+readonly class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly ReadinessAssessorInterface $readinessAssessor,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 

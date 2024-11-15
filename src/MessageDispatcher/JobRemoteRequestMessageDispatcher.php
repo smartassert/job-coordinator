@@ -17,14 +17,14 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
-class JobRemoteRequestMessageDispatcher
+readonly class JobRemoteRequestMessageDispatcher
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly RemoteRequestRepository $remoteRequestRepository,
-        private readonly JobStore $jobStore,
-        private readonly LoggerInterface $logger,
+        private MessageBusInterface $messageBus,
+        private EventDispatcherInterface $eventDispatcher,
+        private RemoteRequestRepository $remoteRequestRepository,
+        private JobStore $jobStore,
+        private LoggerInterface $logger,
     ) {
     }
 

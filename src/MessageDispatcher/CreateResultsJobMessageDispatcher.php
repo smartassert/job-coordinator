@@ -10,11 +10,11 @@ use App\Message\CreateResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
+readonly class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly ReadinessAssessorInterface $readinessAssessor,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 

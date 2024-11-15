@@ -10,12 +10,12 @@ use App\Repository\SerializedSuiteRepository;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
+readonly class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
-        private readonly JobStore $jobStore,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private SerializedSuiteRepository $serializedSuiteRepository,
+        private JobStore $jobStore,
     ) {
     }
 

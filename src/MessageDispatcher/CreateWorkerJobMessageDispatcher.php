@@ -10,11 +10,11 @@ use App\Message\CreateWorkerJobMessage;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
+readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly JobStore $jobStore,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobStore $jobStore,
     ) {
     }
 

@@ -8,10 +8,10 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TerminateMachineMessageDispatcher implements EventSubscriberInterface
+readonly class TerminateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
     ) {
     }
 
