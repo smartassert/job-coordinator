@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotHandleableEvent;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
-use App\Repository\ResultsJobRepository;
+use App\Services\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +21,7 @@ final class CreateResultsJobMessageHandler
     public function __construct(
         private readonly ResultsClient $resultsClient,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly ResultsJobRepository $resultsJobRepository,
+        private readonly CreateResultsJobReadinessAssessor $readinessAssessor,
     ) {
     }
 
@@ -28,8 +30,16 @@ final class CreateResultsJobMessageHandler
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        if ($this->resultsJobRepository->has($message->getJobId())) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+
+            return;
+        }
+
+        if (MessageHandlingReadiness::EVENTUALLY === $readiness) {
+            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
 
             return;
         }
