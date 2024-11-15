@@ -16,12 +16,12 @@ use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CreateResultsJobMessageHandler
+final readonly class CreateResultsJobMessageHandler
 {
     public function __construct(
-        private readonly ResultsClient $resultsClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly ReadinessAssessorInterface $readinessAssessor,
+        private ResultsClient $resultsClient,
+        private EventDispatcherInterface $eventDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
