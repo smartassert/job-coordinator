@@ -9,7 +9,7 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
-class CreateMachineReadinessAssessor
+class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private readonly MachineRepository $machineRepository,
