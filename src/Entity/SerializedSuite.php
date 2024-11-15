@@ -8,14 +8,14 @@ use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements \JsonSerializable
+class SerializedSuite
 {
+    #[ORM\Column(length: 32, unique: true, nullable: false)]
+    public string $id;
+
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     private string $jobId;
-
-    #[ORM\Column(length: 32, unique: true, nullable: false)]
-    private string $serializedSuiteId;
 
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
@@ -39,18 +39,15 @@ class SerializedSuite implements \JsonSerializable
         bool $hasEndState,
     ) {
         $this->jobId = $jobId;
-        $this->serializedSuiteId = $serializedSuiteId;
+        $this->id = $serializedSuiteId;
         $this->state = $state;
         $this->isPrepared = $isPrepared;
         $this->hasEndState = $hasEndState;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getId(): ?string
+    public function getState(): string
     {
-        return '' === $this->serializedSuiteId ? null : $this->serializedSuiteId;
+        return $this->state;
     }
 
     /**
@@ -75,16 +72,6 @@ class SerializedSuite implements \JsonSerializable
         return $this->isPrepared;
     }
 
-    public function isPreparing(): bool
-    {
-        return false === $this->isPrepared && false === $this->hasFailed();
-    }
-
-    public function hasFailed(): bool
-    {
-        return true === $this->hasEndState && false === $this->isPrepared;
-    }
-
     public function setHasEndState(bool $hasEndState): static
     {
         $this->hasEndState = $hasEndState;
@@ -95,17 +82,5 @@ class SerializedSuite implements \JsonSerializable
     public function hasEndState(): bool
     {
         return $this->hasEndState;
-    }
-
-    /**
-     * @return array{state: ?non-empty-string}
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state' => '' === $this->state ? null : $this->state,
-            'is_prepared' => $this->isPrepared,
-            'has_end_state' => $this->hasEndState,
-        ];
     }
 }

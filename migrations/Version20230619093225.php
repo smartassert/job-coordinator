@@ -20,12 +20,12 @@ final class Version20230619093225 extends AbstractMigration
         $this->addSql('
             CREATE TABLE serialized_suite (
                 job_id VARCHAR(32) NOT NULL,
-                serialized_suite_id VARCHAR(32) NOT NULL,
+                id VARCHAR(32) NOT NULL,
                 state VARCHAR(128) NOT NULL,
                 PRIMARY KEY(job_id)
             )
         ');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_81B93DD1325FD920 ON serialized_suite (serialized_suite_id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_81B93DD1325FD920 ON serialized_suite (id)');
     }
 
     public function down(Schema $schema): void

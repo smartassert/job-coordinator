@@ -9,7 +9,7 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
-use App\Repository\SerializedSuiteRepository;
+use App\Services\SerializedSuiteStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class GetSerializedSuiteMessageHandler
 {
     public function __construct(
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
+        private readonly SerializedSuiteStore $serializedSuiteStore,
         private readonly SerializedSuiteClient $serializedSuiteClient,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -30,14 +30,15 @@ final class GetSerializedSuiteMessageHandler
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
-        $serializedSuiteEntity = $this->serializedSuiteRepository->find($message->getJobId());
-        if (null === $serializedSuiteEntity) {
+        $serializedSuite = $this->serializedSuiteStore->retrieve($message->getJobId());
+
+        if (null === $serializedSuite) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             throw new MessageHandlerTargetEntityNotFoundException($message, 'SerializedSuite');
         }
 
-        if ($serializedSuiteEntity->hasEndState()) {
+        if ($serializedSuite->hasEndState()) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
             return;

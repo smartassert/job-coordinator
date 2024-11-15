@@ -10,14 +10,13 @@ use App\Model\RemoteRequestCollection;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
-use App\Repository\SerializedSuiteRepository;
 
 readonly class JobStatusFactory
 {
     public function __construct(
         private PreparationStateFactory $preparationStateFactory,
         private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteRepository $serializedSuiteRepository,
+        private SerializedSuiteStore $serializedSuiteStore,
         private MachineRepository $machineRepository,
         private WorkerStateFactory $workerStateFactory,
         private RemoteRequestRepository $remoteRequestRepository,
@@ -30,7 +29,7 @@ readonly class JobStatusFactory
             $job,
             $this->preparationStateFactory->create($job),
             $this->resultsJobRepository->find($job->getId()),
-            $this->serializedSuiteRepository->find($job->getId()),
+            $this->serializedSuiteStore->retrieve($job->getId()),
             $this->machineRepository->find($job->getId()),
             $this->workerStateFactory->createForJob($job),
             new RemoteRequestCollection(

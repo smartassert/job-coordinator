@@ -11,7 +11,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
-use App\Repository\SerializedSuiteRepository;
+use App\Services\SerializedSuiteStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -21,7 +21,7 @@ final readonly class CreateMachineMessageHandler
 {
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteRepository $serializedSuiteRepository,
+        private SerializedSuiteStore $serializedSuiteStore,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
         private MachineRepository $machineRepository,
@@ -39,7 +39,7 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($message->getJobId());
+        $serializedSuite = $this->serializedSuiteStore->retrieve($message->getJobId());
         if (
             !$this->resultsJobRepository->has($message->getJobId())
             || null === $serializedSuite
