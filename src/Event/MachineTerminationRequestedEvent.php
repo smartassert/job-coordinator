@@ -5,26 +5,21 @@ declare(strict_types=1);
 namespace App\Event;
 
 use SmartAssert\WorkerManagerClient\Model\Machine;
-use Symfony\Contracts\EventDispatcher\Event;
 
-class MachineTerminationRequestedEvent extends Event implements JobEventInterface, MachineEventInterface
+class MachineTerminationRequestedEvent extends AbstractMachineEvent implements JobEventInterface
 {
     /**
      * @param non-empty-string $jobId
      */
     public function __construct(
         private readonly string $jobId,
-        private readonly Machine $machine,
+        Machine $machine,
     ) {
+        parent::__construct($machine);
     }
 
     public function getJobId(): string
     {
         return $this->jobId;
-    }
-
-    public function getMachine(): Machine
-    {
-        return $this->machine;
     }
 }
