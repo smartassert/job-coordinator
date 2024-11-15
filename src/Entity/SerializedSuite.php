@@ -53,6 +53,11 @@ class SerializedSuite implements \JsonSerializable
         return '' === $this->serializedSuiteId ? null : $this->serializedSuiteId;
     }
 
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
     /**
      * @param non-empty-string $state
      */

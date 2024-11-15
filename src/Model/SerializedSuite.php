@@ -16,7 +16,7 @@ readonly class SerializedSuite implements \JsonSerializable
     /**
      * @var non-empty-string
      */
-    private string $serializedSuiteId;
+    private string $id;
 
     /**
      * @var non-empty-string
@@ -26,16 +26,16 @@ readonly class SerializedSuite implements \JsonSerializable
     private bool $hasEndState;
 
     /**
-     * @param non-empty-string $serializedSuiteId
+     * @param non-empty-string $id
      * @param non-empty-string $state
      */
     public function __construct(
-        string $serializedSuiteId,
+        string $id,
         string $state,
         bool $isPrepared,
         bool $hasEndState,
     ) {
-        $this->serializedSuiteId = $serializedSuiteId;
+        $this->id = $id;
         $this->state = $state;
         $this->isPrepared = $isPrepared;
         $this->hasEndState = $hasEndState;
@@ -46,7 +46,7 @@ readonly class SerializedSuite implements \JsonSerializable
      */
     public function getId(): string
     {
-        return $this->serializedSuiteId;
+        return $this->id;
     }
 
     public function isPrepared(): bool
