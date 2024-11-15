@@ -9,7 +9,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -63,7 +63,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchNotReady(): void
     {
-        $readinessAssessor = \Mockery::mock(CreateResultsJobReadinessAssessor::class);
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
             ->shouldReceive('isReady')
             ->andReturn(MessageHandlingReadiness::NEVER)

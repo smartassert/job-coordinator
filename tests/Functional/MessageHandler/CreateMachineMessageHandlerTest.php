@@ -15,6 +15,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -33,7 +34,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $assessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($jobId)
@@ -63,7 +64,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $assessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($jobId)
@@ -93,7 +94,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $assessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($jobId)
@@ -190,7 +191,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        CreateMachineReadinessAssessor $assessor,
+        ReadinessAssessorInterface $assessor,
         WorkerManagerClient $workerManagerClient,
     ): CreateMachineMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);

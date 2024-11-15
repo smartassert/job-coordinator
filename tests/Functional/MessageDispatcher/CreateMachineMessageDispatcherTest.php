@@ -15,7 +15,7 @@ use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -139,7 +139,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchNotReady(): void
     {
-        $readinessAssessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
             ->shouldReceive('isReady')
             ->andReturn(MessageHandlingReadiness::NEVER)
@@ -156,7 +156,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testReDispatchNotReady(): void
     {
-        $readinessAssessor = \Mockery::mock(CreateMachineReadinessAssessor::class);
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
             ->shouldReceive('isReady')
             ->andReturn(MessageHandlingReadiness::NEVER)
@@ -172,7 +172,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         self::assertSame([], $this->messengerTransport->getSent());
     }
 
-    private function createDispatcher(CreateMachineReadinessAssessor $readinessAssessor): CreateMachineMessageDispatcher
+    private function createDispatcher(ReadinessAssessorInterface $readinessAssessor): CreateMachineMessageDispatcher
     {
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);

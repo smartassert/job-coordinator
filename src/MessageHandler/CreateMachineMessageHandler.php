@@ -10,7 +10,7 @@ use App\Event\MessageNotHandleableEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
-use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -21,7 +21,7 @@ final readonly class CreateMachineMessageHandler
     public function __construct(
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
-        private CreateMachineReadinessAssessor $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 

@@ -121,3 +121,22 @@ services:
     SmartAssert\ServiceRequest\Exception\ErrorResponseExceptionFactory: ~
 
     SmartAssert\ServiceRequest\Parameter\Validator\PositiveIntegerParameterValidator: ~
+
+    App\ReadinessAssessor\CreateMachineReadinessAssessor: ~
+    App\ReadinessAssessor\CreateResultsJobReadinessAssessor: ~
+
+    App\MessageHandler\CreateMachineMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessAssessor'
+
+    App\MessageDispatcher\CreateMachineMessageDispatcher:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessAssessor'
+
+    App\MessageHandler\CreateResultsJobMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessAssessor'
+
+    App\MessageDispatcher\CreateResultsJobMessageDispatcher:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessAssessor'

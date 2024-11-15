@@ -9,14 +9,14 @@ use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
-use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly CreateMachineReadinessAssessor $readinessAssessor,
+        private readonly ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
