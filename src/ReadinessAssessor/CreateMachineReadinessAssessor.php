@@ -7,13 +7,13 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
-use App\Repository\SerializedSuiteRepository;
+use App\Services\SerializedSuiteStore;
 
 readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,
-        private SerializedSuiteRepository $serializedSuiteRepository,
+        private SerializedSuiteStore $serializedSuiteStore,
         private ResultsJobRepository $resultsJobRepository,
     ) {
     }
@@ -24,7 +24,7 @@ readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterf
             return MessageHandlingReadiness::NEVER;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->find($jobId);
+        $serializedSuite = $this->serializedSuiteStore->retrieve($jobId);
         if (null === $serializedSuite || !$serializedSuite->isPrepared()) {
             return MessageHandlingReadiness::EVENTUALLY;
         }
