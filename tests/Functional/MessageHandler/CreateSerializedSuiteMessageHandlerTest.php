@@ -6,7 +6,6 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
@@ -175,12 +174,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteParameters);
         $handler($message);
 
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertCount(1, $messageNotHandleableEvents);
-
-        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
-        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
-        self::assertSame($message, $messageNotHandleableEvent->message);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     protected function getHandlerClass(): string

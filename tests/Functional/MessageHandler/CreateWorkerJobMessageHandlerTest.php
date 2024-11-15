@@ -8,8 +8,6 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
@@ -60,12 +58,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $messageNotYetHandleableEvents = $this->eventRecorder->all(MessageNotYetHandleableEvent::class);
-        self::assertCount(1, $messageNotYetHandleableEvents);
-
-        $messageNotYetHandleableEvent = $messageNotYetHandleableEvents[0];
-        self::assertInstanceOf(MessageNotYetHandleableEvent::class, $messageNotYetHandleableEvent);
-        self::assertSame($message, $messageNotYetHandleableEvent->message);
+        $this->assertExpectedNotYetHandleableOutcome($message);
     }
 
     public function testInvokeNotHandleable(): void
@@ -86,12 +79,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertCount(1, $messageNotHandleableEvents);
-
-        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
-        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
-        self::assertSame($message, $messageNotHandleableEvent->message);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeReadSerializedSuiteThrowsException(): void

@@ -6,7 +6,6 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
@@ -131,12 +130,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
 
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertCount(1, $messageNotHandleableEvents);
-
-        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
-        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
-        self::assertSame($message, $messageNotHandleableEvent->message);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     protected function getHandlerClass(): string

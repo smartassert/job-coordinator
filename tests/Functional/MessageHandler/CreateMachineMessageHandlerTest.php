@@ -9,8 +9,6 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
@@ -51,12 +49,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
 
-        $messageNotYetHandleableEvents = $this->eventRecorder->all(MessageNotYetHandleableEvent::class);
-        self::assertCount(1, $messageNotYetHandleableEvents);
-
-        $messageNotYetHandleableEvent = $messageNotYetHandleableEvents[0];
-        self::assertInstanceOf(MessageNotYetHandleableEvent::class, $messageNotYetHandleableEvent);
-        self::assertSame($message, $messageNotYetHandleableEvent->message);
+        $this->assertExpectedNotYetHandleableOutcome($message);
     }
 
     public function testInvokeNotHandleable(): void
@@ -81,12 +74,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
 
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertCount(1, $messageNotHandleableEvents);
-
-        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
-        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
-        self::assertSame($message, $messageNotHandleableEvent->message);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void

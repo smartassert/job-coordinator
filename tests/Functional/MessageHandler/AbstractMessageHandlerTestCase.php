@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Event\MessageNotHandleableEvent;
+use App\Event\MessageNotYetHandleableEvent;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -65,6 +68,16 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
         self::assertSame($this->getHandledMessageClass(), $messageParameterType->getName());
     }
 
+    protected function assertExpectedNotYetHandleableOutcome(JobRemoteRequestMessageInterface $message): void
+    {
+        $this->assertEventOutcome($message, MessageNotYetHandleableEvent::class);
+    }
+
+    protected function assertExpectedNotHandleableOutcome(JobRemoteRequestMessageInterface $message): void
+    {
+        $this->assertEventOutcome($message, MessageNotHandleableEvent::class);
+    }
+
     /**
      * @return class-string
      */
@@ -74,4 +87,18 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
      * @return class-string
      */
     abstract protected function getHandledMessageClass(): string;
+
+    /**
+     * @param class-string $expectedEventClass
+     */
+    private function assertEventOutcome(JobRemoteRequestMessageInterface $message, string $expectedEventClass): void
+    {
+        $events = $this->eventRecorder->all($expectedEventClass);
+        self::assertCount(1, $events);
+
+        $event = $events[0];
+        self::assertInstanceOf($expectedEventClass, $event);
+        self::assertObjectHasProperty('message', $event);
+        self::assertSame($message, $event->message);
+    }
 }
