@@ -6,7 +6,6 @@ namespace App\Model;
 
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
-use App\Entity\SerializedSuite;
 use App\Enum\JobComponent;
 use App\Services\PreparationStateFactory;
 
