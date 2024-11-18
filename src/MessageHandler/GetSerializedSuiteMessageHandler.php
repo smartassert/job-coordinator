@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\Services\SerializedSuiteStore;
@@ -26,7 +25,6 @@ final class GetSerializedSuiteMessageHandler
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerTargetEntityNotFoundException
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
@@ -35,7 +33,7 @@ final class GetSerializedSuiteMessageHandler
         if (null === $serializedSuite) {
             $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
 
-            throw new MessageHandlerTargetEntityNotFoundException($message, 'SerializedSuite');
+            return;
         }
 
         if ($serializedSuite->hasEndState()) {
