@@ -8,7 +8,6 @@ use App\Entity\ResultsJob;
 use App\Enum\RequestState;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -36,13 +35,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $message = new GetResultsJobStateMessage('api token', $job->getId());
 
-        try {
-            $handler($message);
-            self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
-        } catch (MessageHandlerTargetEntityNotFoundException) {
-        }
+        $handler($message);
 
-        self::expectNotToPerformAssertions();
+        self::assertCount(0, $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class));
+
+        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
+        self::assertEquals(new MessageNotHandleableEvent($message), $messageNotHandleableEvents[0]);
     }
 
     public function testInvokeJobPreparationHasFailed(): void

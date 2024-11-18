@@ -9,7 +9,6 @@ use App\Entity\SerializedSuite;
 use App\Enum\RequestState;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\MessageHandlerTargetEntityNotFoundException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
@@ -52,11 +51,12 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         );
         self::assertNull($remoteRequest);
 
-        try {
-            $handler($message);
-            self::fail(MessageHandlerTargetEntityNotFoundException::class . ' not thrown');
-        } catch (MessageHandlerTargetEntityNotFoundException) {
-        }
+        $handler($message);
+
+        self::assertCount(0, $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
+
+        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
+        self::assertEquals(new MessageNotHandleableEvent($message), $messageNotHandleableEvents[0]);
 
         $remoteRequest = $remoteRequestRepository->find(
             RemoteRequest::generateId($job->getId(), $message->getRemoteRequestType(), $message->getIndex())
