@@ -32,7 +32,7 @@ class MachineRepositoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
 
-        $machine = new Machine($jobId, 'up/active', 'active', false);
+        $machine = new Machine($jobId, 'up/active', 'active', false, false);
         $this->machineRepository->save($machine);
 
         self::assertTrue($this->machineRepository->has($jobId));

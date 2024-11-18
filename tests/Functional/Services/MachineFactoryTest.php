@@ -133,7 +133,13 @@ class MachineFactoryTest extends WebTestCase
                 'expectedMachineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return new Machine($jobId, 'find/finding', 'find', false);
+                    return new Machine(
+                        $jobId,
+                        'find/finding',
+                        'find',
+                        false,
+                        false,
+                    );
                 },
             ],
             'with failed state' => [
@@ -154,7 +160,13 @@ class MachineFactoryTest extends WebTestCase
                 'expectedMachineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return new Machine($jobId, 'find/not-findable', 'end', true);
+                    return new Machine(
+                        $jobId,
+                        'find/not-findable',
+                        'end',
+                        true,
+                        true,
+                    );
                 },
             ],
         ];

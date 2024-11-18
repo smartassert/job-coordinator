@@ -160,7 +160,8 @@ class PreparationStateFactoryTest extends WebTestCase
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false
+                        false,
+                        false,
                     ));
                     $workerComponentStateRepository->save(
                         (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))

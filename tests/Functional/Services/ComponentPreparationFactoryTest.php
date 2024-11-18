@@ -135,7 +135,13 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 false
             ));
 
-            $machineRepository->save(new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false));
+            $machineRepository->save(new Machine(
+                $job->getId(),
+                md5((string) rand()),
+                md5((string) rand()),
+                false,
+                false,
+            ));
 
             $workerComponentStateRepository->save(
                 (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))

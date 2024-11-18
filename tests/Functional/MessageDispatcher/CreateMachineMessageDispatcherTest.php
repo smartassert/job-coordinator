@@ -143,7 +143,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $job = $this->jobFactory->createRandom();
 
-        $machine = new Machine($job->getId(), 'up/active', 'active', false);
+        $machine = new Machine($job->getId(), 'up/active', 'active', false, false);
         $machineRepository->save($machine);
 
         $event = new ResultsJobCreatedEvent(
@@ -164,7 +164,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $job = $this->jobFactory->createRandom();
 
-        $machine = new Machine($job->getId(), 'up/active', 'active', false);
+        $machine = new Machine($job->getId(), 'up/active', 'active', false, false);
         $machineRepository->save($machine);
 
         $message = new CreateMachineMessage('api token', $job->getId());
