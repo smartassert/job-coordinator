@@ -249,7 +249,21 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);
 
-                    return new MachineIsActiveEvent($authenticationToken, $job->getId(), '127.0.0.1');
+                    return new MachineIsActiveEvent(
+                        $authenticationToken,
+                        $job->getId(),
+                        '127.0.0.1',
+                        MachineFactory::create(
+                            $job->getId(),
+                            'up/active',
+                            'active',
+                            ['127.0.0.1'],
+                            false,
+                            true,
+                            false,
+                            false,
+                        )
+                    );
                 },
             ],
         ];
@@ -284,7 +298,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertInstanceOf($expectedEventClass, $latestEvent);
         self::assertInstanceOf(MachineStateChangeEvent::class, $latestEvent);
         self::assertEquals($previous, $latestEvent->previous);
-        self::assertEquals($current, $latestEvent->current);
+        self::assertEquals($current, $latestEvent->getMachine());
 
         self::assertEquals(
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],

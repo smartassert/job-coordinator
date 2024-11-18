@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\ActionFailure;
-use Symfony\Contracts\EventDispatcher\Event;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class MachineHasActionFailureEvent extends Event implements JobEventInterface
+class MachineHasActionFailureEvent extends AbstractMachineEvent implements JobEventInterface
 {
     /**
      * @param non-empty-string $jobId
      */
     public function __construct(
         private readonly string $jobId,
-        public readonly ActionFailure $machineActionFailure,
+        Machine $machine,
     ) {
+        parent::__construct($machine);
     }
 
     public function getJobId(): string

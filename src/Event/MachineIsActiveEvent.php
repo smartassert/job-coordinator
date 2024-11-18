@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
+use App\Event\AuthenticatingEventInterface as AuthenticatingEvent;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class MachineIsActiveEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
+class MachineIsActiveEvent extends AbstractMachineEvent implements JobEventInterface, AuthenticatingEvent
 {
     /**
      * @param non-empty-string $authenticationToken
@@ -17,7 +18,9 @@ class MachineIsActiveEvent extends Event implements JobEventInterface, Authentic
         private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly string $ipAddress,
+        Machine $machine,
     ) {
+        parent::__construct($machine);
     }
 
     public function getJobId(): string

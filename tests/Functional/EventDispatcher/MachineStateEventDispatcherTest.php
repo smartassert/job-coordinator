@@ -280,7 +280,17 @@ class MachineStateEventDispatcherTest extends WebTestCase
                 'expected' => new MachineIsActiveEvent(
                     $authenticationToken,
                     $machineId,
-                    '127.0.0.1'
+                    '127.0.0.1',
+                    MachineFactory::create(
+                        $machineId,
+                        'up/active',
+                        'active',
+                        ['127.0.0.1'],
+                        false,
+                        true,
+                        false,
+                        false,
+                    )
                 ),
             ],
             'finding -> active' => [
@@ -310,7 +320,17 @@ class MachineStateEventDispatcherTest extends WebTestCase
                 'expected' => new MachineIsActiveEvent(
                     $authenticationToken,
                     $machineId,
-                    '127.0.0.2'
+                    '127.0.0.2',
+                    MachineFactory::create(
+                        $machineId,
+                        'up/active',
+                        'active',
+                        ['127.0.0.2'],
+                        false,
+                        true,
+                        false,
+                        false,
+                    )
                 ),
             ],
         ];
@@ -392,7 +412,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         self::assertEquals(
             [
-                new MachineHasActionFailureEvent($machineId, $actionFailure),
+                new MachineHasActionFailureEvent($machineId, $currentMachine),
             ],
             $this->eventRecorder->all(MachineHasActionFailureEvent::class)
         );
