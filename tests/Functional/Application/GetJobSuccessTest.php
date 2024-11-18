@@ -628,7 +628,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        false,
+                        false,
+                    );
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -663,6 +669,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
                             'has_failed_state' => false,
+                            'has_end_state' => false,
                         ],
                         'worker-job' => [
                             'state' => 'pending',
@@ -691,7 +698,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        false,
+                        false,
+                    );
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -753,6 +766,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
                             'has_failed_state' => false,
+                            'has_end_state' => false,
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -781,7 +795,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        false,
+                        false,
+                    );
                     $machine = $machine->setIp(md5((string) rand()));
                     $machine->setActionFailure(new MachineActionFailure(
                         $job->getId(),
@@ -852,6 +872,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'context' => null,
                             ],
                             'has_failed_state' => false,
+                            'has_end_state' => false,
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -888,7 +909,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $serializedSuite;
                 },
                 'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), false);
+                    $machine = new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        false,
+                        false,
+                    );
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -957,6 +984,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
                             'has_failed_state' => false,
+                            'has_end_state' => false,
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -1144,7 +1172,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'resultsJobCreator' => $nullCreator,
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
-                    $machine = new Machine($job->getId(), md5((string) rand()), md5((string) rand()), true);
+                    $machine = new Machine(
+                        $job->getId(),
+                        md5((string) rand()),
+                        md5((string) rand()),
+                        true,
+                        true,
+                    );
                     $machine = $machine->setIp(md5((string) rand()));
 
                     $machineRepository->save($machine);
@@ -1179,6 +1213,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
                             'has_failed_state' => true,
+                            'has_end_state' => true,
                         ],
                         'worker-job' => [
                             'state' => 'pending',

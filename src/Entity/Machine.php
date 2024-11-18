@@ -29,17 +29,26 @@ class Machine implements \JsonSerializable
     #[ORM\Column(nullable: false)]
     private bool $hasFailedState;
 
+    #[ORM\Column(nullable: false)]
+    private bool $hasEndState;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
      * @param non-empty-string $stateCategory
      */
-    public function __construct(string $jobId, string $state, string $stateCategory, bool $hasFailedState)
-    {
+    public function __construct(
+        string $jobId,
+        string $state,
+        string $stateCategory,
+        bool $hasFailedState,
+        bool $hasEndState,
+    ) {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
         $this->hasFailedState = $hasFailedState;
+        $this->hasEndState = $hasEndState;
     }
 
     /**
@@ -100,23 +109,6 @@ class Machine implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array{
-     *   state_category: ?non-empty-string,
-     *   ip_address: ?non-empty-string,
-     *   action_failure: ?MachineActionFailure
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state_category' => '' === $this->stateCategory ? null : $this->stateCategory,
-            'ip_address' => $this->getIp(),
-            'action_failure' => $this->actionFailure,
-            'has_failed_state' => $this->hasFailedState,
-        ];
-    }
-
     public function hasFailedState(): ?bool
     {
         return $this->hasFailedState;
@@ -127,5 +119,37 @@ class Machine implements \JsonSerializable
         $this->hasFailedState = $hasFailedState;
 
         return $this;
+    }
+
+    public function setHasEndState(bool $hasEndState): static
+    {
+        $this->hasEndState = $hasEndState;
+
+        return $this;
+    }
+
+    public function hasEndState(): bool
+    {
+        return $this->hasEndState;
+    }
+
+    /**
+     * @return array{
+     *   state_category: ?non-empty-string,
+     *   ip_address: ?non-empty-string,
+     *   action_failure: ?MachineActionFailure,
+     *   has_failed_state: bool,
+     *   has_end_state: bool
+     * }
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'state_category' => '' === $this->stateCategory ? null : $this->stateCategory,
+            'ip_address' => $this->getIp(),
+            'action_failure' => $this->actionFailure,
+            'has_failed_state' => $this->hasFailedState,
+            'has_end_state' => $this->hasEndState,
+        ];
     }
 }
