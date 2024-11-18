@@ -56,7 +56,13 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
             'machine already exists' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
                     $machineRepository->save(
-                        new Machine($job->getId(), 'state', 'state-category', false)
+                        new Machine(
+                            $job->getId(),
+                            'state',
+                            'state-category',
+                            false,
+                            false,
+                        )
                     );
                 },
                 'expected' => MessageHandlingReadiness::NEVER,

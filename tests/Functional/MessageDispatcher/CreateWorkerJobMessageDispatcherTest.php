@@ -68,7 +68,23 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $readinessAssessor,
         );
 
-        $event = new MachineIsActiveEvent(md5((string) rand()), $job->getId(), '127.0.0.1');
+        $event = new MachineIsActiveEvent(
+            md5((string) rand()),
+            $job->getId(),
+            '127.0.0.1',
+            MachineFactory::create(
+                $job->getId(),
+                'state',
+                'state-category',
+                [
+                    '127.0.0.1',
+                ],
+                false,
+                false,
+                false,
+                false,
+            )
+        );
 
         $dispatcher->dispatchForMachineIsActiveEvent($event);
 
@@ -94,7 +110,23 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $readinessAssessor,
         );
 
-        $event = new MachineIsActiveEvent(md5((string) rand()), $jobId, '127.0.0.1');
+        $event = new MachineIsActiveEvent(
+            md5((string) rand()),
+            $jobId,
+            '127.0.0.1',
+            MachineFactory::create(
+                $jobId,
+                'state',
+                'state-category',
+                [
+                    '127.0.0.1',
+                ],
+                false,
+                false,
+                false,
+                false,
+            )
+        );
 
         $dispatcher->dispatchForMachineIsActiveEvent($event);
 
