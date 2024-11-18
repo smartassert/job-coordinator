@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
@@ -33,7 +36,7 @@ readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
     {
-        if ('end' === $event->getMachine()->stateCategory) {
+        if (MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($event->getJobId())) {
             return;
         }
 
