@@ -129,6 +129,7 @@ services:
     App\ReadinessAssessor\GetMachineReadinessAssessor: ~
     App\ReadinessAssessor\GetResultsJobReadinessAssessor: ~
     App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor: ~
+    App\ReadinessAssessor\GetWorkerJobReadinessAssessor: ~
 
     App\MessageHandler\CreateMachineMessageHandler:
         arguments:
@@ -185,3 +186,11 @@ services:
     App\MessageDispatcher\GetSerializedSuiteMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor'
+
+    App\MessageHandler\GetWorkerJobMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerJobReadinessAssessor'
+
+    App\MessageDispatcher\GetWorkerJobMessageDispatcher:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerJobReadinessAssessor'

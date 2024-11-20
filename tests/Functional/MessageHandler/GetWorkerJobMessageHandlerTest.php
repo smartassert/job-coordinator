@@ -4,62 +4,67 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\WorkerComponentState;
-use App\Enum\WorkerComponentName;
-use App\Event\MessageNotHandleableEvent;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
-use App\Tests\Services\Factory\JobFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
+use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeWorkerApplicationIsInEndState(): void
+    public function testInvokeNotHandleable(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $applicationState = new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION);
-        $applicationState->setState('end');
-        $applicationState->setIsEndState(true);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
-        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
-        $workerComponentStateRepository->save($applicationState);
+        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
 
-        $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class));
-
-        $message = new GetWorkerJobMessage($job->getId(), '127.0.0.1');
+        $handler = $this->createHandler(
+            \Mockery::mock(WorkerClientFactory::class),
+            $assessor
+        );
 
         $handler($message);
 
-        $events = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertEquals([new MessageNotHandleableEvent($message)], $events);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $workerClientException = new \Exception('Failed to get worker state');
 
         $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
+        $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
@@ -68,7 +73,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($workerClient)
         ;
 
-        $handler = $this->createHandler($workerClientFactory);
+        $handler = $this->createHandler($workerClientFactory, $assessor);
 
         try {
             $handler($message);
@@ -81,12 +86,18 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
+        $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
@@ -123,7 +134,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($workerClient)
         ;
 
-        $handler = $this->createHandler($workerClientFactory);
+        $handler = $this->createHandler($workerClientFactory, $assessor);
 
         $handler($message);
 
@@ -131,7 +142,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerStateRetrievedEvent($job->getId(), $machineIpAddress, $retrievedWorkerState),
+            new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState),
             $event
         );
     }
@@ -146,14 +157,16 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return GetResultsJobStateMessage::class;
     }
 
-    private function createHandler(WorkerClientFactory $workerClientFactory): GetWorkerJobMessageHandler
-    {
+    private function createHandler(
+        WorkerClientFactory $workerClientFactory,
+        ReadinessAssessorInterface $readinessAssessor,
+    ): GetWorkerJobMessageHandler {
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetWorkerJobMessageHandler($workerComponentStateRepository, $workerClientFactory, $eventDispatcher);
+        return new GetWorkerJobMessageHandler($workerClientFactory, $eventDispatcher, $readinessAssessor);
     }
 }
