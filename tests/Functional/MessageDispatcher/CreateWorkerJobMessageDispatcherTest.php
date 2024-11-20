@@ -209,7 +209,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         );
         $event = new MessageNotYetHandleableEvent($message);
 
-        $this->dispatcher->reDispatch($event);
+        $this->dispatcher->redispatch($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

@@ -154,7 +154,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $this->assertNoMessagesAreDispatched();
     }
 
-    public function testReDispatchNeverReady(): void
+    public function testRedispatchNeverReady(): void
     {
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
@@ -167,13 +167,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $message = new CreateMachineMessage('api token', 'job id');
         $event = new MessageNotYetHandleableEvent($message);
 
-        $dispatcher->reDispatch($event);
+        $dispatcher->redispatch($event);
 
         $this->assertNoMessagesAreDispatched();
     }
 
-    #[DataProvider('reDispatchSuccessDataProvider')]
-    public function testReDispatchSuccess(MessageHandlingReadiness $readiness): void
+    #[DataProvider('redispatchSuccessDataProvider')]
+    public function testRedispatchSuccess(MessageHandlingReadiness $readiness): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -190,7 +190,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $message = new CreateMachineMessage('api token', $job->getId());
         $event = new MessageNotYetHandleableEvent($message);
 
-        $dispatcher->reDispatch($event);
+        $dispatcher->redispatch($event);
 
         $this->assertDelayedMessageIsDispatched($message->authenticationToken, $job->getId());
     }
@@ -198,7 +198,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public static function reDispatchSuccessDataProvider(): array
+    public static function redispatchSuccessDataProvider(): array
     {
         return [
             'ready now' => [

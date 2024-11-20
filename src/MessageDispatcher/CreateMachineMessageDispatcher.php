@@ -26,7 +26,7 @@ readonly class CreateMachineMessageDispatcher extends AbstractMessageDispatcher 
                 ['dispatch', 100],
             ],
             MessageNotYetHandleableEvent::class => [
-                ['reDispatch', 100],
+                ['redispatch', 100],
             ],
         ];
     }
@@ -42,7 +42,7 @@ readonly class CreateMachineMessageDispatcher extends AbstractMessageDispatcher 
         );
     }
 
-    public function reDispatch(MessageNotYetHandleableEvent $event): void
+    public function redispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
 

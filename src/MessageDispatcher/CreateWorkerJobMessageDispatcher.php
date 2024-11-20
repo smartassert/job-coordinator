@@ -31,7 +31,7 @@ readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatche
                 ['dispatchForMachineIsActiveEvent', 100],
             ],
             MessageNotYetHandleableEvent::class => [
-                ['reDispatch', 100],
+                ['redispatch', 100],
             ],
         ];
     }
@@ -53,7 +53,7 @@ readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatche
         );
     }
 
-    public function reDispatch(MessageNotYetHandleableEvent $event): void
+    public function redispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
         if (!$message instanceof CreateWorkerJobMessage) {
