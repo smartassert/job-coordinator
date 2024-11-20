@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
+use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
@@ -65,7 +66,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchNotReady(): void
+    public function testDispatchNeverReady(): void
     {
         $jobId = md5((string) rand());
 
@@ -87,6 +88,27 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatch($event);
+
+        self::assertCount(0, $this->messengerTransport->getSent());
+    }
+
+    public function testRedispatchNeverReady(): void
+    {
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
+
+        $message = new TerminateMachineMessage('api token', 'job id');
+        $event = new MessageNotYetHandleableEvent($message);
+
+        $dispatcher->redispatch($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
     }
