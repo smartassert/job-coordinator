@@ -4,30 +4,29 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
+use App\Event\JobEventInterface;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\Model\JobInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
-use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 {
-    private GetResultsJobStateMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $dispatcher = self::getContainer()->get(GetResultsJobStateMessageDispatcher::class);
-        \assert($dispatcher instanceof GetResultsJobStateMessageDispatcher);
-        $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
         \assert($messengerTransport instanceof InMemoryTransport);
@@ -37,7 +36,10 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
-        $subscribedEvents = $this->dispatcher::getSubscribedEvents();
+        $dispatcher = self::getContainer()->get(GetResultsJobStateMessageDispatcher::class);
+        \assert($dispatcher instanceof GetResultsJobStateMessageDispatcher);
+
+        $subscribedEvents = $dispatcher::getSubscribedEvents();
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
@@ -64,37 +66,99 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchForResultsJobCreatedEventSuccess(): void
+    /**
+     * @param callable(JobInterface $job, string $authenticationToken): JobEventInterface $eventCreator
+     */
+    #[DataProvider('eventDataProvider')]
+    public function testDispatchNotReady(callable $eventCreator): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
         $authenticationToken = md5((string) rand());
-        $resultsToken = md5((string) rand());
-        $resultsJob = new ResultsJob($job->getId(), $resultsToken, new JobState('awaiting-events', null));
 
-        $event = new ResultsJobCreatedEvent($authenticationToken, $job->getId(), $resultsJob);
+        $event = $eventCreator($job, $authenticationToken);
+        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobStateRetrievedEvent);
 
-        $this->dispatcher->dispatchForResultsJobEvent($event);
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
+
+        $dispatcher->dispatchForResultsJobEvent($event);
+
+        self::assertCount(0, $this->messengerTransport->getSent());
+    }
+
+    /**
+     * @param callable(JobInterface $job, string $authenticationToken): JobEventInterface $eventCreator
+     */
+    #[DataProvider('eventDataProvider')]
+    public function testDispatchSuccess(callable $eventCreator): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $authenticationToken = md5((string) rand());
+
+        $event = $eventCreator($job, $authenticationToken);
+        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobStateRetrievedEvent);
+
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
+
+        $dispatcher->dispatchForResultsJobEvent($event);
 
         $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->getId()));
     }
 
-    public function testDispatchForResultsJobStateRetrievedEventSuccess(): void
+    /**
+     * @return array<mixed>
+     */
+    public static function eventDataProvider(): array
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        return [
+            ResultsJobCreatedEvent::class => [
+                'eventCreator' => function (JobInterface $job, string $authenticationToken) {
+                    \assert('' !== $authenticationToken);
 
-        $authenticationToken = md5((string) rand());
-        $resultsJobState = new ResultsJobState('started', null);
+                    return new ResultsJobCreatedEvent(
+                        $authenticationToken,
+                        $job->getId(),
+                        new ResultsJob($job->getId(), 'token', new ResultsJobState('awaiting-events', null))
+                    );
+                },
+            ],
+            ResultsJobStateRetrievedEvent::class => [
+                'eventCreator' => function (JobInterface $job, string $authenticationToken) {
+                    \assert('' !== $authenticationToken);
 
-        $event = new ResultsJobStateRetrievedEvent($authenticationToken, $job->getId(), $resultsJobState);
-
-        $this->dispatcher->dispatchForResultsJobEvent($event);
-
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->getId()));
+                    return new ResultsJobStateRetrievedEvent(
+                        $authenticationToken,
+                        $job->getId(),
+                        new ResultsJobState('awaiting-events', null)
+                    );
+                },
+            ],
+        ];
     }
 
     private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void

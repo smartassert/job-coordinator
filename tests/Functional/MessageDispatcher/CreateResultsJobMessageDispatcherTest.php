@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\ResultsJobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -44,7 +46,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $authenticationToken = md5((string) rand());
 
-        $event = new JobCreatedEvent($authenticationToken, $job->getId(), []);
+        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), []);
 
         $this->dispatcher->dispatchForJobCreatedEvent($event);
 
@@ -59,19 +61,22 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 
-    public function testDispatchResultsJobAlreadyExists(): void
+    public function testDispatchNotReady(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $readinessAssessor
+            ->shouldReceive('isReady')
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $event = new JobCreatedEvent('api token', $job->getId(), []);
+        $dispatcher = new CreateResultsJobMessageDispatcher($messageDispatcher, $readinessAssessor);
 
-        $this->dispatcher->dispatchForJobCreatedEvent($event);
+        $event = new JobCreatedEvent('api token', 'job id', 'suite id', []);
+
+        $dispatcher->dispatchForJobCreatedEvent($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }

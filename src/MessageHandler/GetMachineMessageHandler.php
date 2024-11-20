@@ -7,17 +7,20 @@ namespace App\MessageHandler;
 use App\Event\MachineRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GetMachineMessageHandler
+final readonly class GetMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly WorkerManagerClient $workerManagerClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private WorkerManagerClient $workerManagerClient,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -25,6 +28,10 @@ final class GetMachineMessageHandler
      */
     public function __invoke(GetMachineMessage $message): void
     {
+        if (!$this->isReady($message)) {
+            return;
+        }
+
         $previousMachine = $message->machine;
 
         try {

@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
-use App\Services\SerializedSuiteStore;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GetSerializedSuiteMessageHandler
+final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly SerializedSuiteStore $serializedSuiteStore,
-        private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private SerializedSuiteClient $serializedSuiteClient,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -28,22 +28,12 @@ final class GetSerializedSuiteMessageHandler
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
-        $serializedSuite = $this->serializedSuiteStore->retrieve($message->getJobId());
-
-        if (null === $serializedSuite) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
-            return;
-        }
-
-        if ($serializedSuite->hasEndState()) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
+        if (!$this->isReady($message)) {
             return;
         }
 
         try {
-            $serializedSuiteModel = $this->serializedSuiteClient->get(
+            $serializedSuite = $this->serializedSuiteClient->get(
                 $message->authenticationToken,
                 $message->serializedSuiteId,
             );
@@ -51,7 +41,7 @@ final class GetSerializedSuiteMessageHandler
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
                 $message->authenticationToken,
                 $message->getJobId(),
-                $serializedSuiteModel
+                $serializedSuite
             ));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($message->getJobId(), $e, $message);

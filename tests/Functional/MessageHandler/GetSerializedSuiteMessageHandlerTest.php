@@ -4,131 +4,66 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\RemoteRequest;
 use App\Entity\SerializedSuite;
-use App\Enum\RequestState;
-use App\Event\MessageNotHandleableEvent;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
-use App\Repository\RemoteRequestRepository;
+use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
 use App\Tests\Services\Factory\JobFactory;
-use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    public function testInvokeSerializedSuiteNotFound(): void
+    public function testInvokeNotHandleable(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $handler = self::getContainer()->get(GetSerializedSuiteMessageHandler::class);
-        \assert($handler instanceof GetSerializedSuiteMessageHandler);
+        $suiteId = (string) new Ulid();
+        \assert('' !== $suiteId);
 
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
-        $message = new GetSerializedSuiteMessage(
-            'api token',
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuiteId
-        );
-
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
-        $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->getId(), $message->getRemoteRequestType(), $message->getIndex())
-        );
-        self::assertNull($remoteRequest);
-
-        $handler($message);
-
-        self::assertCount(0, $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
-
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertEquals(new MessageNotHandleableEvent($message), $messageNotHandleableEvents[0]);
-
-        $remoteRequest = $remoteRequestRepository->find(
-            RemoteRequest::generateId($job->getId(), $message->getRemoteRequestType(), $message->getIndex())
-        );
-
-        self::assertInstanceOf(RemoteRequest::class, $remoteRequest);
-        self::assertSame(RequestState::ABORTED, $remoteRequest->getState());
-    }
-
-    public function testInvokeSerializedSuiteStateIsEndState(): void
-    {
-        $job = $this->createJob();
-
-        $serializedSuite = $this->createSerializedSuite($job, 'failed', true, true);
-        \assert('' !== $serializedSuite->id);
-
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
-        $abortedSerializedSuiteRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->getId(),
-            'type' => 'serialized-suite/retrieve',
-            'state' => RequestState::ABORTED,
-        ]);
-
-        self::assertCount(0, $abortedSerializedSuiteRetrieveRemoteRequests);
-
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
-
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $handler = new GetSerializedSuiteMessageHandler(
-            $serializedSuiteStore,
-            $serializedSuiteClient,
-            $eventDispatcher
-        );
-        $message = new GetSerializedSuiteMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuite->id
+            \Mockery::mock(SerializedSuiteClient::class),
+            $eventDispatcher,
+            $assessor,
         );
 
-        ($handler)($message);
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
+        $handler($message);
 
-        self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
-
-        self::assertEquals(
-            [
-                new MessageNotHandleableEvent($message),
-            ],
-            $this->eventRecorder->all(MessageNotHandleableEvent::class)
-        );
-
-        $abortedSerializedSuiteRetrieveRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->getId(),
-            'type' => 'serialized-suite/retrieve',
-            'state' => RequestState::ABORTED,
-        ]);
-
-        self::assertCount(1, $abortedSerializedSuiteRetrieveRemoteRequests);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeSerializedSuiteClientThrowsException(): void
     {
         $job = $this->createJob();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'requested', false, false);
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'requested', false, false);
+        $serializedSuiteRepository->save($serializedSuite);
         \assert('' !== $serializedSuite->id);
 
         $serializedSuiteClientException = new \Exception(md5((string) rand()));
@@ -153,11 +88,10 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $handler = new GetSerializedSuiteMessageHandler(
-            $serializedSuiteStore,
-            $serializedSuiteClient,
-            $eventDispatcher
-        );
+        $assessor = self::getContainer()->get(GetSerializedSuiteReadinessAssessor::class);
+        \assert($assessor instanceof GetSerializedSuiteReadinessAssessor);
+
+        $handler = new GetSerializedSuiteMessageHandler($serializedSuiteClient, $eventDispatcher, $assessor);
         $message = new GetSerializedSuiteMessage(
             self::$apiToken,
             $job->getId(),
@@ -168,66 +102,6 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         ($handler)($message);
 
         self::assertEquals([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
-    }
-
-    public function testInvokeNotEndState(): void
-    {
-        $job = $this->createJob();
-
-        $serializedSuite = $this->createSerializedSuite($job, md5((string) rand()), false, false);
-        \assert('' !== $serializedSuite->id);
-
-        $serializedSuite = new SerializedSuiteModel(
-            $serializedSuite->id,
-            md5((string) rand()),
-            [],
-            md5((string) rand()),
-            false,
-            false,
-            null,
-            null
-        );
-
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
-        $serializedSuiteClient
-            ->shouldReceive('get')
-            ->with(self::$apiToken, $serializedSuite->getId())
-            ->andReturn($serializedSuite)
-        ;
-
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
-
-        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
-
-        $handler = new GetSerializedSuiteMessageHandler(
-            $serializedSuiteStore,
-            $serializedSuiteClient,
-            $eventDispatcher
-        );
-
-        $message = new GetSerializedSuiteMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuite->getId()
-        );
-
-        ($handler)($message);
-
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteRepository::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteRepository);
-
-        $serializedSuiteEntity = $serializedSuiteStore->find($job->getId());
-        \assert($serializedSuiteEntity instanceof SerializedSuite);
-
-        self::assertFalse($serializedSuiteEntity->hasEndState());
-
-        $events = $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class);
-        $event = $events[0] ?? null;
-
-        self::assertEquals(new SerializedSuiteRetrievedEvent(self::$apiToken, $job->getId(), $serializedSuite), $event);
     }
 
     protected function getHandlerClass(): string
@@ -246,24 +120,5 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($jobFactory instanceof JobFactory);
 
         return $jobFactory->createRandom();
-    }
-
-    /**
-     * @param non-empty-string $state
-     */
-    private function createSerializedSuite(
-        JobInterface $job,
-        string $state,
-        bool $isPrepared,
-        bool $hasEndState
-    ): SerializedSuite {
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), $state, $isPrepared, $hasEndState);
-
-        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
-        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
-
-        $serializedSuiteRepository->save($serializedSuite);
-
-        return $serializedSuite;
     }
 }

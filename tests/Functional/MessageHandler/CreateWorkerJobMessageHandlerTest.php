@@ -6,14 +6,14 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
-use App\Enum\RequestState;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
-use App\Repository\RemoteRequestRepository;
+use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
@@ -22,11 +22,10 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -41,149 +40,46 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $this->messengerTransport = $messengerTransport;
     }
 
-    public function testInvokeNoSerializedSuite(): void
+    public function testInvokeNotYetHandleable(): void
     {
-        $job = $this->createJob();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $handler = $this->createHandler();
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
-        $message = new CreateWorkerJobMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getMaximumDurationInSeconds(),
-            md5((string) rand())
-        );
+        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+
+        $handler = $this->createHandler(readinessAssessor: $assessor);
 
         $handler($message);
 
-        $this->assertDispatchedMessage($message);
+        $this->assertExpectedNotYetHandleableOutcome($message);
     }
 
-    public function testInvokeNoResultsJob(): void
+    public function testInvokeNotHandleable(): void
     {
-        $job = $this->createJob();
-        $this->createSerializedSuite($job, 'requested', false, false);
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $handler = $this->createHandler();
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
-        $message = new CreateWorkerJobMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getMaximumDurationInSeconds(),
-            md5((string) rand())
-        );
+        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+
+        $handler = $this->createHandler(readinessAssessor: $assessor);
 
         $handler($message);
 
-        $this->assertDispatchedMessage($message);
-        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-    }
-
-    public function testInvokeSerializedSuiteStateIsFailed(): void
-    {
-        $job = $this->createJob();
-        $jobId = $job->getId();
-
-        $this->createResultsJob($job);
-        $this->createSerializedSuite($job, 'failed', false, true);
-
-        $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
-        \assert($handler instanceof CreateWorkerJobMessageHandler);
-
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
-        $abortedWorkerJobCreateRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->getId(),
-            'type' => 'worker-job/create',
-            'state' => RequestState::ABORTED,
-        ]);
-
-        self::assertCount(0, $abortedWorkerJobCreateRemoteRequests);
-
-        $message = new CreateWorkerJobMessage(
-            self::$apiToken,
-            $jobId,
-            $job->getMaximumDurationInSeconds(),
-            md5((string) rand())
-        );
-
-        $handler($message);
-
-        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-
-        self::assertEquals(
-            [
-                new MessageNotHandleableEvent($message),
-            ],
-            $this->eventRecorder->all(MessageNotHandleableEvent::class)
-        );
-        $this->assertNoStartWorkerJobMessageDispatched();
-
-        $abortedWorkerJobCreateRemoteRequests = $remoteRequestRepository->findBy([
-            'jobId' => $job->getId(),
-            'type' => 'worker-job/create',
-            'state' => RequestState::ABORTED,
-        ]);
-
-        self::assertCount(1, $abortedWorkerJobCreateRemoteRequests);
-    }
-
-    /**
-     * @param non-empty-string $serializedSuiteState
-     */
-    #[DataProvider('invokeMessageIsRedispatchedDataProvider')]
-    public function testInvokeMessageIsRedispatchedDueToSerializedSuiteState(
-        string $serializedSuiteState,
-        bool $isPrepared,
-        bool $hasEndState,
-    ): void {
-        $job = $this->createJob();
-        $jobId = $job->getId();
-
-        $this->createSerializedSuite($job, $serializedSuiteState, $isPrepared, $hasEndState);
-        $this->createResultsJob($job);
-
-        $handler = self::getContainer()->get(CreateWorkerJobMessageHandler::class);
-        \assert($handler instanceof CreateWorkerJobMessageHandler);
-
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-
-        $message = new CreateWorkerJobMessage(
-            self::$apiToken,
-            $jobId,
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
-
-        $handler($message);
-
-        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-        $this->assertDispatchedMessage($message);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function invokeMessageIsRedispatchedDataProvider(): array
-    {
-        return [
-            'requested' => [
-                'serializedSuiteState' => 'requested',
-                'isPrepared' => false,
-                'hasEndState' => false,
-            ],
-            'preparing/running' => [
-                'serializedSuiteState' => 'preparing/running',
-                'isPrepared' => false,
-                'hasEndState' => false,
-            ],
-            'preparing/halted' => [
-                'serializedSuiteState' => 'preparing/halted',
-                'isPrepared' => false,
-                'hasEndState' => false,
-            ],
-        ];
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeReadSerializedSuiteThrowsException(): void
@@ -300,23 +196,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         return CreateWorkerJobMessage::class;
     }
 
-    private function assertDispatchedMessage(CreateWorkerJobMessage $message): void
-    {
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertCount(1, $envelopes);
-
-        $envelope = $envelopes[0];
-        self::assertEquals($message, $envelope->getMessage());
-
-        $messageDelays = self::getContainer()->getParameter('message_delays');
-        \assert(is_array($messageDelays));
-
-        $expectedDelayStampValue = $messageDelays[CreateWorkerJobMessage::class] ?? null;
-        \assert(is_int($expectedDelayStampValue));
-
-        self::assertEquals([new DelayStamp($expectedDelayStampValue)], $envelope->all(DelayStamp::class));
-    }
-
     private function createJob(): JobInterface
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -355,6 +234,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
+        ?ReadinessAssessorInterface $readinessAssessor = null,
     ): CreateWorkerJobMessageHandler {
         $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
         \assert($serializedSuiteStore instanceof SerializedSuiteStore);
@@ -374,12 +254,18 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
+        if (null === $readinessAssessor) {
+            $readinessAssessor = self::getContainer()->get(CreateWorkerJobReadinessAssessor::class);
+            \assert($readinessAssessor instanceof CreateWorkerJobReadinessAssessor);
+        }
+
         return new CreateWorkerJobMessageHandler(
             $serializedSuiteStore,
             $resultsJobRepository,
             $serializedSuiteClient,
             $workerClientFactory,
             $eventDispatcher,
+            $readinessAssessor,
         );
     }
 

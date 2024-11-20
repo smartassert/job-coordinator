@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
-use App\Repository\MachineRepository;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateMachineMessageDispatcher implements EventSubscriberInterface
+readonly class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly MachineRepository $machineRepository,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
@@ -39,7 +40,7 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
 
     public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
-        if ($this->machineRepository->has($event->getJobId())) {
+        if (MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($event->getJobId())) {
             return;
         }
 
@@ -51,7 +52,11 @@ class CreateMachineMessageDispatcher implements EventSubscriberInterface
     public function reDispatch(MessageNotYetHandleableEvent $event): void
     {
         $message = $event->message;
-        if (!$message instanceof CreateMachineMessage || $this->machineRepository->has($event->message->getJobId())) {
+
+        if (
+            !$message instanceof CreateMachineMessage
+            || MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($message->getJobId())
+        ) {
             return;
         }
 

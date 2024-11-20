@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Event\MessageNotHandleableEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Repository\SerializedSuiteRepository;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CreateSerializedSuiteMessageHandler
+final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
+        private SerializedSuiteClient $serializedSuiteClient,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -28,9 +28,7 @@ final class CreateSerializedSuiteMessageHandler
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        if ($this->serializedSuiteRepository->has($message->getJobId())) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
+        if (!$this->isReady($message)) {
             return;
         }
 

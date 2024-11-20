@@ -26,4 +26,16 @@ readonly class SerializedSuiteFactory
 
         return $resultsJob;
     }
+
+    public function createNewForJob(JobInterface $job): SerializedSuite
+    {
+        $serializedSuiteId = md5((string) rand());
+        $state = md5((string) rand());
+
+        $resultsJob = new SerializedSuite($job->getId(), $serializedSuiteId, $state, false, false);
+
+        $this->serializedSuiteRepository->save($resultsJob);
+
+        return $resultsJob;
+    }
 }

@@ -11,11 +11,13 @@ class JobCreatedEvent extends Event implements JobEventInterface, Authenticating
     /**
      * @param non-empty-string                          $authenticationToken
      * @param non-empty-string                          $jobId
+     * @param non-empty-string                          $suiteId
      * @param array<non-empty-string, non-empty-string> $parameters
      */
     public function __construct(
         private readonly string $authenticationToken,
         private readonly string $jobId,
+        private readonly string $suiteId,
         public readonly array $parameters,
     ) {
     }
@@ -28,5 +30,13 @@ class JobCreatedEvent extends Event implements JobEventInterface, Authenticating
     public function getAuthenticationToken(): string
     {
         return $this->authenticationToken;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getSuiteId(): string
+    {
+        return $this->suiteId;
     }
 }

@@ -9,6 +9,7 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageDispatcher\GetSerializedSuiteMessageDispatcher;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\SerializedSuiteFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -69,11 +70,15 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = md5((string) rand());
-        $serializedSuiteId = md5((string) rand());
-        $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $job->getSuiteId());
+        $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
+        \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
+        $serializedSuite = $serializedSuiteFactory->createNewForJob($job);
+        \assert('' !== $serializedSuite->id);
 
-        $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuite);
+        $authenticationToken = md5((string) rand());
+        $serializedSuiteModel = SourcesClientSerializedSuiteFactory::create($serializedSuite->id, $job->getSuiteId());
+
+        $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuiteModel);
 
         $this->dispatcher->dispatchForSerializedSuiteEvent($event);
 
@@ -84,12 +89,30 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
             $authenticationToken,
             $job->getId(),
             $job->getSuiteId(),
-            $serializedSuiteId
+            $serializedSuite->id
         );
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+    }
+
+    public function testDispatchNotReady(): void
+    {
+        $jobId = md5((string) rand());
+        $authenticationToken = md5((string) rand());
+        $suiteId = md5((string) rand());
+        $serializedSuiteId = md5((string) rand());
+        $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId);
+
+        $dispatcher = self::getContainer()->get(GetSerializedSuiteMessageDispatcher::class);
+        \assert($dispatcher instanceof GetSerializedSuiteMessageDispatcher);
+
+        $event = new SerializedSuiteCreatedEvent($authenticationToken, $jobId, $serializedSuite);
+
+        $dispatcher->dispatchForSerializedSuiteEvent($event);
+
+        self::assertSame([], $this->messengerTransport->getSent());
     }
 }

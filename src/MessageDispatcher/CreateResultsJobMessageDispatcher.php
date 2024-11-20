@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
-use App\Repository\ResultsJobRepository;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
+readonly class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly ResultsJobRepository $resultsJobRepository,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
@@ -31,7 +32,7 @@ class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
-        if ($this->resultsJobRepository->has($event->getJobId())) {
+        if (MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($event->getJobId())) {
             return;
         }
 

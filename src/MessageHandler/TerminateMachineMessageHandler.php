@@ -7,19 +7,20 @@ namespace App\MessageHandler;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
-use App\Repository\ResultsJobRepository;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class TerminateMachineMessageHandler
+final readonly class TerminateMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly ResultsJobRepository $resultsJobRepository,
-        private readonly WorkerManagerClient $workerManagerClient,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private WorkerManagerClient $workerManagerClient,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -27,8 +28,7 @@ final class TerminateMachineMessageHandler
      */
     public function __invoke(TerminateMachineMessage $message): void
     {
-        $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (null === $resultsJob || !$resultsJob->hasEndState()) {
+        if (!$this->isReady($message)) {
             return;
         }
 

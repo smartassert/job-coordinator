@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Services\SerializedSuiteStore;
 use App\Services\WorkerClientFactory;
@@ -17,15 +16,17 @@ use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CreateWorkerJobMessageHandler
+final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly SerializedSuiteStore $serializedSuiteStore,
-        private readonly ResultsJobRepository $resultsJobRepository,
-        private readonly SerializedSuiteClient $serializedSuiteClient,
-        private readonly WorkerClientFactory $workerClientFactory,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private SerializedSuiteStore $serializedSuiteStore,
+        private ResultsJobRepository $resultsJobRepository,
+        private SerializedSuiteClient $serializedSuiteClient,
+        private WorkerClientFactory $workerClientFactory,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -33,20 +34,14 @@ final class CreateWorkerJobMessageHandler
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        $serializedSuiteModel = $this->serializedSuiteStore->retrieve($message->getJobId());
-        $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (
-            null === $serializedSuiteModel
-            || $serializedSuiteModel->isPreparing()
-            || null === $resultsJob
-        ) {
-            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
-
+        if (!$this->isReady($message)) {
             return;
         }
 
-        if ($serializedSuiteModel->hasFailed()) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
+        $serializedSuiteModel = $this->serializedSuiteStore->retrieve($message->getJobId());
+        $resultsJob = $this->resultsJobRepository->find($message->getJobId());
+        if (null === $serializedSuiteModel || null === $resultsJob) {
+            $this->isNotYetReady($message);
 
             return;
         }

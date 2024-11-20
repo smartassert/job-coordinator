@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Repository\SerializedSuiteRepository;
-use App\Services\JobStore;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
+readonly class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private readonly SerializedSuiteRepository $serializedSuiteRepository,
-        private readonly JobStore $jobStore,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {
     }
 
@@ -33,20 +32,15 @@ class CreateSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 
     public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
     {
-        if ($this->serializedSuiteRepository->has($event->getJobId())) {
-            return;
-        }
-
-        $job = $this->jobStore->retrieve($event->getJobId());
-        if (null === $job) {
+        if (MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($event->getJobId())) {
             return;
         }
 
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new CreateSerializedSuiteMessage(
                 $event->getAuthenticationToken(),
-                $job->getId(),
-                $job->getSuiteId(),
+                $event->getJobId(),
+                $event->getSuiteId(),
                 $event->parameters
             )
         );

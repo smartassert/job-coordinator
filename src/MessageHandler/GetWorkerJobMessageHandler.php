@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\WorkerComponentState;
-use App\Event\MessageNotHandleableEvent;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
-use App\Repository\WorkerComponentStateRepository;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class GetWorkerJobMessageHandler
+final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private readonly WorkerComponentStateRepository $workerComponentStateRepository,
-        private readonly WorkerClientFactory $workerClientFactory,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private WorkerClientFactory $workerClientFactory,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -29,10 +28,7 @@ final class GetWorkerJobMessageHandler
      */
     public function __invoke(GetWorkerJobMessage $message): void
     {
-        $applicationState = $this->workerComponentStateRepository->getApplicationState($message->getJobId());
-        if ($applicationState instanceof WorkerComponentState && $applicationState->isEndState()) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
+        if (!$this->isReady($message)) {
             return;
         }
 

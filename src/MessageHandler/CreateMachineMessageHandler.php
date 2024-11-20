@@ -5,27 +5,22 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineCreationRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
-use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
-use App\Services\SerializedSuiteStore;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class CreateMachineMessageHandler
+final readonly class CreateMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteStore $serializedSuiteStore,
         private WorkerManagerClient $workerManagerClient,
-        private EventDispatcherInterface $eventDispatcher,
-        private MachineRepository $machineRepository,
+        EventDispatcherInterface $eventDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
+        parent::__construct($eventDispatcher, $readinessAssessor);
     }
 
     /**
@@ -33,20 +28,7 @@ final readonly class CreateMachineMessageHandler
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        if ($this->machineRepository->has($message->getJobId())) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
-            return;
-        }
-
-        $serializedSuite = $this->serializedSuiteStore->retrieve($message->getJobId());
-        if (
-            !$this->resultsJobRepository->has($message->getJobId())
-            || null === $serializedSuite
-            || !$serializedSuite->isPrepared()
-        ) {
-            $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
-
+        if (!$this->isReady($message)) {
             return;
         }
 

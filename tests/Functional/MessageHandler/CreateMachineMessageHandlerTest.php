@@ -5,234 +5,95 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\ResultsJob;
+use App\Entity\SerializedSuite;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
-use App\Model\JobInterface;
-use App\Model\SerializedSuite;
+use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
-use App\Services\SerializedSuiteStore;
+use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Factory\SerializedSuiteFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
-    /**
-     * @param callable(JobInterface): ResultsJobRepository $resultsJobRepositoryCreator
-     * @param callable(JobInterface): SerializedSuiteStore $serializedSuiteStoreCreator
-     */
-    #[DataProvider('invokeNotYetHandleableDataProvider')]
-    public function testInvokeNotYetHandleable(
-        callable $resultsJobRepositoryCreator,
-        callable $serializedSuiteStoreCreator,
-    ): void {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+    public function testInvokeNotYetHandleable(): void
+    {
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
+        \assert($workerManagerClient instanceof WorkerManagerClient);
 
-        $resultsJobRepository = $resultsJobRepositoryCreator($job);
-        $serializedSuiteStore = $serializedSuiteStoreCreator($job);
-
-        $handler = $this->createHandler(
-            $resultsJobRepository,
-            $serializedSuiteStore,
-            HttpMockedWorkerManagerClientFactory::create(),
-            $machineRepository,
-        );
-
-        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $handler($message);
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
 
-        $fooEvents = $this->eventRecorder->all(MessageNotYetHandleableEvent::class);
-        self::assertCount(1, $fooEvents);
-
-        $fooEvent = $fooEvents[0];
-        self::assertInstanceOf(MessageNotYetHandleableEvent::class, $fooEvent);
-        self::assertSame($message, $fooEvent->message);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function invokeNotYetHandleableDataProvider(): array
-    {
-        return [
-            'no results job' => [
-                'resultsJobRepositoryCreator' => function (JobInterface $job) {
-                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
-                    $resultsJobRepository
-                        ->shouldReceive('has')
-                        ->with($job->getId())
-                        ->andReturnFalse()
-                    ;
-
-                    return $resultsJobRepository;
-                },
-                'serializedSuiteStoreCreator' => function (JobInterface $job) {
-                    $serializedSuiteStore = \Mockery::mock(SerializedSuiteStore::class);
-                    $serializedSuiteStore
-                        ->shouldReceive('retrieve')
-                        ->with($job->getId())
-                        ->andReturnNull()
-                    ;
-
-                    return $serializedSuiteStore;
-                },
-            ],
-            'no serialized suite' => [
-                'resultsJobRepositoryCreator' => function (JobInterface $job) {
-                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
-                    $resultsJobRepository
-                        ->shouldReceive('has')
-                        ->with($job->getId())
-                        ->andReturnTrue()
-                    ;
-
-                    return $resultsJobRepository;
-                },
-                'serializedSuiteStoreCreator' => function (JobInterface $job) {
-                    $serializedSuiteStore = \Mockery::mock(SerializedSuiteStore::class);
-                    $serializedSuiteStore
-                        ->shouldReceive('retrieve')
-                        ->with($job->getId())
-                        ->andReturnNull()
-                    ;
-
-                    return $serializedSuiteStore;
-                },
-            ],
-            'serialized suite not prepared' => [
-                'resultsJobRepositoryCreator' => function (JobInterface $job) {
-                    $resultsJobRepository = \Mockery::mock(ResultsJobRepository::class);
-                    $resultsJobRepository
-                        ->shouldReceive('has')
-                        ->with($job->getId())
-                        ->andReturnTrue()
-                    ;
-
-                    return $resultsJobRepository;
-                },
-                'serializedSuiteStoreCreator' => function (JobInterface $job) {
-                    $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
-
-                    $serializedSuite = new SerializedSuite($serializedSuiteId, 'preparing', false, false);
-
-                    $serializedSuiteStore = \Mockery::mock(SerializedSuiteStore::class);
-                    $serializedSuiteStore
-                        ->shouldReceive('retrieve')
-                        ->with($job->getId())
-                        ->andReturn($serializedSuite)
-                    ;
-
-                    return $serializedSuiteStore;
-                },
-            ],
-        ];
+        $this->assertExpectedNotYetHandleableOutcome($message);
     }
 
     public function testInvokeNotHandleable(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
-
-        $machineRepository = \Mockery::mock(MachineRepository::class);
-        $machineRepository
-            ->shouldReceive('has')
-            ->with($job->getId())
-            ->andReturnTrue()
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
+        \assert($workerManagerClient instanceof WorkerManagerClient);
 
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
-
-        $handler = $this->createHandler(
-            $resultsJobRepository,
-            $serializedSuiteStore,
-            HttpMockedWorkerManagerClientFactory::create(),
-            $machineRepository,
-        );
-
-        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $handler($message);
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
 
-        $messageNotHandleableEvents = $this->eventRecorder->all(MessageNotHandleableEvent::class);
-        self::assertCount(1, $messageNotHandleableEvents);
-
-        $messageNotHandleableEvent = $messageNotHandleableEvents[0];
-        self::assertInstanceOf(MessageNotHandleableEvent::class, $messageNotHandleableEvent);
-        self::assertSame($message, $messageNotHandleableEvent->message);
+        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
 
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
-
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
-
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
-
-        $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
-        \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
-        $serializedSuiteFactory->createPreparedForJob($job);
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $workerManagerException = new \Exception('Failed to create machine');
-
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
 
-        $handler = $this->createHandler(
-            $resultsJobRepository,
-            $serializedSuiteStore,
-            $workerManagerClient,
-            $machineRepository,
-        );
-
-        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         try {
             $handler($message);
@@ -249,22 +110,25 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+        $serializedSuiteId = (string) new Ulid();
+        \assert('' !== $serializedSuiteId);
+
+        $serializedSuiteRepository->save(
+            new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+        );
+
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
+        $resultsJobRepository->save(
+            new ResultsJob($job->getId(), 'token', 'state', null)
+        );
 
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
-
-        $serializedSuiteFactory = self::getContainer()->get(SerializedSuiteFactory::class);
-        \assert($serializedSuiteFactory instanceof SerializedSuiteFactory);
-        $serializedSuiteFactory->createPreparedForJob($job);
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
+        \assert($assessor instanceof CreateMachineReadinessAssessor);
 
         $machine = MachineFactory::create(
             $job->getId(),
@@ -281,19 +145,13 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             HttpResponseFactory::createForWorkerManagerMachine($machine),
         ]);
 
-        $handler = $this->createHandler(
-            $resultsJobRepository,
-            $serializedSuiteStore,
-            $workerManagerClient,
-            $machineRepository,
-        );
+        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+
+        $handler($message);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-
-        self::assertNull($machineRepository->find($job->getId()));
-
-        $handler(new CreateMachineMessage(self::$apiToken, $job->getId()));
 
         $createdMachine = $machineRepository->find($job->getId());
         self::assertEquals(
@@ -321,23 +179,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        ResultsJobRepository $resultsJobRepository,
-        SerializedSuiteStore $serializedSuiteStore,
+        ReadinessAssessorInterface $assessor,
         WorkerManagerClient $workerManagerClient,
-        MachineRepository $machineRepository,
     ): CreateMachineMessageHandler {
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateMachineMessageHandler(
-            $resultsJobRepository,
-            $serializedSuiteStore,
-            $workerManagerClient,
-            $eventDispatcher,
-            $machineRepository,
-        );
+        return new CreateMachineMessageHandler($workerManagerClient, $eventDispatcher, $assessor);
     }
 }
