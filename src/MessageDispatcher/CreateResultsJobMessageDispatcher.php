@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateResultsJobMessage;
+use App\Message\JobRemoteRequestMessageInterface;
+use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class CreateResultsJobMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
 {
     /**
      * @return array<class-string, array<mixed>>
@@ -38,17 +39,8 @@ readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatch
         );
     }
 
-    public function redispatch(MessageNotYetHandleableEvent $event): void
+    protected function handles(JobRemoteRequestMessageInterface $message): bool
     {
-        $message = $event->message;
-
-        if (
-            !$message instanceof CreateResultsJobMessage
-            || MessageHandlingReadiness::NEVER === $this->readinessAssessor->isReady($message->getJobId())
-        ) {
-            return;
-        }
-
-        $this->messageDispatcher->dispatch($message);
+        return $message instanceof CreateResultsJobMessage;
     }
 }
