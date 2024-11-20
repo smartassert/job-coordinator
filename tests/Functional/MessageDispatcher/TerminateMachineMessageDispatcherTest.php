@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Entity\Machine;
+use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
+use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
+use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -58,11 +65,59 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
+    public function testDispatchNotReady(): void
+    {
+        $jobId = md5((string) rand());
+
+        $event = new ResultsJobStateRetrievedEvent(
+            md5((string) rand()),
+            $jobId,
+            new ResultsJobState('complete', 'ended')
+        );
+
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
+        $dispatcher->dispatch($event);
+
+        self::assertCount(0, $this->messengerTransport->getSent());
+    }
+
     public function testDispatchSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJob = $resultsJobFactory->create($job);
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save(
+            new Machine(
+                $job->getId(),
+                'state',
+                'state-category',
+                false,
+                true,
+            )
+        );
+
+        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
+        \assert($resultsJobRepository instanceof ResultsJobRepository);
+
+        $resultsJob->setEndState('end-state');
+        $resultsJobRepository->save($resultsJob);
 
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
