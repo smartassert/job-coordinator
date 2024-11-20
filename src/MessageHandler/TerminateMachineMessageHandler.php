@@ -37,7 +37,7 @@ final readonly class TerminateMachineMessageHandler extends AbstractMessageHandl
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($message->getJobId(), $machine));
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($message->getJobId(), $e, $message);
+            throw new RemoteJobActionException($e, $message);
         }
     }
 }

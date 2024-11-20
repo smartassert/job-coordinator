@@ -8,11 +8,7 @@ use App\Message\JobRemoteRequestMessageInterface;
 
 class RemoteJobActionException extends \Exception implements RemoteRequestExceptionInterface
 {
-    /**
-     * @param non-empty-string $jobId
-     */
     public function __construct(
-        private readonly string $jobId,
         private readonly \Throwable $previousException,
         private readonly JobRemoteRequestMessageInterface $failedMessage,
     ) {
@@ -21,7 +17,7 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
                 'Failed to %s %s for job "%s": %s',
                 $failedMessage->getRemoteRequestType()->action->value,
                 $failedMessage->getRemoteRequestType()->jobComponent->value,
-                $jobId,
+                $this->failedMessage->getJobId(),
                 $previousException->getMessage()
             ),
             0,
@@ -31,7 +27,7 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
 
     public function getJobId(): string
     {
-        return $this->jobId;
+        return $this->failedMessage->getJobId();
     }
 
     public function getPreviousException(): \Throwable

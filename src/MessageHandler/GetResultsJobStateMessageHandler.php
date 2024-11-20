@@ -40,7 +40,7 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
                 $resultsJobState
             ));
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($message->getJobId(), $e, $message);
+            throw new RemoteJobActionException($e, $message);
         }
     }
 }
