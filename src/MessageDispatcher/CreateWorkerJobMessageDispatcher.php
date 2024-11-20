@@ -7,11 +7,13 @@ namespace App\MessageDispatcher;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
+use App\Message\JobRemoteRequestMessageInterface;
+use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         JobRemoteRequestMessageDispatcher $messageDispatcher,
@@ -53,13 +55,8 @@ readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatche
         );
     }
 
-    public function redispatch(MessageNotYetHandleableEvent $event): void
+    protected function handles(JobRemoteRequestMessageInterface $message): bool
     {
-        $message = $event->message;
-        if (!$message instanceof CreateWorkerJobMessage) {
-            return;
-        }
-
-        $this->messageDispatcher->dispatch($event->message);
+        return $message instanceof CreateWorkerJobMessage;
     }
 }
