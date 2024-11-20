@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\JobCreatedEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Message\CreateResultsJobMessage;
-use App\Message\JobRemoteRequestMessageInterface;
-use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateResultsJobMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
+readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
 {
     /**
      * @return array<class-string, array<mixed>>
@@ -21,9 +18,6 @@ readonly class CreateResultsJobMessageDispatcher extends BaseMessageDispatcher i
         return [
             JobCreatedEvent::class => [
                 ['dispatchForJobCreatedEvent', 100],
-            ],
-            MessageNotYetHandleableEvent::class => [
-                ['redispatch', 100],
             ],
         ];
     }
@@ -37,10 +31,5 @@ readonly class CreateResultsJobMessageDispatcher extends BaseMessageDispatcher i
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
             new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId())
         );
-    }
-
-    protected function handles(JobRemoteRequestMessageInterface $message): bool
-    {
-        return $message instanceof CreateResultsJobMessage;
     }
 }
