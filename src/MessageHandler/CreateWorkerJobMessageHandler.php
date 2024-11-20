@@ -72,7 +72,7 @@ final class CreateWorkerJobMessageHandler
                 $workerJob,
             ));
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($message->getJobId(), $e, $message);
+            throw new RemoteJobActionException($e, $message);
         }
     }
 }
