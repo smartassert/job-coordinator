@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\CreateWorkerJobRequestedEvent;
+use App\Event\JobEventInterface;
+use App\Event\MachineIpAddressInterface;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,32 +20,21 @@ readonly class GetWorkerJobMessageDispatcher extends AbstractMessageDispatcher i
     {
         return [
             CreateWorkerJobRequestedEvent::class => [
-                ['dispatchForCreateWorkerJobRequestedEvent', 100],
+                ['dispatch', 100],
             ],
             WorkerStateRetrievedEvent::class => [
-                ['dispatchForWorkerStateRetrievedEvent', 100],
+                ['dispatch', 100],
             ],
         ];
     }
 
-    public function dispatchForCreateWorkerJobRequestedEvent(CreateWorkerJobRequestedEvent $event): void
+    public function dispatch(JobEventInterface&MachineIpAddressInterface $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;
         }
 
         $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress())
-        );
-    }
-
-    public function dispatchForWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
-    {
-        if ($this->isNeverReady($event->getJobId())) {
-            return;
-        }
-
-        $this->messageDispatcher->dispatch(
             new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress())
         );
     }

@@ -14,8 +14,6 @@ use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerClient\Model\ApplicationState;
-use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -58,16 +56,16 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         return [
             CreateWorkerJobRequestedEvent::class => [
                 'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
-                'expectedMethod' => 'dispatchForCreateWorkerJobRequestedEvent',
+                'expectedMethod' => 'dispatch',
             ],
             WorkerStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
-                'expectedMethod' => 'dispatchForWorkerStateRetrievedEvent',
+                'expectedMethod' => 'dispatch',
             ],
         ];
     }
 
-    public function testDispatchForWorkerJobStartRequestedEventNotReady(): void
+    public function testDispatchNotReady(): void
     {
         $jobId = md5((string) rand());
         $workerJob = WorkerClientJobFactory::createRandom();
@@ -87,42 +85,12 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         ;
 
         $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
-        $dispatcher->dispatchForCreateWorkerJobRequestedEvent($event);
+        $dispatcher->dispatch($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
     }
 
-    public function testDispatchForWorkerStateRetrievedEventMessageIsDispatchedNotReady(): void
-    {
-        $jobId = md5((string) rand());
-
-        $state = new ApplicationState(
-            new ComponentState('executing', false),
-            new ComponentState('complete', true),
-            new ComponentState('running', false),
-            new ComponentState('running', false),
-        );
-
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $event = new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $state);
-
-        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
-        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
-
-        $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
-        $dispatcher->dispatchForWorkerStateRetrievedEvent($event);
-
-        self::assertCount(0, $this->messengerTransport->getSent());
-    }
-
-    public function testDispatchForWorkerJobStartRequestedEventSuccess(): void
+    public function testDispatchSuccess(): void
     {
         $jobId = md5((string) rand());
         $workerJob = WorkerClientJobFactory::createRandom();
@@ -131,7 +99,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
 
         $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
-        $this->dispatcher->dispatchForCreateWorkerJobRequestedEvent($event);
+        $this->dispatcher->dispatch($event);
 
         $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
@@ -142,32 +110,5 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertEquals([new NonDelayedStamp()], $dispatchedEnvelope->all(NonDelayedStamp::class));
-    }
-
-    public function testDispatchForWorkerStateRetrievedEventMessageIsDispatchedSuccess(): void
-    {
-        $jobId = md5((string) rand());
-
-        $state = new ApplicationState(
-            new ComponentState('executing', false),
-            new ComponentState('complete', true),
-            new ComponentState('running', false),
-            new ComponentState('running', false),
-        );
-
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $event = new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $state);
-
-        $this->dispatcher->dispatchForWorkerStateRetrievedEvent($event);
-
-        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
-
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertCount(1, $envelopes);
-
-        $dispatchedEnvelope = $envelopes[0];
-        self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
-
-        self::assertSame([], $dispatchedEnvelope->all(NonDelayedStamp::class));
     }
 }
