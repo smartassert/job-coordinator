@@ -48,7 +48,7 @@ readonly class CreateMachineMessageDispatcher extends AbstractMessageDispatcher 
 
         if (
             !$message instanceof CreateMachineMessage
-            || MessageHandlingReadiness::NOW !== $this->readinessAssessor->isReady($message->getJobId())
+            || MessageHandlingReadiness::NEVER === $this->readinessAssessor->isReady($message->getJobId())
         ) {
             return;
         }

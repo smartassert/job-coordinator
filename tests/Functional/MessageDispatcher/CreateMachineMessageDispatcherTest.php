@@ -103,7 +103,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage($event->getAuthenticationToken(), $job->getId());
+        $this->assertNonDelayedMessageIsDispatched($event->getAuthenticationToken(), $job->getId());
     }
 
     /**
@@ -137,7 +137,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchNotReady(): void
+    public function testDispatchNeverReady(): void
     {
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
@@ -151,10 +151,10 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $dispatcher->dispatch($event);
 
-        self::assertSame([], $this->messengerTransport->getSent());
+        $this->assertNoMessagesAreDispatched();
     }
 
-    public function testReDispatchNotReady(): void
+    public function testReDispatchNeverReady(): void
     {
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
@@ -169,7 +169,45 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $dispatcher->reDispatch($event);
 
-        self::assertSame([], $this->messengerTransport->getSent());
+        $this->assertNoMessagesAreDispatched();
+    }
+
+    #[DataProvider('reDispatchSuccessDataProvider')]
+    public function testReDispatchSuccess(MessageHandlingReadiness $readiness): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $readinessAssessor
+            ->shouldReceive('isReady')
+            ->andReturn($readiness)
+        ;
+
+        $dispatcher = $this->createDispatcher($readinessAssessor);
+
+        $message = new CreateMachineMessage('api token', $job->getId());
+        $event = new MessageNotYetHandleableEvent($message);
+
+        $dispatcher->reDispatch($event);
+
+        $this->assertDelayedMessageIsDispatched($message->authenticationToken, $job->getId());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function reDispatchSuccessDataProvider(): array
+    {
+        return [
+            'ready now' => [
+                'readiness' => MessageHandlingReadiness::NOW,
+            ],
+            'ready eventually' => [
+                'readiness' => MessageHandlingReadiness::EVENTUALLY,
+            ],
+        ];
     }
 
     private function createDispatcher(ReadinessAssessorInterface $readinessAssessor): CreateMachineMessageDispatcher
@@ -180,21 +218,36 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         return new CreateMachineMessageDispatcher($messageDispatcher, $readinessAssessor);
     }
 
+    private function assertNoMessagesAreDispatched(): void
+    {
+        self::assertSame([], $this->messengerTransport->getSent());
+    }
+
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      */
-    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
+    private function assertNonDelayedMessageIsDispatched(string $authenticationToken, string $jobId): void
     {
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
-        self::assertEquals(
-            new CreateMachineMessage($authenticationToken, $jobId),
-            $envelope->getMessage()
-        );
-
+        self::assertEquals(new CreateMachineMessage($authenticationToken, $jobId), $envelope->getMessage());
         self::assertEquals([new NonDelayedStamp()], $envelope->all(NonDelayedStamp::class));
+    }
+
+    /**
+     * @param non-empty-string $authenticationToken
+     * @param non-empty-string $jobId
+     */
+    private function assertDelayedMessageIsDispatched(string $authenticationToken, string $jobId): void
+    {
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertCount(1, $envelopes);
+
+        $envelope = $envelopes[0];
+        self::assertEquals(new CreateMachineMessage($authenticationToken, $jobId), $envelope->getMessage());
+        self::assertEquals([], $envelope->all(NonDelayedStamp::class));
     }
 }
