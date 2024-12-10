@@ -18,12 +18,12 @@ readonly class CreateSerializedSuiteMessageDispatcher extends BaseMessageDispatc
     {
         return [
             JobCreatedEvent::class => [
-                ['dispatchForJobCreatedEvent', 100],
+                ['dispatchImmediately', 100],
             ],
         ];
     }
 
-    public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
+    public function dispatchImmediately(JobCreatedEvent $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;

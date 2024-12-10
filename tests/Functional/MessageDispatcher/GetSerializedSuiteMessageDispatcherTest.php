@@ -55,16 +55,16 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         return [
             SerializedSuiteCreatedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
-                'expectedMethod' => 'dispatchForSerializedSuiteEvent',
+                'expectedMethod' => 'dispatchImmediately',
             ],
             SerializedSuiteRetrievedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
-                'expectedMethod' => 'dispatchForSerializedSuiteEvent',
+                'expectedMethod' => 'dispatchImmediately',
             ],
         ];
     }
 
-    public function testDispatchForSerializedSuiteEventSuccess(): void
+    public function testDispatchImmediatelySuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -80,7 +80,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuiteModel);
 
-        $this->dispatcher->dispatchForSerializedSuiteEvent($event);
+        $this->dispatcher->dispatchImmediately($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
@@ -98,7 +98,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 
-    public function testDispatchNotReady(): void
+    public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = md5((string) rand());
         $authenticationToken = md5((string) rand());
@@ -111,7 +111,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteCreatedEvent($authenticationToken, $jobId, $serializedSuite);
 
-        $dispatcher->dispatchForSerializedSuiteEvent($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }

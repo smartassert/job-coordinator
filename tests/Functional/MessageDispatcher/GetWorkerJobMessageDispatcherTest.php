@@ -56,16 +56,16 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         return [
             CreateWorkerJobRequestedEvent::class => [
                 'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
-                'expectedMethod' => 'dispatch',
+                'expectedMethod' => 'dispatchImmediately',
             ],
             WorkerStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
-                'expectedMethod' => 'dispatch',
+                'expectedMethod' => 'dispatchImmediately',
             ],
         ];
     }
 
-    public function testDispatchNotReady(): void
+    public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = md5((string) rand());
         $workerJob = WorkerClientJobFactory::createRandom();
@@ -85,12 +85,12 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         ;
 
         $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
-        $dispatcher->dispatch($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
     }
 
-    public function testDispatchSuccess(): void
+    public function testDispatchImmediatelySuccess(): void
     {
         $jobId = md5((string) rand());
         $workerJob = WorkerClientJobFactory::createRandom();
@@ -99,7 +99,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
 
         $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchImmediately($event);
 
         $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 

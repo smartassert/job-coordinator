@@ -87,8 +87,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @param callable(JobInterface): object $eventCreator
      */
-    #[DataProvider('dispatchSuccessDataProvider')]
-    public function testDispatchSuccess(callable $eventCreator): void
+    #[DataProvider('dispatchImmediatelySuccessDataProvider')]
+    public function testDispatchImmediatelySuccess(callable $eventCreator): void
     {
         $job = $this->jobFactory->createRandom();
 
@@ -101,7 +101,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $event = $eventCreator($job);
         \assert($event instanceof ResultsJobCreatedEvent || $event instanceof SerializedSuiteSerializedEvent);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchImmediately($event);
 
         $this->assertNonDelayedMessageIsDispatched($event->getAuthenticationToken(), $job->getId());
     }
@@ -109,7 +109,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public static function dispatchSuccessDataProvider(): array
+    public static function dispatchImmediatelySuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (JobInterface $job) {
             return new ResultsJobCreatedEvent(
@@ -137,7 +137,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    public function testDispatchNeverReady(): void
+    public function testDispatchImmediatelyNeverReady(): void
     {
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
@@ -149,7 +149,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteSerializedEvent('api token', 'job id', 'serialized suite id');
 
-        $dispatcher->dispatch($event);
+        $dispatcher->dispatchImmediately($event);
 
         $this->assertNoMessagesAreDispatched();
     }

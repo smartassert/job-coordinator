@@ -61,12 +61,12 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         return [
             ResultsJobStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
-                'expectedMethod' => 'dispatch',
+                'expectedMethod' => 'dispatchImmediately',
             ],
         ];
     }
 
-    public function testDispatchNeverReady(): void
+    public function testDispatchImmediatelyNeverReady(): void
     {
         $jobId = md5((string) rand());
 
@@ -87,7 +87,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         ;
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
-        $dispatcher->dispatch($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
     }
@@ -113,7 +113,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         self::assertCount(0, $this->messengerTransport->getSent());
     }
 
-    public function testDispatchSuccess(): void
+    public function testDispatchImmediatelySuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -147,7 +147,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
             new ResultsJobState('complete', 'ended')
         );
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchImmediately($event);
 
         $this->assertDispatchedMessage($event->getAuthenticationToken(), $event->getJobId());
     }

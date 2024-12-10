@@ -30,7 +30,7 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
     {
         return [
             MachineIsActiveEvent::class => [
-                ['dispatchForMachineIsActiveEvent', 100],
+                ['dispatchImmediately', 100],
             ],
             MessageNotYetHandleableEvent::class => [
                 ['redispatch', 100],
@@ -38,7 +38,7 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
         ];
     }
 
-    public function dispatchForMachineIsActiveEvent(MachineIsActiveEvent $event): void
+    public function dispatchImmediately(MachineIsActiveEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job || $this->isNeverReady($event->getJobId())) {

@@ -43,7 +43,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey(MessageNotYetHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
-    public function testDispatchForMachineIsActiveEventNotReady(): void
+    public function testDispatchImmediatelyNotReady(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -86,12 +86,12 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             )
         );
 
-        $dispatcher->dispatchForMachineIsActiveEvent($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }
 
-    public function testDispatchForMachineIsActiveEventNoJob(): void
+    public function testDispatchImmediatelyNoJob(): void
     {
         $jobId = (string) new Ulid();
         \assert('' !== $jobId);
@@ -128,12 +128,12 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             )
         );
 
-        $dispatcher->dispatchForMachineIsActiveEvent($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }
 
-    public function testDispatchForMachineIsActiveEventSuccess(): void
+    public function testDispatchImmediatelySuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -174,7 +174,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
 
-        $dispatcher->dispatchForMachineIsActiveEvent($event);
+        $dispatcher->dispatchImmediately($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

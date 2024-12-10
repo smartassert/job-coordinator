@@ -19,12 +19,12 @@ readonly class TerminateMachineMessageDispatcher extends BaseMessageDispatcher i
     {
         return [
             ResultsJobStateRetrievedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
         ];
     }
 
-    public function dispatch(ResultsJobStateRetrievedEvent $event): void
+    public function dispatchImmediately(ResultsJobStateRetrievedEvent $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;
