@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\Message\TerminateMachineMessage;
+use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class TerminateMachineMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class TerminateMachineMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
 {
     /**
      * @return array<class-string, array<mixed>>
@@ -32,5 +34,10 @@ readonly class TerminateMachineMessageDispatcher extends AbstractMessageDispatch
             $event->getAuthenticationToken(),
             $event->getJobId(),
         ));
+    }
+
+    protected function handles(JobRemoteRequestMessageInterface $message): bool
+    {
+        return $message instanceof TerminateMachineMessage;
     }
 }
