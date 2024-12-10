@@ -21,10 +21,10 @@ readonly class CreateMachineMessageDispatcher extends BaseMessageDispatcher impl
     {
         return [
             ResultsJobCreatedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
             SerializedSuiteSerializedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
             MessageNotYetHandleableEvent::class => [
                 ['redispatch', 100],
