@@ -18,15 +18,15 @@ readonly class GetSerializedSuiteMessageDispatcher extends AbstractMessageDispat
     {
         return [
             SerializedSuiteCreatedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
             SerializedSuiteRetrievedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
         ];
     }
 
-    public function dispatch(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
+    public function dispatchImmediately(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;

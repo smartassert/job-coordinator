@@ -20,15 +20,15 @@ readonly class GetWorkerJobMessageDispatcher extends AbstractMessageDispatcher i
     {
         return [
             CreateWorkerJobRequestedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
             WorkerStateRetrievedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
         ];
     }
 
-    public function dispatch(JobEventInterface&MachineIpAddressInterface $event): void
+    public function dispatchImmediately(JobEventInterface&MachineIpAddressInterface $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;
