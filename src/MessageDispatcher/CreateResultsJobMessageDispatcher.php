@@ -17,12 +17,12 @@ readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatch
     {
         return [
             JobCreatedEvent::class => [
-                ['dispatchForJobCreatedEvent', 100],
+                ['dispatch', 100],
             ],
         ];
     }
 
-    public function dispatchForJobCreatedEvent(JobCreatedEvent $event): void
+    public function dispatch(JobCreatedEvent $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;
