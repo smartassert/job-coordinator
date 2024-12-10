@@ -32,7 +32,7 @@ readonly class CreateMachineMessageDispatcher extends BaseMessageDispatcher impl
         ];
     }
 
-    public function dispatch(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
+    public function dispatchImmediately(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;

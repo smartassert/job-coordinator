@@ -38,7 +38,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertArrayHasKey(JobCreatedEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
-    public function testDispatchSuccess(): void
+    public function testDispatchImmediatelySuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -48,7 +48,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), []);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatchImmediately($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
@@ -61,7 +61,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
     }
 
-    public function testDispatchNotReady(): void
+    public function testDispatchImmediatelyNotReady(): void
     {
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $readinessAssessor
@@ -76,7 +76,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
 
         $event = new JobCreatedEvent('api token', 'job id', 'suite id', []);
 
-        $dispatcher->dispatch($event);
+        $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }
