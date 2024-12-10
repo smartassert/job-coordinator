@@ -107,6 +107,11 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
         RequestState $requestState
     ): void {
         $remoteRequest = $this->createRemoteRequest($message);
+
+        if ($requestState === $remoteRequest->getState()) {
+            return;
+        }
+
         $remoteRequest->setState($requestState);
         $this->remoteRequestRepository->save($remoteRequest);
     }
