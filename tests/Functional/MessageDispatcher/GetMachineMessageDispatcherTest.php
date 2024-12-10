@@ -13,6 +13,7 @@ use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -56,13 +57,78 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         return [
             MachineCreationRequestedEvent::class => [
                 'expectedListenedForEvent' => MachineCreationRequestedEvent::class,
-                'expectedMethod' => 'dispatch',
+                'expectedMethod' => 'dispatchImmediately',
             ],
             MachineRetrievedEvent::class => [
                 'expectedListenedForEvent' => MachineRetrievedEvent::class,
-                'expectedMethod' => 'dispatchIfMachineNotInEndState',
+                'expectedMethod' => 'dispatch',
             ],
         ];
+    }
+
+    public function testDispatchImmediatelySuccess(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            false,
+            false,
+        );
+
+        $this->persistMachine($machine);
+
+        $authenticationToken = md5((string) rand());
+
+        $event = new MachineCreationRequestedEvent($authenticationToken, $machine);
+
+        $this->dispatcher->dispatchImmediately($event);
+
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertCount(1, $envelopes);
+
+        $expectedMessage = new GetMachineMessage($authenticationToken, $machine->id, $machine);
+
+        $dispatchedEnvelope = $envelopes[0];
+        self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
+
+        self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+    }
+
+    public function testDispatchMachineIsInEndState(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            false,
+            true,
+        );
+
+        $this->persistMachine($machine);
+
+        $authenticationToken = md5((string) rand());
+
+        $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
+
+        $this->dispatcher->dispatch($event);
+
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertCount(0, $envelopes);
     }
 
     public function testDispatchSuccess(): void
@@ -82,92 +148,13 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
         );
 
+        $this->persistMachine($machine);
+
         $authenticationToken = md5((string) rand());
 
-        $event = new MachineCreationRequestedEvent($authenticationToken, $machine);
+        $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
 
         $this->dispatcher->dispatch($event);
-
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertCount(1, $envelopes);
-
-        $expectedMessage = new GetMachineMessage($authenticationToken, $machine->id, $machine);
-
-        $dispatchedEnvelope = $envelopes[0];
-        self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
-
-        self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
-    }
-
-    public function testDispatchIfMachineNotInEndStateMachineIsInEndState(): void
-    {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
-
-        $machine = MachineFactory::create(
-            $job->getId(),
-            'create/requested',
-            'pre_active',
-            [],
-            false,
-            false,
-            false,
-            false,
-        );
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
-            $job->getId(),
-            $machine->state,
-            $machine->stateCategory,
-            $machine->hasFailedState,
-            true,
-        ));
-
-        $authenticationToken = md5((string) rand());
-
-        $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
-
-        $this->dispatcher->dispatchIfMachineNotInEndState($event);
-
-        $envelopes = $this->messengerTransport->getSent();
-        self::assertCount(0, $envelopes);
-    }
-
-    public function testDispatchIfMachineNotInEndStateSuccess(): void
-    {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
-
-        $machine = MachineFactory::create(
-            $job->getId(),
-            'create/requested',
-            'pre_active',
-            [],
-            false,
-            false,
-            false,
-            false,
-        );
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
-            $job->getId(),
-            $machine->state,
-            $machine->stateCategory,
-            $machine->hasFailedState,
-            $machine->hasEndState,
-        ));
-
-        $authenticationToken = md5((string) rand());
-
-        $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
-
-        $this->dispatcher->dispatchIfMachineNotInEndState($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
@@ -186,5 +173,18 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             ],
             $dispatchedEnvelope->all(DelayStamp::class)
         );
+    }
+
+    private function persistMachine(Machine $machine): void
+    {
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save(new MachineEntity(
+            $machine->id,
+            $machine->state,
+            $machine->stateCategory,
+            $machine->hasFailedState,
+            $machine->hasEndState,
+        ));
     }
 }

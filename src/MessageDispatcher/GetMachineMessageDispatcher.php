@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Event\AuthenticatingEventInterface as AuthenticatingEvent;
+use App\Event\JobEventInterface as JobEvent;
 use App\Event\MachineCreationRequestedEvent;
+use App\Event\MachineEventInterface as MachineEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
+use App\Messenger\NonDelayedStamp;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
 {
@@ -18,31 +23,40 @@ readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher imp
     {
         return [
             MachineCreationRequestedEvent::class => [
-                ['dispatch', 100],
+                ['dispatchImmediately', 100],
             ],
             MachineRetrievedEvent::class => [
-                ['dispatchIfMachineNotInEndState', 100],
+                ['dispatch', 100],
             ],
         ];
     }
 
-    public function dispatchIfMachineNotInEndState(MachineRetrievedEvent $event): void
+    public function dispatch(MachineRetrievedEvent $event): void
+    {
+        $this->doDispatch($event);
+    }
+
+    public function dispatchImmediately(MachineCreationRequestedEvent $event): void
+    {
+        $this->doDispatch($event, [new NonDelayedStamp()]);
+    }
+
+    /**
+     * @param StampInterface[] $stamps
+     */
+    private function doDispatch(AuthenticatingEvent&JobEvent&MachineEvent $event, array $stamps = []): void
     {
         if ($this->isNeverReady($event->getJobId())) {
             return;
         }
 
-        $this->messageDispatcher->dispatch(new GetMachineMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->getMachine()
-        ));
-    }
-
-    public function dispatch(MachineCreationRequestedEvent $event): void
-    {
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetMachineMessage($event->getAuthenticationToken(), $event->getJobId(), $event->getMachine())
+        $this->messageDispatcher->dispatch(
+            new GetMachineMessage(
+                $event->getAuthenticationToken(),
+                $event->getJobId(),
+                $event->getMachine()
+            ),
+            $stamps
         );
     }
 }
