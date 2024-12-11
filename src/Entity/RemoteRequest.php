@@ -74,6 +74,11 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
         return $this;
     }
 
+    public function hasEndState(): bool
+    {
+        return in_array($this->state, RequestState::endStates());
+    }
+
     /**
      * @param non-empty-string $jobId
      * @param int<0, max>      $index

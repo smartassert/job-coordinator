@@ -12,4 +12,16 @@ enum RequestState: string
     case SUCCEEDED = 'succeeded';
     case PENDING = 'pending';
     case ABORTED = 'aborted';
+
+    /**
+     * @return RequestState[]
+     */
+    public static function endStates(): array
+    {
+        return [
+            self::FAILED,
+            self::SUCCEEDED,
+            self::ABORTED,
+        ];
+    }
 }
