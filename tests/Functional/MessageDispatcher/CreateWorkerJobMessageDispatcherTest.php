@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
-use App\Event\MessageNotYetHandleableEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
@@ -40,7 +40,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
     public function testIsEventSubscriber(): void
     {
         self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
-        self::assertArrayHasKey(MessageNotYetHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(MessageNotHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
     public function testDispatchImmediatelyNotReady(): void
@@ -207,7 +207,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
         );
-        $event = new MessageNotYetHandleableEvent($message);
+        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $this->dispatcher->redispatch($event);
 

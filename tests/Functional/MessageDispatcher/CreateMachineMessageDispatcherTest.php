@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotYetHandleableEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
@@ -165,7 +165,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $dispatcher = $this->createDispatcher($readinessAssessor);
 
         $message = new CreateMachineMessage('api token', 'job id');
-        $event = new MessageNotYetHandleableEvent($message);
+        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $dispatcher->redispatch($event);
 
@@ -188,7 +188,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $dispatcher = $this->createDispatcher($readinessAssessor);
 
         $message = new CreateMachineMessage('api token', $job->getId());
-        $event = new MessageNotYetHandleableEvent($message);
+        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $dispatcher->redispatch($event);
 

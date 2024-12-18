@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotYetHandleableEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
@@ -106,7 +106,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
 
         $message = new TerminateMachineMessage('api token', 'job id');
-        $event = new MessageNotYetHandleableEvent($message);
+        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $dispatcher->redispatch($event);
 
