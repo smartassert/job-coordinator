@@ -11,13 +11,15 @@ use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Tests\Application\AbstractApplicationTest;
+use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
+use SmartAssert\TestSourcesClient\FileClient;
+use SmartAssert\TestSourcesClient\FileSourceClient;
+use SmartAssert\TestSourcesClient\SuiteClient;
 use Symfony\Component\Uid\Ulid;
 
-class MachineCreateMessageHandlingTest extends AbstractApplicationTest
+class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
 {
     use GetClientAdapterTrait;
 
@@ -34,13 +36,6 @@ class MachineCreateMessageHandlingTest extends AbstractApplicationTest
 
     public function testSuccessfulMachineCreateRequestExists(): void
     {
-        $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
-        \assert($apiTokenProvider instanceof ApiTokenProvider);
-        $apiToken = $apiTokenProvider->get('user1@example.com');
-
-        $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
@@ -55,7 +50,11 @@ class MachineCreateMessageHandlingTest extends AbstractApplicationTest
 
         $entityRemover->removeAllRemoteRequests();
 
-        $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
+        $createResponse = self::$staticApplicationClient->makeCreateJobRequest(
+            self::$apiToken,
+            $this->createSuiteId(),
+            600
+        );
 
         self::assertSame(200, $createResponse->getStatusCode());
         self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
@@ -87,6 +86,34 @@ class MachineCreateMessageHandlingTest extends AbstractApplicationTest
             $successfulMachineCreateRequestCount,
             'Incorrect machine/create request count, should be only one.'
         );
+    }
+
+    protected static function createSuiteId(): string
+    {
+        $fileSourceClient = self::getContainer()->get(FileSourceClient::class);
+        \assert($fileSourceClient instanceof FileSourceClient);
+
+        $fileSourceLabel = (string) new Ulid();
+        \assert('' !== $fileSourceLabel);
+
+        $fileSourceId = $fileSourceClient->create(self::$apiToken, $fileSourceLabel);
+        \assert(is_string($fileSourceId));
+
+        $fileClient = self::getContainer()->get(FileClient::class);
+        \assert($fileClient instanceof FileClient);
+
+        $fileClient->add(self::$apiToken, $fileSourceId, 'test.yaml', '- test file content');
+
+        $suiteClient = self::getContainer()->get(SuiteClient::class);
+        \assert($suiteClient instanceof SuiteClient);
+
+        $suiteLabel = (string) new Ulid();
+        \assert('' !== $suiteLabel);
+
+        $suiteId = $suiteClient->create(self::$apiToken, $fileSourceId, $suiteLabel, ['test.yaml']);
+        \assert(is_string($suiteId));
+
+        return $suiteId;
     }
 
     private function waitUntilSuccessfulMachineCreateRemoteRequestExists(string $jobId): void
