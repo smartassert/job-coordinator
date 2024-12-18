@@ -9,6 +9,7 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
@@ -45,11 +46,18 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = $this->createHandler($assessor, $workerManagerClient);
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
+
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::EVENTUALLY, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
-
-        $this->assertExpectedNotYetHandleableOutcome($message);
     }
 
     public function testInvokeNotHandleable(): void
@@ -70,11 +78,18 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = $this->createHandler($assessor, $workerManagerClient);
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
+
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
 
         self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
-
-        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void

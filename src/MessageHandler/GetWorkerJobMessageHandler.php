@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\WorkerStateRetrievedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -25,12 +26,11 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(GetWorkerJobMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->assessReadiness($message);
 
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
 

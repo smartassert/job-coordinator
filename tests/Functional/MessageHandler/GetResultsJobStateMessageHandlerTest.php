@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MachineCreationRequestedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -46,11 +46,18 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $handler = $this->createHandler($assessor, $resultsClient);
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
 
-        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
 
-        $this->assertExpectedNotHandleableOutcome($message);
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class));
     }
 
     public function testInvokeResultsClientThrowsException(): void

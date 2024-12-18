@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
-use App\Enum\RequestState;
-use App\Model\RemoteRequestType;
-use App\Repository\RemoteRequestRepository;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
 use SmartAssert\TestSourcesClient\FileClient;
@@ -16,7 +11,7 @@ use SmartAssert\TestSourcesClient\FileSourceClient;
 use SmartAssert\TestSourcesClient\SuiteClient;
 use Symfony\Component\Uid\Ulid;
 
-class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
+class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
 {
     use GetClientAdapterTrait;
 
@@ -31,36 +26,39 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         $entityRemover->removeAllRemoteRequests();
     }
 
-    public function testSuccessfulMachineCreateRequestExists(): void
+    public function testMachineCreationResultsInFindFailure(): void
     {
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
-
-        $entityRemover = self::getContainer()->get(EntityRemover::class);
-        \assert($entityRemover instanceof EntityRemover);
-
-        $entityRemover->removeAllRemoteRequests();
-
         $jobId = $this->getJob()?->getId();
         \assert(is_string($jobId));
 
-        $this->waitUntilSuccessfulMachineCreateRemoteRequestExists($jobId);
-
-        $successfulMachineCreateRequestCount = $remoteRequestRepository->count(
+        $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
+        self::assertSame(
             [
-                'jobId' => $jobId,
-                'state' => RequestState::SUCCEEDED->value,
-                'type' => new RemoteRequestType(
-                    JobComponent::MACHINE,
-                    RemoteRequestAction::CREATE,
-                ),
-            ]
+                'state_category' => 'pre_active',
+                'ip_address' => null,
+                'action_failure' => null,
+                'has_failed_state' => false,
+                'has_end_state' => false,
+            ],
+            $machineData
         );
 
+        $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'end');
         self::assertSame(
-            1,
-            $successfulMachineCreateRequestCount,
-            'Incorrect machine/create request count, should be only one.'
+            [
+                'state_category' => 'end',
+                'ip_address' => null,
+                'action_failure' => [
+                    'action' => 'find',
+                    'type' => 'vendor_authentication_failure',
+                    'context' => [
+                        'provider' => null,
+                    ],
+                ],
+                'has_failed_state' => true,
+                'has_end_state' => true,
+            ],
+            $machineData
         );
     }
 
@@ -92,12 +90,10 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         return $suiteId;
     }
 
-    private function waitUntilSuccessfulMachineCreateRemoteRequestExists(string $jobId): void
-    {
-        $this->waitUntilMachineCreateRemoteRequestsExist($jobId, RequestState::SUCCEEDED->value);
-    }
-
-    private function waitUntilMachineCreateRemoteRequestsExist(string $jobId, ?string $state): void
+    /**
+     * @return array<mixed>
+     */
+    private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): array
     {
         $waitThreshold = self::MICROSECONDS_PER_SECOND * 30;
         $totalWaitTime = 0;
@@ -108,28 +104,39 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         while (false === $has && $totalWaitTime < $waitThreshold) {
             $totalWaitTime += $period;
             usleep($period);
-            $has = $this->hasMachineCreateRemoteRequests($jobId, $state);
+
+            $machineData = $this->getMachineData($jobId);
+
+            $has = is_array($machineData) && $machineData['state_category'] === $stateCategory;
         }
 
         if ($totalWaitTime >= $waitThreshold) {
-            throw new \RuntimeException('Exceeded threshold waiting for machine create remote requests');
+            throw new \RuntimeException(
+                'Exceeded threshold waiting for machine state category to be "' . $stateCategory . '".'
+            );
         }
+
+        \assert(is_array($machineData));
+
+        return $machineData;
     }
 
-    private function hasMachineCreateRemoteRequests(string $jobId, ?string $state = null): bool
+    /**
+     * @return null|array<mixed>
+     */
+    private function getMachineData(string $jobId): ?array
     {
-        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
-        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+        $getJobResponse = self::$staticApplicationClient->makeGetJobRequest(
+            self::$apiToken,
+            $jobId
+        );
 
-        $criteria = [
-            'jobId' => $jobId,
-            'type' => 'machine/create',
-        ];
+        $jobData = json_decode($getJobResponse->getBody()->getContents(), true);
+        \assert(is_array($jobData));
 
-        if (is_string($state)) {
-            $criteria['state'] = $state;
-        }
+        $machineData = $jobData['machine'];
+        \assert(null === $machineData || is_array($machineData));
 
-        return $remoteRequestRepository->count($criteria) > 0;
+        return $machineData;
     }
 }

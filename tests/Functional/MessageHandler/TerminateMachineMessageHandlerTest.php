@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineTerminationRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
@@ -39,11 +39,18 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = $this->createHandler($workerManagerClient, $assessor);
         $message = new TerminateMachineMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
 
-        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
 
-        $this->assertExpectedNotYetHandleableOutcome($message);
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::EVENTUALLY, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
     }
 
     public function testInvokeNotHandleable(): void
@@ -64,11 +71,18 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler = $this->createHandler($workerManagerClient, $assessor);
         $message = new TerminateMachineMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
 
-        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
 
-        $this->assertExpectedNotHandleableOutcome($message);
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(MachineTerminationRequestedEvent::class));
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void

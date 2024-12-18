@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -25,12 +26,11 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->assessReadiness($message);
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(

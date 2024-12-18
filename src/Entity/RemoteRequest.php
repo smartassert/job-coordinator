@@ -69,7 +69,9 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
 
     public function setState(RequestState $state): self
     {
-        $this->state = $state;
+        if ($this->allowsStateChange($state)) {
+            $this->state = $state;
+        }
 
         return $this;
     }
@@ -116,5 +118,31 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
         }
 
         return $data;
+    }
+
+    private function allowsStateChange(RequestState $state): bool
+    {
+        if (in_array($this->state, RequestState::endStates())) {
+            return false;
+        }
+
+        if (RequestState::HALTED === $this->state) {
+            return RequestState::REQUESTING === $state;
+        }
+
+        if (RequestState::PENDING === $this->state) {
+            return RequestState::REQUESTING === $state || RequestState::HALTED === $state;
+        }
+
+        if (RequestState::REQUESTING === $this->state) {
+            return
+                RequestState::REQUESTING === $state
+                || RequestState::HALTED === $state
+                || RequestState::FAILED === $state
+                || RequestState::SUCCEEDED === $state
+                || RequestState::ABORTED === $state;
+        }
+
+        return false;
     }
 }

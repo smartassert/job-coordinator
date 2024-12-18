@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\ResultsJobCreatedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -25,12 +26,11 @@ final readonly class CreateResultsJobMessageHandler extends AbstractMessageHandl
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->assessReadiness($message);
 
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->getJobId());

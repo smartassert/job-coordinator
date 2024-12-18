@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
@@ -126,11 +127,18 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
 
-        $handler($message);
+        $exception = null;
+
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
 
         self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
-
-        $this->assertExpectedNotHandleableOutcome($message);
     }
 
     protected function getHandlerClass(): string
