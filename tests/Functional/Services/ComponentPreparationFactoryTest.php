@@ -105,7 +105,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
-        self::assertEquals($expected, $this->componentPreparationFactory->getAll($job));
+        self::assertEquals($expected, $this->componentPreparationFactory->getAll($job->getId()));
     }
 
     /**

@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enum\JobComponent;
 use App\Model\ComponentPreparation;
-use App\Model\JobInterface;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
 
 readonly class ComponentPreparationFactory
@@ -22,7 +21,7 @@ readonly class ComponentPreparationFactory
     /**
      * @return array<value-of<JobComponent>, ComponentPreparation>
      */
-    public function getAll(JobInterface $job): array
+    public function getAll(string $jobId): array
     {
         $componentPreparations = [];
 
@@ -31,7 +30,7 @@ readonly class ComponentPreparationFactory
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
                 if (null === $componentPreparation) {
-                    $componentPreparation = $jobComponentHandler->getComponentPreparation($jobComponent, $job->getId());
+                    $componentPreparation = $jobComponentHandler->getComponentPreparation($jobComponent, $jobId);
 
                     if ($componentPreparation instanceof ComponentPreparation) {
                         $componentPreparations[$jobComponent->value] = $componentPreparation;
