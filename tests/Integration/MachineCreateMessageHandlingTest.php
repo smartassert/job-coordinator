@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\Job;
 use App\Enum\JobComponent;
 use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
-use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
-use Doctrine\ORM\EntityManagerInterface;
 use SmartAssert\TestSourcesClient\FileClient;
 use SmartAssert\TestSourcesClient\FileSourceClient;
 use SmartAssert\TestSourcesClient\SuiteClient;
@@ -36,12 +33,6 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
 
     public function testSuccessfulMachineCreateRequestExists(): void
     {
-        $jobRepository = self::getContainer()->get(JobRepository::class);
-        \assert($jobRepository instanceof JobRepository);
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
 
@@ -50,29 +41,14 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
 
         $entityRemover->removeAllRemoteRequests();
 
-        $createResponse = self::$staticApplicationClient->makeCreateJobRequest(
-            self::$apiToken,
-            $this->createSuiteId(),
-            600
-        );
-
-        self::assertSame(200, $createResponse->getStatusCode());
-        self::assertSame('application/json', $createResponse->getHeaderLine('content-type'));
-
-        $createResponseData = json_decode($createResponse->getBody()->getContents(), true);
-        self::assertIsArray($createResponseData);
-        self::assertArrayHasKey('id', $createResponseData);
-        self::assertTrue(Ulid::isValid($createResponseData['id']));
-        $jobId = $createResponseData['id'];
-
-        $job = $jobRepository->find($jobId);
-        self::assertInstanceOf(Job::class, $job);
+        $jobId = $this->getJob()?->getId();
+        \assert(is_string($jobId));
 
         $this->waitUntilSuccessfulMachineCreateRemoteRequestExists($jobId);
 
         $successfulMachineCreateRequestCount = $remoteRequestRepository->count(
             [
-                'jobId' => $job->id,
+                'jobId' => $jobId,
                 'state' => RequestState::SUCCEEDED->value,
                 'type' => new RemoteRequestType(
                     JobComponent::MACHINE,
