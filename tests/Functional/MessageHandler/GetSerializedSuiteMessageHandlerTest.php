@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
@@ -50,9 +51,19 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         );
 
         $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
-        $handler($message);
 
-        $this->assertExpectedNotHandleableOutcome($message);
+        $exception = null;
+
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
     }
 
     public function testInvokeSerializedSuiteClientThrowsException(): void

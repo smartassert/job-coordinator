@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineTerminationRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -25,12 +26,11 @@ final readonly class TerminateMachineMessageHandler extends AbstractMessageHandl
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(TerminateMachineMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->isReady($message);
 
         try {
             $machine = $this->workerManagerClient->deleteMachine($message->authenticationToken, $message->getJobId());

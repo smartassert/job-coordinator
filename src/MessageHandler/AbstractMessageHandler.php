@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -21,27 +20,27 @@ abstract readonly class AbstractMessageHandler
     ) {
     }
 
-    protected function isReady(JobRemoteRequestMessageInterface $message): bool
+    /**
+     * @throws MessageHandlerNotReadyException
+     */
+    protected function isReady(JobRemoteRequestMessageInterface $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
 
         if (MessageHandlingReadiness::NEVER === $readiness) {
-            $this->eventDispatcher->dispatch(new MessageNotHandleableEvent($message));
-
-            return false;
+            throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::NEVER);
         }
 
         if (MessageHandlingReadiness::EVENTUALLY === $readiness) {
             $this->isNotYetReady($message);
-
-            return false;
         }
-
-        return true;
     }
 
-    protected function isNotYetReady(JobRemoteRequestMessageInterface $message): void
+    /**
+     * @throws MessageHandlerNotReadyException
+     */
+    protected function isNotYetReady(JobRemoteRequestMessageInterface $message): never
     {
-        $this->eventDispatcher->dispatch(new MessageNotYetHandleableEvent($message));
+        throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::EVENTUALLY);
     }
 }

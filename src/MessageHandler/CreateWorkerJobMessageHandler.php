@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\CreateWorkerJobRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -31,19 +32,16 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->isReady($message);
 
         $serializedSuiteModel = $this->serializedSuiteStore->retrieve($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if (null === $serializedSuiteModel || null === $resultsJob) {
             $this->isNotYetReady($message);
-
-            return;
         }
 
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);

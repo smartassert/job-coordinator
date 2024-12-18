@@ -9,6 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
@@ -27,6 +28,7 @@ use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -405,6 +407,50 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'expectedEventClass' => MachineStateChangeEvent::class,
             ],
         ];
+    }
+
+    public function testInvokeNotHandleable(): void
+    {
+        $jobId = (string) new Ulid();
+        \assert('' !== $jobId);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $machine = MachineFactory::create(
+            $jobId,
+            'up/active',
+            'active',
+            [],
+            false,
+            true,
+            false,
+            false,
+        );
+
+        $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
+
+        $handler = $this->createHandler(
+            HttpMockedWorkerManagerClientFactory::create(),
+            readinessAssessor: $assessor,
+        );
+
+        $exception = null;
+
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
     }
 
     protected function getHandlerClass(): string

@@ -6,6 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
@@ -42,9 +43,18 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $assessor
         );
 
-        $handler($message);
+        $exception = null;
 
-        $this->assertExpectedNotHandleableOutcome($message);
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(WorkerStateRetrievedEvent::class));
     }
 
     public function testInvokeWorkerClientThrowsException(): void

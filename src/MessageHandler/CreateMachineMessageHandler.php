@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Event\MachineCreationRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -25,12 +26,11 @@ final readonly class CreateMachineMessageHandler extends AbstractMessageHandler
 
     /**
      * @throws RemoteJobActionException
+     * @throws MessageHandlerNotReadyException
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        if (!$this->isReady($message)) {
-            return;
-        }
+        $this->isReady($message);
 
         try {
             $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $message->getJobId());

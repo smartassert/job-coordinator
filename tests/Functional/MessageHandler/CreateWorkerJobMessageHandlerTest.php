@@ -8,6 +8,7 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
+use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
@@ -56,9 +57,18 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 
-        $handler($message);
+        $exception = null;
 
-        $this->assertExpectedNotYetHandleableOutcome($message);
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::EVENTUALLY, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
     }
 
     public function testInvokeNotHandleable(): void
@@ -77,9 +87,18 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 
-        $handler($message);
+        $exception = null;
 
-        $this->assertExpectedNotHandleableOutcome($message);
+        try {
+            $handler($message);
+        } catch (MessageHandlerNotReadyException $exception) {
+        }
+
+        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
+        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
+        self::assertSame($exception->getHandlerMessage(), $message);
+
+        self::assertSame([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
     }
 
     public function testInvokeReadSerializedSuiteThrowsException(): void
