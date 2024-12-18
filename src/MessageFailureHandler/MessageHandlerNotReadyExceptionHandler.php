@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageFailureHandler;
 
-use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotHandleableEvent;
-use App\Event\MessageNotYetHandleableEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerMessageFailedEventBundle\ExceptionHandlerInterface;
@@ -25,14 +23,8 @@ readonly class MessageHandlerNotReadyExceptionHandler implements ExceptionHandle
             return;
         }
 
-        if (MessageHandlingReadiness::NEVER === $throwable->getReadiness()) {
-            $this->eventDispatcher->dispatch(
-                new MessageNotHandleableEvent($throwable->getHandlerMessage())
-            );
-        }
-
         $this->eventDispatcher->dispatch(
-            new MessageNotYetHandleableEvent($throwable->getHandlerMessage())
+            new MessageNotHandleableEvent($throwable->getHandlerMessage(), $throwable->getReadiness())
         );
     }
 }

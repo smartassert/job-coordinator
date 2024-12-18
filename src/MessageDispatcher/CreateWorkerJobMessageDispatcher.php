@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Event\MachineIsActiveEvent;
-use App\Event\MessageNotYetHandleableEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
@@ -32,7 +32,7 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
             MachineIsActiveEvent::class => [
                 ['dispatchImmediately', 100],
             ],
-            MessageNotYetHandleableEvent::class => [
+            MessageNotHandleableEvent::class => [
                 ['redispatch', 100],
             ],
         ];

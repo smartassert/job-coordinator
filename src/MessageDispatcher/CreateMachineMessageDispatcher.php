@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Event\MessageNotYetHandleableEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
@@ -26,7 +26,7 @@ readonly class CreateMachineMessageDispatcher extends BaseMessageDispatcher impl
             SerializedSuiteSerializedEvent::class => [
                 ['dispatchImmediately', 100],
             ],
-            MessageNotYetHandleableEvent::class => [
+            MessageNotHandleableEvent::class => [
                 ['redispatch', 100],
             ],
         ];
