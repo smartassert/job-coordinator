@@ -30,7 +30,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
      */
     public function __invoke(GetWorkerJobMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
 

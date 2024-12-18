@@ -23,7 +23,7 @@ abstract readonly class AbstractMessageHandler
     /**
      * @throws MessageHandlerNotReadyException
      */
-    protected function isReady(JobRemoteRequestMessageInterface $message): void
+    protected function assessReadiness(JobRemoteRequestMessageInterface $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
 
@@ -32,15 +32,7 @@ abstract readonly class AbstractMessageHandler
         }
 
         if (MessageHandlingReadiness::EVENTUALLY === $readiness) {
-            $this->isNotYetReady($message);
+            throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::EVENTUALLY);
         }
-    }
-
-    /**
-     * @throws MessageHandlerNotReadyException
-     */
-    protected function isNotYetReady(JobRemoteRequestMessageInterface $message): never
-    {
-        throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::EVENTUALLY);
     }
 }

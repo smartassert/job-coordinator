@@ -30,7 +30,7 @@ final readonly class CreateResultsJobMessageHandler extends AbstractMessageHandl
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         try {
             $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->getJobId());

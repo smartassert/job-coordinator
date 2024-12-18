@@ -30,7 +30,7 @@ final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHan
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         try {
             $serializedSuite = $this->serializedSuiteClient->get(

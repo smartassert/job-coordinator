@@ -30,7 +30,7 @@ final readonly class TerminateMachineMessageHandler extends AbstractMessageHandl
      */
     public function __invoke(TerminateMachineMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         try {
             $machine = $this->workerManagerClient->deleteMachine($message->authenticationToken, $message->getJobId());

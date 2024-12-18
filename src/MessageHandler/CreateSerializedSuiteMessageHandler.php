@@ -30,7 +30,7 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(

@@ -30,7 +30,7 @@ final readonly class CreateMachineMessageHandler extends AbstractMessageHandler
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         try {
             $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $message->getJobId());

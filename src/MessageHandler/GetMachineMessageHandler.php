@@ -30,7 +30,7 @@ final readonly class GetMachineMessageHandler extends AbstractMessageHandler
      */
     public function __invoke(GetMachineMessage $message): void
     {
-        $this->isReady($message);
+        $this->assessReadiness($message);
 
         $previousMachine = $message->machine;
 
