@@ -31,7 +31,7 @@ class PreparationStateFactory
      */
     public function create(JobInterface $job): array
     {
-        $componentPreparationStates = $this->componentPreparationFactory->getAll($job);
+        $componentPreparationStates = $this->componentPreparationFactory->getAll($job->getId());
 
         $componentFailures = [];
         foreach ($componentPreparationStates as $name => $preparationState) {
