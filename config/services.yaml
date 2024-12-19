@@ -104,11 +104,6 @@ services:
         arguments:
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
 
-    App\Services\JobPreparationInspectorInterface:
-        class: App\Services\JobPreparationInspector
-        arguments:
-            $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
-
     App\Services\RequestStatesFactory:
         arguments:
             $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'

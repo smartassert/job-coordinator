@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\RemoteRequestFailure;
 use App\Enum\JobComponent;
+use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
 use App\Model\JobInterface;
@@ -41,9 +42,16 @@ class PreparationStateFactory
         }
 
         return [
-            'state' => $this->preparationStateReducer->reduce($componentPreparationStates),
+            'state' => $this->createState($job->getId()),
             'request_states' => $this->requestStatesFactory->create($job),
             'failures' => $componentFailures,
         ];
+    }
+
+    public function createState(string $jobId): PreparationState
+    {
+        $componentPreparationStates = $this->componentPreparationFactory->getAll($jobId);
+
+        return $this->preparationStateReducer->reduce($componentPreparationStates);
     }
 }

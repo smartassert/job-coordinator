@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\PreparationState;
 use App\Repository\ResultsJobRepository;
-use App\Services\JobPreparationInspectorInterface;
+use App\Services\PreparationStateFactory;
 
 readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
-        private JobPreparationInspectorInterface $jobPreparationInspector,
+        private PreparationStateFactory $preparationStateFactory,
     ) {
     }
 
@@ -27,7 +28,8 @@ readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterf
             return MessageHandlingReadiness::NEVER;
         }
 
-        if ($this->jobPreparationInspector->hasFailed($jobId)) {
+        $preparationState = $this->preparationStateFactory->createState($jobId);
+        if (PreparationState::FAILED === $preparationState) {
             return MessageHandlingReadiness::NEVER;
         }
 
