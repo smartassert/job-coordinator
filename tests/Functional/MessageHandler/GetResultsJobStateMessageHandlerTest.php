@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerNotReadyException;
@@ -12,7 +13,7 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Repository\ResultsJobRepository;
+use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -95,12 +96,15 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     public function testInvokeSuccess(): void
     {
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $machine = new Machine($job->getId(), 'up/active', 'up', false, false);
+        $machineRepository->save($machine);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
