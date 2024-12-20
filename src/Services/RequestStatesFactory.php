@@ -27,11 +27,12 @@ class RequestStatesFactory
         $requestStates = [];
 
         foreach (JobComponent::cases() as $jobComponent) {
+            //            var_dump($jobComponent);
             $requestState = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
-                if (null === $requestState) {
-                    $requestState = $jobComponentHandler->getRequestState($jobComponent, $job->getId());
+                if (null === $requestState && $jobComponentHandler->handles($jobComponent)) {
+                    $requestState = $jobComponentHandler->getRequestState($job->getId());
                 }
             }
 

@@ -29,8 +29,8 @@ readonly class ComponentPreparationFactory
             $componentPreparation = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
-                if (null === $componentPreparation) {
-                    $componentPreparation = $jobComponentHandler->getComponentPreparation($jobComponent, $jobId);
+                if (null === $componentPreparation && $jobComponentHandler->handles($jobComponent)) {
+                    $componentPreparation = $jobComponentHandler->getComponentPreparation($jobId);
 
                     if ($componentPreparation instanceof ComponentPreparation) {
                         $componentPreparations[$jobComponent->value] = $componentPreparation;

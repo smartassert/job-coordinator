@@ -21,46 +21,39 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     ) {
     }
 
-    public function getComponentPreparation(JobComponent $jobComponent, string $jobId): ?ComponentPreparation
+    public function handles(JobComponent $jobComponent): bool
     {
-        if ($this->getJobComponent() !== $jobComponent) {
-            return null;
-        }
-
-        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return new ComponentPreparation($jobComponent, PreparationState::SUCCEEDED);
-        }
-
-        return $this->deriveFromRemoteRequests($jobId, $jobComponent);
+        return $this->getJobComponent() === $jobComponent;
     }
 
-    public function getRequestState(JobComponent $jobComponent, string $jobId): ?RequestState
+    public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        if ($this->getJobComponent() !== $jobComponent) {
-            return null;
+        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
+            return new ComponentPreparation($this->getJobComponent(), PreparationState::SUCCEEDED);
         }
 
+        return $this->deriveFromRemoteRequests($jobId, $this->getJobComponent());
+    }
+
+    public function getRequestState(string $jobId): ?RequestState
+    {
         if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
             return RequestState::SUCCEEDED;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $jobId,
-            new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
+            new RemoteRequestType($this->getJobComponent(), RemoteRequestAction::CREATE),
         );
 
         return $remoteRequest?->getState();
     }
 
-    public function hasFailed(JobComponent $jobComponent, string $jobId): ?bool
+    public function hasFailed(string $jobId): ?bool
     {
-        if ($this->getJobComponent() !== $jobComponent) {
-            return null;
-        }
-
         $remoteRequest = $this->remoteRequestRepository->findNewest(
             $jobId,
-            new RemoteRequestType($jobComponent, RemoteRequestAction::CREATE),
+            new RemoteRequestType($this->getJobComponent(), RemoteRequestAction::CREATE),
         );
 
         if (null === $remoteRequest) {
