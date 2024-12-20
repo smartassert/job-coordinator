@@ -10,9 +10,11 @@ use App\Model\ComponentPreparation;
 
 interface JobComponentHandlerInterface
 {
-    public function getComponentPreparation(JobComponent $jobComponent, string $jobId): ?ComponentPreparation;
+    public function handles(JobComponent $jobComponent): bool;
 
-    public function getRequestState(JobComponent $jobComponent, string $jobId): ?RequestState;
+    public function getComponentPreparation(string $jobId): ?ComponentPreparation;
 
-    public function hasFailed(JobComponent $jobComponent, string $jobId): ?bool;
+    public function getRequestState(string $jobId): ?RequestState;
+
+    public function hasFailed(string $jobId): ?bool;
 }
