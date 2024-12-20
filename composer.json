@@ -11,7 +11,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^3.1",
         "guzzlehttp/guzzle": "^7.5",
-        "smartassert/health-check-bundle": "^6.1",
+        "smartassert/health-check-bundle": "^7.1",
         "smartassert/results-client": "^8.1",
         "smartassert/service-client": "*",
         "smartassert/service-request": "^1.5",
@@ -20,17 +20,17 @@
         "smartassert/worker-client": "^4.1",
         "smartassert/worker-manager-client": "^10.3",
         "smartassert/worker-message-failed-event-bundle": "^3.0",
-        "symfony/console": "7.1.*",
-        "symfony/doctrine-messenger": "7.1.*",
-        "symfony/dotenv": "7.1.*",
+        "symfony/console": "7.2.*",
+        "symfony/doctrine-messenger": "7.2.*",
+        "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "7.1.*",
-        "symfony/messenger": "7.1.*",
+        "symfony/framework-bundle": "7.2.*",
+        "symfony/messenger": "7.2.*",
         "symfony/monolog-bundle": "^3.8",
-        "symfony/runtime": "7.1.*",
-        "symfony/security-bundle": "7.1.*",
-        "symfony/uid": "7.1.*",
-        "symfony/yaml": "7.1.*"
+        "symfony/runtime": "7.2.*",
+        "symfony/security-bundle": "7.2.*",
+        "symfony/uid": "7.2.*",
+        "symfony/yaml": "7.2.*"
     },
     "require-dev": {
         "mockery/mockery": "^1.5",
@@ -46,7 +46,7 @@
         "smartassert/test-sources-client": "^0.5.0",
         "squizlabs/php_codesniffer": "^3.7",
         "symfony/maker-bundle": "^1.40",
-        "symfony/phpunit-bridge": "7.1.*"
+        "symfony/phpunit-bridge": "7.2.*"
     },
     "config": {
         "allow-plugins": {
@@ -173,7 +173,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.1.*"
+            "require": "7.2.*"
         }
     }
 }
