@@ -24,4 +24,12 @@ enum RequestState: string
             self::ABORTED,
         ];
     }
+
+    /**
+     * @return RequestState::PENDING
+     */
+    public static function getDefault(): RequestState
+    {
+        return self::PENDING;
+    }
 }
