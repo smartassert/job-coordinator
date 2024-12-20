@@ -36,7 +36,7 @@ class PreparationStateFactory
 
         $componentFailures = [];
         foreach ($componentPreparationStates as $name => $preparationState) {
-            if (PreparationStateEnum::FAILED === $preparationState->state) {
+            if (PreparationStateEnum::FAILED === $preparationState->state && null !== $preparationState->failure) {
                 $componentFailures[$name] = $preparationState->failure;
             }
         }

@@ -6,6 +6,7 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
+use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
 
@@ -14,6 +15,7 @@ readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterf
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
         private PreparationStateFactory $preparationStateFactory,
+        private MachineRepository $machineRepository,
     ) {
     }
 
@@ -31,6 +33,11 @@ readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterf
         $preparationState = $this->preparationStateFactory->createState($jobId);
         if (PreparationState::FAILED === $preparationState) {
             return MessageHandlingReadiness::NEVER;
+        }
+
+        $machine = $this->machineRepository->find($jobId);
+        if (null === $machine) {
+            return MessageHandlingReadiness::EVENTUALLY;
         }
 
         return MessageHandlingReadiness::NOW;
