@@ -27,7 +27,7 @@ class MessageHandlerNotReadyException extends \Exception implements Unrecoverabl
 
     public function getJobId(): string
     {
-        return $this->message->getJobId();
+        return $this->handlerMessage->getJobId();
     }
 
     public function getHandlerMessage(): JobRemoteRequestMessageInterface

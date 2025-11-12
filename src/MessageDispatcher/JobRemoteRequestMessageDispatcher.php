@@ -43,8 +43,8 @@ class JobRemoteRequestMessageDispatcher
 
             $latestRemoteRequest = $this->remoteRequestRepository->findNewest($job->getId(), $type);
             $hasSuccessfulRequest = $this->remoteRequestRepository->hasSuccessful($job->getId(), $type);
-            $latestRemoteRequestHasDisallowedState =
-                $latestRemoteRequest instanceof RemoteRequest
+            $latestRemoteRequestHasDisallowedState
+                = $latestRemoteRequest instanceof RemoteRequest
                 && in_array($latestRemoteRequest->getState(), [RequestState::REQUESTING, RequestState::PENDING]);
 
             // @todo test

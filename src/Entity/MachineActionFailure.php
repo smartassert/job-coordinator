@@ -48,7 +48,7 @@ class MachineActionFailure implements \JsonSerializable
      * @return array{
      *   action: ?non-empty-string,
      *   type: ?non-empty-string,
-     *   context: array<mixed>|null
+     *   context: null|array<mixed>
      * }
      */
     public function jsonSerialize(): array
