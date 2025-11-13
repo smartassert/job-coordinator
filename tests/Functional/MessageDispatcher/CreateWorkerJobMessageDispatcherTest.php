@@ -94,7 +94,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNoJob(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $jobRemoteRequestMessageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($jobRemoteRequestMessageDispatcher instanceof JobRemoteRequestMessageDispatcher);

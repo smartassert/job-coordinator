@@ -79,7 +79,6 @@ class ResultsJobFactoryTest extends WebTestCase
     {
         $jobCount = $this->jobRepository->count([]);
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $event = new ResultsJobCreatedEvent(
             'authentication token',

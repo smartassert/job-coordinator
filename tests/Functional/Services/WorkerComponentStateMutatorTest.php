@@ -81,7 +81,6 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $jobCount = $this->jobRepository->count([]);
 
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $irrelevantApplicationState = new ApplicationState(
             new ComponentState('state', false),

@@ -64,10 +64,7 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
      */
     protected static function createSuiteId(): string
     {
-        $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
-        return $suiteId;
+        return (string) new Ulid();
     }
 
     protected function getJob(): ?JobInterface

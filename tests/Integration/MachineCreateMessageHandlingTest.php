@@ -70,7 +70,6 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         \assert($fileSourceClient instanceof FileSourceClient);
 
         $fileSourceLabel = (string) new Ulid();
-        \assert('' !== $fileSourceLabel);
 
         $fileSourceId = $fileSourceClient->create(self::$apiToken, $fileSourceLabel);
         \assert(is_string($fileSourceId));
@@ -84,7 +83,6 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         \assert($suiteClient instanceof SuiteClient);
 
         $suiteLabel = (string) new Ulid();
-        \assert('' !== $suiteLabel);
 
         $suiteId = $suiteClient->create(self::$apiToken, $fileSourceId, $suiteLabel, ['test.yaml']);
         \assert(is_string($suiteId));

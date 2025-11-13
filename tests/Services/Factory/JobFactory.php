@@ -17,14 +17,8 @@ readonly class JobFactory
 
     public function createRandom(): JobInterface
     {
-        $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $userId = (string) new Ulid();
-        \assert('' !== $userId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $maximumDurationInSeconds = rand(1, 1000);
 

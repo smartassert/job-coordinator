@@ -29,7 +29,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -112,7 +111,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

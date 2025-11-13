@@ -53,12 +53,7 @@ readonly class JobStore
      */
     public function create(string $userId, string $suiteId, int $maximumDurationInSeconds): Job
     {
-        $job = new Job(
-            self::generateId(),
-            $userId,
-            $suiteId,
-            $maximumDurationInSeconds
-        );
+        $job = new Job((string) new Ulid(), $userId, $suiteId, $maximumDurationInSeconds);
 
         $this->jobRepository->store($job);
 
@@ -84,19 +79,5 @@ readonly class JobStore
         }
 
         return new Job($entity->id, $entity->userId, $entity->suiteId, $entity->maximumDurationInSeconds);
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function generateId(): string
-    {
-        $id = (string) new Ulid();
-
-        while ('' === $id) {
-            $id = (string) new Ulid();
-        }
-
-        return $id;
     }
 }

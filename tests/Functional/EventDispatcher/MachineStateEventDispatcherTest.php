@@ -32,7 +32,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineStateChangeEventNoStateChange(): void
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
 
         $event = new MachineRetrievedEvent(
             md5((string) rand()),
@@ -68,8 +67,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineStateChangeEventHasStateChange(): void
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
-
         $authenticationToken = md5((string) rand());
 
         $previousMachine = MachineFactory::create(
@@ -124,7 +121,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public static function dispatchMachineIsActiveEventNotActiveDataProvider(): array
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
 
         return [
             'unknown -> unknown' => [
@@ -248,8 +244,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public static function dispatchMachineIsActiveEventIsActiveDataProvider(): array
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
-
         $authenticationToken = md5((string) rand());
 
         return [
@@ -339,8 +333,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEventNoActionFailure(): void
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
-
         $authenticationToken = md5((string) rand());
 
         $previousMachine = MachineFactory::create(
@@ -377,8 +369,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
     {
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
-
         $authenticationToken = md5((string) rand());
         $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
 

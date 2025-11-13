@@ -30,10 +30,7 @@ class SerializedSuiteRepositoryTest extends WebTestCase
     public function testHasDoesHave(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
 
         $serializedSuite = new SerializedSuite($jobId, $serializedSuiteId, 'preparing', false, false);
         $this->serializedSuiteRepository->save($serializedSuite);

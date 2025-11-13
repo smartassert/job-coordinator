@@ -31,7 +31,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
@@ -70,7 +69,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
         self::assertSame(200, $createResponse->getStatusCode());

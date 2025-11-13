@@ -118,10 +118,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
             new SerializedSuiteCreatedEvent(
@@ -182,10 +179,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         ;
 
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(

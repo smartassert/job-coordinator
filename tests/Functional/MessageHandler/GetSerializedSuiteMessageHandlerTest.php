@@ -26,13 +26,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
 
         $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

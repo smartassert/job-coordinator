@@ -78,10 +78,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
-        $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
-        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, $suiteId);
+        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, (string) new Ulid());
 
         echo $response->getBody()->getContents();
 

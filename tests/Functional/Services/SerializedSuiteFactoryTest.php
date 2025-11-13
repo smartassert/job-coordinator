@@ -79,13 +79,8 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $jobCount = $this->jobRepository->count([]);
 
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $event = new SerializedSuiteCreatedEvent(
             'authentication token',
