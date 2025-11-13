@@ -31,7 +31,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -63,7 +62,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -95,7 +93,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -129,7 +126,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
         $serializedSuiteId = (string) new Ulid();
-        \assert('' !== $serializedSuiteId);
 
         $serializedSuiteRepository->save(
             new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)

@@ -132,7 +132,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
@@ -149,7 +148,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
@@ -278,7 +276,6 @@ class MachineMutatorTest extends WebTestCase
         };
 
         $machineId = (string) new Ulid();
-        \assert('' !== $machineId);
 
         $arbitraryMachine = MachineFactory::create(
             $machineId,
@@ -300,7 +297,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () use ($arbitraryMachine) {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new MachineIsActiveEvent(
                         md5((string) rand()),
@@ -483,7 +479,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
@@ -510,7 +505,6 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new MachineHasActionFailureEvent(
                         $jobId,

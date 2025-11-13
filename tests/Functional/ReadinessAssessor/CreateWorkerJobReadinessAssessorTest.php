@@ -56,7 +56,6 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
             'serialized suite is not prepared' => [
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -73,7 +72,6 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
             'results job does not exist' => [
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -94,7 +92,6 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     ResultsJobRepository $resultsJobRepository,
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -119,7 +116,6 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     ResultsJobRepository $resultsJobRepository,
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),

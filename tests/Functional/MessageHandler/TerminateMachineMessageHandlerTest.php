@@ -24,7 +24,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -56,7 +55,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -88,7 +86,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -117,7 +114,6 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccess(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

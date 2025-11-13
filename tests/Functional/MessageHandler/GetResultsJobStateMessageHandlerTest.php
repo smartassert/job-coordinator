@@ -29,7 +29,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

@@ -119,7 +119,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
 
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),

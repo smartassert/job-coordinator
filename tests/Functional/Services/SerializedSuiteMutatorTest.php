@@ -120,13 +120,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
-                    \assert('' !== $jobId);
-
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
-
                     $suiteId = (string) new Ulid();
-                    \assert('' !== $suiteId);
 
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),
@@ -144,7 +139,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     return new SerializedSuiteRetrievedEvent(
                         md5((string) rand()),

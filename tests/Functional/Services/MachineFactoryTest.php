@@ -73,7 +73,6 @@ class MachineFactoryTest extends WebTestCase
         self::assertSame(0, $this->machineRepository->count([]));
 
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $machine = WorkerMachineFactory::createRandomForJob($jobId);
 

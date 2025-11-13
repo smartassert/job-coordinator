@@ -79,7 +79,6 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     SerializedSuiteRepository $serializedSuiteRepository
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite($job->getId(), $serializedSuiteId, 'preparing', false, false)
@@ -94,7 +93,6 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     SerializedSuiteRepository $serializedSuiteRepository
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
@@ -110,7 +108,6 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     ResultsJobRepository $resultsJobRepository
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
-                    \assert('' !== $serializedSuiteId);
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)

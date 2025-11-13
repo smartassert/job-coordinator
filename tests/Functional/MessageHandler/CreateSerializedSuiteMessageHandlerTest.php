@@ -140,10 +140,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $serializedSuiteParameters = [
             md5((string) rand()) => md5((string) rand()),

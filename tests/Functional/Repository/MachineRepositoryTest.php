@@ -30,7 +30,6 @@ class MachineRepositoryTest extends WebTestCase
     public function testHasDoesHave(): void
     {
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         $machine = new Machine($jobId, 'up/active', 'active', false, false);
         $this->machineRepository->save($machine);
