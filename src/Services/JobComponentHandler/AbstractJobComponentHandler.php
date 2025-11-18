@@ -18,8 +18,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
     public function __construct(
         protected readonly JobComponentRepositoryInterface $entityRepository,
         protected readonly RemoteRequestRepository $remoteRequestRepository,
-    ) {
-    }
+    ) {}
 
     public function handles(JobComponent $jobComponent): bool
     {

@@ -26,8 +26,7 @@ readonly class JobStatus implements \JsonSerializable
         private ?Machine $machine,
         private ?WorkerState $workerState,
         private RemoteRequestCollection $serviceRequests,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<mixed>

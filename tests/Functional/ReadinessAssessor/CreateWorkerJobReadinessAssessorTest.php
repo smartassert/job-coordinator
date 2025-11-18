@@ -49,8 +49,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
     {
         return [
             'serialized suite does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
             'serialized suite is not prepared' => [

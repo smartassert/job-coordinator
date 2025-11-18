@@ -11,6 +11,5 @@ class JobRemoteRequestMessageCreatedEvent extends Event
 {
     public function __construct(
         public readonly JobRemoteRequestMessageInterface $message,
-    ) {
-    }
+    ) {}
 }

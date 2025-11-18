@@ -11,8 +11,7 @@ readonly class CreateResultsJobReadinessAssessor implements ReadinessAssessorInt
 {
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

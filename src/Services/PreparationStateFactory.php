@@ -24,8 +24,7 @@ class PreparationStateFactory
         private readonly ComponentPreparationFactory $componentPreparationFactory,
         private readonly PreparationStateReducer $preparationStateReducer,
         private readonly RequestStatesFactory $requestStatesFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SerializedPreparationState

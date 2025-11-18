@@ -178,8 +178,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         return [
             'no pre-existing component states' => [
-                'componentStateCreator' => function () {
-                },
+                'componentStateCreator' => function () {},
                 'retrievedApplicationState' => $applicationStates[0],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
                     return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))

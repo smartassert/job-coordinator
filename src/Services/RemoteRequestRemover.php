@@ -15,8 +15,7 @@ class RemoteRequestRemover
         private readonly JobStore $jobStore,
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestFailureRepository $remoteRequestFailureRepository,
-    ) {
-    }
+    ) {}
 
     public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
     {

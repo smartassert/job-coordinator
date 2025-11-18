@@ -12,8 +12,7 @@ readonly class ResultsJobFactory
 {
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @param null|non-empty-string $state

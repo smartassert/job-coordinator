@@ -61,8 +61,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'application state does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NOW,
             ],
             'application state is not end state' => [

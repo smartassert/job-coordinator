@@ -12,8 +12,7 @@ readonly class RemoteRequestType implements \Stringable
     public function __construct(
         public JobComponent $jobComponent,
         public RemoteRequestAction $action,
-    ) {
-    }
+    ) {}
 
     /**
      * @return non-empty-string

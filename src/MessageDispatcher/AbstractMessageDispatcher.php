@@ -12,8 +12,7 @@ abstract readonly class AbstractMessageDispatcher
     public function __construct(
         protected JobRemoteRequestMessageDispatcher $messageDispatcher,
         protected ReadinessAssessorInterface $readinessAssessor,
-    ) {
-    }
+    ) {}
 
     protected function isNeverReady(string $jobId): bool
     {

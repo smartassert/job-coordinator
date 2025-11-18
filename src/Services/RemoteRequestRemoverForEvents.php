@@ -23,8 +23,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 {
     public function __construct(
         private RemoteRequestRemover $remoteRequestRemover,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

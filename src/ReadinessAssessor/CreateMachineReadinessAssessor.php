@@ -15,8 +15,7 @@ readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterf
         private MachineRepository $machineRepository,
         private SerializedSuiteStore $serializedSuiteStore,
         private ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

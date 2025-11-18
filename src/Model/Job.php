@@ -22,8 +22,7 @@ readonly class Job implements JobInterface
         private string $userId,
         private string $suiteId,
         private int $maximumDurationInSeconds
-    ) {
-    }
+    ) {}
 
     /**
      * @return non-empty-string

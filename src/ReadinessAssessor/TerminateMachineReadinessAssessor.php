@@ -13,8 +13,7 @@ readonly class TerminateMachineReadinessAssessor implements ReadinessAssessorInt
     public function __construct(
         private MachineRepository $machineRepository,
         private ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

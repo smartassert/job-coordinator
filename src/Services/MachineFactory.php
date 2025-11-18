@@ -14,8 +14,7 @@ class MachineFactory implements EventSubscriberInterface
     public function __construct(
         private readonly JobStore $jobStore,
         private readonly MachineRepository $machineRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

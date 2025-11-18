@@ -17,8 +17,7 @@ class ResultsJobCreatedEvent extends Event implements JobEventInterface, Authent
         private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly ResultsJob $resultsJob,
-    ) {
-    }
+    ) {}
 
     public function getJobId(): string
     {

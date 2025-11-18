@@ -22,8 +22,7 @@ readonly class JobController
         private JobRepository $jobRepository,
         private JobStatusFactory $jobStatusFactory,
         private JobStore $jobStore,
-    ) {
-    }
+    ) {}
 
     #[Route('/{suiteId<[A-Z90-9]{26}>}', name: 'job_create', methods: ['POST'])]
     public function create(

@@ -25,8 +25,7 @@ class JobRemoteRequestMessageDispatcher
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly JobStore $jobStore,
         private readonly LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     /**
      * @param StampInterface[] $stamps

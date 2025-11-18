@@ -15,8 +15,7 @@ class WorkerStateFactory
 {
     public function __construct(
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
-    ) {
-    }
+    ) {}
 
     public function createForJob(JobInterface $job): WorkerState
     {

@@ -14,8 +14,7 @@ class SerializedSuiteFactory implements EventSubscriberInterface
     public function __construct(
         private readonly JobStore $jobStore,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

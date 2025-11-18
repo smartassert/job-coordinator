@@ -11,8 +11,7 @@ abstract class AbstractMachineEvent extends Event implements MachineEventInterfa
 {
     public function __construct(
         private readonly Machine $machine,
-    ) {
-    }
+    ) {}
 
     public function getMachine(): Machine
     {

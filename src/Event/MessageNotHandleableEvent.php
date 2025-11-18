@@ -13,6 +13,5 @@ class MessageNotHandleableEvent extends Event
     public function __construct(
         public readonly JobRemoteRequestMessageInterface $message,
         public readonly MessageHandlingReadiness $readiness,
-    ) {
-    }
+    ) {}
 }

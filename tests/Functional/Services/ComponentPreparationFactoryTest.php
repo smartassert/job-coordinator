@@ -191,10 +191,8 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         return [
             'no entities, no remote requests' => [
-                'entityCreator' => function () {
-                },
-                'remoteRequestsCreator' => function () {
-                },
+                'entityCreator' => function () {},
+                'remoteRequestsCreator' => function () {},
                 'expected' => [
                     JobComponent::RESULTS_JOB->value => new ComponentPreparation(
                         JobComponent::RESULTS_JOB,
@@ -215,8 +213,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single serialized-suite/create request with state "requesting"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -248,8 +245,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single machine/create request with state "requesting"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -279,8 +275,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single machine/start-job request with state "requesting"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -312,8 +307,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single results/create request with state "requesting"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -345,8 +339,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single results/create request with state "halted"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -378,8 +371,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single results/create request with state "pending"' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -411,8 +403,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single results/create request of state "failed", no remote request failure' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -444,8 +435,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 ],
             ],
             'no entities, single results/create request of state "failed", has remote request failure' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
@@ -488,8 +478,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
             ],
             'has entities, no remote requests' => [
                 'entityCreator' => $allEntitiesCreator,
-                'remoteRequestsCreator' => function () {
-                },
+                'remoteRequestsCreator' => function () {},
                 'expected' => $expectedAllSuccess,
             ],
             'has results job entity, has failed request for all components' => [

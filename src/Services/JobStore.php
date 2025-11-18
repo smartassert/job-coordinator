@@ -14,8 +14,7 @@ readonly class JobStore
 {
     public function __construct(
         private JobRepository $jobRepository,
-    ) {
-    }
+    ) {}
 
     public function retrieve(string $jobId): ?JobInterface
     {

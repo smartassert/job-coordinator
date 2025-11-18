@@ -15,8 +15,7 @@ abstract class AbstractWorkerEvent extends Event implements JobEventInterface, M
     public function __construct(
         private readonly string $jobId,
         private readonly string $machineIpAddress,
-    ) {
-    }
+    ) {}
 
     public function getJobId(): string
     {

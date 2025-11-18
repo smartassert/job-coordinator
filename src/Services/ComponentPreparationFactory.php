@@ -15,8 +15,7 @@ readonly class ComponentPreparationFactory
      */
     public function __construct(
         private iterable $jobComponentHandlers,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<value-of<JobComponent>, ComponentPreparation>

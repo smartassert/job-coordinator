@@ -18,8 +18,7 @@ readonly class CreateJobRequestResolver implements ValueResolverInterface
 {
     public function __construct(
         private PositiveIntegerParameterValidator $parameterValidator,
-    ) {
-    }
+    ) {}
 
     /**
      * @return CreateJobRequest[]

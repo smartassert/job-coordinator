@@ -20,8 +20,7 @@ readonly class JobStatusFactory
         private MachineRepository $machineRepository,
         private WorkerStateFactory $workerStateFactory,
         private RemoteRequestRepository $remoteRequestRepository,
-    ) {
-    }
+    ) {}
 
     public function create(JobInterface $job): JobStatus
     {

@@ -12,8 +12,7 @@ class SerializedSuiteStore
 {
     public function __construct(
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     public function retrieve(string $jobId): ?SerializedSuite
     {

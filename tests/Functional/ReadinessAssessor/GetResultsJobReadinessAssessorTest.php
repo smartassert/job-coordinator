@@ -61,8 +61,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
     {
         return [
             'results job does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'preparationStateFactoryCreator' => function (): PreparationStateFactory {
                     return \Mockery::mock(PreparationStateFactory::class);
                 },

@@ -13,8 +13,7 @@ class SerializedSuiteSerializedEventDispatcher implements EventSubscriberInterfa
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
