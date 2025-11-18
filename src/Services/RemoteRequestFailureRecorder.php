@@ -14,8 +14,7 @@ class RemoteRequestFailureRecorder
     public function __construct(
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestFailureFactory $remoteRequestFailureFactory,
-    ) {
-    }
+    ) {}
 
     public function record(RemoteRequestExceptionInterface $throwable): void
     {

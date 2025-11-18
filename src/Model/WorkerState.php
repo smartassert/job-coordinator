@@ -26,8 +26,7 @@ class WorkerState implements \JsonSerializable
         private readonly WorkerComponentStateInterface $compilationState,
         private readonly WorkerComponentStateInterface $executionState,
         private readonly WorkerComponentStateInterface $eventDeliveryState,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SerializedWorkerState

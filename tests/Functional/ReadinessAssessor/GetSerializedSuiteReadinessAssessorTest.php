@@ -43,8 +43,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
     {
         return [
             'serialized suite does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'serialized suite has end state' => [

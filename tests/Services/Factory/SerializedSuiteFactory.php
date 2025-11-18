@@ -12,8 +12,7 @@ readonly class SerializedSuiteFactory
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     public function createPreparedForJob(JobInterface $job): SerializedSuite
     {

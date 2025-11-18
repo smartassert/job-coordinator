@@ -12,8 +12,7 @@ readonly class GetWorkerJobReadinessAssessor implements ReadinessAssessorInterfa
 {
     public function __construct(
         private WorkerComponentStateRepository $workerComponentStateRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

@@ -128,8 +128,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => function () {
                     return null;
                 },
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
@@ -144,8 +143,7 @@ class MachineMutatorTest extends WebTestCase
             ],
             'no machine' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
@@ -293,8 +291,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => function () {
                     return null;
                 },
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function () use ($arbitraryMachine) {
                     $jobId = (string) new Ulid();
 
@@ -311,8 +308,7 @@ class MachineMutatorTest extends WebTestCase
             ],
             'no machine' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
                     return new MachineIsActiveEvent(
                         md5((string) rand()),
@@ -475,8 +471,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => function () {
                     return null;
                 },
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
@@ -501,8 +496,7 @@ class MachineMutatorTest extends WebTestCase
             ],
             'no machine' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function () {
-                },
+                'machineCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 

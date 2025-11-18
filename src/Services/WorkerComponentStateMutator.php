@@ -16,8 +16,7 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
     public function __construct(
         private readonly JobStore $jobStore,
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

@@ -17,8 +17,7 @@ abstract readonly class AbstractMessageHandler
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         private ReadinessAssessorInterface $readinessAssessor,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws MessageHandlerNotReadyException

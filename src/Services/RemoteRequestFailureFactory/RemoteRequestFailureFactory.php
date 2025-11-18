@@ -16,8 +16,7 @@ class RemoteRequestFailureFactory
     public function __construct(
         private readonly iterable $handlers,
         private readonly RemoteRequestFailureRepository $remoteRequestFailureRepository,
-    ) {
-    }
+    ) {}
 
     public function create(\Throwable $throwable): ?RemoteRequestFailureEntity
     {

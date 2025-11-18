@@ -14,8 +14,7 @@ class Client
     public function __construct(
         private readonly ClientInterface $client,
         private readonly RouterInterface $router,
-    ) {
-    }
+    ) {}
 
     public function makeCreateJobRequest(
         ?string $authenticationToken,

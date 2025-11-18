@@ -14,8 +14,7 @@ class ResultsJobMutator implements EventSubscriberInterface
     public function __construct(
         private readonly JobStore $jobStore,
         private readonly ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

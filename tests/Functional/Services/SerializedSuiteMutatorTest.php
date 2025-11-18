@@ -116,8 +116,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 'jobCreator' => function () {
                     return null;
                 },
-                'serializedSuiteCreator' => function () {
-                },
+                'serializedSuiteCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
                     $serializedSuiteId = (string) new Ulid();
@@ -135,8 +134,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
             ],
             'no serialized suite' => [
                 'jobCreator' => $jobCreator,
-                'serializedSuiteCreator' => function () {
-                },
+                'serializedSuiteCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
                     $serializedSuiteId = (string) new Ulid();
 

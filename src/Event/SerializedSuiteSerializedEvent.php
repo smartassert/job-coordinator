@@ -17,8 +17,7 @@ class SerializedSuiteSerializedEvent extends Event implements JobEventInterface,
         private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly string $serializedSuiteId,
-    ) {
-    }
+    ) {}
 
     public function getJobId(): string
     {

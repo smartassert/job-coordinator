@@ -14,8 +14,7 @@ readonly class MessageHandlerNotReadyExceptionHandler implements ExceptionHandle
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
-    ) {
-    }
+    ) {}
 
     public function handle(Envelope $envelope, \Throwable $throwable): void
     {

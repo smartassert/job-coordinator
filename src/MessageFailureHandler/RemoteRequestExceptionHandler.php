@@ -13,8 +13,7 @@ class RemoteRequestExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct(
         private readonly RemoteRequestFailureRecorder $remoteRequestFailureRecorder,
-    ) {
-    }
+    ) {}
 
     public function handle(Envelope $envelope, \Throwable $throwable): void
     {

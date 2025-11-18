@@ -11,8 +11,7 @@ readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorI
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

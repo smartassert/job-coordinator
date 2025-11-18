@@ -15,8 +15,7 @@ class RemoteRequest implements RemoteRequestInterface
     public function __construct(
         private readonly RequestState $state,
         private readonly ?RemoteRequestFailure $failure = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SerializedRemoteRequest

@@ -43,8 +43,7 @@ class GetMachineReadinessAssessorTest extends WebTestCase
     {
         return [
             'machine does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'machine has end state' => [

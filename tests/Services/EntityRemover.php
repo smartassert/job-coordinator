@@ -15,8 +15,7 @@ readonly class EntityRemover
         private EntityManagerInterface $entityManager,
         private RemoteRequestRepository $remoteRequestRepository,
         private JobRepository $jobRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @param non-empty-string $jobId

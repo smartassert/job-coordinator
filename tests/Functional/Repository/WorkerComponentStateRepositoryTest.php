@@ -59,8 +59,7 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
     {
         return [
             'no states' => [
-                'statesCreator' => function () {
-                },
+                'statesCreator' => function () {},
                 'expectedStatesCreator' => function () {
                     return [];
                 },

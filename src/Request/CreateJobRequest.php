@@ -19,6 +19,5 @@ class CreateJobRequest
         public readonly string $suiteId,
         public int $maximumDurationInSeconds,
         public readonly array $parameters,
-    ) {
-    }
+    ) {}
 }

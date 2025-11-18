@@ -68,8 +68,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'serialized suite does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
             'serialized suite is not prepared' => [

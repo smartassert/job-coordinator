@@ -12,8 +12,7 @@ readonly class JobFactory
 {
     public function __construct(
         private JobStore $jobStore,
-    ) {
-    }
+    ) {}
 
     public function createRandom(): JobInterface
     {

@@ -11,8 +11,7 @@ class RemoteRequestIndexGenerator
 {
     public function __construct(
         private readonly RemoteRequestRepository $remoteRequestRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * @return int<0, max>

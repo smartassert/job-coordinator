@@ -15,8 +15,7 @@ class WorkerClientFactory
         private readonly ServiceClient $serviceClient,
         private readonly EventFactory $eventFactory,
         private readonly JobFactory $jobFactory,
-    ) {
-    }
+    ) {}
 
     public function create(string $baseUrl): Client
     {

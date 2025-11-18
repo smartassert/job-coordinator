@@ -14,6 +14,5 @@ class ComponentPreparation
         public readonly JobComponent $jobComponent,
         public readonly PreparationState $state,
         public readonly ?RemoteRequestFailureEntity $failure = null,
-    ) {
-    }
+    ) {}
 }

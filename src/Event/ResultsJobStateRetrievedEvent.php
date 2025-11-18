@@ -17,8 +17,7 @@ class ResultsJobStateRetrievedEvent extends Event implements JobEventInterface, 
         private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly ResultsJobState $resultsJobState,
-    ) {
-    }
+    ) {}
 
     public function getJobId(): string
     {

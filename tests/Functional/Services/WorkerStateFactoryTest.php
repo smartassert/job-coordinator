@@ -69,8 +69,7 @@ class WorkerStateFactoryTest extends WebTestCase
     {
         return [
             'no component state entities' => [
-                'componentStatesCreator' => function () {
-                },
+                'componentStatesCreator' => function () {},
                 'expectedWorkerStateCreator' => function () {
                     return new WorkerState(
                         new PendingWorkerComponentState(),

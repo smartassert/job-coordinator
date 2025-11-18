@@ -16,8 +16,7 @@ readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterf
         private ResultsJobRepository $resultsJobRepository,
         private PreparationStateFactory $preparationStateFactory,
         private MachineRepository $machineRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

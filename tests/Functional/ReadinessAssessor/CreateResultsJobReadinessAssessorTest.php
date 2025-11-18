@@ -51,8 +51,7 @@ class CreateResultsJobReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'ready' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NOW,
             ],
         ];

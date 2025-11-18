@@ -121,10 +121,8 @@ class PreparationStateFactoryTest extends WebTestCase
 
         return [
             'pending' => [
-                'entityCreator' => function () {
-                },
-                'remoteRequestCreator' => function () {
-                },
+                'entityCreator' => function () {},
+                'remoteRequestCreator' => function () {},
                 'expected' => [
                     'state' => PreparationStateEnum::PENDING,
                     'failures' => [],
@@ -169,8 +167,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             ->setIsEndState(false)
                     );
                 },
-                'remoteRequestCreator' => function () {
-                },
+                'remoteRequestCreator' => function () {},
                 'expected' => [
                     'state' => PreparationStateEnum::SUCCEEDED,
                     'failures' => [],
@@ -183,8 +180,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 ],
             ],
             'preparing' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $remoteRequestRepository
@@ -207,8 +203,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 ],
             ],
             'failed, single component failure' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $remoteRequestRepository
@@ -243,8 +238,7 @@ class PreparationStateFactoryTest extends WebTestCase
                 ],
             ],
             'failed, multiple component failures' => [
-                'entityCreator' => function () {
-                },
+                'entityCreator' => function () {},
                 'remoteRequestCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $remoteRequestRepository

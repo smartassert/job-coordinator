@@ -21,8 +21,7 @@ class RemoteRequestCollection implements \JsonSerializable
      */
     public function __construct(
         private readonly iterable $requests,
-    ) {
-    }
+    ) {}
 
     /**
      * @return SerializedRemoteRequestCollection

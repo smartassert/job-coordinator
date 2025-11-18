@@ -115,8 +115,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 'jobCreator' => function () {
                     return null;
                 },
-                'resultsJobCreator' => function () {
-                },
+                'resultsJobCreator' => function () {},
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
@@ -132,8 +131,7 @@ class ResultsJobMutatorTest extends WebTestCase
             ],
             'no results job' => [
                 'jobCreator' => $jobCreator,
-                'resultsJobCreator' => function () {
-                },
+                'resultsJobCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),

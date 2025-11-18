@@ -13,8 +13,7 @@ readonly class CreateWorkerJobReadinessAssessor implements ReadinessAssessorInte
     public function __construct(
         private SerializedSuiteStore $serializedSuiteStore,
         private ResultsJobRepository $resultsJobRepository,
-    ) {
-    }
+    ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

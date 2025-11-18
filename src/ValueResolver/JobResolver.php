@@ -17,8 +17,7 @@ readonly class JobResolver implements ValueResolverInterface
     public function __construct(
         private JobStore $jobStore,
         private Security $security,
-    ) {
-    }
+    ) {}
 
     /**
      * @return JobInterface[]

@@ -16,8 +16,7 @@ class RequestStatesFactory
      */
     public function __construct(
         private readonly iterable $jobComponentHandlers,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<value-of<JobComponent>, RequestState>

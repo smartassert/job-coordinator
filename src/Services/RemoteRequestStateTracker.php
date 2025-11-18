@@ -21,8 +21,7 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
     public function __construct(
         private readonly RemoteRequestRepository $remoteRequestRepository,
         private readonly RemoteRequestIndexGenerator $remoteRequestIndexGenerator,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>

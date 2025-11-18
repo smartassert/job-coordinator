@@ -6,6 +6,4 @@ namespace App\Messenger;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
-class NonDelayedStamp implements StampInterface
-{
-}
+class NonDelayedStamp implements StampInterface {}

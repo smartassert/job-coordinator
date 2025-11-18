@@ -48,8 +48,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
     {
         return [
             'machine does not exist' => [
-                'setup' => function (): void {
-                },
+                'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'results job does not exist' => [
