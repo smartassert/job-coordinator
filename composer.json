@@ -16,7 +16,7 @@
         "smartassert/service-client": "^8",
         "smartassert/service-request": "^1.5",
         "smartassert/sources-client": "^13",
-        "smartassert/users-security-bundle": "^10.0",
+        "smartassert/users-security-bundle": "^11.0",
         "smartassert/worker-client": "^5",
         "smartassert/worker-manager-client": "^11",
         "smartassert/worker-message-failed-event-bundle": "^3.0",
