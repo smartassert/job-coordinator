@@ -39,6 +39,14 @@ class WorkerJobHandler extends AbstractJobComponentHandler implements JobCompone
         );
     }
 
+    public function hasFailed(string $jobId): ?bool
+    {
+        return $this->doHasFailed(
+            $jobId,
+            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE)
+        );
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::WORKER_JOB;

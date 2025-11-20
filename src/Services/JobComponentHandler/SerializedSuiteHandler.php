@@ -39,6 +39,14 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
         );
     }
 
+    public function hasFailed(string $jobId): ?bool
+    {
+        return $this->doHasFailed(
+            $jobId,
+            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+        );
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::SERIALIZED_SUITE;

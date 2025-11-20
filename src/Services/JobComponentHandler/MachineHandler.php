@@ -39,6 +39,14 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
         );
     }
 
+    public function hasFailed(string $jobId): ?bool
+    {
+        return $this->doHasFailed(
+            $jobId,
+            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
+        );
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::MACHINE;
