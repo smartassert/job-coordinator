@@ -125,7 +125,7 @@ class RemoteRequestRemoverTest extends WebTestCase
                 'remoteRequestsCreator' => function () {
                     return [];
                 },
-                'type' => new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
+                'type' => RemoteRequestType::createForMachineCreation(),
                 'expectedRemoteRequestFailuresCreator' => function () {
                     return [];
                 },

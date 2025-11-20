@@ -37,10 +37,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->shouldReceive('removeForJobAndType')
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
-                self::assertEquals(
-                    new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
-                    $passedRemoteRequestType,
-                );
+                self::assertEquals(RemoteRequestType::createForMachineCreation(), $passedRemoteRequestType);
 
                 return true;
             })
