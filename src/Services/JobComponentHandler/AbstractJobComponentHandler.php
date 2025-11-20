@@ -25,11 +25,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return null;
         }
 
-        if (RequestState::FAILED === $remoteRequest->getState()) {
-            return true;
-        }
-
-        return false;
+        return RequestState::FAILED === $remoteRequest->getState();
     }
 
     protected function doGetRequestState(string $jobId, RemoteRequestType $creationType): ?RequestState
@@ -38,9 +34,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return RequestState::SUCCEEDED;
         }
 
-        $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
-
-        return $remoteRequest?->getState();
+        return $this->remoteRequestRepository->findNewest($jobId, $creationType)?->getState();
     }
 
     protected function doGetComponentPreparation(string $jobId, RemoteRequestType $creationType): ?ComponentPreparation
@@ -49,13 +43,7 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
             return new ComponentPreparation($creationType->jobComponent, PreparationState::SUCCEEDED);
         }
 
-        return $this->deriveFromRemoteRequests($jobId, $creationType);
-    }
-
-    private function deriveFromRemoteRequests(string $jobId, RemoteRequestType $creationType): ComponentPreparation
-    {
         $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
-
         if (null === $remoteRequest) {
             return new ComponentPreparation($creationType->jobComponent, PreparationState::PENDING);
         }
