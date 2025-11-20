@@ -54,8 +54,6 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         return $this->deriveFromRemoteRequests($jobId, $jobComponent);
     }
 
-    abstract protected function getJobComponent(): JobComponent;
-
     private function deriveFromRemoteRequests(string $jobId, JobComponent $jobComponent): ComponentPreparation
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(

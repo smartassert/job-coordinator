@@ -46,9 +46,4 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
             new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE)
         );
     }
-
-    protected function getJobComponent(): JobComponent
-    {
-        return JobComponent::RESULTS_JOB;
-    }
 }
