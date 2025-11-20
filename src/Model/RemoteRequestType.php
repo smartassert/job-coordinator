@@ -9,7 +9,7 @@ use App\Enum\RemoteRequestAction;
 
 readonly class RemoteRequestType implements \Stringable
 {
-    public function __construct(
+    private function __construct(
         public JobComponent $jobComponent,
         public RemoteRequestAction $action,
     ) {}
