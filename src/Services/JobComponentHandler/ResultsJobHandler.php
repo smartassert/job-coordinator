@@ -14,6 +14,8 @@ use App\Repository\ResultsJobRepository;
 
 class ResultsJobHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
+    private const JobComponent JOB_COMPONENT = JobComponent::RESULTS_JOB;
+
     public function __construct(
         ResultsJobRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
@@ -23,19 +25,19 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
 
     public function handles(JobComponent $jobComponent): bool
     {
-        return JobComponent::RESULTS_JOB === $jobComponent;
+        return self::JOB_COMPONENT === $jobComponent;
     }
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, JobComponent::RESULTS_JOB);
+        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
     }
 
     public function getRequestState(string $jobId): ?RequestState
     {
         return $this->doGetRequestState(
             $jobId,
-            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 
@@ -43,7 +45,7 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
     {
         return $this->doHasFailed(
             $jobId,
-            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 }

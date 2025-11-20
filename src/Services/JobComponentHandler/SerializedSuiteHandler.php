@@ -14,6 +14,8 @@ use App\Repository\SerializedSuiteRepository;
 
 class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
+    private const JobComponent JOB_COMPONENT = JobComponent::SERIALIZED_SUITE;
+
     public function __construct(
         SerializedSuiteRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
@@ -23,19 +25,19 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
 
     public function handles(JobComponent $jobComponent): bool
     {
-        return JobComponent::SERIALIZED_SUITE === $jobComponent;
+        return self::JOB_COMPONENT === $jobComponent;
     }
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, JobComponent::SERIALIZED_SUITE);
+        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
     }
 
     public function getRequestState(string $jobId): ?RequestState
     {
         return $this->doGetRequestState(
             $jobId,
-            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 
@@ -43,7 +45,7 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
     {
         return $this->doHasFailed(
             $jobId,
-            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 }

@@ -14,6 +14,8 @@ use App\Repository\WorkerComponentStateRepository;
 
 class WorkerJobHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
+    private const JobComponent JOB_COMPONENT = JobComponent::WORKER_JOB;
+
     public function __construct(
         WorkerComponentStateRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
@@ -23,19 +25,19 @@ class WorkerJobHandler extends AbstractJobComponentHandler implements JobCompone
 
     public function handles(JobComponent $jobComponent): bool
     {
-        return JobComponent::WORKER_JOB === $jobComponent;
+        return self::JOB_COMPONENT === $jobComponent;
     }
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, JobComponent::WORKER_JOB);
+        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
     }
 
     public function getRequestState(string $jobId): ?RequestState
     {
         return $this->doGetRequestState(
             $jobId,
-            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 
@@ -43,7 +45,7 @@ class WorkerJobHandler extends AbstractJobComponentHandler implements JobCompone
     {
         return $this->doHasFailed(
             $jobId,
-            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 }

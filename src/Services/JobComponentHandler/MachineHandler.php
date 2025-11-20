@@ -14,6 +14,8 @@ use App\Repository\RemoteRequestRepository;
 
 class MachineHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
+    private const JobComponent JOB_COMPONENT = JobComponent::MACHINE;
+
     public function __construct(
         MachineRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
@@ -23,19 +25,19 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
 
     public function handles(JobComponent $jobComponent): bool
     {
-        return JobComponent::MACHINE === $jobComponent;
+        return self::JOB_COMPONENT === $jobComponent;
     }
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, JobComponent::MACHINE);
+        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
     }
 
     public function getRequestState(string $jobId): ?RequestState
     {
         return $this->doGetRequestState(
             $jobId,
-            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 
@@ -43,7 +45,7 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
     {
         return $this->doHasFailed(
             $jobId,
-            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
         );
     }
 }
