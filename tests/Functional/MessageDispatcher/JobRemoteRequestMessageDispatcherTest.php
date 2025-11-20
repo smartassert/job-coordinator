@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\RemoteRequest;
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\CreateMachineMessage;
@@ -149,10 +147,7 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    $remoteRequest = new RemoteRequest(
-                        $job->getId(),
-                        new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
-                    );
+                    $remoteRequest = new RemoteRequest($job->getId(), RemoteRequestType::createForMachineCreation());
 
                     $remoteRequestRepository->save($remoteRequest);
                 },
@@ -165,10 +160,7 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    $remoteRequest = new RemoteRequest(
-                        $job->getId(),
-                        new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
-                    );
+                    $remoteRequest = new RemoteRequest($job->getId(), RemoteRequestType::createForMachineCreation());
                     $remoteRequest->setState(RequestState::REQUESTING);
 
                     $remoteRequestRepository->save($remoteRequest);
@@ -182,10 +174,7 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
                     RemoteRequestRepository $remoteRequestRepository,
                     JobInterface $job,
                 ): void {
-                    $remoteRequest = new RemoteRequest(
-                        $job->getId(),
-                        new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE),
-                    );
+                    $remoteRequest = new RemoteRequest($job->getId(), RemoteRequestType::createForMachineCreation());
                     $remoteRequest->setState(RequestState::PENDING);
 
                     $remoteRequestRepository->save($remoteRequest);

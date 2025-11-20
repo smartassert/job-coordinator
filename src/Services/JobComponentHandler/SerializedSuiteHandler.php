@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\JobComponentHandler;
 
 use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
 use App\Model\RemoteRequestType;
@@ -30,22 +29,16 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
+        return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForSerializedSuiteCreation());
     }
 
     public function getRequestState(string $jobId): ?RequestState
     {
-        return $this->doGetRequestState(
-            $jobId,
-            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
-        );
+        return $this->doGetRequestState($jobId, RemoteRequestType::createForSerializedSuiteCreation());
     }
 
     public function hasFailed(string $jobId): ?bool
     {
-        return $this->doHasFailed(
-            $jobId,
-            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
-        );
+        return $this->doHasFailed($jobId, RemoteRequestType::createForSerializedSuiteCreation());
     }
 }

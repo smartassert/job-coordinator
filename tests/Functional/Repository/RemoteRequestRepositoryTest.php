@@ -6,8 +6,6 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -69,73 +67,53 @@ class RemoteRequestRepositoryTest extends WebTestCase
     {
         $jobId = md5((string) rand());
 
-        $resultsJobCreateType = new RemoteRequestType(
-            JobComponent::RESULTS_JOB,
-            RemoteRequestAction::CREATE,
-        );
-
-        $machineCreateType = new RemoteRequestType(
-            JobComponent::MACHINE,
-            RemoteRequestAction::CREATE,
-        );
-
-        $machineRetrieveType = new RemoteRequestType(
-            JobComponent::MACHINE,
-            RemoteRequestAction::RETRIEVE,
-        );
-
-        $serializedSuiteRetrieveType = new RemoteRequestType(
-            JobComponent::SERIALIZED_SUITE,
-            RemoteRequestAction::RETRIEVE,
-        );
-
         return [
             'no existing remote requests' => [
                 'existingRemoteRequests' => [],
                 'jobId' => $jobId,
-                'type' => $resultsJobCreateType,
+                'type' => RemoteRequestType::createForResultsJobCreation(),
                 'expected' => null,
             ],
             'no existing remote requests for job' => [
-                'existingRemoteRequests' => (function () use ($resultsJobCreateType) {
+                'existingRemoteRequests' => (function () {
                     $jobId = md5((string) rand());
 
                     return [
-                        new RemoteRequest($jobId, $resultsJobCreateType, 0),
-                        new RemoteRequest($jobId, $resultsJobCreateType, 1),
-                        new RemoteRequest($jobId, $resultsJobCreateType, 2),
+                        new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 1),
+                        new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 2),
                     ];
                 })(),
                 'jobId' => $jobId,
-                'type' => $resultsJobCreateType,
+                'type' => RemoteRequestType::createForResultsJobCreation(),
                 'expected' => null,
             ],
             'no existing remote requests for type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, $machineCreateType, 0),
-                    new RemoteRequest($jobId, $machineRetrieveType, 0),
-                    new RemoteRequest($jobId, $serializedSuiteRetrieveType, 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForMachineCreation(), 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForMachineRetrieval(), 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForSerializedSuiteRetrieval(), 0),
                 ],
                 'jobId' => $jobId,
-                'type' => $resultsJobCreateType,
+                'type' => RemoteRequestType::createForResultsJobCreation(),
                 'expected' => null,
             ],
             'single existing request for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, $resultsJobCreateType, 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
                 ],
                 'jobId' => $jobId,
-                'type' => $resultsJobCreateType,
+                'type' => RemoteRequestType::createForResultsJobCreation(),
                 'expected' => 0,
             ],
             'multiple existing requests for job and type' => [
                 'existingRemoteRequests' => [
-                    new RemoteRequest($jobId, $resultsJobCreateType, 0),
-                    new RemoteRequest($jobId, $resultsJobCreateType, 1),
-                    new RemoteRequest($jobId, $resultsJobCreateType, 2),
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 1),
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 2),
                 ],
                 'jobId' => $jobId,
-                'type' => $resultsJobCreateType,
+                'type' => RemoteRequestType::createForResultsJobCreation(),
                 'expected' => 2,
             ],
         ];
@@ -173,11 +151,6 @@ class RemoteRequestRepositoryTest extends WebTestCase
      */
     public static function hasAnyWithFailureDataProvider(): array
     {
-        $machineCreateType = new RemoteRequestType(
-            JobComponent::MACHINE,
-            RemoteRequestAction::CREATE,
-        );
-
         return [
             'single remote request failure, no remote requests' => [
                 'remoteRequestFailuresCreator' => function () {
@@ -210,12 +183,12 @@ class RemoteRequestRepositoryTest extends WebTestCase
                         new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
-                'remoteRequestsCreator' => function (array $remoteRequestFailures) use ($machineCreateType) {
+                'remoteRequestsCreator' => function (array $remoteRequestFailures) {
                     $remoteRequestFailure = $remoteRequestFailures[0] ?? null;
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        (new RemoteRequest(md5((string) rand()), $machineCreateType, 0))
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
@@ -228,16 +201,16 @@ class RemoteRequestRepositoryTest extends WebTestCase
                         new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
-                'remoteRequestsCreator' => function (array $remoteRequestFailures) use ($machineCreateType) {
+                'remoteRequestsCreator' => function (array $remoteRequestFailures) {
                     $remoteRequestFailure = $remoteRequestFailures[0] ?? null;
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        (new RemoteRequest(md5((string) rand()), $machineCreateType, 0))
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
-                        (new RemoteRequest(md5((string) rand()), $machineCreateType, 0))
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
-                        (new RemoteRequest(md5((string) rand()), $machineCreateType, 0))
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
@@ -250,11 +223,11 @@ class RemoteRequestRepositoryTest extends WebTestCase
                         new RemoteRequestFailure(RemoteRequestFailureType::HTTP, 404, null),
                     ];
                 },
-                'remoteRequestsCreator' => function () use ($machineCreateType) {
+                'remoteRequestsCreator' => function () {
                     return [
-                        new RemoteRequest(md5((string) rand()), $machineCreateType, 0),
-                        new RemoteRequest(md5((string) rand()), $machineCreateType, 0),
-                        new RemoteRequest(md5((string) rand()), $machineCreateType, 0),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
                     ];
                 },
                 'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIsActiveEvent;
@@ -63,74 +61,47 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 
     public function removeMachineCreateRequests(MachineIsActiveEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForMachineCreation());
     }
 
     public function removeResultsCreateRequests(ResultsJobCreatedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForResultsJobCreation());
     }
 
     public function removeSerializedSuiteCreateRequests(SerializedSuiteCreatedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForSerializedSuiteCreation());
     }
 
     public function removeMachineGetRequests(MachineRetrievedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::RETRIEVE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForMachineRetrieval());
     }
 
     public function removeSerializedSuiteGetRequests(SerializedSuiteRetrievedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForSerializedSuiteRetrieval());
     }
 
     public function removeWorkerJobCreateRequests(CreateWorkerJobRequestedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobCreation());
     }
 
     public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForResultsJobRetrieval());
     }
 
     public function removeMachineTerminationRequests(MachineTerminationRequestedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::TERMINATE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForMachineTermination());
     }
 
     public function removeWorkerStateGetRequests(WorkerStateRetrievedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::RETRIEVE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobRetrieval());
     }
 
     private function removeForEventAndType(JobEventInterface $event, RemoteRequestType $type): void

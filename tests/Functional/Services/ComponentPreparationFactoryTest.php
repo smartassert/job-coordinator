@@ -12,7 +12,6 @@ use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
 use App\Enum\JobComponent;
 use App\Enum\PreparationState;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
@@ -144,31 +143,11 @@ class ComponentPreparationFactoryTest extends WebTestCase
             ));
 
             $workerComponentStateRepository->save(
-                (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                     ->setState('awaiting-job')
                     ->setIsEndState(false)
             );
         };
-
-        $resultsCreateType = new RemoteRequestType(
-            JobComponent::RESULTS_JOB,
-            RemoteRequestAction::CREATE,
-        );
-
-        $serializedSuiteCreateType = new RemoteRequestType(
-            JobComponent::SERIALIZED_SUITE,
-            RemoteRequestAction::CREATE,
-        );
-
-        $machineCreateType = new RemoteRequestType(
-            JobComponent::MACHINE,
-            RemoteRequestAction::CREATE,
-        );
-
-        $workerJobCreateType = new RemoteRequestType(
-            JobComponent::WORKER_JOB,
-            RemoteRequestAction::CREATE,
-        );
 
         $expectedAllSuccess = [
             JobComponent::RESULTS_JOB->value => new ComponentPreparation(
@@ -217,11 +196,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $serializedSuiteCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForSerializedSuiteCreation(), 0)
                             ->setState(RequestState::REQUESTING)
                     );
                 },
@@ -249,9 +226,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use ($machineCreateType) {
+                ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $machineCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setState(RequestState::REQUESTING)
                     );
                 },
@@ -279,11 +256,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $workerJobCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $workerJobCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForWorkerJobCreation(), 0)
                             ->setState(RequestState::REQUESTING)
                     );
                 },
@@ -311,11 +286,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::REQUESTING)
                     );
                 },
@@ -343,11 +316,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::HALTED)
                     );
                 },
@@ -375,11 +346,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType,
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::PENDING)
                     );
                 },
@@ -407,11 +376,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::FAILED)
                     );
                 },
@@ -439,11 +406,9 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::FAILED)
                             ->setFailure(new RemoteRequestFailure(
                                 RemoteRequestFailureType::HTTP,
@@ -486,29 +451,24 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'remoteRequestsCreator' => function (
                     JobInterface $job,
                     RemoteRequestRepository $repository
-                ) use (
-                    $resultsCreateType,
-                    $serializedSuiteCreateType,
-                    $machineCreateType,
-                    $workerJobCreateType,
                 ) {
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $resultsCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                             ->setState(RequestState::FAILED)
                     );
 
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $serializedSuiteCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForSerializedSuiteCreation(), 0)
                             ->setState(RequestState::FAILED)
                     );
 
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $machineCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setState(RequestState::FAILED)
                     );
 
                     $repository->save(
-                        (new RemoteRequest($job->getId(), $workerJobCreateType, 0))
+                        new RemoteRequest($job->getId(), RemoteRequestType::createForWorkerJobCreation(), 0)
                             ->setState(RequestState::FAILED)
                     );
                 },
