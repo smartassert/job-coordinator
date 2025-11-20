@@ -96,10 +96,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
 
     public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
     {
-        $this->removeForEventAndType(
-            $event,
-            new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE)
-        );
+        $this->removeForEventAndType($event, RemoteRequestType::createForResultsJobRetrieval());
     }
 
     public function removeMachineTerminationRequests(MachineTerminationRequestedEvent $event): void
