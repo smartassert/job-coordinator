@@ -20,20 +20,6 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    public function getRequestState(string $jobId): ?RequestState
-    {
-        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return RequestState::SUCCEEDED;
-        }
-
-        $remoteRequest = $this->remoteRequestRepository->findNewest(
-            $jobId,
-            new RemoteRequestType($this->getJobComponent(), RemoteRequestAction::CREATE),
-        );
-
-        return $remoteRequest?->getState();
-    }
-
     public function hasFailed(string $jobId): ?bool
     {
         $remoteRequest = $this->remoteRequestRepository->findNewest(
@@ -50,6 +36,17 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         }
 
         return false;
+    }
+
+    protected function doGetRequestState(string $jobId, RemoteRequestType $creationType): ?RequestState
+    {
+        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
+            return RequestState::SUCCEEDED;
+        }
+
+        $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
+
+        return $remoteRequest?->getState();
     }
 
     protected function doGetComponentPreparation(string $jobId, JobComponent $jobComponent): ?ComponentPreparation
