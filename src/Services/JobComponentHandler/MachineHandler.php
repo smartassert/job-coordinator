@@ -17,6 +17,11 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
+    public function handles(JobComponent $jobComponent): bool
+    {
+        return JobComponent::MACHINE === $jobComponent;
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::MACHINE;

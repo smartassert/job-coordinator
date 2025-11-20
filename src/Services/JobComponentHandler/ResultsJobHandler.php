@@ -17,6 +17,11 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
+    public function handles(JobComponent $jobComponent): bool
+    {
+        return JobComponent::RESULTS_JOB === $jobComponent;
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::RESULTS_JOB;

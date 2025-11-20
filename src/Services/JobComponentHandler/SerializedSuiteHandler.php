@@ -17,6 +17,11 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
+    public function handles(JobComponent $jobComponent): bool
+    {
+        return JobComponent::SERIALIZED_SUITE === $jobComponent;
+    }
+
     protected function getJobComponent(): JobComponent
     {
         return JobComponent::SERIALIZED_SUITE;

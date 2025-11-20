@@ -20,11 +20,6 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    public function handles(JobComponent $jobComponent): bool
-    {
-        return $this->getJobComponent() === $jobComponent;
-    }
-
     public function getComponentPreparation(string $jobId): ?ComponentPreparation
     {
         if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
