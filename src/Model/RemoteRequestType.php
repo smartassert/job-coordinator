@@ -51,4 +51,9 @@ readonly class RemoteRequestType implements \Stringable
     {
         return new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE);
     }
+
+    public static function createForSerializedSuiteRetrieval(): self
+    {
+        return new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
+    }
 }
