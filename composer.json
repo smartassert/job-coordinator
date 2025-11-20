@@ -45,6 +45,7 @@
         "smartassert/symfony-test-client": "^2.0",
         "smartassert/test-authenticaton-provider-bundle": "^5.0",
         "smartassert/test-sources-client": "^0.5.0",
+        "squizlabs/php_codesniffer": "^4.0",
         "symfony/maker-bundle": "^1.40",
         "symfony/phpunit-bridge": "7.3.*"
     },
