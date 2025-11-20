@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
@@ -50,10 +48,7 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
             [
                 'jobId' => $jobId,
                 'state' => RequestState::SUCCEEDED->value,
-                'type' => new RemoteRequestType(
-                    JobComponent::MACHINE,
-                    RemoteRequestAction::CREATE,
-                ),
+                'type' => RemoteRequestType::createForMachineCreation(),
             ]
         );
 
