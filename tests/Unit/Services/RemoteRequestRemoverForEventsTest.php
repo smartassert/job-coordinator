@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
@@ -235,10 +233,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->shouldReceive('removeForJobAndType')
             ->withArgs(function ($passedJobId, $passedRemoteRequestType) use ($jobId) {
                 self::assertSame($jobId, $passedJobId);
-                self::assertEquals(
-                    new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::TERMINATE),
-                    $passedRemoteRequestType,
-                );
+                self::assertEquals(RemoteRequestType::createForMachineTermination(), $passedRemoteRequestType);
 
                 return true;
             })
