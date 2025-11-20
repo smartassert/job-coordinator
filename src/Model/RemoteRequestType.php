@@ -26,4 +26,9 @@ readonly class RemoteRequestType implements \Stringable
     {
         return new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE);
     }
+
+    public static function createForResultsJobCreation(): self
+    {
+        return new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE);
+    }
 }
