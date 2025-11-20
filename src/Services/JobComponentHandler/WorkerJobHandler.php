@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace App\Services\JobComponentHandler;
 
 use App\Enum\JobComponent;
+use App\Enum\RemoteRequestAction;
+use App\Enum\RequestState;
+use App\Model\ComponentPreparation;
+use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 
 class WorkerJobHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
+    private const JobComponent JOB_COMPONENT = JobComponent::WORKER_JOB;
+
     public function __construct(
         WorkerComponentStateRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
@@ -17,8 +23,29 @@ class WorkerJobHandler extends AbstractJobComponentHandler implements JobCompone
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
-    protected function getJobComponent(): JobComponent
+    public function handles(JobComponent $jobComponent): bool
     {
-        return JobComponent::WORKER_JOB;
+        return self::JOB_COMPONENT === $jobComponent;
+    }
+
+    public function getComponentPreparation(string $jobId): ?ComponentPreparation
+    {
+        return $this->doGetComponentPreparation($jobId, self::JOB_COMPONENT);
+    }
+
+    public function getRequestState(string $jobId): ?RequestState
+    {
+        return $this->doGetRequestState(
+            $jobId,
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
+        );
+    }
+
+    public function hasFailed(string $jobId): ?bool
+    {
+        return $this->doHasFailed(
+            $jobId,
+            new RemoteRequestType(self::JOB_COMPONENT, RemoteRequestAction::CREATE)
+        );
     }
 }
