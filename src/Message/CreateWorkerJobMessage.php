@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Enum\JobComponent;
-use App\Enum\RemoteRequestAction;
 use App\Model\RemoteRequestType;
 
 class CreateWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
@@ -27,6 +25,6 @@ class CreateWorkerJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 
     public function getRemoteRequestType(): RemoteRequestType
     {
-        return new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE);
+        return RemoteRequestType::createForWorkerJobCreation();
     }
 }
