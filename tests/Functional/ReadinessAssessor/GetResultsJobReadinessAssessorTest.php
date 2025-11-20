@@ -9,6 +9,7 @@ use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
 use App\Model\JobInterface;
+use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
@@ -19,6 +20,23 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetResultsJobReadinessAssessorTest extends WebTestCase
 {
+    public function testHandles(): void
+    {
+        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
+        \assert($assessor instanceof GetResultsJobReadinessAssessor);
+
+        self::assertTrue($assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
+
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForResultsJobCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineTermination()));
+    }
+
     /**
      * @param callable(JobInterface, ResultsJobRepository, MachineRepository): void $setup
      * @param callable(JobInterface): PreparationStateFactory                       $preparationStateFactoryCreator
@@ -41,9 +59,6 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $resultsJobRepository, $machineRepository);
         $jobPreparationInspector = $preparationStateFactoryCreator($job);
-
-        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof GetResultsJobReadinessAssessor);
 
         $assessor = new GetResultsJobReadinessAssessor(
             $resultsJobRepository,

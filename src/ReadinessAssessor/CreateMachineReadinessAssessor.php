@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\SerializedSuiteStore;
@@ -16,6 +17,11 @@ readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterf
         private SerializedSuiteStore $serializedSuiteStore,
         private ResultsJobRepository $resultsJobRepository,
     ) {}
+
+    public function handles(RemoteRequestType $type): bool
+    {
+        return RemoteRequestType::createForMachineCreation()->equals($type);
+    }
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
