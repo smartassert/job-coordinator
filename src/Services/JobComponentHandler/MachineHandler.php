@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\JobComponentHandler;
 
 use App\Enum\JobComponent;
+use App\Model\ComponentPreparation;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 
@@ -20,6 +21,11 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
     public function handles(JobComponent $jobComponent): bool
     {
         return JobComponent::MACHINE === $jobComponent;
+    }
+
+    public function getComponentPreparation(string $jobId): ?ComponentPreparation
+    {
+        return $this->doGetComponentPreparation($jobId, JobComponent::MACHINE);
     }
 
     protected function getJobComponent(): JobComponent
