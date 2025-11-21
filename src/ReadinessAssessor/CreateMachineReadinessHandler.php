@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
+use App\Services\JobComponentHandler\SerializedSuiteHandler;
 use App\Services\SerializedSuiteStore;
 
 readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterface
@@ -16,6 +17,7 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
         private MachineRepository $machineRepository,
         private SerializedSuiteStore $serializedSuiteStore,
         private ResultsJobRepository $resultsJobRepository,
+        private SerializedSuiteHandler $serializedSuiteJobComponentHandler,
     ) {}
 
     public function handles(RemoteRequestType $type): bool
@@ -26,6 +28,10 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
     public function isReady(string $jobId): MessageHandlingReadiness
     {
         if ($this->machineRepository->has($jobId)) {
+            return MessageHandlingReadiness::NEVER;
+        }
+
+        if ($this->serializedSuiteJobComponentHandler->hasFailed($jobId)) {
             return MessageHandlingReadiness::NEVER;
         }
 

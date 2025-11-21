@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
+use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RequestState;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateMachineReadinessHandler;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -46,7 +49,13 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, MachineRepository, SerializedSuiteRepository, ResultsJobRepository): void $setup
+     * @param callable(
+     *   JobInterface,
+     *   MachineRepository,
+     *   SerializedSuiteRepository,
+     *   ResultsJobRepository,
+     *   RemoteRequestRepository
+     * ): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -64,7 +73,10 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $setup($job, $machineRepository, $serializedSuiteRepository, $resultsJobRepository);
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $setup($job, $machineRepository, $serializedSuiteRepository, $resultsJobRepository, $remoteRequestRepository);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -106,6 +118,25 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     );
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
+            ],
+            'serialized suite creation failed' => [
+                'setup' => function (
+                    JobInterface $job,
+                    MachineRepository $machineRepository,
+                    SerializedSuiteRepository $serializedSuiteRepository,
+                    ResultsJobRepository $resultsJobRepository,
+                    RemoteRequestRepository $remoteRequestRepository
+                ): void {
+                    $remoteRequest = new RemoteRequest(
+                        $job->getId(),
+                        RemoteRequestType::createForSerializedSuiteCreation()
+                    );
+
+                    $remoteRequest->setState(RequestState::FAILED);
+
+                    $remoteRequestRepository->save($remoteRequest);
+                },
+                'expected' => MessageHandlingReadiness::NEVER,
             ],
             'results job does not exist' => [
                 'setup' => function (
