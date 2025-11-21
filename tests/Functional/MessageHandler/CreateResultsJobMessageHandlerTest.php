@@ -10,13 +10,12 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\CreateResultsJobMessageHandler;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
@@ -31,7 +30,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
-        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NOW);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $resultsClientException = new \Exception('Failed to create results job');
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
@@ -106,7 +109,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
 
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
-        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NEVER);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $resultsClient = HttpMockedResultsClientFactory::create();
         $handler = $this->createHandler($resultsClient, $assessor);
@@ -145,24 +152,5 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new CreateResultsJobMessageHandler($resultsClient, $eventDispatcher, $readinessAssessor);
-    }
-
-    private function createAssessor(
-        JobRemoteRequestMessageInterface $message,
-        MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
-                self::assertTrue($type->equals($message->getRemoteRequestType()));
-                self::assertSame($passedJobId, $message->getJobId());
-
-                return true;
-            })
-            ->andReturn($readiness)
-        ;
-
-        return $assessor;
     }
 }

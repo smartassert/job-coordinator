@@ -15,6 +15,7 @@ use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -56,7 +57,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForWorkerJobCreation(),
             $job->getId(),
             MessageHandlingReadiness::NEVER
@@ -65,7 +66,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $jobStore,
-            $readinessAssessor,
+            $assessor,
         );
 
         $event = new MachineIsActiveEvent(
@@ -144,7 +145,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForWorkerJobCreation(),
             $job->getId(),
             MessageHandlingReadiness::NOW
@@ -153,7 +154,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $jobStore,
-            $readinessAssessor,
+            $assessor,
         );
 
         $machineIpAddress = '127.0.0.1';
@@ -221,25 +222,5 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
-    }
-
-    private function createAssessor(
-        RemoteRequestType $type,
-        string $jobId,
-        MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
-                self::assertTrue($passedType->equals($type));
-                self::assertSame($passedJobId, $jobId);
-
-                return true;
-            })
-            ->andReturn($readiness)
-        ;
-
-        return $assessor;
     }
 }

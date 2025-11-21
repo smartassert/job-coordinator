@@ -22,6 +22,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -143,13 +144,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
 
-        $readinessAssessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForMachineCreation(),
             $jobId,
             MessageHandlingReadiness::NEVER
         );
 
-        $dispatcher = $this->createDispatcher($readinessAssessor);
+        $dispatcher = $this->createDispatcher($assessor);
 
         $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
 
@@ -162,13 +163,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
 
-        $readinessAssessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForMachineCreation(),
             $jobId,
             MessageHandlingReadiness::NEVER
         );
 
-        $dispatcher = $this->createDispatcher($readinessAssessor);
+        $dispatcher = $this->createDispatcher($assessor);
 
         $message = new CreateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
@@ -185,13 +186,13 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $readinessAssessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForMachineCreation(),
             $job->getId(),
             $readiness
         );
 
-        $dispatcher = $this->createDispatcher($readinessAssessor);
+        $dispatcher = $this->createDispatcher($assessor);
 
         $message = new CreateMachineMessage('api token', $job->getId());
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
@@ -216,12 +217,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    private function createDispatcher(FooReadinessAssessorInterface $readinessAssessor): CreateMachineMessageDispatcher
+    private function createDispatcher(FooReadinessAssessorInterface $assessor): CreateMachineMessageDispatcher
     {
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        return new CreateMachineMessageDispatcher($messageDispatcher, $readinessAssessor);
+        return new CreateMachineMessageDispatcher($messageDispatcher, $assessor);
     }
 
     private function assertNoMessagesAreDispatched(): void
@@ -255,25 +256,5 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertEquals(new CreateMachineMessage($authenticationToken, $jobId), $envelope->getMessage());
         self::assertEquals([], $envelope->all(NonDelayedStamp::class));
-    }
-
-    private function createAssessor(
-        RemoteRequestType $type,
-        string $jobId,
-        MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
-                self::assertTrue($passedType->equals($type));
-                self::assertSame($passedJobId, $jobId);
-
-                return true;
-            })
-            ->andReturn($readiness)
-        ;
-
-        return $assessor;
     }
 }

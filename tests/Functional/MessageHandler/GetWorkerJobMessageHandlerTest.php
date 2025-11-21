@@ -10,14 +10,13 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
@@ -30,7 +29,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
-        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NEVER);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class), $assessor);
 
@@ -53,7 +56,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
-        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NOW);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $workerClientException = new \Exception('Failed to get worker state');
         $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
@@ -81,7 +88,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
-        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NOW);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
@@ -152,24 +163,5 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         return new GetWorkerJobMessageHandler($workerClientFactory, $eventDispatcher, $readinessAssessor);
-    }
-
-    private function createAssessor(
-        JobRemoteRequestMessageInterface $message,
-        MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
-                self::assertTrue($type->equals($message->getRemoteRequestType()));
-                self::assertSame($passedJobId, $message->getJobId());
-
-                return true;
-            })
-            ->andReturn($readiness)
-        ;
-
-        return $assessor;
     }
 }

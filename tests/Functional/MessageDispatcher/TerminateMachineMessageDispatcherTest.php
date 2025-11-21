@@ -13,11 +13,11 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -81,7 +81,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForMachineTermination(),
             $jobId,
             MessageHandlingReadiness::NEVER
@@ -97,7 +97,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
 
-        $assessor = $this->createAssessor(
+        $assessor = ReadinessAssessorFactory::create(
             RemoteRequestType::createForMachineTermination(),
             $jobId,
             MessageHandlingReadiness::NEVER
@@ -171,25 +171,5 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         );
 
         self::assertEquals([new NonDelayedStamp()], $envelope->all(NonDelayedStamp::class));
-    }
-
-    private function createAssessor(
-        RemoteRequestType $type,
-        string $jobId,
-        MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
-                self::assertTrue($passedType->equals($type));
-                self::assertSame($passedJobId, $jobId);
-
-                return true;
-            })
-            ->andReturn($readiness)
-        ;
-
-        return $assessor;
     }
 }
