@@ -30,12 +30,11 @@ readonly class GetWorkerJobMessageDispatcher extends AbstractMessageDispatcher i
 
     public function dispatchImmediately(JobEventInterface&MachineIpAddressInterface $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress())
-        );
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 }

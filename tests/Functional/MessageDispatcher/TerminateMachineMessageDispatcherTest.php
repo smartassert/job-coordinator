@@ -12,7 +12,8 @@ use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class TerminateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -79,12 +81,11 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $assessor = $this->createAssessor(
+            RemoteRequestType::createForMachineTermination(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);
@@ -94,18 +95,20 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
     public function testRedispatchNeverReady(): void
     {
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $jobId = (string) new Ulid();
+
+        $assessor = $this->createAssessor(
+            RemoteRequestType::createForMachineTermination(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
 
-        $message = new TerminateMachineMessage('api token', 'job id');
+        $message = new TerminateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $dispatcher->redispatch($event);
@@ -168,5 +171,25 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         );
 
         self::assertEquals([new NonDelayedStamp()], $envelope->all(NonDelayedStamp::class));
+    }
+
+    private function createAssessor(
+        RemoteRequestType $type,
+        string $jobId,
+        MessageHandlingReadiness $readiness,
+    ): FooReadinessAssessorInterface {
+        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
+                self::assertTrue($passedType->equals($type));
+                self::assertSame($passedJobId, $jobId);
+
+                return true;
+            })
+            ->andReturn($readiness)
+        ;
+
+        return $assessor;
     }
 }

@@ -24,12 +24,11 @@ readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatch
 
     public function dispatchImmediately(JobCreatedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId())
-        );
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 }

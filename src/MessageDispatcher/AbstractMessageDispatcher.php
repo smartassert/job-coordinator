@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Message\JobRemoteRequestMessageInterface;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 
 abstract readonly class AbstractMessageDispatcher
 {
     public function __construct(
         protected JobRemoteRequestMessageDispatcher $messageDispatcher,
-        protected ReadinessAssessorInterface $readinessAssessor,
+        protected FooReadinessAssessorInterface $readinessAssessor,
     ) {}
 
-    protected function isNeverReady(string $jobId): bool
+    protected function isNeverReady(JobRemoteRequestMessageInterface $message): bool
     {
-        return MessageHandlingReadiness::NEVER === $this->readinessAssessor->isReady($jobId);
+        $readiness = $this->readinessAssessor->isReady($message->getRemoteRequestType(), $message->getJobId());
+
+        return MessageHandlingReadiness::NEVER === $readiness;
     }
 }

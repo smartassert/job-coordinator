@@ -10,7 +10,8 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
@@ -55,12 +56,11 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $readinessAssessor = $this->createAssessor(
+            RemoteRequestType::createForWorkerJobCreation(),
+            $job->getId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
@@ -101,7 +101,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $readinessAssessor = \Mockery::mock(FooReadinessAssessorInterface::class);
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
@@ -144,12 +144,11 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $readinessAssessor = $this->createAssessor(
+            RemoteRequestType::createForWorkerJobCreation(),
+            $job->getId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
@@ -222,5 +221,25 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
+    }
+
+    private function createAssessor(
+        RemoteRequestType $type,
+        string $jobId,
+        MessageHandlingReadiness $readiness,
+    ): FooReadinessAssessorInterface {
+        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
+                self::assertTrue($passedType->equals($type));
+                self::assertSame($passedJobId, $jobId);
+
+                return true;
+            })
+            ->andReturn($readiness)
+        ;
+
+        return $assessor;
     }
 }

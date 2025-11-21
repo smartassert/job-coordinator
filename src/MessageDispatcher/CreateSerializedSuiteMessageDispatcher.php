@@ -25,17 +25,17 @@ readonly class CreateSerializedSuiteMessageDispatcher extends BaseMessageDispatc
 
     public function dispatchImmediately(JobCreatedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new CreateSerializedSuiteMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $event->getSuiteId(),
+            $event->parameters
+        );
+
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateSerializedSuiteMessage(
-                $event->getAuthenticationToken(),
-                $event->getJobId(),
-                $event->getSuiteId(),
-                $event->parameters
-            )
-        );
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 }

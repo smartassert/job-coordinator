@@ -28,15 +28,17 @@ readonly class GetSerializedSuiteMessageDispatcher extends AbstractMessageDispat
 
     public function dispatchImmediately(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
-            return;
-        }
-
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(new GetSerializedSuiteMessage(
+        $message = new GetSerializedSuiteMessage(
             $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->serializedSuite->getSuiteId(),
             $event->serializedSuite->getId()
-        ));
+        );
+
+        if ($this->isNeverReady($message)) {
+            return;
+        }
+
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 }

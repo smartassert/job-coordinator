@@ -15,7 +15,8 @@ use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -25,6 +26,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -139,15 +141,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNeverReady(): void
     {
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $jobId = (string) new Ulid();
+
+        $readinessAssessor = $this->createAssessor(
+            RemoteRequestType::createForMachineCreation(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = $this->createDispatcher($readinessAssessor);
 
-        $event = new SerializedSuiteSerializedEvent('api token', 'job id', 'serialized suite id');
+        $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
 
         $dispatcher->dispatchImmediately($event);
 
@@ -156,15 +160,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testRedispatchNeverReady(): void
     {
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $jobId = (string) new Ulid();
+
+        $readinessAssessor = $this->createAssessor(
+            RemoteRequestType::createForMachineCreation(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = $this->createDispatcher($readinessAssessor);
 
-        $message = new CreateMachineMessage('api token', 'job id');
+        $message = new CreateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $dispatcher->redispatch($event);
@@ -179,11 +185,11 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->andReturn($readiness)
-        ;
+        $readinessAssessor = $this->createAssessor(
+            RemoteRequestType::createForMachineCreation(),
+            $job->getId(),
+            $readiness
+        );
 
         $dispatcher = $this->createDispatcher($readinessAssessor);
 
@@ -210,7 +216,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    private function createDispatcher(ReadinessAssessorInterface $readinessAssessor): CreateMachineMessageDispatcher
+    private function createDispatcher(FooReadinessAssessorInterface $readinessAssessor): CreateMachineMessageDispatcher
     {
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -249,5 +255,25 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $envelope = $envelopes[0];
         self::assertEquals(new CreateMachineMessage($authenticationToken, $jobId), $envelope->getMessage());
         self::assertEquals([], $envelope->all(NonDelayedStamp::class));
+    }
+
+    private function createAssessor(
+        RemoteRequestType $type,
+        string $jobId,
+        MessageHandlingReadiness $readiness,
+    ): FooReadinessAssessorInterface {
+        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
+                self::assertTrue($passedType->equals($type));
+                self::assertSame($passedJobId, $jobId);
+
+                return true;
+            })
+            ->andReturn($readiness)
+        ;
+
+        return $assessor;
     }
 }

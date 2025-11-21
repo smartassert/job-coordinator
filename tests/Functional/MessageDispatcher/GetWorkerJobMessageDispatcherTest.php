@@ -11,7 +11,8 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -77,12 +78,11 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $assessor = $this->createAssessor(
+            RemoteRequestType::createForWorkerJobRetrieval(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);
@@ -110,5 +110,25 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertEquals([new NonDelayedStamp()], $dispatchedEnvelope->all(NonDelayedStamp::class));
+    }
+
+    private function createAssessor(
+        RemoteRequestType $type,
+        string $jobId,
+        MessageHandlingReadiness $readiness,
+    ): FooReadinessAssessorInterface {
+        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
+                self::assertTrue($passedType->equals($type));
+                self::assertSame($passedJobId, $jobId);
+
+                return true;
+            })
+            ->andReturn($readiness)
+        ;
+
+        return $assessor;
     }
 }
