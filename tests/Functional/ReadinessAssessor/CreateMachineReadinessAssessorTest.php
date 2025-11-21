@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
+use App\Entity\RemoteRequest;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RequestState;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateMachineReadinessHandler;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -46,7 +49,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, MachineRepository, SerializedSuiteRepository, ResultsJobRepository): void $setup
+     * @param callable(JobInterface $job, array<mixed>): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -55,16 +58,15 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-
-        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
-        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
-
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-
-        $setup($job, $machineRepository, $serializedSuiteRepository, $resultsJobRepository);
+        $setup(
+            $job,
+            [
+                MachineRepository::class => self::getContainer()->get(MachineRepository::class),
+                SerializedSuiteRepository::class => self::getContainer()->get(SerializedSuiteRepository::class),
+                ResultsJobRepository::class => self::getContainer()->get(ResultsJobRepository::class),
+                RemoteRequestRepository::class => self::getContainer()->get(RemoteRequestRepository::class),
+            ]
+        );
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -76,7 +78,10 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
     {
         return [
             'machine already exists' => [
-                'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
+                'setup' => function (JobInterface $job, array $services): void {
+                    $machineRepository = $services[MachineRepository::class];
+                    \assert($machineRepository instanceof MachineRepository);
+
                     $machineRepository->save(
                         new Machine(
                             $job->getId(),
@@ -94,11 +99,10 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
             'serialized suite is not prepared' => [
-                'setup' => function (
-                    JobInterface $job,
-                    MachineRepository $machineRepository,
-                    SerializedSuiteRepository $serializedSuiteRepository
-                ): void {
+                'setup' => function (JobInterface $job, array $services): void {
+                    $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
+                    \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
@@ -107,12 +111,27 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
+            'serialized suite creation failed' => [
+                'setup' => function (JobInterface $job, array $services): void {
+                    $remoteRequest = new RemoteRequest(
+                        $job->getId(),
+                        RemoteRequestType::createForSerializedSuiteCreation()
+                    );
+
+                    $remoteRequest->setState(RequestState::FAILED);
+
+                    $remoteRequestRepository = $services[RemoteRequestRepository::class];
+                    \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+                    $remoteRequestRepository->save($remoteRequest);
+                },
+                'expected' => MessageHandlingReadiness::NEVER,
+            ],
             'results job does not exist' => [
-                'setup' => function (
-                    JobInterface $job,
-                    MachineRepository $machineRepository,
-                    SerializedSuiteRepository $serializedSuiteRepository
-                ): void {
+                'setup' => function (JobInterface $job, array $services): void {
+                    $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
+                    \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
@@ -122,12 +141,13 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
             'ready' => [
-                'setup' => function (
-                    JobInterface $job,
-                    MachineRepository $machineRepository,
-                    SerializedSuiteRepository $serializedSuiteRepository,
-                    ResultsJobRepository $resultsJobRepository
-                ): void {
+                'setup' => function (JobInterface $job, array $services): void {
+                    $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
+                    \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
+
+                    $resultsJobRepository = $services[ResultsJobRepository::class];
+                    \assert($resultsJobRepository instanceof ResultsJobRepository);
+
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
