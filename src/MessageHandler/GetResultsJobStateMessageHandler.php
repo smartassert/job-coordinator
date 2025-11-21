@@ -8,7 +8,7 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
     public function __construct(
         private ResultsClient $resultsClient,
         EventDispatcherInterface $eventDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
+        FooReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($eventDispatcher, $readinessAssessor);
     }

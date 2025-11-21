@@ -7,7 +7,7 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 
-readonly class ReadinessAssessor
+readonly class ReadinessAssessor implements FooReadinessAssessorInterface
 {
     /**
      * @var ReadinessAssessorInterface[]

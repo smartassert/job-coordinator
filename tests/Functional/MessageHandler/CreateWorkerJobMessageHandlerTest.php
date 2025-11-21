@@ -11,10 +11,11 @@ use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
@@ -44,18 +45,10 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
-        ;
-
         $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+        $assessor = $this->createAssessor($message, MessageHandlingReadiness::EVENTUALLY);
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
-
         $exception = null;
 
         try {
@@ -73,18 +66,10 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
-
         $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+        $assessor = $this->createAssessor($message, MessageHandlingReadiness::NEVER);
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
-
         $exception = null;
 
         try {
@@ -251,7 +236,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
-        ?ReadinessAssessorInterface $readinessAssessor = null,
+        ?FooReadinessAssessorInterface $readinessAssessor = null,
     ): CreateWorkerJobMessageHandler {
         $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
         \assert($serializedSuiteStore instanceof SerializedSuiteStore);
@@ -272,8 +257,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         if (null === $readinessAssessor) {
-            $readinessAssessor = self::getContainer()->get(CreateWorkerJobReadinessAssessor::class);
-            \assert($readinessAssessor instanceof CreateWorkerJobReadinessAssessor);
+            $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
+            \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
         }
 
         return new CreateWorkerJobMessageHandler(
@@ -291,5 +276,24 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         foreach ($this->messengerTransport->getSent() as $envelope) {
             self::assertFalse($envelope->getMessage() instanceof CreateWorkerJobMessage);
         }
+    }
+
+    private function createAssessor(
+        JobRemoteRequestMessageInterface $message,
+        MessageHandlingReadiness $readiness,
+    ): FooReadinessAssessorInterface {
+        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
+                self::assertTrue($type->equals($message->getRemoteRequestType()));
+                self::assertSame($passedJobId, $message->getJobId());
+
+                return true;
+            })
+            ->andReturn($readiness)
+        ;
+
+        return $assessor;
     }
 }

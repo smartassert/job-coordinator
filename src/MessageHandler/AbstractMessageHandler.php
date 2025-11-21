@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Enum\MessageHandlingReadiness;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\FooReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -16,7 +16,7 @@ abstract readonly class AbstractMessageHandler
 {
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
-        private ReadinessAssessorInterface $readinessAssessor,
+        private FooReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**
@@ -24,7 +24,7 @@ abstract readonly class AbstractMessageHandler
      */
     protected function assessReadiness(JobRemoteRequestMessageInterface $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        $readiness = $this->readinessAssessor->isReady($message->getRemoteRequestType(), $message->getJobId());
 
         if (MessageHandlingReadiness::NEVER === $readiness) {
             throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::NEVER);
