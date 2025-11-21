@@ -13,7 +13,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -132,8 +132,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             new ResultsJob($job->getId(), 'token', 'state', null)
         );
 
-        $assessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($assessor instanceof FooReadinessAssessorInterface);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $machine = MachineFactory::create(
             $job->getId(),
@@ -184,7 +184,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        FooReadinessAssessorInterface $assessor,
+        ReadinessAssessorInterface $assessor,
         WorkerManagerClient $workerManagerClient,
     ): CreateMachineMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);

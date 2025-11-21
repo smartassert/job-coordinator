@@ -10,7 +10,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
+use App\ReadinessAssessor\GetResultsJobReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
@@ -22,8 +22,8 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
 {
     public function testHandles(): void
     {
-        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof GetResultsJobReadinessAssessor);
+        $assessor = self::getContainer()->get(GetResultsJobReadinessHandler::class);
+        \assert($assessor instanceof GetResultsJobReadinessHandler);
 
         self::assertTrue($assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
 
@@ -60,7 +60,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
         $setup($job, $resultsJobRepository, $machineRepository);
         $jobPreparationInspector = $preparationStateFactoryCreator($job);
 
-        $assessor = new GetResultsJobReadinessAssessor(
+        $assessor = new GetResultsJobReadinessHandler(
             $resultsJobRepository,
             $jobPreparationInspector,
             $machineRepository

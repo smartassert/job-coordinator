@@ -16,7 +16,7 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -217,7 +217,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    private function createDispatcher(FooReadinessAssessorInterface $assessor): CreateMachineMessageDispatcher
+    private function createDispatcher(ReadinessAssessorInterface $assessor): CreateMachineMessageDispatcher
     {
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);

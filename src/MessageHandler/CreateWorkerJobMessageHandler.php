@@ -9,7 +9,7 @@ use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Services\SerializedSuiteStore;
 use App\Services\WorkerClientFactory;
@@ -26,7 +26,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         private SerializedSuiteClient $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($eventDispatcher, $readinessAssessor);
     }

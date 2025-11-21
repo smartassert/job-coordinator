@@ -9,7 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 use App\Repository\WorkerComponentStateRepository;
 
-readonly class GetWorkerJobReadinessAssessor implements ReadinessAssessorInterface
+readonly class GetWorkerJobReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
         private WorkerComponentStateRepository $workerComponentStateRepository,

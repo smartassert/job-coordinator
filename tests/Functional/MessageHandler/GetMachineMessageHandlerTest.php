@@ -14,7 +14,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
@@ -99,8 +99,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->hasEndState,
         ));
 
-        $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -185,8 +185,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->hasEndState,
         ));
 
-        $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -336,8 +336,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->hasEndState,
         ));
 
-        $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -448,7 +448,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         WorkerManagerClient $workerManagerClient,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ): GetMachineMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

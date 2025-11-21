@@ -9,7 +9,5 @@ use App\Model\RemoteRequestType;
 
 interface ReadinessAssessorInterface
 {
-    public function isReady(string $jobId): MessageHandlingReadiness;
-
-    public function handles(RemoteRequestType $type): bool;
+    public function isReady(RemoteRequestType $type, string $jobId): MessageHandlingReadiness;
 }

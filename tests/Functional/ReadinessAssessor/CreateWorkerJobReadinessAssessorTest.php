@@ -9,7 +9,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
+use App\ReadinessAssessor\CreateWorkerJobReadinessHandler;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -19,12 +19,12 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobReadinessAssessorTest extends WebTestCase
 {
-    private CreateWorkerJobReadinessAssessor $assessor;
+    private CreateWorkerJobReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateWorkerJobReadinessAssessor::class);
-        \assert($assessor instanceof CreateWorkerJobReadinessAssessor);
+        $assessor = self::getContainer()->get(CreateWorkerJobReadinessHandler::class);
+        \assert($assessor instanceof CreateWorkerJobReadinessHandler);
 
         $this->assessor = $assessor;
     }

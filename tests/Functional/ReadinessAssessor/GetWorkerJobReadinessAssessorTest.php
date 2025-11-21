@@ -9,7 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\GetWorkerJobReadinessAssessor;
+use App\ReadinessAssessor\GetWorkerJobReadinessHandler;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,12 +17,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetWorkerJobReadinessAssessorTest extends WebTestCase
 {
-    private GetWorkerJobReadinessAssessor $assessor;
+    private GetWorkerJobReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(GetWorkerJobReadinessAssessor::class);
-        \assert($assessor instanceof GetWorkerJobReadinessAssessor);
+        $assessor = self::getContainer()->get(GetWorkerJobReadinessHandler::class);
+        \assert($assessor instanceof GetWorkerJobReadinessHandler);
 
         $this->assessor = $assessor;
     }

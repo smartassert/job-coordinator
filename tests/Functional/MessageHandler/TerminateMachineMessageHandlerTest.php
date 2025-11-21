@@ -10,7 +10,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
@@ -150,7 +150,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         WorkerManagerClient $workerManagerClient,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ): TerminateMachineMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);

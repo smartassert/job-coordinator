@@ -6,7 +6,7 @@ namespace App\Tests\Services\Mock;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use PHPUnit\Framework\TestCase;
 
 class ReadinessAssessorFactory
@@ -15,8 +15,8 @@ class ReadinessAssessorFactory
         RemoteRequestType $type,
         string $jobId,
         MessageHandlingReadiness $readiness,
-    ): FooReadinessAssessorInterface {
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+    ): ReadinessAssessorInterface {
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {

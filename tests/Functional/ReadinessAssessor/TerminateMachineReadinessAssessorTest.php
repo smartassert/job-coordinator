@@ -9,7 +9,7 @@ use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\TerminateMachineReadinessAssessor;
+use App\ReadinessAssessor\TerminateMachineReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -18,12 +18,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TerminateMachineReadinessAssessorTest extends WebTestCase
 {
-    private TerminateMachineReadinessAssessor $assessor;
+    private TerminateMachineReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(TerminateMachineReadinessAssessor::class);
-        \assert($assessor instanceof TerminateMachineReadinessAssessor);
+        $assessor = self::getContainer()->get(TerminateMachineReadinessHandler::class);
+        \assert($assessor instanceof TerminateMachineReadinessHandler);
 
         $this->assessor = $assessor;
     }

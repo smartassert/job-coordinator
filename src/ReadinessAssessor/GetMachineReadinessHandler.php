@@ -6,22 +6,27 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
-use App\Repository\SerializedSuiteRepository;
+use App\Repository\MachineRepository;
 
-readonly class CreateSerializedSuiteReadinessAssessor implements ReadinessAssessorInterface
+readonly class GetMachineReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
-        private SerializedSuiteRepository $serializedSuiteRepository,
+        private MachineRepository $machineRepository,
     ) {}
 
     public function handles(RemoteRequestType $type): bool
     {
-        return RemoteRequestType::createForSerializedSuiteCreation()->equals($type);
+        return RemoteRequestType::createForMachineRetrieval()->equals($type);
     }
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
-        if ($this->serializedSuiteRepository->has($jobId)) {
+        $machine = $this->machineRepository->find($jobId);
+        if (null === $machine) {
+            return MessageHandlingReadiness::NEVER;
+        }
+
+        if ($machine->hasEndState()) {
             return MessageHandlingReadiness::NEVER;
         }
 

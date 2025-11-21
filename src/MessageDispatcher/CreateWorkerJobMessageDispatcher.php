@@ -9,7 +9,7 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -18,7 +18,7 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
     public function __construct(
         JobRemoteRequestMessageDispatcher $messageDispatcher,
         private JobStore $jobStore,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($messageDispatcher, $readinessAssessor);
     }

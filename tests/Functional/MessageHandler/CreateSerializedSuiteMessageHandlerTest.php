@@ -12,7 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -42,8 +42,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
@@ -98,8 +98,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
@@ -148,7 +148,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {

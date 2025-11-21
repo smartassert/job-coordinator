@@ -31,8 +31,8 @@ services:
             tags: ['app.remote_request_failure_factory.exception_handler']
         App\Services\JobComponentHandler\JobComponentHandlerInterface:
             tags: ['app.job_component_handler.component_handler']
-        App\ReadinessAssessor\ReadinessAssessorInterface:
-            tags: ['app.readiness_assessor.assessor']
+        App\ReadinessAssessor\ReadinessHandlerInterface:
+            tags: ['app.readiness_assessor.handler']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -119,7 +119,7 @@ services:
 
     SmartAssert\ServiceRequest\Parameter\Validator\PositiveIntegerParameterValidator: ~
 
-    App\ReadinessAssessor\FooReadinessAssessorInterface:
+    App\ReadinessAssessor\ReadinessAssessorInterface:
         class: App\ReadinessAssessor\ReadinessAssessor
         arguments:
-            $assessors: !tagged_iterator 'app.readiness_assessor.assessor'
+            $assessors: !tagged_iterator 'app.readiness_assessor.handler'

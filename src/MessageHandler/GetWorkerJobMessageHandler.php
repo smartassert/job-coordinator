@@ -8,7 +8,7 @@ use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
     public function __construct(
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($eventDispatcher, $readinessAssessor);
     }

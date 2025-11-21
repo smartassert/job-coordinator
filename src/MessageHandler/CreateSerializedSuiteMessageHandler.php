@@ -8,7 +8,7 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
     public function __construct(
         private SerializedSuiteClient $serializedSuiteClient,
         EventDispatcherInterface $eventDispatcher,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($eventDispatcher, $readinessAssessor);
     }

@@ -13,7 +13,7 @@ use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
 use App\Tests\Services\Factory\JobFactory;
@@ -30,7 +30,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteId = (string) new Ulid();
         $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
 
-        $assessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
@@ -98,8 +98,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $assessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($assessor instanceof FooReadinessAssessorInterface);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $handler = new GetSerializedSuiteMessageHandler($serializedSuiteClient, $eventDispatcher, $assessor);
         $message = new GetSerializedSuiteMessage(

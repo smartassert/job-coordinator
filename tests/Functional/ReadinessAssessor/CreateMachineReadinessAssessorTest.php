@@ -10,7 +10,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\CreateMachineReadinessAssessor;
+use App\ReadinessAssessor\CreateMachineReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -21,12 +21,12 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateMachineReadinessAssessorTest extends WebTestCase
 {
-    private CreateMachineReadinessAssessor $assessor;
+    private CreateMachineReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
-        \assert($assessor instanceof CreateMachineReadinessAssessor);
+        $assessor = self::getContainer()->get(CreateMachineReadinessHandler::class);
+        \assert($assessor instanceof CreateMachineReadinessHandler);
 
         $this->assessor = $assessor;
     }

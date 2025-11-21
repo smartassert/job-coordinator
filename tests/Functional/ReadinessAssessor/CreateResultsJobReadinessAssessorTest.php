@@ -8,7 +8,7 @@ use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\CreateResultsJobReadinessHandler;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -16,12 +16,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CreateResultsJobReadinessAssessorTest extends WebTestCase
 {
-    private CreateResultsJobReadinessAssessor $assessor;
+    private CreateResultsJobReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof CreateResultsJobReadinessAssessor);
+        $assessor = self::getContainer()->get(CreateResultsJobReadinessHandler::class);
+        \assert($assessor instanceof CreateResultsJobReadinessHandler);
 
         $this->assessor = $assessor;
     }

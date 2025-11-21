@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorInterface
+readonly class CreateSerializedSuiteReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
@@ -16,13 +16,12 @@ readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorI
 
     public function handles(RemoteRequestType $type): bool
     {
-        return RemoteRequestType::createForSerializedSuiteRetrieval()->equals($type);
+        return RemoteRequestType::createForSerializedSuiteCreation()->equals($type);
     }
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $serializedSuite = $this->serializedSuiteRepository->find($jobId);
-        if (null === $serializedSuite || $serializedSuite->hasEndState()) {
+        if ($this->serializedSuiteRepository->has($jobId)) {
             return MessageHandlingReadiness::NEVER;
         }
 

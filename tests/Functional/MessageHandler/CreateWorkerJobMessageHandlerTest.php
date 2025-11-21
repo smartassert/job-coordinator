@@ -13,7 +13,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
@@ -243,7 +243,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         ?SerializedSuiteClient $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
-        ?FooReadinessAssessorInterface $readinessAssessor = null,
+        ?ReadinessAssessorInterface $readinessAssessor = null,
     ): CreateWorkerJobMessageHandler {
         $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
         \assert($serializedSuiteStore instanceof SerializedSuiteStore);
@@ -264,8 +264,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         if (null === $readinessAssessor) {
-            $readinessAssessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-            \assert($readinessAssessor instanceof FooReadinessAssessorInterface);
+            $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+            \assert($readinessAssessor instanceof ReadinessAssessorInterface);
         }
 
         return new CreateWorkerJobMessageHandler(

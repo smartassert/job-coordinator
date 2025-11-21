@@ -11,7 +11,7 @@ use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
@@ -102,7 +102,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(FooReadinessAssessorInterface::class);
+        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,

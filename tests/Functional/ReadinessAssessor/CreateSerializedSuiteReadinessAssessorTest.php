@@ -8,7 +8,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor;
+use App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,12 +17,12 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
 {
-    private CreateSerializedSuiteReadinessAssessor $assessor;
+    private CreateSerializedSuiteReadinessHandler $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateSerializedSuiteReadinessAssessor::class);
-        \assert($assessor instanceof CreateSerializedSuiteReadinessAssessor);
+        $assessor = self::getContainer()->get(CreateSerializedSuiteReadinessHandler::class);
+        \assert($assessor instanceof CreateSerializedSuiteReadinessHandler);
 
         $this->assessor = $assessor;
     }

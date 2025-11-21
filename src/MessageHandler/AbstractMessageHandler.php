@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Enum\MessageHandlingReadiness;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -16,7 +16,7 @@ abstract readonly class AbstractMessageHandler
 {
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
-        private FooReadinessAssessorInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**

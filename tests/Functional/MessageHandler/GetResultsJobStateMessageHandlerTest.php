@@ -11,7 +11,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -101,8 +101,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             ])),
         ]);
 
-        $assessor = self::getContainer()->get(FooReadinessAssessorInterface::class);
-        \assert($assessor instanceof FooReadinessAssessorInterface);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler($assessor, $resultsClient);
 
@@ -132,7 +132,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     private function createHandler(
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);

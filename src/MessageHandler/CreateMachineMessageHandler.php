@@ -8,7 +8,7 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -19,7 +19,7 @@ final readonly class CreateMachineMessageHandler extends AbstractMessageHandler
     public function __construct(
         private WorkerManagerClient $workerManagerClient,
         EventDispatcherInterface $eventDispatcher,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ) {
         parent::__construct($eventDispatcher, $readinessAssessor);
     }

@@ -12,7 +12,7 @@ use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
-use App\ReadinessAssessor\FooReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
@@ -154,7 +154,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         WorkerClientFactory $workerClientFactory,
-        FooReadinessAssessorInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ): GetWorkerJobMessageHandler {
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);

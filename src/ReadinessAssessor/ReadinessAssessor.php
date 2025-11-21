@@ -7,10 +7,10 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 
-readonly class ReadinessAssessor implements FooReadinessAssessorInterface
+readonly class ReadinessAssessor implements ReadinessAssessorInterface
 {
     /**
-     * @var ReadinessAssessorInterface[]
+     * @var ReadinessHandlerInterface[]
      */
     private array $assessors;
 
@@ -22,7 +22,7 @@ readonly class ReadinessAssessor implements FooReadinessAssessorInterface
         $filteredAssessors = [];
 
         foreach ($assessors as $assessor) {
-            if ($assessor instanceof ReadinessAssessorInterface) {
+            if ($assessor instanceof ReadinessHandlerInterface) {
                 $filteredAssessors[] = $assessor;
             }
         }
