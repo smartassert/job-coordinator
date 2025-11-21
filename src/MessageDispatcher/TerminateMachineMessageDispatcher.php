@@ -26,14 +26,12 @@ readonly class TerminateMachineMessageDispatcher extends BaseMessageDispatcher i
 
     public function dispatchImmediately(ResultsJobStateRetrievedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new TerminateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(new TerminateMachineMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-        ));
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 
     protected function handles(JobRemoteRequestMessageInterface $message): bool

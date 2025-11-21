@@ -6,17 +6,23 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
+use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
 
-readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterface
+readonly class GetResultsJobReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
         private PreparationStateFactory $preparationStateFactory,
         private MachineRepository $machineRepository,
     ) {}
+
+    public function handles(RemoteRequestType $type): bool
+    {
+        return RemoteRequestType::createForResultsJobRetrieval()->equals($type);
+    }
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

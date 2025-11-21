@@ -14,6 +14,7 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -24,20 +25,17 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
-        ;
+        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::EVENTUALLY
+        );
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
 
         $handler = $this->createHandler($workerManagerClient, $assessor);
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
-
         $exception = null;
 
         try {
@@ -55,20 +53,17 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
 
         $handler = $this->createHandler($workerManagerClient, $assessor);
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
-
         $exception = null;
 
         try {
@@ -86,21 +81,16 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $workerManagerException = new \Exception('Failed to terminate machine');
-
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
-
         $handler = $this->createHandler($workerManagerClient, $assessor);
-
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
 
         try {
             $handler($message);
@@ -115,12 +105,12 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $machine = MachineFactory::create(
             $jobId,
@@ -139,7 +129,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($workerManagerClient, $assessor);
 
-        $handler(new TerminateMachineMessage(self::$apiToken, $jobId));
+        $handler($message);
 
         $events = $this->eventRecorder->all(MachineTerminationRequestedEvent::class);
         $event = $events[0] ?? null;

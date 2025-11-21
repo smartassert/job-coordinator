@@ -8,7 +8,8 @@ use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\CreateWorkerJobReadinessHandler;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -18,6 +19,30 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobReadinessAssessorTest extends WebTestCase
 {
+    private CreateWorkerJobReadinessHandler $assessor;
+
+    protected function setUp(): void
+    {
+        $assessor = self::getContainer()->get(CreateWorkerJobReadinessHandler::class);
+        \assert($assessor instanceof CreateWorkerJobReadinessHandler);
+
+        $this->assessor = $assessor;
+    }
+
+    public function testHandles(): void
+    {
+        self::assertTrue($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
+
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
+    }
+
     /**
      * @param callable(JobInterface, SerializedSuiteRepository, ResultsJobRepository): void $setup
      */
@@ -36,10 +61,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $serializedSuiteRepository, $resultsJobRepository);
 
-        $assessor = self::getContainer()->get(CreateWorkerJobReadinessAssessor::class);
-        \assert($assessor instanceof CreateWorkerJobReadinessAssessor);
-
-        self::assertSame($expected, $assessor->isReady($job->getId()));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

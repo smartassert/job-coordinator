@@ -8,7 +8,8 @@ use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\TerminateMachineReadinessAssessor;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\TerminateMachineReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -17,6 +18,30 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TerminateMachineReadinessAssessorTest extends WebTestCase
 {
+    private TerminateMachineReadinessHandler $assessor;
+
+    protected function setUp(): void
+    {
+        $assessor = self::getContainer()->get(TerminateMachineReadinessHandler::class);
+        \assert($assessor instanceof TerminateMachineReadinessHandler);
+
+        $this->assessor = $assessor;
+    }
+
+    public function testHandles(): void
+    {
+        self::assertTrue($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
+
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
+        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
+    }
+
     /**
      * @param callable(JobInterface, MachineRepository, ResultsJobRepository): void $setup
      */
@@ -35,10 +60,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository, $resultsJobRepository);
 
-        $assessor = self::getContainer()->get(TerminateMachineReadinessAssessor::class);
-        \assert($assessor instanceof TerminateMachineReadinessAssessor);
-
-        self::assertSame($expected, $assessor->isReady($job->getId()));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

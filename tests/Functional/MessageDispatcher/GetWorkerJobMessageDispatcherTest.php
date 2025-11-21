@@ -11,8 +11,9 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -77,12 +78,11 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $assessor = ReadinessAssessorFactory::create(
+            RemoteRequestType::createForWorkerJobRetrieval(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);

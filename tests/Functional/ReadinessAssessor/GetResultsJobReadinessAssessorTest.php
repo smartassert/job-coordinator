@@ -9,7 +9,8 @@ use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
+use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\GetResultsJobReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
@@ -19,6 +20,23 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetResultsJobReadinessAssessorTest extends WebTestCase
 {
+    public function testHandles(): void
+    {
+        $assessor = self::getContainer()->get(GetResultsJobReadinessHandler::class);
+        \assert($assessor instanceof GetResultsJobReadinessHandler);
+
+        self::assertTrue($assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
+
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForResultsJobCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
+        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineTermination()));
+    }
+
     /**
      * @param callable(JobInterface, ResultsJobRepository, MachineRepository): void $setup
      * @param callable(JobInterface): PreparationStateFactory                       $preparationStateFactoryCreator
@@ -42,10 +60,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
         $setup($job, $resultsJobRepository, $machineRepository);
         $jobPreparationInspector = $preparationStateFactoryCreator($job);
 
-        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof GetResultsJobReadinessAssessor);
-
-        $assessor = new GetResultsJobReadinessAssessor(
+        $assessor = new GetResultsJobReadinessHandler(
             $resultsJobRepository,
             $jobPreparationInspector,
             $machineRepository

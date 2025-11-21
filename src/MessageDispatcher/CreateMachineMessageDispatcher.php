@@ -34,13 +34,12 @@ readonly class CreateMachineMessageDispatcher extends BaseMessageDispatcher impl
 
     public function dispatchImmediately(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId())
-        );
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 
     protected function handles(JobRemoteRequestMessageInterface $message): bool

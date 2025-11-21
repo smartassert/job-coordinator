@@ -11,11 +11,11 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
-use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
@@ -29,21 +29,17 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $resultsClientException = new \Exception('Failed to create results job');
-
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
 
         $handler = $this->createHandler($resultsClient, $assessor);
-
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
 
         try {
             $handler($message);
@@ -63,8 +59,8 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $assessor = self::getContainer()->get(CreateResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof CreateResultsJobReadinessAssessor);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $resultsJobModel = new ResultsJobModel(
             $job->getId(),
@@ -112,19 +108,15 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $resultsClient = HttpMockedResultsClientFactory::create();
-
         $handler = $this->createHandler($resultsClient, $assessor);
-
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
-
         $exception = null;
 
         try {

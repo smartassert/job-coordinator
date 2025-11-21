@@ -41,18 +41,22 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
     public function dispatchImmediately(MachineIsActiveEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
-        if (null === $job || $this->isNeverReady($event->getJobId())) {
+        if (null === $job) {
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp(
-            new CreateWorkerJobMessage(
-                $event->getAuthenticationToken(),
-                $event->getJobId(),
-                $job->getMaximumDurationInSeconds(),
-                $event->ipAddress
-            )
+        $message = new CreateWorkerJobMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $job->getMaximumDurationInSeconds(),
+            $event->ipAddress
         );
+
+        if ($this->isNeverReady($message)) {
+            return;
+        }
+
+        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 
     protected function handles(JobRemoteRequestMessageInterface $message): bool

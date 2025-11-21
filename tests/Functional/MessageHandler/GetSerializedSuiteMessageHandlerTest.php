@@ -12,7 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
+use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteStore;
@@ -28,24 +28,28 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobId = (string) new Ulid();
         $suiteId = (string) new Ulid();
         $serializedSuiteId = (string) new Ulid();
-
-        $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
+        $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
+                self::assertTrue($type->equals($message->getRemoteRequestType()));
+                self::assertSame($passedJobId, $message->getJobId());
+
+                return true;
+            })
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
+
+        $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         $handler = new GetSerializedSuiteMessageHandler(
             \Mockery::mock(SerializedSuiteClient::class),
             $eventDispatcher,
             $assessor,
         );
-
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
 
         $exception = null;
 
@@ -94,8 +98,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $assessor = self::getContainer()->get(GetSerializedSuiteReadinessAssessor::class);
-        \assert($assessor instanceof GetSerializedSuiteReadinessAssessor);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $handler = new GetSerializedSuiteMessageHandler($serializedSuiteClient, $eventDispatcher, $assessor);
         $message = new GetSerializedSuiteMessage(

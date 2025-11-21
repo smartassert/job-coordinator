@@ -11,17 +11,16 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Uid\Ulid;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -29,23 +28,17 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($jobId)
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
-
-        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
-        \assert($workerManagerClient instanceof WorkerManagerClient);
+        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $resultsClient = self::getContainer()->get(ResultsClient::class);
         \assert($resultsClient instanceof ResultsClient);
 
         $handler = $this->createHandler($assessor, $resultsClient);
-        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
-
         $exception = null;
 
         try {
@@ -62,27 +55,18 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     public function testInvokeResultsClientThrowsException(): void
     {
-        $jobFactory = self::getContainer()->get(JobFactory::class);
-        \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
-
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobFactory->create($job);
+        $jobId = (string) new Ulid();
+        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $assessor = ReadinessAssessorFactory::create(
+            $message->getRemoteRequestType(),
+            $message->getJobId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $assessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
-
         $resultsClient = HttpMockedResultsClientFactory::create([$resultsClientException]);
-
         $handler = $this->createHandler($assessor, $resultsClient);
-        $message = new GetResultsJobStateMessage(self::$apiToken, $job->getId());
 
         try {
             $handler($message);
@@ -117,8 +101,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             ])),
         ]);
 
-        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
-        \assert($assessor instanceof GetResultsJobReadinessAssessor);
+        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        \assert($assessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler($assessor, $resultsClient);
 

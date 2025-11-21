@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Model\RemoteRequestType;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorInterface
+readonly class GetSerializedSuiteReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
     ) {}
+
+    public function handles(RemoteRequestType $type): bool
+    {
+        return RemoteRequestType::createForSerializedSuiteRetrieval()->equals($type);
+    }
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {

@@ -9,11 +9,13 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Model\RemoteRequestType;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 {
@@ -73,18 +75,20 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNotReady(): void
     {
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $jobId = (string) new Ulid();
+
+        $assessor = ReadinessAssessorFactory::create(
+            RemoteRequestType::createForSerializedSuiteCreation(),
+            $jobId,
+            MessageHandlingReadiness::NEVER
+        );
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $dispatcher = new CreateSerializedSuiteMessageDispatcher($messageDispatcher, $readinessAssessor);
+        $dispatcher = new CreateSerializedSuiteMessageDispatcher($messageDispatcher, $assessor);
 
-        $event = new JobCreatedEvent('api token', 'job id', 'suite id', []);
+        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
 
         $dispatcher->dispatchImmediately($event);
 

@@ -46,17 +46,16 @@ readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher imp
      */
     private function doDispatch(AuthenticatingEvent&JobEvent&MachineEvent $event, array $stamps = []): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new GetMachineMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $event->getMachine()
+        );
+
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatch(
-            new GetMachineMessage(
-                $event->getAuthenticationToken(),
-                $event->getJobId(),
-                $event->getMachine()
-            ),
-            $stamps
-        );
+        $this->messageDispatcher->dispatch($message, $stamps);
     }
 }

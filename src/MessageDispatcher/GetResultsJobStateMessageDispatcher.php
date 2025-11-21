@@ -28,12 +28,11 @@ readonly class GetResultsJobStateMessageDispatcher extends AbstractMessageDispat
 
     public function dispatch(ResultsJobCreatedEvent|ResultsJobStateRetrievedEvent $event): void
     {
-        if ($this->isNeverReady($event->getJobId())) {
+        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
+        if ($this->isNeverReady($message)) {
             return;
         }
 
-        $this->messageDispatcher->dispatch(
-            new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId())
-        );
+        $this->messageDispatcher->dispatch($message);
     }
 }

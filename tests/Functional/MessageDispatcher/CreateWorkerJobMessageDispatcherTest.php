@@ -10,10 +10,12 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -55,17 +57,16 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+        $assessor = ReadinessAssessorFactory::create(
+            RemoteRequestType::createForWorkerJobCreation(),
+            $job->getId(),
+            MessageHandlingReadiness::NEVER
+        );
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $jobStore,
-            $readinessAssessor,
+            $assessor,
         );
 
         $event = new MachineIsActiveEvent(
@@ -144,17 +145,16 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
-        $readinessAssessor
-            ->shouldReceive('isReady')
-            ->with($job->getId())
-            ->andReturn(MessageHandlingReadiness::NOW)
-        ;
+        $assessor = ReadinessAssessorFactory::create(
+            RemoteRequestType::createForWorkerJobCreation(),
+            $job->getId(),
+            MessageHandlingReadiness::NOW
+        );
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $jobStore,
-            $readinessAssessor,
+            $assessor,
         );
 
         $machineIpAddress = '127.0.0.1';
