@@ -20,16 +20,16 @@
         "smartassert/worker-client": "^5",
         "smartassert/worker-manager-client": "^11",
         "smartassert/worker-message-failed-event-bundle": "^3.0",
-        "symfony/console": "7.3.*",
+        "symfony/console": "8.0.*",
         "symfony/doctrine-messenger": "7.3.*",
-        "symfony/dotenv": "7.3.*",
+        "symfony/dotenv": "8.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.3.*",
         "symfony/messenger": "7.3.*",
-        "symfony/monolog-bundle": "^3.8",
-        "symfony/runtime": "7.3.*",
-        "symfony/security-bundle": "7.3.*",
-        "symfony/uid": "7.3.*",
+        "symfony/monolog-bundle": "^4.0",
+        "symfony/runtime": "8.0.*",
+        "symfony/security-bundle": "8.0.*",
+        "symfony/uid": "8.0.*",
         "symfony/yaml": "7.3.*"
     },
     "require-dev": {
@@ -47,7 +47,7 @@
         "smartassert/test-sources-client": "^0.5.0",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/maker-bundle": "^1.40",
-        "symfony/phpunit-bridge": "7.3.*"
+        "symfony/phpunit-bridge": "8.0.*"
     },
     "config": {
         "allow-plugins": {
