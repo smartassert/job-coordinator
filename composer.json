@@ -11,26 +11,26 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^3.1",
         "guzzlehttp/guzzle": "^7.5",
-        "smartassert/health-check-bundle": "8.1",
+        "smartassert/health-check-bundle": "8.2",
         "smartassert/results-client": "^9",
         "smartassert/service-client": "^8",
         "smartassert/service-request": "^1.5",
         "smartassert/sources-client": "^13",
-        "smartassert/users-security-bundle": "^11.0",
+        "smartassert/users-security-bundle": "^12.0",
         "smartassert/worker-client": "^5",
         "smartassert/worker-manager-client": "^11",
-        "smartassert/worker-message-failed-event-bundle": "^3.0",
-        "symfony/console": "7.4.*",
-        "symfony/doctrine-messenger": "7.4.*",
-        "symfony/dotenv": "7.4.*",
+        "smartassert/worker-message-failed-event-bundle": "^4",
+        "symfony/console": "8.0.*",
+        "symfony/doctrine-messenger": "8.0.*",
+        "symfony/dotenv": "8.0.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "7.4.*",
-        "symfony/messenger": "7.4.*",
-        "symfony/monolog-bundle": "^3.8",
-        "symfony/runtime": "7.4.*",
-        "symfony/security-bundle": "7.4.*",
-        "symfony/uid": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/framework-bundle": "8.0.*",
+        "symfony/messenger": "8.0.*",
+        "symfony/monolog-bundle": "^4",
+        "symfony/runtime": "8.0.*",
+        "symfony/security-bundle": "8.0.*",
+        "symfony/uid": "8.0.*",
+        "symfony/yaml": "8.0.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.89",
@@ -42,12 +42,12 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^12",
-        "smartassert/symfony-test-client": "^2.0",
-        "smartassert/test-authenticaton-provider-bundle": "^5.0",
+        "smartassert/symfony-test-client": "^3",
+        "smartassert/test-authenticaton-provider-bundle": "^6",
         "smartassert/test-sources-client": "^0.5.0",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/maker-bundle": "^1.40",
-        "symfony/phpunit-bridge": "7.4.*"
+        "symfony/phpunit-bridge": "8.0.*"
     },
     "config": {
         "allow-plugins": {
@@ -213,7 +213,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "8.0.*"
         }
     }
 }
