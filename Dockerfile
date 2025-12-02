@@ -67,4 +67,4 @@ RUN mkdir -p /app/var/log \
   && rm composer.lock \
   && php bin/console cache:clear
 
-CMD supervisord -c /etc/supervisor/supervisord.conf
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
