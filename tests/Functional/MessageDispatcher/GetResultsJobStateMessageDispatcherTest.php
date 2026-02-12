@@ -18,6 +18,7 @@ use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -142,7 +143,11 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
                     return new ResultsJobCreatedEvent(
                         $authenticationToken,
                         $job->getId(),
-                        new ResultsJob($job->getId(), 'token', new ResultsJobState('awaiting-events', null))
+                        new ResultsJob(
+                            $job->getId(),
+                            'token',
+                            new ResultsJobState('awaiting-events', null, new ResultsClientMetaState(false, false))
+                        )
                     );
                 },
             ],
@@ -153,7 +158,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         $authenticationToken,
                         $job->getId(),
-                        new ResultsJobState('awaiting-events', null)
+                        new ResultsJobState('awaiting-events', null, new ResultsClientMetaState(false, false))
                     );
                 },
             ],

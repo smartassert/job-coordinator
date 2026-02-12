@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\ReadinessAssessor;
 
-use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateResultsJobReadinessHandler;
-use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -41,7 +40,7 @@ class CreateResultsJobReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, ResultsJobRepository): void $setup
+     * @param callable(JobInterface, ResultsJobFactory): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -50,10 +49,10 @@ class CreateResultsJobReadinessAssessorTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $setup($job, $resultsJobRepository);
+        $setup($job, $resultsJobFactory);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -65,10 +64,8 @@ class CreateResultsJobReadinessAssessorTest extends WebTestCase
     {
         return [
             'results job already exists' => [
-                'setup' => function (JobInterface $job, ResultsJobRepository $resultsJobRepository): void {
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'state', null)
-                    );
+                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
+                    $resultsJobFactory->create($job);
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],

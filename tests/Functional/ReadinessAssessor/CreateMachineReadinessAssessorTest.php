@@ -6,7 +6,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
 use App\Entity\RemoteRequest;
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
@@ -18,6 +17,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -145,18 +145,15 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
                     \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-                    $resultsJobRepository = $services[ResultsJobRepository::class];
-                    \assert($resultsJobRepository instanceof ResultsJobRepository);
-
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
                     );
 
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'compiling', null)
-                    );
+                    $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+                    \assert($resultsJobFactory instanceof ResultsJobFactory);
+                    $resultsJobFactory->create(job: $job, state: 'compiling');
                 },
                 'expected' => MessageHandlingReadiness::NOW,
             ],

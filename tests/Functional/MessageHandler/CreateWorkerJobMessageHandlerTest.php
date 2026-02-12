@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
@@ -19,6 +18,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
@@ -214,11 +214,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createResultsJob(JobInterface $job): void
     {
-        $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), md5((string) rand()), md5((string) rand()));
-
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-        $resultsJobRepository->save($resultsJob);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJobFactory->create($job);
     }
 
     /**

@@ -14,12 +14,12 @@ use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
@@ -75,7 +75,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $jobId,
-            new ResultsJobState('complete', 'ended')
+            new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
         );
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
@@ -124,7 +124,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJob = $resultsJobFactory->create($job);
+        $resultsJobFactory->create(job: $job, endState: 'end-state');
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -138,16 +138,10 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
             )
         );
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-
-        $resultsJob->setEndState('end-state');
-        $resultsJobRepository->save($resultsJob);
-
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $job->getId(),
-            new ResultsJobState('complete', 'ended')
+            new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
         );
 
         $this->dispatcher->dispatchImmediately($event);

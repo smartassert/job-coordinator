@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
@@ -15,11 +14,11 @@ use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -125,12 +124,9 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
         );
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-
-        $resultsJobRepository->save(
-            new ResultsJob($job->getId(), 'token', 'state', null)
-        );
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJobFactory->create($job);
 
         $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
         \assert($assessor instanceof ReadinessAssessorInterface);

@@ -11,6 +11,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
@@ -21,6 +22,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
+use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -65,7 +67,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsJobModel = new ResultsJobModel(
             $job->getId(),
             md5((string) rand()),
-            new JobState('awaiting-events', null)
+            new JobState('awaiting-events', null, new ResultsClientMetaState(false, false))
         );
 
         $resultsClient = HttpMockedResultsClientFactory::create([
@@ -93,7 +95,11 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 $resultsJobModel->label,
                 $resultsJobModel->token,
                 $resultsJobModel->state->state,
-                $resultsJobModel->state->endState
+                $resultsJobModel->state->endState,
+                new MetaState(
+                    $resultsJobModel->state->metaState->ended,
+                    $resultsJobModel->state->metaState->succeeded,
+                ),
             ),
             $resultsJob
         );
