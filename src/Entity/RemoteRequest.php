@@ -26,7 +26,7 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     #[ORM\Column(type: 'string', length: 32, nullable: false)]
     private readonly string $jobId;
 
-    #[ORM\Column(nullable: false)]
+    #[ORM\Column(nullable: false, length: 64)]
     private readonly string $type;
 
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RequestState::class)]
