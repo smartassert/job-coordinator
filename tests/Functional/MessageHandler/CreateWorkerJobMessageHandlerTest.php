@@ -96,7 +96,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
         $jobId = $job->getId();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -136,7 +136,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
         $jobId = $job->getId();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
@@ -226,16 +226,13 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createSerializedSuite(
         JobInterface $job,
         string $state,
-        bool $isPrepared,
-        bool $hasEndState,
+        MetaState $metaState,
     ): SerializedSuite {
         $serializedSuite = new SerializedSuite(
             $job->getId(),
             md5((string) rand()),
             $state,
-            $isPrepared,
-            $hasEndState,
-            new MetaState($hasEndState, $isPrepared),
+            $metaState,
         );
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);

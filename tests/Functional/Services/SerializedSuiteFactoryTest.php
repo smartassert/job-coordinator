@@ -127,8 +127,6 @@ class SerializedSuiteFactoryTest extends WebTestCase
                 $job->getId(),
                 $serializedSuiteId,
                 $serializedSuiteState,
-                false,
-                false,
                 new MetaState(false, false),
             ),
             $serializedSuiteEntity

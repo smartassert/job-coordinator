@@ -76,8 +76,6 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $job->getId(),
             md5((string) rand()),
             'requested',
-            false,
-            false,
             new MetaState(false, false),
         );
         $serializedSuiteRepository->save($serializedSuite);

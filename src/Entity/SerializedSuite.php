@@ -28,12 +28,6 @@ class SerializedSuite implements \JsonSerializable
     #[ORM\Column(length: 128, nullable: false)]
     private string $state;
 
-    #[ORM\Column(nullable: false)]
-    private bool $isPrepared;
-
-    #[ORM\Column(nullable: false)]
-    private bool $hasEndState;
-
     #[ORM\Column]
     private bool $stateIsEnded;
 
@@ -49,15 +43,11 @@ class SerializedSuite implements \JsonSerializable
         string $jobId,
         string $serializedSuiteId,
         string $state,
-        bool $isPrepared,
-        bool $hasEndState,
         MetaState $metaState,
     ) {
         $this->jobId = $jobId;
         $this->id = $serializedSuiteId;
         $this->state = $state;
-        $this->isPrepared = $isPrepared;
-        $this->hasEndState = $hasEndState;
         $this->stateIsEnded = $metaState->ended;
         $this->stateIsSucceeded = $metaState->succeeded;
     }
@@ -77,38 +67,24 @@ class SerializedSuite implements \JsonSerializable
         return $this;
     }
 
-    public function setIsPrepared(bool $isPrepared): static
-    {
-        $this->isPrepared = $isPrepared;
-
-        return $this;
-    }
-
     public function isPrepared(): bool
     {
-        return $this->isPrepared;
-    }
-
-    public function setHasEndState(bool $hasEndState): static
-    {
-        $this->hasEndState = $hasEndState;
-
-        return $this;
+        return $this->stateIsEnded && $this->stateIsSucceeded;
     }
 
     public function hasEndState(): bool
     {
-        return $this->hasEndState;
+        return $this->stateIsEnded;
     }
 
     public function isPreparing(): bool
     {
-        return false === $this->isPrepared && false === $this->hasFailed();
+        return false === $this->isPrepared() && false === $this->hasFailed();
     }
 
     public function hasFailed(): bool
     {
-        return true === $this->hasEndState && false === $this->isPrepared;
+        return true === $this->hasEndState() && false === $this->isPrepared();
     }
 
     /**
@@ -122,8 +98,8 @@ class SerializedSuite implements \JsonSerializable
 
         return [
             'state' => $this->state,
-            'is_prepared' => $this->isPrepared,
-            'has_end_state' => $this->hasEndState,
+            'is_prepared' => $this->isPrepared(),
+            'has_end_state' => $this->hasEndState(),
         ];
     }
 

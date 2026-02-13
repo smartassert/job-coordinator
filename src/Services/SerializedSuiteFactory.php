@@ -42,8 +42,6 @@ class SerializedSuiteFactory implements EventSubscriberInterface
                     $job->getId(),
                     $event->serializedSuite->getId(),
                     $event->serializedSuite->getState(),
-                    $event->serializedSuite->isPrepared(),
-                    $event->serializedSuite->hasEndState(),
                     new MetaState(
                         $event->serializedSuite->getMetaState()->ended,
                         $event->serializedSuite->getMetaState()->succeeded,

@@ -37,8 +37,6 @@ class SerializedSuiteRepositoryTest extends WebTestCase
             $jobId,
             $serializedSuiteId,
             'preparing',
-            false,
-            false,
             new MetaState(false, false),
         );
         $this->serializedSuiteRepository->save($serializedSuite);

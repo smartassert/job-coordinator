@@ -509,8 +509,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         'prepared',
-                        true,
-                        true,
                         new MetaState(true, true)
                     );
                     $serializedSuiteRepository->save($serializedSuite);
@@ -909,8 +907,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         'prepared',
-                        true,
-                        true,
                         new MetaState(true, true),
                     );
                     $serializedSuiteRepository->save($serializedSuite);

@@ -73,8 +73,6 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             (string) new Ulid(),
                             'state',
-                            false,
-                            false,
                             new MetaState(false, false),
                         )
                     );

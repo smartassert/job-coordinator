@@ -125,8 +125,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 $job->getId(),
                 md5((string) rand()),
                 'requested',
-                false,
-                false,
                 new MetaState(false, false),
             ));
 
