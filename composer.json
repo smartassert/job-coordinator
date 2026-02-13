@@ -179,6 +179,7 @@
         "integration-setup": [
             "@integration-build",
             "@integration-up",
+            "sleep 5",
             "@db-setup",
             "@messenger-setup",
             "@users-setup",
