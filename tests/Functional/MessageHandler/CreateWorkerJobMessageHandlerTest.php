@@ -12,6 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -228,7 +229,14 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         bool $isPrepared,
         bool $hasEndState,
     ): SerializedSuite {
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), $state, $isPrepared, $hasEndState);
+        $serializedSuite = new SerializedSuite(
+            $job->getId(),
+            md5((string) rand()),
+            $state,
+            $isPrepared,
+            $hasEndState,
+            new MetaState($hasEndState, $isPrepared),
+        );
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

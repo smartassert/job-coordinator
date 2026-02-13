@@ -10,6 +10,7 @@ use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateMachineReadinessHandler;
 use App\Repository\MachineRepository;
@@ -106,7 +107,14 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
-                        new SerializedSuite($job->getId(), $serializedSuiteId, 'preparing', false, false)
+                        new SerializedSuite(
+                            $job->getId(),
+                            $serializedSuiteId,
+                            'preparing',
+                            false,
+                            false,
+                            new MetaState(false, false),
+                        )
                     );
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
@@ -135,7 +143,14 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
-                        new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+                        new SerializedSuite(
+                            $job->getId(),
+                            $serializedSuiteId,
+                            'prepared',
+                            true,
+                            true,
+                            new MetaState(true, true),
+                        )
                     );
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
@@ -148,7 +163,14 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteId = (string) new Ulid();
 
                     $serializedSuiteRepository->save(
-                        new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+                        new SerializedSuite(
+                            $job->getId(),
+                            $serializedSuiteId,
+                            'prepared',
+                            true,
+                            true,
+                            new MetaState(true, true),
+                        )
                     );
 
                     $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);

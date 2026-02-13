@@ -7,6 +7,7 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateWorkerJobReadinessHandler;
 use App\Repository\SerializedSuiteRepository;
@@ -83,6 +84,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         'preparing',
                         false,
                         false,
+                        new MetaState(false, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -99,6 +101,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         'prepared',
                         true,
                         true,
+                        new MetaState(true, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -119,6 +122,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         'failed',
                         false,
                         true,
+                        new MetaState(false, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -141,6 +145,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         'prepared',
                         true,
                         true,
+                        new MetaState(true, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -33,6 +34,12 @@ class SerializedSuite implements \JsonSerializable
     #[ORM\Column(nullable: false)]
     private bool $hasEndState;
 
+    #[ORM\Column]
+    private bool $stateIsEnded;
+
+    #[ORM\Column]
+    private bool $stateIsSucceeded;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
@@ -44,12 +51,15 @@ class SerializedSuite implements \JsonSerializable
         string $state,
         bool $isPrepared,
         bool $hasEndState,
+        MetaState $metaState,
     ) {
         $this->jobId = $jobId;
         $this->id = $serializedSuiteId;
         $this->state = $state;
         $this->isPrepared = $isPrepared;
         $this->hasEndState = $hasEndState;
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
     }
 
     public function getState(): string
@@ -115,5 +125,18 @@ class SerializedSuite implements \JsonSerializable
             'is_prepared' => $this->isPrepared,
             'has_end_state' => $this->hasEndState,
         ];
+    }
+
+    public function setMetaState(MetaState $metaState): self
+    {
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
+
+        return $this;
+    }
+
+    public function getMetaState(): MetaState
+    {
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Model\MetaState;
 use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteFactory;
@@ -13,6 +14,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -110,8 +112,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
             $suiteId,
             [],
             $serializedSuiteState,
-            false,
-            false,
+            new SourcesClientMetaState(false, false),
             null,
             null
         );
@@ -122,7 +123,14 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->find($job->getId());
         self::assertEquals(
-            new SerializedSuite($job->getId(), $serializedSuiteId, $serializedSuiteState, false, false),
+            new SerializedSuite(
+                $job->getId(),
+                $serializedSuiteId,
+                $serializedSuiteState,
+                false,
+                false,
+                new MetaState(false, false),
+            ),
             $serializedSuiteEntity
         );
     }

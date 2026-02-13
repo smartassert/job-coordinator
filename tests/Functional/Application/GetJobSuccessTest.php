@@ -505,7 +505,14 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        true,
+                        true,
+                        new MetaState(true, true)
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -898,7 +905,14 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        true,
+                        true,
+                        new MetaState(true, true),
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;

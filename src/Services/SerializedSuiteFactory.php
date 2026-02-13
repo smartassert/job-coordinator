@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
+use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -43,6 +44,10 @@ class SerializedSuiteFactory implements EventSubscriberInterface
                     $event->serializedSuite->getState(),
                     $event->serializedSuite->isPrepared(),
                     $event->serializedSuite->hasEndState(),
+                    new MetaState(
+                        $event->serializedSuite->getMetaState()->ended,
+                        $event->serializedSuite->getMetaState()->succeeded,
+                    )
                 )
             );
         }

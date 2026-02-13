@@ -14,6 +14,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -137,7 +138,8 @@ class PreparationStateFactoryTest extends WebTestCase
                             md5((string) rand()),
                             md5((string) rand()),
                             false,
-                            false
+                            false,
+                            new MetaState(false, false),
                         )
                     );
                     $machineRepository->save(new Machine(

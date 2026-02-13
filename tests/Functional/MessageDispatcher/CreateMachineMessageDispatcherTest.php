@@ -14,6 +14,7 @@ use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
@@ -98,7 +99,14 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $resultsJobFactory->create(job: $job, state: 'awaiting-events');
 
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+        $serializedSuite = new SerializedSuite(
+            $job->getId(),
+            md5((string) rand()),
+            'prepared',
+            true,
+            true,
+            new MetaState(true, true),
+        );
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $event = $eventCreator($job);

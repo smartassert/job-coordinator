@@ -12,6 +12,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -121,7 +122,14 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteId = (string) new Ulid();
 
         $serializedSuiteRepository->save(
-            new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+            new SerializedSuite(
+                $job->getId(),
+                $serializedSuiteId,
+                'prepared',
+                true,
+                true,
+                new MetaState(true, true),
+            )
         );
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);

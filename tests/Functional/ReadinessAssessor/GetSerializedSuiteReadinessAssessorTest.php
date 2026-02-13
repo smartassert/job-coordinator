@@ -7,6 +7,7 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessHandler;
 use App\Repository\SerializedSuiteRepository;
@@ -79,6 +80,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                         'prepared',
                         true,
                         true,
+                        new MetaState(true, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -93,6 +95,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                         'preparing',
                         false,
                         false,
+                        new MetaState(false, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);

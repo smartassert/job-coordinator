@@ -7,6 +7,7 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler;
 use App\Repository\SerializedSuiteRepository;
@@ -73,7 +74,8 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
                             (string) new Ulid(),
                             'state',
                             false,
-                            false
+                            false,
+                            new MetaState(false, false),
                         )
                     );
                 },
