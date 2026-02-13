@@ -15,7 +15,6 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\SerializedSuiteStore;
 use App\Tests\Services\Factory\JobFactory;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -91,9 +90,6 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $job->getId(),
             $serializedSuiteClientException->getMessage()
         ));
-
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

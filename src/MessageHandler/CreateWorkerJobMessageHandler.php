@@ -11,7 +11,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
-use App\Services\SerializedSuiteStore;
+use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private SerializedSuiteStore $serializedSuiteStore,
+        private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClient $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
@@ -39,9 +39,9 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
     {
         $this->assessReadiness($message);
 
-        $serializedSuiteModel = $this->serializedSuiteStore->retrieve($message->getJobId());
+        $serializedSuiteEntity = $this->serializedSuiteRepository->get($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (null === $serializedSuiteModel || null === $resultsJob) {
+        if (null === $serializedSuiteEntity || null === $resultsJob) {
             throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::EVENTUALLY);
         }
 
@@ -50,7 +50,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         try {
             $serializedSuite = $this->serializedSuiteClient->read(
                 $message->authenticationToken,
-                $serializedSuiteModel->getId()
+                $serializedSuiteEntity->id
             );
 
             $workerJob = $workerClient->createJob(
