@@ -25,10 +25,10 @@ class ResultsJob implements \JsonSerializable
     private ?string $endState;
 
     #[ORM\Column]
-    private bool $stateIsEnded = false;
+    private bool $stateIsEnded;
 
     #[ORM\Column]
-    private bool $stateIsSucceeded = false;
+    private bool $stateIsSucceeded;
 
     /**
      * @param non-empty-string  $jobId
