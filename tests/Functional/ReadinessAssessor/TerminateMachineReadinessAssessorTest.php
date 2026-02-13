@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
-use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\TerminateMachineReadinessHandler;
 use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -43,7 +43,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, MachineRepository, ResultsJobRepository): void $setup
+     * @param callable(JobInterface, MachineRepository, ResultsJobFactory): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -55,10 +55,10 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $setup($job, $machineRepository, $resultsJobRepository);
+        $setup($job, $machineRepository, $resultsJobFactory);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -91,7 +91,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                 'setup' => function (
                     JobInterface $job,
                     MachineRepository $machineRepository,
-                    ResultsJobRepository $resultsJobRepository
+                    ResultsJobFactory $resultsJobFactory
                 ): void {
                     $machineRepository->save(
                         new Machine(
@@ -103,9 +103,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                         )
                     );
 
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'state', null)
-                    );
+                    $resultsJobFactory->create($job);
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
@@ -113,7 +111,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                 'setup' => function (
                     JobInterface $job,
                     MachineRepository $machineRepository,
-                    ResultsJobRepository $resultsJobRepository
+                    ResultsJobFactory $resultsJobFactory
                 ): void {
                     $machineRepository->save(
                         new Machine(
@@ -125,8 +123,10 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                         )
                     );
 
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'state', 'end-state')
+                    $resultsJobFactory->create(
+                        job: $job,
+                        endState: 'end-state',
+                        metaState: new MetaState(true, false),
                     );
                 },
                 'expected' => MessageHandlingReadiness::NOW,

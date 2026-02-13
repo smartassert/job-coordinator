@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,8 +42,11 @@ class SerializedSuiteMutator implements EventSubscriberInterface
         }
 
         $serializedSuite->setState($event->serializedSuite->getState());
-        $serializedSuite->setIsPrepared($event->serializedSuite->isPrepared());
-        $serializedSuite->setHasEndState($event->serializedSuite->hasEndState());
+        $serializedSuite->setMetaState(new MetaState(
+            $event->serializedSuite->getMetaState()->ended,
+            $event->serializedSuite->getMetaState()->succeeded,
+        ));
+
         $this->serializedSuiteRepository->save($serializedSuite);
     }
 }

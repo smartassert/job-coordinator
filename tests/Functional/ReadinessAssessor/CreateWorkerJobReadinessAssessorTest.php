@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\ReadinessAssessor;
 
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateWorkerJobReadinessHandler;
-use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -44,7 +44,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, SerializedSuiteRepository, ResultsJobRepository): void $setup
+     * @param callable(JobInterface, SerializedSuiteRepository, ResultsJobFactory): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -56,10 +56,10 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $setup($job, $serializedSuiteRepository, $resultsJobRepository);
+        $setup($job, $serializedSuiteRepository, $resultsJobFactory);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -82,8 +82,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'preparing',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -98,8 +97,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        true,
-                        true,
+                        new MetaState(true, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -110,7 +108,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                 'setup' => function (
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository,
-                    ResultsJobRepository $resultsJobRepository,
+                    ResultsJobFactory $resultsJobFactory,
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
 
@@ -118,15 +116,12 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'failed',
-                        false,
-                        true,
+                        new MetaState(true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
 
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'state', null)
-                    );
+                    $resultsJobFactory->create($job);
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
@@ -134,7 +129,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                 'setup' => function (
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository,
-                    ResultsJobRepository $resultsJobRepository,
+                    ResultsJobFactory $resultsJobFactory,
                 ): void {
                     $serializedSuiteId = (string) new Ulid();
 
@@ -142,15 +137,12 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        true,
-                        true,
+                        new MetaState(true, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
 
-                    $resultsJobRepository->save(
-                        new ResultsJob($job->getId(), 'token', 'state', null)
-                    );
+                    $resultsJobFactory->create($job);
                 },
                 'expected' => MessageHandlingReadiness::NOW,
             ],

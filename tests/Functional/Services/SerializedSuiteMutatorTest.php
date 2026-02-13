@@ -7,12 +7,14 @@ namespace App\Tests\Functional\Services;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -158,8 +160,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'requested',
-                        false,
-                        false
+                        new MetaState(false, false),
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
@@ -172,15 +173,19 @@ class SerializedSuiteMutatorTest extends WebTestCase
                             'suite id',
                             [],
                             'requested',
-                            false,
-                            false,
+                            new SourcesClientMetaState(false, false),
                             null,
                             null,
                         ),
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    return new SerializedSuite($job->getId(), $serializedSuiteId, 'requested', false, false);
+                    return new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'requested',
+                        new MetaState(false, false),
+                    );
                 },
             ],
             'has state change' => [
@@ -193,8 +198,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'requested',
-                        false,
-                        false
+                        new MetaState(false, false),
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
@@ -207,15 +211,19 @@ class SerializedSuiteMutatorTest extends WebTestCase
                             'suite id',
                             [],
                             'prepared',
-                            true,
-                            true,
+                            new SourcesClientMetaState(true, true),
                             null,
                             null,
                         ),
                     );
                 },
                 'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
-                    return new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true);
+                    return new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'prepared',
+                        new MetaState(true, true),
+                    );
                 },
             ],
         ];

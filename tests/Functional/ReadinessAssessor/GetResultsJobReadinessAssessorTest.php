@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
-use App\Entity\ResultsJob;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetResultsJobReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -38,8 +39,8 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, ResultsJobRepository, MachineRepository): void $setup
-     * @param callable(JobInterface): PreparationStateFactory                       $preparationStateFactoryCreator
+     * @param callable(JobInterface, ResultsJobFactory, MachineRepository): void $setup
+     * @param callable(JobInterface): PreparationStateFactory                    $preparationStateFactoryCreator
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(
@@ -57,7 +58,10 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $setup($job, $resultsJobRepository, $machineRepository);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+
+        $setup($job, $resultsJobFactory, $machineRepository);
         $jobPreparationInspector = $preparationStateFactoryCreator($job);
 
         $assessor = new GetResultsJobReadinessHandler(
@@ -83,10 +87,12 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'results job has end state' => [
-                'setup' => function (JobInterface $job, ResultsJobRepository $resultsJobRepository): void {
-                    $resultsJob = new ResultsJob($job->getId(), 'token', 'state', 'end-state');
-
-                    $resultsJobRepository->save($resultsJob);
+                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
+                    $resultsJobFactory->create(
+                        job: $job,
+                        endState: 'end-state',
+                        metaState: new MetaState(true, false),
+                    );
                 },
                 'preparationStateFactoryCreator' => function (): PreparationStateFactory {
                     return \Mockery::mock(PreparationStateFactory::class);
@@ -94,10 +100,8 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'job preparation has failed' => [
-                'setup' => function (JobInterface $job, ResultsJobRepository $resultsJobRepository): void {
-                    $resultsJob = new ResultsJob($job->getId(), 'token', 'state', null);
-
-                    $resultsJobRepository->save($resultsJob);
+                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
+                    $resultsJobFactory->create($job);
                 },
                 'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {
                     $factory = \Mockery::mock(PreparationStateFactory::class);
@@ -112,10 +116,8 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'machine is null' => [
-                'setup' => function (JobInterface $job, ResultsJobRepository $resultsJobRepository): void {
-                    $resultsJob = new ResultsJob($job->getId(), 'token', 'state', null);
-
-                    $resultsJobRepository->save($resultsJob);
+                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
+                    $resultsJobFactory->create($job);
                 },
                 'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {
                     $factory = \Mockery::mock(PreparationStateFactory::class);
@@ -132,11 +134,10 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
             'ready' => [
                 'setup' => function (
                     JobInterface $job,
-                    ResultsJobRepository $resultsJobRepository,
+                    ResultsJobFactory $resultsJobFactory,
                     MachineRepository $machineRepository
                 ): void {
-                    $resultsJob = new ResultsJob($job->getId(), 'token', 'state', null);
-                    $resultsJobRepository->save($resultsJob);
+                    $resultsJobFactory->create($job);
 
                     $machine = new Machine($job->getId(), 'up/active', 'up', false, false);
                     $machineRepository->save($machine);

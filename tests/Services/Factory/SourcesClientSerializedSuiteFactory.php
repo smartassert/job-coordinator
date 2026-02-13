@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
+use SmartAssert\SourcesClient\Model\MetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite;
 
 class SourcesClientSerializedSuiteFactory
@@ -21,8 +22,7 @@ class SourcesClientSerializedSuiteFactory
             $suiteId,
             [],
             'requested',
-            false,
-            false,
+            new MetaState(false, false),
             null,
             null
         );

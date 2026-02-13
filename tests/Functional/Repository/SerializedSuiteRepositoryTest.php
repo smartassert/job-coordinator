@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Repository;
 
 use App\Entity\SerializedSuite;
+use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -32,7 +33,12 @@ class SerializedSuiteRepositoryTest extends WebTestCase
         $jobId = (string) new Ulid();
         $serializedSuiteId = (string) new Ulid();
 
-        $serializedSuite = new SerializedSuite($jobId, $serializedSuiteId, 'preparing', false, false);
+        $serializedSuite = new SerializedSuite(
+            $jobId,
+            $serializedSuiteId,
+            'preparing',
+            new MetaState(false, false),
+        );
         $this->serializedSuiteRepository->save($serializedSuite);
 
         self::assertTrue($this->serializedSuiteRepository->has($jobId));

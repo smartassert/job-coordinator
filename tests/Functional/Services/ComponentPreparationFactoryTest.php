@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
 use App\Enum\JobComponent;
@@ -17,15 +16,16 @@ use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\ComponentPreparation;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\ComponentPreparationFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -64,11 +64,11 @@ class ComponentPreparationFactoryTest extends WebTestCase
     /**
      * @param callable(
      *   JobInterface,
-     *   ResultsJobRepository,
+     *   ResultsJobFactory,
      *   SerializedSuiteRepository,
      *   MachineRepository,
      *   WorkerComponentStateRepository,
-     * ): void    $entityCreator
+     * ): void $entityCreator
      * @param callable(JobInterface, RemoteRequestRepository): void $remoteRequestsCreator
      * @param ComponentPreparation[]                                $expected
      */
@@ -82,8 +82,8 @@ class ComponentPreparationFactoryTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
@@ -96,7 +96,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $entityCreator(
             $job,
-            $resultsJobRepository,
+            $resultsJobFactory,
             $serializedSuiteRepository,
             $machineRepository,
             $workerComponentStateRepository
@@ -114,24 +114,18 @@ class ComponentPreparationFactoryTest extends WebTestCase
     {
         $allEntitiesCreator = function (
             JobInterface $job,
-            ResultsJobRepository $resultsJobRepository,
+            ResultsJobFactory $resultsJobFactory,
             SerializedSuiteRepository $serializedSuiteRepository,
             MachineRepository $machineRepository,
             WorkerComponentStateRepository $workerComponentStateRepository,
         ) {
-            $resultsJobRepository->save(new ResultsJob(
-                $job->getId(),
-                'results job token',
-                'awaiting-events',
-                null
-            ));
+            $resultsJobFactory->create(job: $job, state: 'awaiting-events');
 
             $serializedSuiteRepository->save(new SerializedSuite(
                 $job->getId(),
                 md5((string) rand()),
                 'requested',
-                false,
-                false
+                new MetaState(false, false),
             ));
 
             $machineRepository->save(new Machine(

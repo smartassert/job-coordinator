@@ -15,6 +15,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
@@ -136,12 +137,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
             return [];
         };
 
-        $resultsJobCreatorCreator = function (string $state, ?string $endState) {
-            return function (JobInterface $job, ResultsJobRepository $resultsJobRepository) use ($state, $endState) {
+        $resultsJobCreatorCreator = function (
+            string $state,
+            ?string $endState = null,
+            ?MetaState $metaState = null,
+        ) {
+            $metaState = $metaState ?? new MetaState(false, false);
+
+            return function (
+                JobInterface $job,
+                ResultsJobRepository $resultsJobRepository
+            ) use (
+                $state,
+                $endState,
+                $metaState
+            ) {
                 \assert('' !== $state);
                 \assert('' !== $endState);
 
-                $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), $state, $endState);
+                $resultsJob = new ResultsJob(
+                    $job->getId(),
+                    md5((string) rand()),
+                    $state,
+                    $endState,
+                    $metaState,
+                );
                 $resultsJobRepository->save($resultsJob);
 
                 return $resultsJob;
@@ -395,6 +415,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'results-state-1',
                             'end_state' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => null,
                         'machine' => null,
@@ -445,6 +469,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'results-state-2',
                             'end_state' => 'results-end-state-2',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => null,
                         'machine' => null,
@@ -477,7 +505,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true)
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -870,7 +903,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true),
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -940,6 +978,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'awaiting-events',
                             'end_state' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => [
                             'state' => 'prepared',
