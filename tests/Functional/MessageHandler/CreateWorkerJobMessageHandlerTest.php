@@ -16,7 +16,6 @@ use App\Model\JobInterface;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\SerializedSuiteStore;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -245,8 +244,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ?WorkerClientFactory $workerClientFactory = null,
         ?ReadinessAssessorInterface $readinessAssessor = null,
     ): CreateWorkerJobMessageHandler {
-        $serializedSuiteStore = self::getContainer()->get(SerializedSuiteStore::class);
-        \assert($serializedSuiteStore instanceof SerializedSuiteStore);
+        $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
+        \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
         if (null === $serializedSuiteClient) {
             $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
@@ -269,7 +268,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         }
 
         return new CreateWorkerJobMessageHandler(
-            $serializedSuiteStore,
+            $serializedSuiteRepository,
             $resultsJobRepository,
             $serializedSuiteClient,
             $workerClientFactory,

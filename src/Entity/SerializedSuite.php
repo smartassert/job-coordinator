@@ -7,8 +7,15 @@ namespace App\Entity;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedSerializedSuite array{
+ *   state: non-empty-string,
+ *   is_prepared: bool,
+ *   has_end_state: bool
+ *  }
+ */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite
+class SerializedSuite implements \JsonSerializable
 {
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     public string $id;
@@ -82,5 +89,31 @@ class SerializedSuite
     public function hasEndState(): bool
     {
         return $this->hasEndState;
+    }
+
+    public function isPreparing(): bool
+    {
+        return false === $this->isPrepared && false === $this->hasFailed();
+    }
+
+    public function hasFailed(): bool
+    {
+        return true === $this->hasEndState && false === $this->isPrepared;
+    }
+
+    /**
+     * @return ?SerializedSerializedSuite
+     */
+    public function jsonSerialize(): ?array
+    {
+        if ('' === $this->state) {
+            return null;
+        }
+
+        return [
+            'state' => $this->state,
+            'is_prepared' => $this->isPrepared,
+            'has_end_state' => $this->hasEndState,
+        ];
     }
 }

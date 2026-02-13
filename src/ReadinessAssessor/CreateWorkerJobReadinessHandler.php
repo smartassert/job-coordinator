@@ -7,12 +7,12 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 use App\Repository\ResultsJobRepository;
-use App\Services\SerializedSuiteStore;
+use App\Repository\SerializedSuiteRepository;
 
 readonly class CreateWorkerJobReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
-        private SerializedSuiteStore $serializedSuiteStore,
+        private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
     ) {}
 
@@ -23,7 +23,7 @@ readonly class CreateWorkerJobReadinessHandler implements ReadinessHandlerInterf
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $serializedSuite = $this->serializedSuiteStore->retrieve($jobId);
+        $serializedSuite = $this->serializedSuiteRepository->get($jobId);
         $resultsJob = $this->resultsJobRepository->find($jobId);
         if (null === $serializedSuite || $serializedSuite->isPreparing() || null === $resultsJob) {
             return MessageHandlingReadiness::EVENTUALLY;

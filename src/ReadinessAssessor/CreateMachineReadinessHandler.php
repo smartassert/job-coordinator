@@ -8,14 +8,14 @@ use App\Enum\MessageHandlingReadiness;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
+use App\Repository\SerializedSuiteRepository;
 use App\Services\JobComponentHandler\SerializedSuiteHandler;
-use App\Services\SerializedSuiteStore;
 
 readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,
-        private SerializedSuiteStore $serializedSuiteStore,
+        private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteHandler $serializedSuiteJobComponentHandler,
     ) {}
@@ -35,7 +35,7 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
             return MessageHandlingReadiness::NEVER;
         }
 
-        $serializedSuite = $this->serializedSuiteStore->retrieve($jobId);
+        $serializedSuite = $this->serializedSuiteRepository->get($jobId);
         if (null === $serializedSuite || !$serializedSuite->isPrepared()) {
             return MessageHandlingReadiness::EVENTUALLY;
         }
