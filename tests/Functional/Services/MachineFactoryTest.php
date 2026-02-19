@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -13,6 +14,7 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachin
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -127,6 +129,7 @@ class MachineFactoryTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -138,6 +141,7 @@ class MachineFactoryTest extends WebTestCase
                         'find',
                         false,
                         false,
+                        new MetaState(false, false),
                     );
                 },
             ],
@@ -154,6 +158,7 @@ class MachineFactoryTest extends WebTestCase
                         false,
                         false,
                         true,
+                        new WorkerManagerClientMetaState(true, false),
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -165,6 +170,7 @@ class MachineFactoryTest extends WebTestCase
                         'end',
                         true,
                         true,
+                        new MetaState(true, false),
                     );
                 },
             ],

@@ -24,6 +24,7 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFacto
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -146,6 +147,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
@@ -162,7 +164,14 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $createdMachine = $machineRepository->find($job->getId());
         self::assertEquals(
-            new Machine($job->getId(), 'create/requested', 'pre_active', false, false),
+            new Machine(
+                $job->getId(),
+                'create/requested',
+                'pre_active',
+                false,
+                false,
+                new MetaState(false, false),
+            ),
             $createdMachine
         );
 

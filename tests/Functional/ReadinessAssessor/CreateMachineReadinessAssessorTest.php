@@ -90,6 +90,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             false,
+                            new MetaState(false, false),
                         )
                     );
                 },

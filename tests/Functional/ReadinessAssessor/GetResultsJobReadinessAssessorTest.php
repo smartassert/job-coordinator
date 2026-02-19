@@ -139,7 +139,14 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                 ): void {
                     $resultsJobFactory->create($job);
 
-                    $machine = new Machine($job->getId(), 'up/active', 'up', false, false);
+                    $machine = new Machine(
+                        $job->getId(),
+                        'up/active',
+                        'up',
+                        false,
+                        false,
+                        new MetaState(false, false),
+                    );
                     $machineRepository->save($machine);
                 },
                 'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {

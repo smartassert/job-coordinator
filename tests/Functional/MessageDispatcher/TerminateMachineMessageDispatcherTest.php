@@ -12,6 +12,7 @@ use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -135,6 +136,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
                 'state-category',
                 false,
                 true,
+                new MetaState(true, true),
             )
         );
 

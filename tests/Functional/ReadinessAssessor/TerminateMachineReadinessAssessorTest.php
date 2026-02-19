@@ -82,6 +82,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             false,
+                            new MetaState(false, false),
                         )
                     );
                 },
@@ -100,6 +101,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             false,
+                            new MetaState(false, false),
                         )
                     );
 
@@ -120,6 +122,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             false,
+                            new MetaState(false, false),
                         )
                     );
 

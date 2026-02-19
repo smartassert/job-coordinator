@@ -634,6 +634,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         md5((string) rand()),
                         false,
                         false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -670,6 +671,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'action_failure' => null,
                             'has_failed_state' => false,
                             'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'pending',
@@ -704,6 +709,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         md5((string) rand()),
                         false,
                         false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -767,6 +773,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'action_failure' => null,
                             'has_failed_state' => false,
                             'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -801,6 +811,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         md5((string) rand()),
                         false,
                         false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
                     $machine->setActionFailure(new MachineActionFailure(
@@ -873,6 +884,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'has_failed_state' => false,
                             'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -920,6 +935,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         md5((string) rand()),
                         false,
                         false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -994,6 +1010,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'action_failure' => null,
                             'has_failed_state' => false,
                             'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -1182,6 +1202,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         md5((string) rand()),
                         true,
                         true,
+                        new MetaState(true, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -1218,6 +1239,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'action_failure' => null,
                             'has_failed_state' => true,
                             'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'pending',

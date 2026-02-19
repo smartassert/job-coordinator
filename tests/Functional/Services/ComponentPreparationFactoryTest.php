@@ -134,6 +134,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 md5((string) rand()),
                 false,
                 false,
+                new MetaState(false, false),
             ));
 
             $workerComponentStateRepository->save(

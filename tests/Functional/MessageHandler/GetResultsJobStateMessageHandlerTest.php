@@ -11,6 +11,7 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
@@ -87,7 +88,14 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $machine = new Machine($job->getId(), 'up/active', 'up', false, false);
+        $machine = new Machine(
+            $job->getId(),
+            'up/active',
+            'up',
+            false,
+            false,
+            new MetaState(false, false),
+        );
         $machineRepository->save($machine);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);

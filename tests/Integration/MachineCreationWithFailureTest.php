@@ -39,6 +39,10 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                 'action_failure' => null,
                 'has_failed_state' => false,
                 'has_end_state' => false,
+                'meta_state' => [
+                    'ended' => false,
+                    'succeeded' => false,
+                ],
             ],
             $machineData
         );
@@ -57,6 +61,10 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                 ],
                 'has_failed_state' => true,
                 'has_end_state' => true,
+                'meta_state' => [
+                    'ended' => true,
+                    'succeeded' => false,
+                ],
             ],
             $machineData
         );

@@ -16,6 +16,7 @@ use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -84,6 +85,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
                 false,
                 false,
                 false,
+                new WorkerManagerClientMetaState(false, false),
             )
         );
 
@@ -125,6 +127,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
                 false,
                 false,
                 false,
+                new WorkerManagerClientMetaState(false, false),
             )
         );
 
@@ -169,6 +172,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             false,
             false,
             true,
+            new WorkerManagerClientMetaState(true, false),
         );
 
         $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);

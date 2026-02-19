@@ -7,6 +7,7 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetMachineReadinessHandler;
 use App\Repository\MachineRepository;
@@ -77,6 +78,7 @@ class GetMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             true,
+                            new MetaState(true, false),
                         )
                     );
                 },
@@ -91,6 +93,7 @@ class GetMachineReadinessAssessorTest extends WebTestCase
                             'state-category',
                             false,
                             false,
+                            new MetaState(false, false),
                         )
                     );
                 },

@@ -12,6 +12,7 @@ use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
@@ -44,6 +45,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                 true,
                 false,
                 false,
+                new WorkerManagerClientMetaState(false, false),
             ),
             MachineFactory::create(
                 $machineId,
@@ -54,6 +56,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                 true,
                 false,
                 false,
+                new WorkerManagerClientMetaState(false, false),
             ),
         );
 
@@ -78,6 +81,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $currentMachine = MachineFactory::create(
@@ -89,6 +93,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
@@ -135,6 +140,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -145,6 +151,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
             ],
@@ -160,6 +167,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -170,6 +178,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
             ],
@@ -185,6 +194,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -195,6 +205,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
             ],
@@ -210,6 +221,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -220,6 +232,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
             ],
@@ -259,6 +272,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -269,6 +283,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
                 'expected' => new MachineIsActiveEvent(
@@ -284,6 +299,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     )
                 ),
             ],
@@ -299,6 +315,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                     MachineFactory::create(
                         $machineId,
@@ -309,6 +326,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     ),
                 ),
                 'expected' => new MachineIsActiveEvent(
@@ -324,6 +342,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     )
                 ),
             ],
@@ -344,6 +363,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $currentMachine = MachineFactory::create(
@@ -355,6 +375,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
@@ -381,6 +402,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
         $currentMachine = MachineFactory::create(
             $machineId,
@@ -391,6 +413,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
             false,
             true,
+            new WorkerManagerClientMetaState(true, false),
             $actionFailure
         );
 

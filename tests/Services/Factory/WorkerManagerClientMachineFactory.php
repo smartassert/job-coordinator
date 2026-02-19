@@ -6,6 +6,7 @@ namespace App\Tests\Services\Factory;
 
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\MetaState;
 
 class WorkerManagerClientMachineFactory
 {
@@ -24,6 +25,7 @@ class WorkerManagerClientMachineFactory
         bool $hasActiveState,
         bool $hasEndingState,
         bool $hasEndState,
+        MetaState $metaState,
         ?ActionFailure $actionFailure = null,
     ): Machine {
         return new Machine(
@@ -36,6 +38,10 @@ class WorkerManagerClientMachineFactory
             $hasActiveState,
             $hasEndingState,
             $hasEndState,
+            new MetaState(
+                $metaState->ended,
+                $metaState->succeeded,
+            )
         );
     }
 
@@ -58,6 +64,7 @@ class WorkerManagerClientMachineFactory
             $hasActiveState,
             $hasEndingState,
             $hasEndState,
+            new MetaState($hasEndState, $hasEndState && !$hasFailedState),
         );
     }
 }

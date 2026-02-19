@@ -14,6 +14,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
@@ -26,6 +27,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -97,6 +99,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->stateCategory,
             $previous->hasFailedState,
             $previous->hasEndState,
+            new MetaState(
+                $previous->metaState->ended,
+                $previous->metaState->succeeded,
+            )
         ));
 
         $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
@@ -139,6 +145,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -151,6 +158,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
             ],
@@ -183,6 +191,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->stateCategory,
             $previous->hasFailedState,
             $previous->hasEndState,
+            new MetaState(
+                $previous->metaState->ended,
+                $previous->metaState->succeeded,
+            ),
         ));
 
         $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
@@ -219,6 +231,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -231,6 +244,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
@@ -246,6 +260,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             false,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                         ),
                         MachineFactory::create(
                             $job->getId(),
@@ -256,6 +271,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             false,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                         )
                     );
                 },
@@ -271,6 +287,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -283,6 +300,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
@@ -301,6 +319,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                         )
                     );
                 },
@@ -334,6 +353,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $previous->stateCategory,
             $previous->hasFailedState,
             $previous->hasEndState,
+            new MetaState(
+                $previous->metaState->ended,
+                $previous->metaState->succeeded,
+            ),
         ));
 
         $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
@@ -378,6 +401,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         true,
                         false,
                         false,
+                        new WorkerManagerClientMetaState(false, false),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -387,9 +411,10 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         'end',
                         [],
                         false,
-                        true,
+                        false,
                         false,
                         true,
+                        new WorkerManagerClientMetaState(true, true),
                     );
                 },
                 'expectedEventClass' => MachineStateChangeEvent::class,
@@ -409,6 +434,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
         $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
         $assessor = ReadinessAssessorFactory::create(

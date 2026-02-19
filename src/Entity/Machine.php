@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -32,6 +33,12 @@ class Machine implements \JsonSerializable
     #[ORM\Column(nullable: false)]
     private bool $hasEndState;
 
+    #[ORM\Column]
+    private bool $stateIsEnded;
+
+    #[ORM\Column]
+    private bool $stateIsSucceeded;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
@@ -43,12 +50,15 @@ class Machine implements \JsonSerializable
         string $stateCategory,
         bool $hasFailedState,
         bool $hasEndState,
+        MetaState $metaState,
     ) {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
         $this->hasFailedState = $hasFailedState;
         $this->hasEndState = $hasEndState;
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
     }
 
     /**
@@ -133,13 +143,22 @@ class Machine implements \JsonSerializable
         return $this->hasEndState;
     }
 
+    public function setMetaState(MetaState $metaState): self
+    {
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
+
+        return $this;
+    }
+
     /**
      * @return array{
      *   state_category: ?non-empty-string,
      *   ip_address: ?non-empty-string,
      *   action_failure: ?MachineActionFailure,
      *   has_failed_state: bool,
-     *   has_end_state: bool
+     *   has_end_state: bool,
+     *   'meta_state': MetaState,
      * }
      */
     public function jsonSerialize(): array
@@ -150,6 +169,7 @@ class Machine implements \JsonSerializable
             'action_failure' => $this->actionFailure,
             'has_failed_state' => $this->hasFailedState,
             'has_end_state' => $this->hasEndState,
+            'meta_state' => new MetaState($this->stateIsEnded, $this->stateIsSucceeded),
         ];
     }
 }
