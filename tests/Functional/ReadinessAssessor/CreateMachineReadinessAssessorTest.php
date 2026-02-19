@@ -88,8 +88,6 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             'state',
                             'state-category',
-                            false,
-                            false,
                             new MetaState(false, false),
                         )
                     );

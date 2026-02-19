@@ -143,8 +143,6 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         'up/active',
                         'up',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machineRepository->save($machine);

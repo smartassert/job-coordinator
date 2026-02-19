@@ -632,8 +632,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
@@ -669,8 +667,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
@@ -707,8 +703,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
@@ -771,8 +765,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
@@ -809,8 +801,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
@@ -882,8 +872,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'type' => 'vendor_authentication_failure',
                                 'context' => null,
                             ],
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
@@ -933,8 +921,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
@@ -1008,8 +994,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
@@ -1200,8 +1184,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        true,
-                        true,
                         new MetaState(true, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
@@ -1237,8 +1219,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => true,
-                            'has_end_state' => true,
                             'meta_state' => [
                                 'ended' => true,
                                 'succeeded' => false,

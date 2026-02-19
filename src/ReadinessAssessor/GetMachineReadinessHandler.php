@@ -26,7 +26,7 @@ readonly class GetMachineReadinessHandler implements ReadinessHandlerInterface
             return MessageHandlingReadiness::NEVER;
         }
 
-        if ($machine->hasEndState()) {
+        if ($machine->getMetaState()->ended) {
             return MessageHandlingReadiness::NEVER;
         }
 

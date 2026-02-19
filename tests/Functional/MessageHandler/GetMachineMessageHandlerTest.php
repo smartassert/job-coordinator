@@ -97,8 +97,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $job->getId(),
             $previous->state,
             $previous->stateCategory,
-            $previous->hasFailedState,
-            $previous->hasEndState,
             new MetaState(
                 $previous->metaState->ended,
                 $previous->metaState->succeeded,
@@ -189,8 +187,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $job->getId(),
             $previous->state,
             $previous->stateCategory,
-            $previous->hasFailedState,
-            $previous->hasEndState,
             new MetaState(
                 $previous->metaState->ended,
                 $previous->metaState->succeeded,
@@ -351,8 +347,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $job->getId(),
             $previous->state,
             $previous->stateCategory,
-            $previous->hasFailedState,
-            $previous->hasEndState,
             new MetaState(
                 $previous->metaState->ended,
                 $previous->metaState->succeeded,

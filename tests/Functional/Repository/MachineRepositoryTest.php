@@ -36,8 +36,6 @@ class MachineRepositoryTest extends WebTestCase
             $jobId,
             'up/active',
             'active',
-            false,
-            false,
             new MetaState(false, false),
         );
         $this->machineRepository->save($machine);

@@ -188,8 +188,6 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             $machine->id,
             $machine->state,
             $machine->stateCategory,
-            $machine->hasFailedState,
-            $machine->hasEndState,
             new MetaState(
                 $machine->metaState->ended,
                 $machine->metaState->succeeded,

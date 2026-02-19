@@ -139,8 +139,6 @@ class MachineFactoryTest extends WebTestCase
                         $jobId,
                         'find/finding',
                         'find',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                 },
@@ -168,8 +166,6 @@ class MachineFactoryTest extends WebTestCase
                         $jobId,
                         'find/not-findable',
                         'end',
-                        true,
-                        true,
                         new MetaState(true, false),
                     );
                 },

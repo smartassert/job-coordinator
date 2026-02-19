@@ -165,8 +165,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
@@ -194,8 +192,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                 },
@@ -207,8 +203,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
@@ -236,8 +230,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/active',
                         'active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                 },
@@ -337,8 +329,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
@@ -360,8 +350,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
@@ -375,8 +363,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
@@ -396,8 +382,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
@@ -411,8 +395,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
@@ -434,8 +416,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.2')
@@ -543,8 +523,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
@@ -573,8 +551,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setActionFailure(
@@ -590,8 +566,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     ))
                         ->setActionFailure(
@@ -624,8 +598,6 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
                         new MetaState(false, false),
                     )
                         ->setActionFailure(

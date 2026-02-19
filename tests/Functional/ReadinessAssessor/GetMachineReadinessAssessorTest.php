@@ -76,8 +76,6 @@ class GetMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             'state',
                             'state-category',
-                            false,
-                            true,
                             new MetaState(true, false),
                         )
                     );
@@ -91,8 +89,6 @@ class GetMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             'state',
                             'state-category',
-                            false,
-                            false,
                             new MetaState(false, false),
                         )
                     );

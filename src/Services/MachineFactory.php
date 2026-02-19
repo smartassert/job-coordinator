@@ -47,8 +47,6 @@ class MachineFactory implements EventSubscriberInterface
             $job->getId(),
             $machine->state,
             $machine->stateCategory,
-            $machine->hasFailedState,
-            $machine->hasEndState,
             new MetaState(
                 $machine->metaState->ended,
                 $machine->metaState->succeeded,

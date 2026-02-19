@@ -92,8 +92,6 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             $job->getId(),
             'up/active',
             'up',
-            false,
-            false,
             new MetaState(false, false),
         );
         $machineRepository->save($machine);

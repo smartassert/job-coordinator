@@ -37,8 +37,6 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                 'state_category' => 'pre_active',
                 'ip_address' => null,
                 'action_failure' => null,
-                'has_failed_state' => false,
-                'has_end_state' => false,
                 'meta_state' => [
                     'ended' => false,
                     'succeeded' => false,
@@ -59,8 +57,6 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                         'provider' => null,
                     ],
                 ],
-                'has_failed_state' => true,
-                'has_end_state' => true,
                 'meta_state' => [
                     'ended' => true,
                     'succeeded' => false,

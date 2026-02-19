@@ -168,8 +168,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 $job->getId(),
                 'create/requested',
                 'pre_active',
-                false,
-                false,
                 new MetaState(false, false),
             ),
             $createdMachine
