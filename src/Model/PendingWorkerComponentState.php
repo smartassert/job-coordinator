@@ -10,7 +10,6 @@ class PendingWorkerComponentState implements WorkerComponentStateInterface
     {
         return [
             'state' => 'pending',
-            'is_end_state' => false,
             'meta_state' => new MetaState(false, false)->jsonSerialize(),
         ];
     }
