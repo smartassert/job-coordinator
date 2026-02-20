@@ -13,7 +13,8 @@ use App\Enum\RequestState;
  * @phpstan-type SerializedPreparationState array{
  *   state: PreparationStateEnum,
  *   request_states: array<RequestState>,
- *   failures: array<value-of<JobComponent>, RemoteRequestFailure>
+ *   failures: array<value-of<JobComponent>, RemoteRequestFailure>,
+ *   meta_state: MetaState
  * }
  */
 readonly class PreparationState implements \JsonSerializable
@@ -37,6 +38,10 @@ readonly class PreparationState implements \JsonSerializable
             'state' => $this->state,
             'request_states' => $this->requestStates,
             'failures' => $this->componentFailures,
+            'meta_state' => new MetaState(
+                PreparationStateEnum::isEndState($this->state),
+                PreparationStateEnum::isSuccessState($this->state),
+            ),
         ];
     }
 }

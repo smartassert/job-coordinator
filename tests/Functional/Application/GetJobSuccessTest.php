@@ -183,6 +183,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
@@ -247,6 +251,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'requesting',
                                 'serialized-suite' => 'pending',
@@ -340,6 +348,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'halted',
                                 'serialized-suite' => 'halted',
@@ -440,6 +452,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'succeeded',
                                 'serialized-suite' => 'pending',
@@ -506,6 +522,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'succeeded',
                                 'serialized-suite' => 'pending',
@@ -585,6 +605,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'succeeded',
@@ -656,6 +680,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
@@ -740,6 +768,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
@@ -847,6 +879,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
@@ -959,6 +995,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
@@ -1083,6 +1123,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'succeeded',
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
                             'request_states' => [
                                 'results-job' => 'succeeded',
                                 'serialized-suite' => 'succeeded',
@@ -1197,6 +1241,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'failed',
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'failed',
                                 'serialized-suite' => 'failed',
@@ -1346,6 +1394,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'created_at' => $job->toArray()['created_at'],
                         'preparation' => [
                             'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'request_states' => [
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
