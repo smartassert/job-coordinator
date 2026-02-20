@@ -8,20 +8,15 @@ use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\JobComponent;
-use App\Services\PreparationStateFactory;
 
 /**
- * @phpstan-import-type SerializedPreparationState from PreparationStateFactory
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  */
 readonly class JobStatus implements \JsonSerializable
 {
-    /**
-     * @param SerializedPreparationState $preparationState
-     */
     public function __construct(
         private JobInterface $job,
-        private array $preparationState,
+        private PreparationState $preparationState,
         private ?ResultsJob $resultsJob,
         private ?SerializedSuite $serializedSuite,
         private ?Machine $machine,

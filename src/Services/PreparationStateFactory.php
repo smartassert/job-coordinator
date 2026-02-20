@@ -4,32 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\RemoteRequestFailure;
-use App\Enum\JobComponent;
-use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
-use App\Enum\RequestState;
 use App\Model\JobInterface;
+use App\Model\PreparationState;
 
-/**
- * @phpstan-type SerializedPreparationState array{
- *   state: PreparationStateEnum,
- *   request_states: array<RequestState>,
- *   failures: array<value-of<JobComponent>, RemoteRequestFailure|null>
- * }
- */
-class PreparationStateFactory
+readonly class PreparationStateFactory
 {
     public function __construct(
-        private readonly ComponentPreparationFactory $componentPreparationFactory,
-        private readonly PreparationStateReducer $preparationStateReducer,
-        private readonly RequestStatesFactory $requestStatesFactory,
+        private ComponentPreparationFactory $componentPreparationFactory,
+        private PreparationStateReducer $preparationStateReducer,
+        private RequestStatesFactory $requestStatesFactory,
     ) {}
 
-    /**
-     * @return SerializedPreparationState
-     */
-    public function create(JobInterface $job): array
+    public function create(JobInterface $job): PreparationState
     {
         $componentPreparationStates = $this->componentPreparationFactory->getAll($job->getId());
 
@@ -40,14 +27,14 @@ class PreparationStateFactory
             }
         }
 
-        return [
-            'state' => $this->createState($job->getId()),
-            'request_states' => $this->requestStatesFactory->create($job),
-            'failures' => $componentFailures,
-        ];
+        return new PreparationState(
+            $this->createState($job->getId()),
+            $this->requestStatesFactory->create($job),
+            $componentFailures,
+        );
     }
 
-    public function createState(string $jobId): PreparationState
+    public function createState(string $jobId): PreparationStateEnum
     {
         $componentPreparationStates = $this->componentPreparationFactory->getAll($jobId);
 
