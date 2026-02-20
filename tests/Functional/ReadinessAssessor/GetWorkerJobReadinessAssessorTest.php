@@ -8,6 +8,7 @@ use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetWorkerJobReadinessHandler;
 use App\Repository\WorkerComponentStateRepository;
@@ -76,7 +77,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
                     );
 
                     $applicationState->setState('state');
-                    $applicationState->setIsEndState(true);
+                    $applicationState->setMetaState(new MetaState(true, true));
 
                     $workerComponentStateRepository->save($applicationState);
                 },
@@ -97,7 +98,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
                     );
 
                     $applicationState->setState('state');
-                    $applicationState->setIsEndState(false);
+                    $applicationState->setMetaState(new MetaState(false, false));
 
                     $workerComponentStateRepository->save($applicationState);
                 },

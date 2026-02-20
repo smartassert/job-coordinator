@@ -147,9 +147,8 @@ class PreparationStateFactoryTest extends WebTestCase
                         new MetaState(false, false),
                     ));
                     $workerComponentStateRepository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('awaiting-job')
-                            ->setIsEndState(false)
                     );
                 },
                 'remoteRequestCreator' => function () {},

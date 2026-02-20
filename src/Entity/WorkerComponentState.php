@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\WorkerComponentName;
+use App\Model\MetaState;
 use App\Model\WorkerComponentStateInterface;
 use App\Repository\WorkerComponentStateRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,6 +30,12 @@ class WorkerComponentState implements WorkerComponentStateInterface
     #[ORM\Column]
     private bool $isEndState;
 
+    #[ORM\Column]
+    private bool $stateIsEnded;
+
+    #[ORM\Column]
+    private bool $stateIsSucceeded;
+
     /**
      * @param non-empty-string $jobId
      */
@@ -36,6 +43,9 @@ class WorkerComponentState implements WorkerComponentStateInterface
     {
         $this->jobId = $jobId;
         $this->componentName = $componentName;
+        $this->isEndState = false;
+        $this->stateIsEnded = false;
+        $this->stateIsSucceeded = false;
     }
 
     /**
@@ -48,23 +58,25 @@ class WorkerComponentState implements WorkerComponentStateInterface
         return $this;
     }
 
-    public function setIsEndState(bool $isEndState): static
+    public function setMetaState(MetaState $metaState): self
     {
-        $this->isEndState = $isEndState;
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
 
         return $this;
     }
 
-    public function isEndState(): bool
+    public function getMetaState(): MetaState
     {
-        return $this->isEndState;
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
     }
 
     public function toArray(): array
     {
         return [
             'state' => '' === $this->state ? null : $this->state,
-            'is_end_state' => $this->isEndState,
+            'is_end_state' => $this->getMetaState()->ended,
+            'meta_state' => $this->getMetaState()->jsonSerialize(),
         ];
     }
 }

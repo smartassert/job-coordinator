@@ -138,7 +138,6 @@ class ComponentPreparationFactoryTest extends WebTestCase
             $workerComponentStateRepository->save(
                 new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                     ->setState('awaiting-job')
-                    ->setIsEndState(false)
             );
         };
 

@@ -23,7 +23,10 @@ readonly class GetWorkerJobReadinessHandler implements ReadinessHandlerInterface
     public function isReady(string $jobId): MessageHandlingReadiness
     {
         $applicationState = $this->workerComponentStateRepository->getApplicationState($jobId);
-        if ($applicationState instanceof WorkerComponentState && $applicationState->isEndState()) {
+        if (
+            $applicationState instanceof WorkerComponentState
+            && $applicationState->getMetaState()->ended
+        ) {
             return MessageHandlingReadiness::NEVER;
         }
 

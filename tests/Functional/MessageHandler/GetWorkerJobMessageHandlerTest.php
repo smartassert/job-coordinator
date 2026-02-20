@@ -21,6 +21,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
+use SmartAssert\WorkerClient\Model\MetaState;
 use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -95,29 +96,45 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $retrievedWorkerState = new ApplicationState(
-            new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
-            new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
-            new ComponentState(md5((string) rand()), (bool) rand(0, 1)),
-            new ComponentState(md5((string) rand()), (bool) rand(0, 1))
+            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
+            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
+            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
+            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
         );
 
         $workerClient = HttpMockedWorkerClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
                 'application' => [
                     'state' => $retrievedWorkerState->applicationState->state,
-                    'is_end_state' => $retrievedWorkerState->applicationState->isEndState,
+                    'is_end_state' => $retrievedWorkerState->applicationState->metaState->ended,
+                    'meta_state' => [
+                        'ended' => $retrievedWorkerState->applicationState->metaState->ended,
+                        'succeeded' => $retrievedWorkerState->applicationState->metaState->succeeded,
+                    ],
                 ],
                 'compilation' => [
                     'state' => $retrievedWorkerState->compilationState->state,
-                    'is_end_state' => $retrievedWorkerState->compilationState->isEndState,
+                    'is_end_state' => $retrievedWorkerState->compilationState->metaState->ended,
+                    'meta_state' => [
+                        'ended' => $retrievedWorkerState->compilationState->metaState->ended,
+                        'succeeded' => $retrievedWorkerState->compilationState->metaState->succeeded,
+                    ],
                 ],
                 'execution' => [
                     'state' => $retrievedWorkerState->executionState->state,
-                    'is_end_state' => $retrievedWorkerState->executionState->isEndState,
+                    'is_end_state' => $retrievedWorkerState->executionState->metaState->ended,
+                    'meta_state' => [
+                        'ended' => $retrievedWorkerState->executionState->metaState->ended,
+                        'succeeded' => $retrievedWorkerState->executionState->metaState->succeeded,
+                    ],
                 ],
                 'event_delivery' => [
                     'state' => $retrievedWorkerState->eventDeliveryState->state,
-                    'is_end_state' => $retrievedWorkerState->eventDeliveryState->isEndState,
+                    'is_end_state' => $retrievedWorkerState->eventDeliveryState->metaState->ended,
+                    'meta_state' => [
+                        'ended' => $retrievedWorkerState->eventDeliveryState->metaState->ended,
+                        'succeeded' => $retrievedWorkerState->eventDeliveryState->metaState->succeeded,
+                    ],
                 ],
             ])),
         ]);

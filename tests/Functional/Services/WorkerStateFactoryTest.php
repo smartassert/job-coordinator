@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerState;
 use App\Repository\WorkerComponentStateRepository;
@@ -82,22 +83,20 @@ class WorkerStateFactoryTest extends WebTestCase
             'application component state entity only' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,
-                        ))
+                        )
                             ->setState('awaiting-job')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
                     return new WorkerState(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,
-                        ))
-                            ->setState('awaiting-job')
-                            ->setIsEndState(false),
+                        )
+                            ->setState('awaiting-job'),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
@@ -107,24 +106,22 @@ class WorkerStateFactoryTest extends WebTestCase
             'execution component state entity only' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EXECUTION,
-                        ))
+                        )
                             ->setState('awaiting')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
                     return new WorkerState(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EXECUTION,
-                        ))
-                            ->setState('awaiting')
-                            ->setIsEndState(false),
+                        )
+                            ->setState('awaiting'),
                         new PendingWorkerComponentState(),
                     );
                 },
@@ -132,67 +129,61 @@ class WorkerStateFactoryTest extends WebTestCase
             'all component states' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,
-                        ))
+                        )
                             ->setState('executing')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::COMPILATION,
-                        ))
+                        )
                             ->setState('complete')
-                            ->setIsEndState(true)
+                            ->setMetaState(new MetaState(true, true))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EXECUTION,
-                        ))
+                        )
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EVENT_DELIVERY,
-                        ))
+                        )
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedWorkerStateCreator' => function (JobInterface $job) {
                     return new WorkerState(
-                        (new WorkerComponentState(
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,
-                        ))
-                            ->setState('executing')
-                            ->setIsEndState(false),
-                        (new WorkerComponentState(
+                        )
+                            ->setState('executing'),
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::COMPILATION,
-                        ))
+                        )
                             ->setState('complete')
-                            ->setIsEndState(true),
-                        (new WorkerComponentState(
+                            ->setMetaState(new MetaState(true, true)),
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EXECUTION,
-                        ))
-                            ->setState('running')
-                            ->setIsEndState(false),
-                        (new WorkerComponentState(
+                        )
+                            ->setState('running'),
+                        new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::EVENT_DELIVERY,
-                        ))
-                            ->setState('running')
-                            ->setIsEndState(false),
+                        )
+                            ->setState('running'),
                     );
                 },
             ],
