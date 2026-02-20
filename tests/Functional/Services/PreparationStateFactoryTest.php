@@ -69,11 +69,13 @@ class PreparationStateFactoryTest extends WebTestCase
      *   WorkerComponentStateRepository
      * ): void $entityCreator
      * @param callable(JobInterface, RemoteRequestRepository): void $remoteRequestCreator
-     * @param array<mixed>                                          $expected
      */
     #[DataProvider('createDataProvider')]
-    public function testCreate(callable $entityCreator, callable $remoteRequestCreator, PreparationState $expected): void
-    {
+    public function testCreate(
+        callable $entityCreator,
+        callable $remoteRequestCreator,
+        PreparationState $expected
+    ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
