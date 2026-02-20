@@ -16,6 +16,7 @@ readonly class JobStatus implements \JsonSerializable
 {
     public function __construct(
         private JobInterface $job,
+        private MetaState $metaState,
         private PreparationState $preparationState,
         private ?ResultsJob $resultsJob,
         private ?SerializedSuite $serializedSuite,
@@ -32,6 +33,7 @@ readonly class JobStatus implements \JsonSerializable
         return array_merge(
             $this->job->toArray(),
             [
+                'meta_state' => $this->metaState,
                 'preparation' => $this->preparationState,
                 JobComponent::RESULTS_JOB->value => $this->resultsJob,
                 JobComponent::SERIALIZED_SUITE->value => $this->serializedSuite,

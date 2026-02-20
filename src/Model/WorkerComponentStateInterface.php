@@ -19,4 +19,6 @@ interface WorkerComponentStateInterface
      * @return SerializedWorkerComponentState
      */
     public function toArray(): array;
+
+    public function getMetaState(): MetaState;
 }

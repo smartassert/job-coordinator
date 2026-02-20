@@ -38,10 +38,15 @@ readonly class PreparationState implements \JsonSerializable
             'state' => $this->state,
             'request_states' => $this->requestStates,
             'failures' => $this->componentFailures,
-            'meta_state' => new MetaState(
-                PreparationStateEnum::isEndState($this->state),
-                PreparationStateEnum::isSuccessState($this->state),
-            ),
+            'meta_state' => $this->getMetaState(),
         ];
+    }
+
+    public function getMetaState(): MetaState
+    {
+        return new MetaState(
+            PreparationStateEnum::isEndState($this->state),
+            PreparationStateEnum::isSuccessState($this->state)
+        );
     }
 }

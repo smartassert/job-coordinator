@@ -47,4 +47,9 @@ class WorkerState implements \JsonSerializable
             ]
         );
     }
+
+    public function getMetaState(): MetaState
+    {
+        return $this->applicationState->getMetaState();
+    }
 }
