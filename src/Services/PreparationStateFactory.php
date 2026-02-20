@@ -8,12 +8,12 @@ use App\Enum\PreparationState as PreparationStateEnum;
 use App\Model\JobInterface;
 use App\Model\PreparationState;
 
-readonly class PreparationStateFactory
+class PreparationStateFactory
 {
     public function __construct(
-        private ComponentPreparationFactory $componentPreparationFactory,
-        private PreparationStateReducer $preparationStateReducer,
-        private RequestStatesFactory $requestStatesFactory,
+        private readonly ComponentPreparationFactory $componentPreparationFactory,
+        private readonly PreparationStateReducer $preparationStateReducer,
+        private readonly RequestStatesFactory $requestStatesFactory,
     ) {}
 
     public function create(JobInterface $job): PreparationState
