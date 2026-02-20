@@ -28,9 +28,6 @@ class WorkerComponentState implements WorkerComponentStateInterface
     private string $state;
 
     #[ORM\Column]
-    private bool $isEndState;
-
-    #[ORM\Column]
     private bool $stateIsEnded;
 
     #[ORM\Column]
@@ -43,7 +40,6 @@ class WorkerComponentState implements WorkerComponentStateInterface
     {
         $this->jobId = $jobId;
         $this->componentName = $componentName;
-        $this->isEndState = false;
         $this->stateIsEnded = false;
         $this->stateIsSucceeded = false;
     }
