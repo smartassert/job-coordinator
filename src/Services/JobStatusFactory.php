@@ -21,17 +21,33 @@ readonly class JobStatusFactory
         private MachineRepository $machineRepository,
         private WorkerStateFactory $workerStateFactory,
         private RemoteRequestRepository $remoteRequestRepository,
+        private MetaStateReducer $metaStateReducer,
     ) {}
 
     public function create(JobInterface $job): JobStatus
     {
+        $preparationState = $this->preparationStateFactory->create($job);
+        $resultsJob = $this->resultsJobRepository->find($job->getId());
+        $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
+        $machine = $this->machineRepository->find($job->getId());
+        $workerJobState = $this->workerStateFactory->createForJob($job);
+
+        $jobMetaState = $this->metaStateReducer->reduce([
+            $preparationState->getMetaState(),
+            $resultsJob?->getMetaState(),
+            $serializedSuite?->getMetaState(),
+            $machine?->getMetaState(),
+            $workerJobState->getMetaState(),
+        ]);
+
         return new JobStatus(
             $job,
-            $this->preparationStateFactory->create($job),
-            $this->resultsJobRepository->find($job->getId()),
-            $this->serializedSuiteRepository->get($job->getId()),
-            $this->machineRepository->find($job->getId()),
-            $this->workerStateFactory->createForJob($job),
+            $jobMetaState,
+            $preparationState,
+            $resultsJob,
+            $serializedSuite,
+            $machine,
+            $workerJobState,
             new RemoteRequestCollection(
                 $this->remoteRequestRepository->findBy(['jobId' => $job->getId()], ['id' => 'ASC'])
             ),

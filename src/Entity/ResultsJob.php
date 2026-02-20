@@ -76,6 +76,11 @@ class ResultsJob implements \JsonSerializable
         return $this;
     }
 
+    public function getMetaState(): MetaState
+    {
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
+    }
+
     public function setMetaState(MetaState $metaState): self
     {
         $this->stateIsEnded = $metaState->ended;

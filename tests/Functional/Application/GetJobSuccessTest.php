@@ -181,6 +181,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'pending',
                             'meta_state' => [
@@ -249,6 +253,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -346,6 +354,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -450,6 +462,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -520,6 +536,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -603,6 +623,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -678,6 +702,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -766,6 +794,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -877,6 +909,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -993,6 +1029,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -1121,6 +1161,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'succeeded',
                             'meta_state' => [
@@ -1239,6 +1283,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'failed',
                             'meta_state' => [
@@ -1392,6 +1440,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'suite_id' => $job->getSuiteId(),
                         'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                         'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => false,
+                        ],
                         'preparation' => [
                             'state' => 'preparing',
                             'meta_state' => [
@@ -1443,6 +1495,155 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'meta_state' => [
                                         'ended' => false,
                                         'succeeded' => false,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'succeeded' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator(
+                    'ended',
+                    'complete',
+                    new MetaState(true, true),
+                ),
+                'serializedSuiteCreator' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) {
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true),
+                    );
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    return $serializedSuite;
+                },
+                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                    $machine = new Machine(
+                        $job->getId(),
+                        'complete',
+                        'end',
+                        new MetaState(true, true),
+                    );
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => function (
+                    JobInterface $job,
+                    WorkerComponentStateRepository $repository,
+                ) {
+                    $repository->save(
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
+                            ->setState('complete')
+                            ->setMetaState(new MetaState(true, true))
+                    );
+
+                    $repository->save(
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
+                            ->setState('complete')
+                            ->setMetaState(new MetaState(true, true))
+                    );
+
+                    $repository->save(
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
+                            ->setState('complete')
+                            ->setMetaState(new MetaState(true, true))
+                    );
+
+                    $repository->save(
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
+                            ->setState('complete')
+                            ->setMetaState(new MetaState(true, true))
+                    );
+                },
+                'expectedSerializedJobCreator' => function (
+                    JobInterface $job,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
+                        'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                        'preparation' => [
+                            'state' => 'succeeded',
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
+                            'request_states' => [
+                                'results-job' => 'succeeded',
+                                'serialized-suite' => 'succeeded',
+                                'machine' => 'succeeded',
+                                'worker-job' => 'succeeded',
+                            ],
+                            'failures' => [],
+                        ],
+                        'results-job' => [
+                            'state' => 'ended',
+                            'end_state' => 'complete',
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
+                        ],
+                        'serialized-suite' => [
+                            'state' => 'prepared',
+                            'is_prepared' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
+                        ],
+                        'machine' => [
+                            'state_category' => 'end',
+                            'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
+                        ],
+                        'worker-job' => [
+                            'state' => 'complete',
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
+                            'components' => [
+                                'compilation' => [
+                                    'state' => 'complete',
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
+                                    ],
+                                ],
+                                'execution' => [
+                                    'state' => 'complete',
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
+                                    ],
+                                ],
+                                'event_delivery' => [
+                                    'state' => 'complete',
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
                                     ],
                                 ],
                             ],
