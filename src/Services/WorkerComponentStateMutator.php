@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Model\MetaState;
 use App\Repository\WorkerComponentStateRepository;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -62,7 +63,10 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
 
         $componentStateEntity = $componentStateEntity
             ->setState($componentState->state)
-            ->setIsEndState($componentState->isEndState)
+            ->setMetaState(new MetaState(
+                $componentState->metaState->ended,
+                $componentState->metaState->succeeded,
+            ))
         ;
 
         $this->workerComponentStateRepository->save($componentStateEntity);

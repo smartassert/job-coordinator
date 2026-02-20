@@ -9,6 +9,7 @@ use App\Entity\MachineActionFailure;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -51,8 +52,12 @@ class MachineMutator implements EventSubscriberInterface
 
         $machineEntity->setState($event->getMachine()->state);
         $machineEntity->setStateCategory($event->getMachine()->stateCategory);
-        $machineEntity->setHasFailedState($event->getMachine()->hasFailedState);
-        $machineEntity->setHasEndState($event->getMachine()->hasEndState);
+        $machineEntity->setMetaState(
+            new MetaState(
+                $event->getMachine()->metaState->ended,
+                $event->getMachine()->metaState->succeeded,
+            )
+        );
 
         $this->machineRepository->save($machineEntity);
     }

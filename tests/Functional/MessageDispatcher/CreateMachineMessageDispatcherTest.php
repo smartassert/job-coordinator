@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MessageNotHandleableEvent;
@@ -15,6 +14,7 @@ use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
@@ -22,6 +22,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,7 +34,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 {
     private CreateMachineMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
-    private ResultsJobRepository $resultsJobRepository;
     private SerializedSuiteRepository $serializedSuiteRepository;
 
     private JobFactory $jobFactory;
@@ -63,7 +63,6 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             $entityManager->remove($resultsJob);
         }
         $entityManager->flush();
-        $this->resultsJobRepository = $resultsJobRepository;
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -95,10 +94,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $job = $this->jobFactory->createRandom();
 
-        $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), 'awaiting-events', null);
-        $this->resultsJobRepository->save($resultsJob);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+        $resultsJobFactory->create(job: $job, state: 'awaiting-events');
+
+        $serializedSuite = new SerializedSuite(
+            $job->getId(),
+            md5((string) rand()),
+            'prepared',
+            new MetaState(true, true),
+        );
         $this->serializedSuiteRepository->save($serializedSuite);
 
         $event = $eventCreator($job);

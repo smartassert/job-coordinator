@@ -67,27 +67,23 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
             'no matching states' => [
                 'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::APPLICATION)
                             ->setState('compiling')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::COMPILATION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION)
                             ->setState('pending')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedStatesCreator' => function () {
@@ -97,53 +93,45 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
             'single matching state' => [
                 'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('executing')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedStatesCreator' => function (JobInterface $job) {
                     return [
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
-                            ->setState('executing')
-                            ->setIsEndState(false),
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
+                            ->setState('executing'),
                     ];
                 },
             ],
             'multiple matching state' => [
                 'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('executing')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState('complete')
-                            ->setIsEndState(true)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION)
                             ->setState('pending')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedStatesCreator' => function (JobInterface $job) {
                     return [
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
-                            ->setState('executing')
-                            ->setIsEndState(false),
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
-                            ->setState('complete')
-                            ->setIsEndState(true),
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
+                            ->setState('executing'),
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
+                            ->setState('complete'),
                     ];
                 },
             ],

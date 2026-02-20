@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,11 +27,11 @@ class Machine implements \JsonSerializable
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?MachineActionFailure $actionFailure = null;
 
-    #[ORM\Column(nullable: false)]
-    private bool $hasFailedState;
+    #[ORM\Column]
+    private bool $stateIsEnded;
 
-    #[ORM\Column(nullable: false)]
-    private bool $hasEndState;
+    #[ORM\Column]
+    private bool $stateIsSucceeded;
 
     /**
      * @param non-empty-string $jobId
@@ -41,14 +42,13 @@ class Machine implements \JsonSerializable
         string $jobId,
         string $state,
         string $stateCategory,
-        bool $hasFailedState,
-        bool $hasEndState,
+        MetaState $metaState,
     ) {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
-        $this->hasFailedState = $hasFailedState;
-        $this->hasEndState = $hasEndState;
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
     }
 
     /**
@@ -109,28 +109,17 @@ class Machine implements \JsonSerializable
         return $this;
     }
 
-    public function hasFailedState(): ?bool
+    public function setMetaState(MetaState $metaState): self
     {
-        return $this->hasFailedState;
-    }
-
-    public function setHasFailedState(bool $hasFailedState): static
-    {
-        $this->hasFailedState = $hasFailedState;
+        $this->stateIsEnded = $metaState->ended;
+        $this->stateIsSucceeded = $metaState->succeeded;
 
         return $this;
     }
 
-    public function setHasEndState(bool $hasEndState): static
+    public function getMetaState(): MetaState
     {
-        $this->hasEndState = $hasEndState;
-
-        return $this;
-    }
-
-    public function hasEndState(): bool
-    {
-        return $this->hasEndState;
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
     }
 
     /**
@@ -138,8 +127,7 @@ class Machine implements \JsonSerializable
      *   state_category: ?non-empty-string,
      *   ip_address: ?non-empty-string,
      *   action_failure: ?MachineActionFailure,
-     *   has_failed_state: bool,
-     *   has_end_state: bool
+     *   'meta_state': MetaState,
      * }
      */
     public function jsonSerialize(): array
@@ -148,8 +136,7 @@ class Machine implements \JsonSerializable
             'state_category' => '' === $this->stateCategory ? null : $this->stateCategory,
             'ip_address' => $this->getIp(),
             'action_failure' => $this->actionFailure,
-            'has_failed_state' => $this->hasFailedState,
-            'has_end_state' => $this->hasEndState,
+            'meta_state' => new MetaState($this->stateIsEnded, $this->stateIsSucceeded),
         ];
     }
 }

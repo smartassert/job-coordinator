@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Model\MetaState;
 use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -45,6 +46,11 @@ class ResultsJobMutator implements EventSubscriberInterface
         if (null !== $event->resultsJobState->endState) {
             $resultsJob->setEndState($event->resultsJobState->endState);
         }
+
+        $resultsJob->setMetaState(new MetaState(
+            $event->resultsJobState->metaState->ended,
+            $event->resultsJobState->metaState->succeeded,
+        ));
 
         $this->resultsJobRepository->save($resultsJob);
     }

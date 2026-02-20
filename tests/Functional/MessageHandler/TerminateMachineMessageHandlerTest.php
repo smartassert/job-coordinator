@@ -17,6 +17,7 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFacto
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -121,6 +122,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([

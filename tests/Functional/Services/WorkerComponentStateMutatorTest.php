@@ -8,14 +8,16 @@ use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerComponentStateMutator;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerClient\Model\ApplicationState;
-use SmartAssert\WorkerClient\Model\ComponentState;
+use SmartAssert\WorkerClient\Model\ApplicationState as WorkerClientApplicationState;
+use SmartAssert\WorkerClient\Model\ComponentState as WorkerClientComponentState;
+use SmartAssert\WorkerClient\Model\MetaState as WorkerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -82,11 +84,11 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $jobId = (string) new Ulid();
 
-        $irrelevantApplicationState = new ApplicationState(
-            new ComponentState('state', false),
-            new ComponentState('state', false),
-            new ComponentState('state', false),
-            new ComponentState('state', false),
+        $irrelevantApplicationState = new WorkerClientApplicationState(
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
         );
 
         $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
@@ -107,7 +109,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     #[DataProvider('setOnWorkerStateRetrievedEventSuccessDataProvider')]
     public function testSetOnWorkerStateRetrievedEventSuccess(
         callable $componentStateCreator,
-        ApplicationState $retrievedApplicationState,
+        WorkerClientApplicationState $retrievedApplicationState,
         callable $expectedApplicationStateCreator,
         callable $expectedCompilationStateCreator,
         callable $expectedExecutionStateCreator,
@@ -162,17 +164,17 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     public static function setOnWorkerStateRetrievedEventSuccessDataProvider(): array
     {
         $applicationStates = [
-            new ApplicationState(
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
+            new WorkerClientApplicationState(
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
             ),
-            new ApplicationState(
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
-                new ComponentState(md5((string) rand()), false),
+            new WorkerClientApplicationState(
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
             ),
         ];
 
@@ -181,27 +183,39 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                 'componentStateCreator' => function () {},
                 'retrievedApplicationState' => $applicationStates[0],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                         ->setState($applicationStates[0]->applicationState->state)
-                        ->setIsEndState($applicationStates[0]->applicationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->applicationState->metaState->ended,
+                            $applicationStates[0]->applicationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                         ->setState($applicationStates[0]->compilationState->state)
-                        ->setIsEndState($applicationStates[0]->compilationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->compilationState->metaState->ended,
+                            $applicationStates[0]->compilationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                         ->setState($applicationStates[0]->executionState->state)
-                        ->setIsEndState($applicationStates[0]->executionState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->executionState->metaState->ended,
+                            $applicationStates[0]->executionState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                         ->setState($applicationStates[0]->eventDeliveryState->state)
-                        ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->eventDeliveryState->metaState->ended,
+                            $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                        ))
                     ;
                 },
             ],
@@ -213,52 +227,76 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                     $applicationStates
                 ) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState($applicationStates[0]->applicationState->state)
-                            ->setIsEndState($applicationStates[0]->applicationState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->applicationState->metaState->ended,
+                                $applicationStates[0]->applicationState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState($applicationStates[0]->compilationState->state)
-                            ->setIsEndState($applicationStates[0]->compilationState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->compilationState->metaState->ended,
+                                $applicationStates[0]->compilationState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                             ->setState($applicationStates[0]->executionState->state)
-                            ->setIsEndState($applicationStates[0]->executionState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->executionState->metaState->ended,
+                                $applicationStates[0]->executionState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState($applicationStates[0]->eventDeliveryState->state)
-                            ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->eventDeliveryState->metaState->ended,
+                                $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                            ))
                     );
                 },
                 'retrievedApplicationState' => $applicationStates[0],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                         ->setState($applicationStates[0]->applicationState->state)
-                        ->setIsEndState($applicationStates[0]->applicationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->applicationState->metaState->ended,
+                            $applicationStates[0]->applicationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                         ->setState($applicationStates[0]->compilationState->state)
-                        ->setIsEndState($applicationStates[0]->compilationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->compilationState->metaState->ended,
+                            $applicationStates[0]->compilationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                         ->setState($applicationStates[0]->executionState->state)
-                        ->setIsEndState($applicationStates[0]->executionState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->executionState->metaState->ended,
+                            $applicationStates[0]->executionState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                         ->setState($applicationStates[0]->eventDeliveryState->state)
-                        ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[0]->eventDeliveryState->metaState->ended,
+                            $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                        ))
                     ;
                 },
             ],
@@ -270,52 +308,76 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                     $applicationStates
                 ) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState($applicationStates[0]->applicationState->state)
-                            ->setIsEndState($applicationStates[0]->applicationState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->applicationState->metaState->ended,
+                                $applicationStates[0]->applicationState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState($applicationStates[0]->compilationState->state)
-                            ->setIsEndState($applicationStates[0]->compilationState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->compilationState->metaState->ended,
+                                $applicationStates[0]->compilationState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                             ->setState($applicationStates[0]->executionState->state)
-                            ->setIsEndState($applicationStates[0]->executionState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->executionState->metaState->ended,
+                                $applicationStates[0]->executionState->metaState->succeeded,
+                            ))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState($applicationStates[0]->eventDeliveryState->state)
-                            ->setIsEndState($applicationStates[0]->eventDeliveryState->isEndState)
+                            ->setMetaState(new MetaState(
+                                $applicationStates[0]->eventDeliveryState->metaState->ended,
+                                $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                            ))
                     );
                 },
                 'retrievedApplicationState' => $applicationStates[1],
                 'expectedApplicationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                         ->setState($applicationStates[1]->applicationState->state)
-                        ->setIsEndState($applicationStates[1]->applicationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[1]->applicationState->metaState->ended,
+                            $applicationStates[1]->applicationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedCompilationStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                         ->setState($applicationStates[1]->compilationState->state)
-                        ->setIsEndState($applicationStates[1]->compilationState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[1]->compilationState->metaState->ended,
+                            $applicationStates[1]->compilationState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedExecutionStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                         ->setState($applicationStates[1]->executionState->state)
-                        ->setIsEndState($applicationStates[1]->executionState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[1]->executionState->metaState->ended,
+                            $applicationStates[1]->executionState->metaState->succeeded,
+                        ))
                     ;
                 },
                 'expectedEventDeliveryStateCreator' => function (JobInterface $job) use ($applicationStates) {
-                    return (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                    return new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                         ->setState($applicationStates[1]->eventDeliveryState->state)
-                        ->setIsEndState($applicationStates[1]->eventDeliveryState->isEndState)
+                        ->setMetaState(new MetaState(
+                            $applicationStates[1]->eventDeliveryState->metaState->ended,
+                            $applicationStates[1]->eventDeliveryState->metaState->succeeded,
+                        ))
                     ;
                 },
             ],

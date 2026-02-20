@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
@@ -13,17 +12,19 @@ use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -122,15 +123,17 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteId = (string) new Ulid();
 
         $serializedSuiteRepository->save(
-            new SerializedSuite($job->getId(), $serializedSuiteId, 'prepared', true, true)
+            new SerializedSuite(
+                $job->getId(),
+                $serializedSuiteId,
+                'prepared',
+                new MetaState(true, true),
+            )
         );
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-
-        $resultsJobRepository->save(
-            new ResultsJob($job->getId(), 'token', 'state', null)
-        );
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJobFactory->create($job);
 
         $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
         \assert($assessor instanceof ReadinessAssessorInterface);
@@ -144,6 +147,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
@@ -160,7 +164,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $createdMachine = $machineRepository->find($job->getId());
         self::assertEquals(
-            new Machine($job->getId(), 'create/requested', 'pre_active', false, false),
+            new Machine(
+                $job->getId(),
+                'create/requested',
+                'pre_active',
+                new MetaState(false, false),
+            ),
             $createdMachine
         );
 

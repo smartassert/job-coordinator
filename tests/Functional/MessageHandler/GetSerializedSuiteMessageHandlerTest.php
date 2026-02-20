@@ -12,6 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
@@ -71,7 +72,12 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'requested', false, false);
+        $serializedSuite = new SerializedSuite(
+            $job->getId(),
+            md5((string) rand()),
+            'requested',
+            new MetaState(false, false),
+        );
         $serializedSuiteRepository->save($serializedSuite);
         \assert('' !== $serializedSuite->id);
 

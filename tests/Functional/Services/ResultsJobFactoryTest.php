@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobCreatedEvent;
+use App\Model\MetaState;
 use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobFactory;
@@ -15,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -97,7 +99,7 @@ class ResultsJobFactoryTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        self::assertSame(0, $this->resultsJobRepository->count([]));
+        self::assertSame(0, $this->resultsJobRepository->count());
 
         $resultsJobToken = md5((string) rand());
         $resultsJobState = 'awaiting-events';
@@ -106,7 +108,7 @@ class ResultsJobFactoryTest extends WebTestCase
         $resultsJob = new ResultsClientJob(
             $job->getId(),
             $resultsJobToken,
-            new ResultsJobState($resultsJobState, $resultsJobEndState)
+            new ResultsJobState($resultsJobState, $resultsJobEndState, new ResultsClientMetaState(false, false))
         );
 
         $event = new ResultsJobCreatedEvent('authentication token', $job->getId(), $resultsJob);
@@ -115,7 +117,13 @@ class ResultsJobFactoryTest extends WebTestCase
 
         $resultsJobEntity = $this->resultsJobRepository->find($job->getId());
         self::assertEquals(
-            new ResultsJob($job->getId(), $resultsJobToken, $resultsJobState, $resultsJobEndState),
+            new ResultsJob(
+                $job->getId(),
+                $resultsJobToken,
+                $resultsJobState,
+                $resultsJobEndState,
+                new MetaState(false, false),
+            ),
             $resultsJobEntity
         );
     }

@@ -9,11 +9,13 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -81,6 +83,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $this->persistMachine($machine);
@@ -117,6 +120,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             true,
+            new WorkerManagerClientMetaState(true, false),
         );
 
         $this->persistMachine($machine);
@@ -146,6 +150,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         $this->persistMachine($machine);
@@ -183,8 +188,10 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             $machine->id,
             $machine->state,
             $machine->stateCategory,
-            $machine->hasFailedState,
-            $machine->hasEndState,
+            new MetaState(
+                $machine->metaState->ended,
+                $machine->metaState->succeeded,
+            ),
         ));
     }
 }

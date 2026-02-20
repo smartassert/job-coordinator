@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobCreatedEvent;
+use App\Model\MetaState;
 use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,7 +42,11 @@ class ResultsJobFactory implements EventSubscriberInterface
                 $job->getId(),
                 $event->resultsJob->token,
                 $event->resultsJob->state->state,
-                $event->resultsJob->state->endState
+                $event->resultsJob->state->endState,
+                new MetaState(
+                    $event->resultsJob->state->metaState->ended,
+                    $event->resultsJob->state->metaState->succeeded,
+                )
             );
             $this->resultsJobRepository->save($resultsJob);
         }

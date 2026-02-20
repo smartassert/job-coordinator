@@ -11,7 +11,10 @@ use App\Enum\WorkerComponentName;
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: ?non-empty-string,
- *   is_end_state: bool,
+ *   meta_state: array{
+ *     ended: bool,
+ *     succeeded: bool
+ *   },
  *   components: array{
  *     compilation: SerializedWorkerComponentState,
  *     execution: SerializedWorkerComponentState,

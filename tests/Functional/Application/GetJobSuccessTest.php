@@ -15,6 +15,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
@@ -136,12 +137,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
             return [];
         };
 
-        $resultsJobCreatorCreator = function (string $state, ?string $endState) {
-            return function (JobInterface $job, ResultsJobRepository $resultsJobRepository) use ($state, $endState) {
+        $resultsJobCreatorCreator = function (
+            string $state,
+            ?string $endState = null,
+            ?MetaState $metaState = null,
+        ) {
+            $metaState = $metaState ?? new MetaState(false, false);
+
+            return function (
+                JobInterface $job,
+                ResultsJobRepository $resultsJobRepository
+            ) use (
+                $state,
+                $endState,
+                $metaState
+            ) {
                 \assert('' !== $state);
                 \assert('' !== $endState);
 
-                $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), $state, $endState);
+                $resultsJob = new ResultsJob(
+                    $job->getId(),
+                    md5((string) rand()),
+                    $state,
+                    $endState,
+                    $metaState,
+                );
                 $resultsJobRepository->save($resultsJob);
 
                 return $resultsJob;
@@ -176,19 +196,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -228,19 +260,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -309,19 +353,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -395,24 +451,40 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'results-state-1',
                             'end_state' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => null,
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -445,24 +517,40 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'results-state-2',
                             'end_state' => 'results-end-state-2',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => null,
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -477,7 +565,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true)
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -504,24 +597,39 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'serialized-suite' => [
                             'state' => 'prepared',
                             'is_prepared' => true,
-                            'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
                         ],
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -561,19 +669,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -599,8 +719,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -635,24 +754,38 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -669,8 +802,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -683,27 +815,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     WorkerComponentStateRepository $repository,
                 ) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState('complete')
-                            ->setIsEndState(true)
+                            ->setMetaState(new MetaState(true, true))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedSerializedJobCreator' => function (
@@ -732,24 +861,38 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'complete',
-                                    'is_end_state' => true,
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -766,8 +909,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
                     $machine->setActionFailure(new MachineActionFailure(
@@ -785,27 +927,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     WorkerComponentStateRepository $repository
                 ) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState('complete')
-                            ->setIsEndState(true)
+                            ->setMetaState(new MetaState(true, true))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedSerializedJobCreator' => function (
@@ -838,24 +977,38 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'type' => 'vendor_authentication_failure',
                                 'context' => null,
                             ],
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'complete',
-                                    'is_end_state' => true,
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -870,7 +1023,12 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
                 ) {
-                    $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), 'prepared', true, true);
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true),
+                    );
                     $serializedSuiteRepository->save($serializedSuite);
 
                     return $serializedSuite;
@@ -880,8 +1038,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -894,27 +1051,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     WorkerComponentStateRepository $repository,
                 ) {
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::COMPILATION)
                             ->setState('complete')
-                            ->setIsEndState(true)
+                            ->setMetaState(new MetaState(true, true))
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EXECUTION)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
 
                     $repository->save(
-                        (new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY))
+                        new WorkerComponentState($job->getId(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
-                            ->setIsEndState(false)
                     );
                 },
                 'expectedSerializedJobCreator' => function (
@@ -940,34 +1094,55 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'results-job' => [
                             'state' => 'awaiting-events',
                             'end_state' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'serialized-suite' => [
                             'state' => 'prepared',
                             'is_prepared' => true,
-                            'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
                         ],
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => false,
-                            'has_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'running',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'complete',
-                                    'is_end_state' => true,
+                                    'meta_state' => [
+                                        'ended' => true,
+                                        'succeeded' => true,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'running',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -1056,19 +1231,31 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'machine' => null,
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],
@@ -1138,8 +1325,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $job->getId(),
                         md5((string) rand()),
                         md5((string) rand()),
-                        true,
-                        true,
+                        new MetaState(true, false),
                     );
                     $machine = $machine->setIp(md5((string) rand()));
 
@@ -1174,24 +1360,38 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state_category' => $machine->getStateCategory(),
                             'ip_address' => $machine->getIp(),
                             'action_failure' => null,
-                            'has_failed_state' => true,
-                            'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => false,
+                            ],
                         ],
                         'worker-job' => [
                             'state' => 'pending',
-                            'is_end_state' => false,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
                             'components' => [
                                 'compilation' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'execution' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                                 'event_delivery' => [
                                     'state' => 'pending',
-                                    'is_end_state' => false,
+                                    'meta_state' => [
+                                        'ended' => false,
+                                        'succeeded' => false,
+                                    ],
                                 ],
                             ],
                         ],

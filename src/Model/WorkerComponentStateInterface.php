@@ -7,7 +7,10 @@ namespace App\Model;
 /**
  * @phpstan-type SerializedWorkerComponentState array{
  *   state: ?non-empty-string,
- *   is_end_state: bool
+ *   meta_state: array{
+ *     ended: bool,
+ *     succeeded: bool
+ *   }
  * }
  */
 interface WorkerComponentStateInterface

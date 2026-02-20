@@ -16,6 +16,7 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Uid\Ulid;
@@ -82,8 +83,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $job->getSuiteId(),
             $serializedSuiteParameters,
             'requested',
-            false,
-            false,
+            new SourcesClientMetaState(false, false),
             null,
             null,
         );

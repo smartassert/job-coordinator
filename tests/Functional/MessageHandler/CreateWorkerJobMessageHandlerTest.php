@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
@@ -13,12 +12,14 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
@@ -95,7 +96,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
         $jobId = $job->getId();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -135,7 +136,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
         $jobId = $job->getId();
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', true, true);
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
@@ -214,11 +215,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createResultsJob(JobInterface $job): void
     {
-        $resultsJob = new ResultsJob($job->getId(), md5((string) rand()), md5((string) rand()), md5((string) rand()));
-
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
-        $resultsJobRepository->save($resultsJob);
+        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
+        \assert($resultsJobFactory instanceof ResultsJobFactory);
+        $resultsJobFactory->create($job);
     }
 
     /**
@@ -227,10 +226,14 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createSerializedSuite(
         JobInterface $job,
         string $state,
-        bool $isPrepared,
-        bool $hasEndState,
+        MetaState $metaState,
     ): SerializedSuite {
-        $serializedSuite = new SerializedSuite($job->getId(), md5((string) rand()), $state, $isPrepared, $hasEndState);
+        $serializedSuite = new SerializedSuite(
+            $job->getId(),
+            md5((string) rand()),
+            $state,
+            $metaState,
+        );
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

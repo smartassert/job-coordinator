@@ -10,6 +10,7 @@ use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
@@ -18,6 +19,7 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFacto
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -163,8 +165,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
 
@@ -182,6 +183,7 @@ class MachineMutatorTest extends WebTestCase
                             false,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                         )
                     );
                 },
@@ -190,8 +192,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                 },
             ],
@@ -202,8 +203,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
 
@@ -221,6 +221,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                         )
                     );
                 },
@@ -229,8 +230,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/active',
                         'active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                 },
             ],
@@ -284,6 +284,7 @@ class MachineMutatorTest extends WebTestCase
             true,
             false,
             false,
+            new WorkerManagerClientMetaState(false, false),
         );
 
         return [
@@ -328,8 +329,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
                     ;
@@ -350,8 +350,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
                     ;
@@ -364,8 +363,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
 
@@ -384,8 +382,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
                     ;
@@ -398,8 +395,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.1')
                     ;
@@ -420,8 +416,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'up/started',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setIp('127.0.0.2')
                     ;
@@ -486,6 +481,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -511,6 +507,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -526,8 +523,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     );
                     $machineRepository->save($machine);
 
@@ -545,6 +541,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -554,8 +551,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'find', 'vendor_authentication_failure', [])
@@ -570,8 +566,7 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
+                        new MetaState(false, false),
                     ))
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
@@ -593,18 +588,18 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
+                            new WorkerManagerClientMetaState(false, false),
                             new ActionFailure('new_action', 'new_type', []),
                         ),
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
-                    return (new Machine(
+                    return new Machine(
                         $job->getId(),
                         'find/finding',
                         'pre_active',
-                        false,
-                        false,
-                    ))
+                        new MetaState(false, false),
+                    )
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
                         )
