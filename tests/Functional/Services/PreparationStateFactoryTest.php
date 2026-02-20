@@ -15,6 +15,7 @@ use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Model\MetaState;
+use App\Model\PreparationState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
@@ -71,7 +72,7 @@ class PreparationStateFactoryTest extends WebTestCase
      * @param array<mixed>                                          $expected
      */
     #[DataProvider('createDataProvider')]
-    public function testCreate(callable $entityCreator, callable $remoteRequestCreator, array $expected): void
+    public function testCreate(callable $entityCreator, callable $remoteRequestCreator, PreparationState $expected): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -111,16 +112,16 @@ class PreparationStateFactoryTest extends WebTestCase
             'pending' => [
                 'entityCreator' => function () {},
                 'remoteRequestCreator' => function () {},
-                'expected' => [
-                    'state' => PreparationStateEnum::PENDING,
-                    'failures' => [],
-                    'request_states' => [
+                'expected' => new PreparationState(
+                    PreparationStateEnum::PENDING,
+                    [
                         'results-job' => RequestState::PENDING,
                         'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
                     ],
-                ],
+                    [],
+                ),
             ],
             'succeeded' => [
                 'entityCreator' => function (
@@ -152,16 +153,16 @@ class PreparationStateFactoryTest extends WebTestCase
                     );
                 },
                 'remoteRequestCreator' => function () {},
-                'expected' => [
-                    'state' => PreparationStateEnum::SUCCEEDED,
-                    'failures' => [],
-                    'request_states' => [
+                'expected' => new PreparationState(
+                    PreparationStateEnum::SUCCEEDED,
+                    [
                         'results-job' => RequestState::SUCCEEDED,
                         'serialized-suite' => RequestState::SUCCEEDED,
                         'machine' => RequestState::SUCCEEDED,
                         'worker-job' => RequestState::SUCCEEDED,
                     ],
-                ],
+                    [],
+                ),
             ],
             'preparing' => [
                 'entityCreator' => function () {},
@@ -173,16 +174,16 @@ class PreparationStateFactoryTest extends WebTestCase
                         new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                     );
                 },
-                'expected' => [
-                    'state' => PreparationStateEnum::PREPARING,
-                    'failures' => [],
-                    'request_states' => [
+                'expected' => new PreparationState(
+                    PreparationStateEnum::PREPARING,
+                    [
                         'results-job' => RequestState::REQUESTING,
                         'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
                     ],
-                ],
+                    [],
+                ),
             ],
             'failed, single component failure' => [
                 'entityCreator' => function () {},
@@ -200,22 +201,22 @@ class PreparationStateFactoryTest extends WebTestCase
                             ))
                     );
                 },
-                'expected' => [
-                    'state' => PreparationStateEnum::FAILED,
-                    'failures' => [
+                'expected' => new PreparationState(
+                    PreparationStateEnum::FAILED,
+                    [
+                        'results-job' => RequestState::FAILED,
+                        'serialized-suite' => RequestState::PENDING,
+                        'machine' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
+                    ],
+                    [
                         'results-job' => new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
                             503,
                             'service unavailable'
                         ),
                     ],
-                    'request_states' => [
-                        'results-job' => RequestState::FAILED,
-                        'serialized-suite' => RequestState::PENDING,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                ],
+                ),
             ],
             'failed, multiple component failures' => [
                 'entityCreator' => function () {},
@@ -243,9 +244,15 @@ class PreparationStateFactoryTest extends WebTestCase
                             ))
                     );
                 },
-                'expected' => [
-                    'state' => PreparationStateEnum::FAILED,
-                    'failures' => [
+                'expected' => new PreparationState(
+                    PreparationStateEnum::FAILED,
+                    [
+                        'results-job' => RequestState::FAILED,
+                        'serialized-suite' => RequestState::FAILED,
+                        'machine' => RequestState::PENDING,
+                        'worker-job' => RequestState::PENDING,
+                    ],
+                    [
                         'results-job' => new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
                             503,
@@ -257,13 +264,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             'connection timed out'
                         ),
                     ],
-                    'request_states' => [
-                        'results-job' => RequestState::FAILED,
-                        'serialized-suite' => RequestState::FAILED,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                ],
+                ),
             ],
         ];
     }
