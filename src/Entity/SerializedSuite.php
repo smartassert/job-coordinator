@@ -12,7 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
  * @phpstan-type SerializedSerializedSuite array{
  *   state: non-empty-string,
  *   is_prepared: bool,
- *   has_end_state: bool
+ *   has_end_state: bool,
+ *   meta_state: array{
+ *     ended: bool,
+ *     succeeded: bool
+ *   },
  *  }
  */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
@@ -100,6 +104,7 @@ class SerializedSuite implements \JsonSerializable
             'state' => $this->state,
             'is_prepared' => $this->isPrepared(),
             'has_end_state' => $this->hasEndState(),
+            'meta_state' => $this->getMetaState()->jsonSerialize(),
         ];
     }
 

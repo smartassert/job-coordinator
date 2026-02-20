@@ -618,6 +618,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => 'prepared',
                             'is_prepared' => true,
                             'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
                         ],
                         'machine' => null,
                         'worker-job' => [
@@ -1140,6 +1144,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'state' => 'prepared',
                             'is_prepared' => true,
                             'has_end_state' => true,
+                            'meta_state' => [
+                                'ended' => true,
+                                'succeeded' => true,
+                            ],
                         ],
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
