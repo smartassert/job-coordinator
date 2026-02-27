@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enum\JobComponentName;
+use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
+use App\Model\NamedJobComponent;
 use App\Model\RemoteRequestCollection;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
@@ -40,14 +43,18 @@ readonly class JobStatusFactory
             $workerJobState->getMetaState(),
         ]);
 
+        $components = new JobComponents([
+            new NamedJobComponent(JobComponentName::RESULTS_JOB, $resultsJob),
+            new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
+            new NamedJobComponent(JobComponentName::MACHINE, $machine),
+            new NamedJobComponent(JobComponentName::WORKER_JOB, $workerJobState),
+        ]);
+
         return new JobStatus(
             $job,
             $jobMetaState,
             $preparationState,
-            $resultsJob,
-            $serializedSuite,
-            $machine,
-            $workerJobState,
+            $components,
             new RemoteRequestCollection(
                 $this->remoteRequestRepository->findBy(['jobId' => $job->getId()], ['id' => 'ASC'])
             ),

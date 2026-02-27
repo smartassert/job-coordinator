@@ -136,7 +136,10 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         $jobData = json_decode($getJobResponse->getBody()->getContents(), true);
         \assert(is_array($jobData));
 
-        $machineData = $jobData['machine'];
+        $componentsData = $jobData['components'] ?? [];
+        \assert(is_array($componentsData));
+
+        $machineData = $componentsData['machine'];
         \assert(null === $machineData || is_array($machineData));
 
         return $machineData;

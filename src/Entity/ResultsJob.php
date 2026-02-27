@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
+use App\Model\SerializeToArrayInterface;
 use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
-class ResultsJob implements \JsonSerializable
+class ResultsJob implements SerializeToArrayInterface
 {
     #[ORM\Column(length: 32)]
     public readonly string $token;
