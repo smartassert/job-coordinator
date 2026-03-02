@@ -16,7 +16,7 @@ class RemoteJobActionException extends \Exception implements RemoteRequestExcept
             sprintf(
                 'Failed to %s %s for job "%s": %s',
                 $failedMessage->getRemoteRequestType()->action->value,
-                $failedMessage->getRemoteRequestType()->jobComponent->value,
+                $failedMessage->getRemoteRequestType()->componentName->value,
                 $this->failedMessage->getJobId(),
                 $previousException->getMessage()
             ),
