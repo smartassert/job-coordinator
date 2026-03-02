@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\JobComponent;
+use App\Enum\JobComponentName;
 use App\Enum\RequestState;
 use App\Model\JobInterface;
 use App\Services\JobComponentHandler\JobComponentHandlerInterface;
@@ -19,18 +19,17 @@ class RequestStatesFactory
     ) {}
 
     /**
-     * @return array<value-of<JobComponent>, RequestState>
+     * @return array<value-of<JobComponentName>, RequestState>
      */
     public function create(JobInterface $job): array
     {
         $requestStates = [];
 
-        foreach (JobComponent::cases() as $jobComponent) {
-            //            var_dump($jobComponent);
+        foreach (JobComponentName::cases() as $componentName) {
             $requestState = null;
 
             foreach ($this->jobComponentHandlers as $jobComponentHandler) {
-                if (null === $requestState && $jobComponentHandler->handles($jobComponent)) {
+                if (null === $requestState && $jobComponentHandler->handles($componentName)) {
                     $requestState = $jobComponentHandler->getRequestState($job->getId());
                 }
             }
@@ -39,7 +38,7 @@ class RequestStatesFactory
                 $requestState = RequestState::getDefault();
             }
 
-            $requestStates[$jobComponent->value] = $requestState;
+            $requestStates[$componentName->value] = $requestState;
         }
 
         return $requestStates;

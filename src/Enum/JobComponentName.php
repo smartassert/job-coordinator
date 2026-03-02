@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum JobComponent: string
+enum JobComponentName: string
 {
     case MACHINE = 'machine';
     case WORKER_JOB = 'worker-job';

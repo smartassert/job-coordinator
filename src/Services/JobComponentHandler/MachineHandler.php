@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\JobComponentHandler;
 
-use App\Enum\JobComponent;
+use App\Enum\JobComponentName;
 use App\Enum\RequestState;
 use App\Model\ComponentPreparation;
 use App\Model\RemoteRequestType;
@@ -13,7 +13,7 @@ use App\Repository\RemoteRequestRepository;
 
 class MachineHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
 {
-    private const JobComponent JOB_COMPONENT = JobComponent::MACHINE;
+    private const JobComponentName JOB_COMPONENT = JobComponentName::MACHINE;
 
     public function __construct(
         MachineRepository $entityRepository,
@@ -22,9 +22,9 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
-    public function handles(JobComponent $jobComponent): bool
+    public function handles(JobComponentName $componentName): bool
     {
-        return self::JOB_COMPONENT === $jobComponent;
+        return self::JOB_COMPONENT === $componentName;
     }
 
     public function getComponentPreparation(string $jobId): ?ComponentPreparation

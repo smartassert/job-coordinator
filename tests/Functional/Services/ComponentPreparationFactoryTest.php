@@ -9,7 +9,7 @@ use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
-use App\Enum\JobComponent;
+use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
@@ -142,20 +142,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
         };
 
         $expectedAllSuccess = [
-            JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                JobComponent::RESULTS_JOB,
+            JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                JobComponentName::RESULTS_JOB,
                 PreparationState::SUCCEEDED
             ),
-            JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                JobComponent::SERIALIZED_SUITE,
+            JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                JobComponentName::SERIALIZED_SUITE,
                 PreparationState::SUCCEEDED
             ),
-            JobComponent::MACHINE->value => new ComponentPreparation(
-                JobComponent::MACHINE,
+            JobComponentName::MACHINE->value => new ComponentPreparation(
+                JobComponentName::MACHINE,
                 PreparationState::SUCCEEDED
             ),
-            JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                JobComponent::WORKER_JOB,
+            JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                JobComponentName::WORKER_JOB,
                 PreparationState::SUCCEEDED
             ),
         ];
@@ -165,20 +165,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                 'entityCreator' => function () {},
                 'remoteRequestsCreator' => function () {},
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -195,20 +195,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PREPARING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -225,20 +225,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PREPARING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -255,20 +255,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PENDING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PREPARING
                     ),
                 ],
@@ -285,20 +285,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PREPARING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -315,20 +315,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PREPARING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -345,20 +345,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::PREPARING
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -375,20 +375,20 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::FAILED
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],
@@ -410,8 +410,8 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponent::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponent::RESULTS_JOB,
+                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
+                        JobComponentName::RESULTS_JOB,
                         PreparationState::FAILED,
                         new RemoteRequestFailure(
                             RemoteRequestFailureType::HTTP,
@@ -419,16 +419,16 @@ class ComponentPreparationFactoryTest extends WebTestCase
                             'service unavailable'
                         )
                     ),
-                    JobComponent::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponent::SERIALIZED_SUITE,
+                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
+                        JobComponentName::SERIALIZED_SUITE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::MACHINE->value => new ComponentPreparation(
-                        JobComponent::MACHINE,
+                    JobComponentName::MACHINE->value => new ComponentPreparation(
+                        JobComponentName::MACHINE,
                         PreparationState::PENDING
                     ),
-                    JobComponent::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponent::WORKER_JOB,
+                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
+                        JobComponentName::WORKER_JOB,
                         PreparationState::PENDING
                     ),
                 ],

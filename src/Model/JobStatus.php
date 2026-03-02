@@ -7,7 +7,7 @@ namespace App\Model;
 use App\Entity\Machine;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
-use App\Enum\JobComponent;
+use App\Enum\JobComponentName;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
@@ -35,10 +35,10 @@ readonly class JobStatus implements \JsonSerializable
             [
                 'meta_state' => $this->metaState,
                 'preparation' => $this->preparationState,
-                JobComponent::RESULTS_JOB->value => $this->resultsJob,
-                JobComponent::SERIALIZED_SUITE->value => $this->serializedSuite,
-                JobComponent::MACHINE->value => $this->machine,
-                JobComponent::WORKER_JOB->value => $this->workerState,
+                JobComponentName::RESULTS_JOB->value => $this->resultsJob,
+                JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite,
+                JobComponentName::MACHINE->value => $this->machine,
+                JobComponentName::WORKER_JOB->value => $this->workerState,
                 'service_requests' => $this->serviceRequests,
             ]
         );

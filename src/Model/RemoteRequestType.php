@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Enum\JobComponent;
+use App\Enum\JobComponentName;
 use App\Enum\RemoteRequestAction;
 
 readonly class RemoteRequestType implements \Stringable
 {
     private function __construct(
-        public JobComponent $jobComponent,
+        public JobComponentName $componentName,
         public RemoteRequestAction $action,
     ) {}
 
@@ -19,56 +19,56 @@ readonly class RemoteRequestType implements \Stringable
      */
     public function __toString(): string
     {
-        return $this->jobComponent->value . '/' . $this->action->value;
+        return $this->componentName->value . '/' . $this->action->value;
     }
 
     public function equals(RemoteRequestType $type): bool
     {
-        return $this->jobComponent === $type->jobComponent && $this->action === $type->action;
+        return $this->componentName === $type->componentName && $this->action === $type->action;
     }
 
     public static function createForMachineCreation(): self
     {
-        return new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::CREATE);
+        return new RemoteRequestType(JobComponentName::MACHINE, RemoteRequestAction::CREATE);
     }
 
     public static function createForResultsJobCreation(): self
     {
-        return new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::CREATE);
+        return new RemoteRequestType(JobComponentName::RESULTS_JOB, RemoteRequestAction::CREATE);
     }
 
     public static function createForSerializedSuiteCreation(): self
     {
-        return new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::CREATE);
+        return new RemoteRequestType(JobComponentName::SERIALIZED_SUITE, RemoteRequestAction::CREATE);
     }
 
     public static function createForWorkerJobCreation(): self
     {
-        return new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::CREATE);
+        return new RemoteRequestType(JobComponentName::WORKER_JOB, RemoteRequestAction::CREATE);
     }
 
     public static function createForMachineRetrieval(): self
     {
-        return new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(JobComponentName::MACHINE, RemoteRequestAction::RETRIEVE);
     }
 
     public static function createForResultsJobRetrieval(): self
     {
-        return new RemoteRequestType(JobComponent::RESULTS_JOB, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(JobComponentName::RESULTS_JOB, RemoteRequestAction::RETRIEVE);
     }
 
     public static function createForSerializedSuiteRetrieval(): self
     {
-        return new RemoteRequestType(JobComponent::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(JobComponentName::SERIALIZED_SUITE, RemoteRequestAction::RETRIEVE);
     }
 
     public static function createForWorkerJobRetrieval(): self
     {
-        return new RemoteRequestType(JobComponent::WORKER_JOB, RemoteRequestAction::RETRIEVE);
+        return new RemoteRequestType(JobComponentName::WORKER_JOB, RemoteRequestAction::RETRIEVE);
     }
 
     public static function createForMachineTermination(): self
     {
-        return new RemoteRequestType(JobComponent::MACHINE, RemoteRequestAction::TERMINATE);
+        return new RemoteRequestType(JobComponentName::MACHINE, RemoteRequestAction::TERMINATE);
     }
 }

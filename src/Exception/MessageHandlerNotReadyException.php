@@ -18,7 +18,7 @@ class MessageHandlerNotReadyException extends \Exception implements Unrecoverabl
             sprintf(
                 'Failed to %s %s for job "%s": %s handleable',
                 $handlerMessage->getRemoteRequestType()->action->value,
-                $handlerMessage->getRemoteRequestType()->jobComponent->value,
+                $handlerMessage->getRemoteRequestType()->componentName->value,
                 $handlerMessage->getJobId(),
                 MessageHandlingReadiness::NEVER === $this->readiness ? 'never' : 'not yet'
             ),
