@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
+use App\Model\SerializeToArrayInterface;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,7 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  *  }
  */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements \JsonSerializable
+class SerializedSuite implements SerializeToArrayInterface
 {
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     public string $id;

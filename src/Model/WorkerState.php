@@ -22,7 +22,7 @@ use App\Enum\WorkerComponentName;
  *   }
  * }
  */
-class WorkerState implements \JsonSerializable
+class WorkerState implements SerializeToArrayInterface
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,

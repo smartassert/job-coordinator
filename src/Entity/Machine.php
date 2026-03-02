@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
+use App\Model\SerializeToArrayInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine implements \JsonSerializable
+class Machine implements SerializeToArrayInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]

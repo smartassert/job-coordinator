@@ -199,35 +199,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
-                                ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -271,35 +273,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
-                                ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -372,35 +376,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
-                                ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -480,42 +486,44 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => [
-                            'state' => 'results-state-1',
-                            'end_state' => null,
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'results-state-1',
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -554,42 +562,44 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => [
-                            'state' => 'results-state-2',
-                            'end_state' => 'results-end-state-2',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'results-state-2',
+                                'end_state' => 'results-end-state-2',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -641,42 +651,44 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => [
-                            'state' => 'prepared',
-                            'is_prepared' => true,
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                        ],
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => [
+                                'state' => 'prepared',
+                                'is_prepared' => true,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -720,35 +732,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
-                                ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -812,43 +826,45 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => null,
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => [
+                                'state_category' => $machine->getStateCategory(),
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -927,43 +943,45 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => null,
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'running',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => [
+                                'state_category' => $machine->getStateCategory(),
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'running',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1047,47 +1065,49 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => [
-                                'action' => 'find',
-                                'type' => 'vendor_authentication_failure',
-                                'context' => null,
-                            ],
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'running',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => [
+                                'state_category' => $machine->getStateCategory(),
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => [
+                                    'action' => 'find',
+                                    'type' => 'vendor_authentication_failure',
+                                    'context' => null,
                                 ],
-                                'execution' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                            ],
+                            'worker-job' => [
+                                'state' => 'running',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1179,57 +1199,59 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => [
-                            'state' => 'awaiting-events',
-                            'end_state' => null,
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'serialized-suite' => [
-                            'state' => 'prepared',
-                            'is_prepared' => true,
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                        ],
-                        'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => null,
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'running',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
-                                    ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'awaiting-events',
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'serialized-suite' => [
+                                'state' => 'prepared',
+                                'is_prepared' => true,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'running',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                            ],
+                            'machine' => [
+                                'state_category' => $machine->getStateCategory(),
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'running',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'running',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1322,35 +1344,37 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => null,
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => null,
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
-                                ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1458,43 +1482,45 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => null,
-                        'serialized-suite' => null,
-                        'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => null,
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => false,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                        'components' => [
+                            'results-job' => null,
+                            'serialized-suite' => null,
+                            'machine' => [
+                                'state_category' => $machine->getStateCategory(),
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => false,
                                 ],
-                                'execution' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
-                                    ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'pending',
-                                    'meta_state' => [
-                                        'ended' => false,
-                                        'succeeded' => false,
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1593,57 +1619,59 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'failures' => [],
                         ],
-                        'results-job' => [
-                            'state' => 'ended',
-                            'end_state' => 'complete',
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                        ],
-                        'serialized-suite' => [
-                            'state' => 'prepared',
-                            'is_prepared' => true,
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                        ],
-                        'machine' => [
-                            'state_category' => 'end',
-                            'ip_address' => $machine->getIp(),
-                            'action_failure' => null,
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                        ],
-                        'worker-job' => [
-                            'state' => 'complete',
-                            'meta_state' => [
-                                'ended' => true,
-                                'succeeded' => true,
-                            ],
-                            'components' => [
-                                'compilation' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
-                                    ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'ended',
+                                'end_state' => 'complete',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
                                 ],
-                                'execution' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
-                                    ],
+                            ],
+                            'serialized-suite' => [
+                                'state' => 'prepared',
+                                'is_prepared' => true,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
                                 ],
-                                'event_delivery' => [
-                                    'state' => 'complete',
-                                    'meta_state' => [
-                                        'ended' => true,
-                                        'succeeded' => true,
+                            ],
+                            'machine' => [
+                                'state_category' => 'end',
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'complete',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'complete',
+                                        'meta_state' => [
+                                            'ended' => true,
+                                            'succeeded' => true,
+                                        ],
                                     ],
                                 ],
                             ],
