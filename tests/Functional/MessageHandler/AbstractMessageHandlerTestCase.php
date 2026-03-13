@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Message\JobRemoteRequestMessageInterface;
+use App\Message\MessageNotHandleableMessage;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 abstract class AbstractMessageHandlerTestCase extends WebTestCase
 {
@@ -74,4 +77,17 @@ abstract class AbstractMessageHandlerTestCase extends WebTestCase
      * @return class-string
      */
     abstract protected function getHandledMessageClass(): string;
+
+    protected function assertMessageNotHandleableMessageIsDispatched(JobRemoteRequestMessageInterface $message): void
+    {
+        $messengerTransport = self::getContainer()->get('messenger.transport.async');
+        \assert($messengerTransport instanceof InMemoryTransport);
+
+        $envelopes = $messengerTransport->getSent();
+        self::assertCount(1, $envelopes);
+
+        $messageNotHandleableMessage = $envelopes[0]->getMessage();
+        self::assertInstanceOf(MessageNotHandleableMessage::class, $messageNotHandleableMessage);
+        self::assertSame($message, $messageNotHandleableMessage->message);
+    }
 }

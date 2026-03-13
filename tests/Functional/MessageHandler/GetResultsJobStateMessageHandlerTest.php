@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -20,9 +20,11 @@ use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -41,18 +43,13 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($resultsClient instanceof ResultsClient);
 
         $handler = $this->createHandler($assessor, $resultsClient);
-        $exception = null;
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
+        $handler($message);
 
-        self::assertSame([], $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     public function testInvokeResultsClientThrowsException(): void
@@ -145,6 +142,18 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetResultsJobStateMessageHandler($resultsClient, $eventDispatcher, $readinessAssessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new GetResultsJobStateMessageHandler(
+            $resultsClient,
+            $eventDispatcher,
+            $readinessAssessor,
+            $messageBus,
+            $logger,
+        );
     }
 }

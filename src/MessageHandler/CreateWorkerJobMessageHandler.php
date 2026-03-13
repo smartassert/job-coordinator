@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -14,8 +13,11 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
@@ -27,22 +29,29 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
         ReadinessAssessorInterface $readinessAssessor,
+        MessageBusInterface $messageBus,
+        LoggerInterface $logger,
     ) {
-        parent::__construct($eventDispatcher, $readinessAssessor);
+        parent::__construct($eventDispatcher, $readinessAssessor, $messageBus, $logger);
     }
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerNotReadyException
+     * @throws ExceptionInterface
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        $this->assessReadiness($message);
+        $readiness = $this->assessReadiness($message);
+        if (MessageHandlingReadiness::NOW !== $readiness) {
+            return;
+        }
 
         $serializedSuiteEntity = $this->serializedSuiteRepository->get($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if (null === $serializedSuiteEntity || null === $resultsJob) {
-            throw new MessageHandlerNotReadyException($message, MessageHandlingReadiness::EVENTUALLY);
+            $this->handleNonHandleableMessage($message, MessageHandlingReadiness::EVENTUALLY);
+
+            return;
         }
 
         $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Enum\MessageState;
 use App\Model\RemoteRequestType;
 
 interface JobRemoteRequestMessageInterface
@@ -26,4 +27,8 @@ interface JobRemoteRequestMessageInterface
      * @param int<0, max> $index
      */
     public function setIndex(int $index): self;
+
+    public function getState(): MessageState;
+
+    public function setState(MessageState $state): self;
 }

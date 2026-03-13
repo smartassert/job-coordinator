@@ -7,8 +7,8 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\MachineCreationRequestedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
@@ -23,8 +23,10 @@ use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -44,18 +46,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($assessor, $workerManagerClient);
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::EVENTUALLY, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+        self::assertSame(MessageState::HALTED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     public function testInvokeNotHandleable(): void
@@ -73,18 +69,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($assessor, $workerManagerClient);
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(MachineCreationRequestedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     public function testInvokeWorkerManagerClientThrowsException(): void
@@ -199,6 +189,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateMachineMessageHandler($workerManagerClient, $eventDispatcher, $assessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new CreateMachineMessageHandler($workerManagerClient, $eventDispatcher, $assessor, $messageBus, $logger);
     }
 }

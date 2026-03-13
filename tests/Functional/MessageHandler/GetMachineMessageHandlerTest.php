@@ -6,10 +6,10 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine as MachineEntity;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
@@ -25,10 +25,12 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFacto
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -442,18 +444,12 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             readinessAssessor: $assessor,
         );
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(MachineRetrievedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     protected function getHandlerClass(): string
@@ -473,6 +469,18 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetMachineMessageHandler($workerManagerClient, $eventDispatcher, $readinessAssessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new GetMachineMessageHandler(
+            $workerManagerClient,
+            $eventDispatcher,
+            $readinessAssessor,
+            $messageBus,
+            $logger,
+        );
     }
 }

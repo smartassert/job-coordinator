@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Event\MessageNotHandleableEvent;
@@ -64,7 +65,17 @@ class RemoteRequestStateTracker implements EventSubscriberInterface
             return;
         }
 
-        $this->setRemoteRequestForMessage($message, RequestState::SUCCEEDED);
+        $requestState = RequestState::SUCCEEDED;
+
+        if (MessageState::HALTED === $message->getState()) {
+            $requestState = RequestState::HALTED;
+        }
+
+        if (MessageState::STOPPED === $message->getState()) {
+            $requestState = RequestState::FAILED;
+        }
+
+        $this->setRemoteRequestForMessage($message, $requestState);
     }
 
     public function setRemoteRequestStateForMessageReceivedEvent(WorkerMessageReceivedEvent $event): void
