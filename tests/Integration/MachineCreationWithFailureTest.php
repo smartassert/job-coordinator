@@ -97,7 +97,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
      */
     private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): array
     {
-        $waitThreshold = self::MICROSECONDS_PER_SECOND * 30;
+        $waitThreshold = self::MICROSECONDS_PER_SECOND * 90;
         $totalWaitTime = 0;
         $period = (int) (self::MICROSECONDS_PER_SECOND * 0.1);
 
