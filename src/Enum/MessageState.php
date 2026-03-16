@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum MessageState: string
+enum MessageState
 {
-    case HANDLING = 'handling';
-    case HALTED = 'halted';
-    case STOPPED = 'stopped';
+    case HANDLING;
+    case HALTED;
+    case STOPPED;
 }
