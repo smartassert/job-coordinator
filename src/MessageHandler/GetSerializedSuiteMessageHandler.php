@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHandler
@@ -20,17 +23,22 @@ final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHan
         private SerializedSuiteClient $serializedSuiteClient,
         EventDispatcherInterface $eventDispatcher,
         ReadinessAssessorInterface $readinessAssessor,
+        MessageBusInterface $messageBus,
+        LoggerInterface $logger,
     ) {
-        parent::__construct($eventDispatcher, $readinessAssessor);
+        parent::__construct($eventDispatcher, $readinessAssessor, $messageBus, $logger);
     }
 
     /**
      * @throws RemoteJobActionException
-     * @throws MessageHandlerNotReadyException
+     * @throws ExceptionInterface
      */
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
-        $this->assessReadiness($message);
+        $readiness = $this->assessReadiness($message);
+        if (MessageHandlingReadiness::NOW !== $readiness) {
+            return;
+        }
 
         try {
             $serializedSuite = $this->serializedSuiteClient->get(

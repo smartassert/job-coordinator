@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RemoteRequest;
+use App\Enum\MessageState;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
@@ -221,6 +222,11 @@ class RemoteRequestStateTrackerTest extends WebTestCase
         $message
             ->shouldReceive('getIndex')
             ->andReturn(0)
+        ;
+
+        $message
+            ->shouldReceive('getState')
+            ->andReturn(MessageState::HANDLING)
         ;
 
         return $message;

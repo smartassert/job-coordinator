@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Enum\MessageState;
 use App\Enum\RemoteRequestAction;
 
 abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageInterface
@@ -12,6 +13,8 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
      * @var int<0, max>
      */
     private int $index = 0;
+
+    private MessageState $state = MessageState::HANDLING;
 
     /**
      * @param non-empty-string $jobId
@@ -40,5 +43,17 @@ abstract class AbstractRemoteRequestMessage implements JobRemoteRequestMessageIn
     public function isRepeatable(): bool
     {
         return RemoteRequestAction::RETRIEVE === $this->getRemoteRequestType()->action;
+    }
+
+    public function setState(MessageState $state): static
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getState(): MessageState
+    {
+        return $this->state;
     }
 }

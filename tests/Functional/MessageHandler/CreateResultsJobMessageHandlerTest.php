@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\ResultsJobCreatedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
@@ -19,6 +19,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
@@ -123,18 +124,13 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsClient = HttpMockedResultsClientFactory::create();
         $handler = $this->createHandler($resultsClient, $assessor);
-        $exception = null;
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
+        $handler($message);
 
-        self::assertSame([], $this->eventRecorder->all(ResultsJobCreatedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     protected function getHandlerClass(): string
@@ -157,6 +153,18 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new CreateResultsJobMessageHandler($resultsClient, $eventDispatcher, $readinessAssessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new CreateResultsJobMessageHandler(
+            $resultsClient,
+            $eventDispatcher,
+            $readinessAssessor,
+            $messageBus,
+            $logger,
+        );
     }
 }

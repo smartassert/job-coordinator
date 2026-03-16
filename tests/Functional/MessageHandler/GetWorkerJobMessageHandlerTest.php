@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\WorkerStateRetrievedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
@@ -19,9 +19,11 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use SmartAssert\WorkerClient\Model\MetaState;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -38,18 +40,12 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class), $assessor);
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(WorkerStateRetrievedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     public function testInvokeWorkerClientThrowsException(): void
@@ -179,6 +175,18 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        return new GetWorkerJobMessageHandler($workerClientFactory, $eventDispatcher, $readinessAssessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new GetWorkerJobMessageHandler(
+            $workerClientFactory,
+            $eventDispatcher,
+            $readinessAssessor,
+            $messageBus,
+            $logger,
+        );
     }
 }

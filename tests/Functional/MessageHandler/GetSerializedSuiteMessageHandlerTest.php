@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
@@ -17,8 +17,10 @@ use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -45,24 +47,26 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
         $handler = new GetSerializedSuiteMessageHandler(
             \Mockery::mock(SerializedSuiteClient::class),
             $eventDispatcher,
             $assessor,
+            $messageBus,
+            $logger,
         );
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     public function testInvokeSerializedSuiteClientThrowsException(): void
@@ -103,7 +107,20 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
         \assert($assessor instanceof ReadinessAssessorInterface);
 
-        $handler = new GetSerializedSuiteMessageHandler($serializedSuiteClient, $eventDispatcher, $assessor);
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        $handler = new GetSerializedSuiteMessageHandler(
+            $serializedSuiteClient,
+            $eventDispatcher,
+            $assessor,
+            $messageBus,
+            $logger,
+        );
+
         $message = new GetSerializedSuiteMessage(
             self::$apiToken,
             $job->getId(),

@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
 use App\Event\SerializedSuiteCreatedEvent;
-use App\Exception\MessageHandlerNotReadyException;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
@@ -16,9 +16,11 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -46,10 +48,18 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
             $eventDispatcher,
             $readinessAssessor,
+            $messageBus,
+            $logger,
         );
 
         $message = new CreateSerializedSuiteMessage(
@@ -101,10 +111,18 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             $serializedSuiteClient,
             $eventDispatcher,
             $readinessAssessor,
+            $messageBus,
+            $logger,
         );
 
         $handler(new CreateSerializedSuiteMessage(
@@ -160,24 +178,26 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             \Mockery::mock(SerializedSuiteClient::class),
             $eventDispatcher,
             $assessor,
+            $messageBus,
+            $logger,
         );
 
-        $exception = null;
+        self::assertSame(MessageState::HANDLING, $message->getState());
 
-        try {
-            $handler($message);
-        } catch (MessageHandlerNotReadyException $exception) {
-        }
+        $handler($message);
 
-        self::assertInstanceOf(MessageHandlerNotReadyException::class, $exception);
-        self::assertSame(MessageHandlingReadiness::NEVER, $exception->getReadiness());
-        self::assertSame($exception->getHandlerMessage(), $message);
-
-        self::assertSame([], $this->eventRecorder->all(SerializedSuiteCreatedEvent::class));
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
     }
 
     protected function getHandlerClass(): string
