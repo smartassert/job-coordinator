@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\RemoteRequestStateTracker;
 
 use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;

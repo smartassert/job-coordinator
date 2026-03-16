@@ -8,10 +8,15 @@ use App\Enum\MessageHandlingReadiness;
 use App\Message\JobRemoteRequestMessageInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MessageNotHandleableEvent extends Event
+class MessageNotHandleableEvent extends Event implements HasJobRemoteRequestMessageInterface
 {
     public function __construct(
         public readonly JobRemoteRequestMessageInterface $message,
         public readonly MessageHandlingReadiness $readiness,
     ) {}
+
+    public function getMessage(): JobRemoteRequestMessageInterface
+    {
+        return $this->message;
+    }
 }
