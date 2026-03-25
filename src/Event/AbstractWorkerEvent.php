@@ -8,6 +8,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractWorkerEvent extends Event implements JobEventInterface, MachineIpAddressInterface
 {
+    use GetJobIdTrait;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $machineIpAddress
@@ -16,11 +18,6 @@ abstract class AbstractWorkerEvent extends Event implements JobEventInterface, M
         private readonly string $jobId,
         private readonly string $machineIpAddress,
     ) {}
-
-    public function getJobId(): string
-    {
-        return $this->jobId;
-    }
 
     public function getMachineIpAddress(): string
     {

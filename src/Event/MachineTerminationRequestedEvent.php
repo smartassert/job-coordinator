@@ -8,6 +8,8 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class MachineTerminationRequestedEvent extends AbstractMachineEvent implements JobEventInterface
 {
+    use GetJobIdTrait;
+
     /**
      * @param non-empty-string $jobId
      */
@@ -16,10 +18,5 @@ class MachineTerminationRequestedEvent extends AbstractMachineEvent implements J
         Machine $machine,
     ) {
         parent::__construct($machine);
-    }
-
-    public function getJobId(): string
-    {
-        return $this->jobId;
     }
 }

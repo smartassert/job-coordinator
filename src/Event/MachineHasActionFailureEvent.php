@@ -8,6 +8,8 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class MachineHasActionFailureEvent extends AbstractMachineEvent implements JobEventInterface
 {
+    use GetJobIdTrait;
+
     /**
      * @param non-empty-string $jobId
      */
@@ -16,10 +18,5 @@ class MachineHasActionFailureEvent extends AbstractMachineEvent implements JobEv
         Machine $machine,
     ) {
         parent::__construct($machine);
-    }
-
-    public function getJobId(): string
-    {
-        return $this->jobId;
     }
 }
