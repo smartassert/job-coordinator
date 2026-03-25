@@ -7,6 +7,7 @@ namespace App\MessageHandler;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\RemoteJobActionException;
+use App\Exception\UnrecoverableRemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
@@ -62,7 +63,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
                 $serializedSuiteEntity->id
             );
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($e, $message);
+            throw new UnrecoverableRemoteJobActionException($e, $message);
         }
 
         try {
@@ -73,7 +74,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
                 $serializedSuite
             );
         } catch (\Throwable $e) {
-            throw new RemoteJobActionException($e, $message);
+            throw new UnrecoverableRemoteJobActionException($e, $message);
         }
 
         $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
