@@ -11,9 +11,11 @@ use App\Entity\RemoteRequestFailure;
 use App\Entity\ResultsJob;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
+use App\Entity\WorkerJobCreationFailure;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
+use App\Enum\WorkerJobCreationStage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -24,6 +26,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
+use App\Repository\WorkerJobCreationFailureRepository;
 use App\Services\JobStore;
 use App\Tests\Application\AbstractApplicationTest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,6 +44,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
      * @param callable(JobInterface, SerializedSuiteRepository): ?SerializedSuite $serializedSuiteCreator
      * @param callable(JobInterface, MachineRepository): ?Machine                 $machineCreator
      * @param callable(JobInterface, WorkerComponentStateRepository): void        $workerComponentStatesCreator
+     * @param callable(JobInterface, WorkerJobCreationFailureRepository): void    $workerJobCreationFailureCreator
      * @param callable(JobInterface, ?SerializedSuite, ?Machine): array<mixed>    $expectedSerializedJobCreator
      */
     #[DataProvider('getDataProvider')]
@@ -50,6 +54,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         callable $serializedSuiteCreator,
         callable $machineCreator,
         callable $workerComponentStatesCreator,
+        callable $workerJobCreationFailureCreator,
         callable $expectedSerializedJobCreator
     ): void {
         $apiTokenProvider = self::getContainer()->get(ApiTokenProvider::class);
@@ -76,6 +81,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
+
+        $workerJobCreationFailureRepository = self::getContainer()->get(WorkerJobCreationFailureRepository::class);
+        \assert($workerJobCreationFailureRepository instanceof WorkerJobCreationFailureRepository);
 
         $suiteId = (string) new Ulid();
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
@@ -114,6 +122,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
         foreach ($remoteRequests as $remoteRequest) {
             $remoteRequestRepository->save($remoteRequest);
         }
+
+        $workerJobCreationFailureCreator($job, $workerJobCreationFailureRepository);
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
         self::assertSame(200, $getResponse->getStatusCode());
@@ -175,6 +185,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -249,6 +260,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -352,6 +364,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -462,6 +475,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -538,6 +552,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -627,6 +642,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 },
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -708,6 +724,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -798,6 +815,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $machine;
                 },
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -915,6 +933,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setState('running')
                     );
                 },
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1037,6 +1056,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setState('running')
                     );
                 },
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1171,6 +1191,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setState('running')
                     );
                 },
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1299,6 +1320,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'serializedSuiteCreator' => $nullCreator,
                 'machineCreator' => $nullCreator,
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (JobInterface $job) {
                     return [
                         'id' => $job->getId(),
@@ -1454,6 +1476,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     return $machine;
                 },
                 'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1591,6 +1614,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ->setMetaState(new MetaState(true, true))
                     );
                 },
+                'workerJobCreationFailureCreator' => $nullCreator,
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1671,6 +1695,300 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                         'meta_state' => [
                                             'ended' => true,
                                             'succeeded' => true,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'worker job creation failed; serialized suite read failure' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator(
+                    'ended',
+                    'complete',
+                    new MetaState(true, true),
+                ),
+                'serializedSuiteCreator' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) {
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true),
+                    );
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    return $serializedSuite;
+                },
+                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                    $machine = new Machine(
+                        $job->getId(),
+                        'complete',
+                        'end',
+                        new MetaState(true, true),
+                    );
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => function (
+                    JobInterface $job,
+                    WorkerJobCreationFailureRepository $repository
+                ) {
+                    $repository->save(
+                        new WorkerJobCreationFailure(
+                            $job->getId(),
+                            WorkerJobCreationStage::SERIALIZED_SUITE_READ,
+                            new \Exception(
+                                'exception message',
+                                123
+                            )
+                        )
+                    );
+                },
+                'expectedSerializedJobCreator' => function (
+                    JobInterface $job,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
+                        'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                        'preparation' => [
+                            'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                            'request_states' => [
+                                'results-job' => 'succeeded',
+                                'serialized-suite' => 'succeeded',
+                                'machine' => 'succeeded',
+                                'worker-job' => 'pending',
+                            ],
+                            'failures' => [],
+                        ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'ended',
+                                'end_state' => 'complete',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'serialized-suite' => [
+                                'state' => 'prepared',
+                                'is_prepared' => true,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'machine' => [
+                                'state_category' => 'end',
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'failed',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => false,
+                                ],
+                                'creation_failure' => [
+                                    'stage' => WorkerJobCreationStage::SERIALIZED_SUITE_READ->value,
+                                    'exception' => [
+                                        'class' => \Exception::class,
+                                        'message' => 'exception message',
+                                        'code' => 123,
+                                    ],
+                                ],
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'service_requests' => [],
+                    ];
+                },
+            ],
+            'worker job creation failed; job creation failure' => [
+                'remoteRequestsCreator' => $emptyRemoteRequestsCreator,
+                'resultsJobCreator' => $resultsJobCreatorCreator(
+                    'ended',
+                    'complete',
+                    new MetaState(true, true),
+                ),
+                'serializedSuiteCreator' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) {
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        md5((string) rand()),
+                        'prepared',
+                        new MetaState(true, true),
+                    );
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    return $serializedSuite;
+                },
+                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                    $machine = new Machine(
+                        $job->getId(),
+                        'complete',
+                        'end',
+                        new MetaState(true, true),
+                    );
+                    $machine = $machine->setIp(md5((string) rand()));
+
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'workerComponentStatesCreator' => $nullCreator,
+                'workerJobCreationFailureCreator' => function (
+                    JobInterface $job,
+                    WorkerJobCreationFailureRepository $repository
+                ) {
+                    $repository->save(
+                        new WorkerJobCreationFailure(
+                            $job->getId(),
+                            WorkerJobCreationStage::WORKER_JOB_CREATE,
+                            new \Exception(
+                                'exception message',
+                                123
+                            )
+                        )
+                    );
+                },
+                'expectedSerializedJobCreator' => function (
+                    JobInterface $job,
+                    ?SerializedSuite $serializedSuite,
+                    Machine $machine,
+                ) {
+                    return [
+                        'id' => $job->getId(),
+                        'suite_id' => $job->getSuiteId(),
+                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
+                        'created_at' => $job->toArray()['created_at'],
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                        'preparation' => [
+                            'state' => 'preparing',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                            'request_states' => [
+                                'results-job' => 'succeeded',
+                                'serialized-suite' => 'succeeded',
+                                'machine' => 'succeeded',
+                                'worker-job' => 'pending',
+                            ],
+                            'failures' => [],
+                        ],
+                        'components' => [
+                            'results-job' => [
+                                'state' => 'ended',
+                                'end_state' => 'complete',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'serialized-suite' => [
+                                'state' => 'prepared',
+                                'is_prepared' => true,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'machine' => [
+                                'state_category' => 'end',
+                                'ip_address' => $machine->getIp(),
+                                'action_failure' => null,
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => true,
+                                ],
+                            ],
+                            'worker-job' => [
+                                'state' => 'failed',
+                                'meta_state' => [
+                                    'ended' => true,
+                                    'succeeded' => false,
+                                ],
+                                'creation_failure' => [
+                                    'stage' => WorkerJobCreationStage::WORKER_JOB_CREATE->value,
+                                    'exception' => [
+                                        'class' => \Exception::class,
+                                        'message' => 'exception message',
+                                        'code' => 123,
+                                    ],
+                                ],
+                                'components' => [
+                                    'compilation' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'execution' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
+                                        ],
+                                    ],
+                                    'event_delivery' => [
+                                        'state' => 'pending',
+                                        'meta_state' => [
+                                            'ended' => false,
+                                            'succeeded' => false,
                                         ],
                                     ],
                                 ],
