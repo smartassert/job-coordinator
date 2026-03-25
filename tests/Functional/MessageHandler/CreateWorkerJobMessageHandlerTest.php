@@ -24,7 +24,9 @@ use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
+use SmartAssert\ServiceClient\Exception\CurlException;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -118,6 +120,68 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             self::fail(RemoteJobActionException::class . ' not thrown');
         } catch (RemoteJobActionException $e) {
             self::assertSame($serializedSuiteReadException, $e->getPreviousException());
+            self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
+            $this->assertNoStartWorkerJobMessageDispatched();
+        }
+    }
+
+    public function testInvokeCreateWorkerJobThrowsException(): void
+    {
+        $job = $this->createJob();
+        $jobId = $job->getId();
+
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
+        $this->createResultsJob($job);
+
+        $serializedSuiteContent = md5((string) rand());
+
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient
+            ->shouldReceive('read')
+            ->with(self::$apiToken, $serializedSuite->id)
+            ->andReturn($serializedSuiteContent)
+        ;
+
+        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+
+        $workerJobCreateException = new CurlException(
+            \Mockery::mock(RequestInterface::class),
+            7,
+            sprintf(
+                'Failed to connect to %s port 80 after 190 ms: '
+                . 'Could not connect to server (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) '
+                . 'for http://%s/job',
+                $machineIpAddress,
+                $machineIpAddress,
+            )
+        );
+
+        $workerClient = HttpMockedWorkerClientFactory::create([$workerJobCreateException]);
+
+        $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
+        $workerClientFactory
+            ->shouldReceive('create')
+            ->with('http://' . $machineIpAddress)
+            ->andReturn($workerClient)
+        ;
+
+        $handler = $this->createHandler(
+            serializedSuiteClient: $serializedSuiteClient,
+            workerClientFactory: $workerClientFactory,
+        );
+
+        $message = new CreateWorkerJobMessage(
+            self::$apiToken,
+            $jobId,
+            $job->getMaximumDurationInSeconds(),
+            $machineIpAddress
+        );
+
+        try {
+            $handler($message);
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        } catch (RemoteJobActionException $e) {
+            self::assertSame($workerJobCreateException, $e->getPreviousException());
             self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
             $this->assertNoStartWorkerJobMessageDispatched();
         }

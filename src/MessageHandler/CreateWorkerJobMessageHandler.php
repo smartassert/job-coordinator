@@ -61,21 +61,25 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
                 $message->authenticationToken,
                 $serializedSuiteEntity->id
             );
+        } catch (\Throwable $e) {
+            throw new RemoteJobActionException($e, $message);
+        }
 
+        try {
             $workerJob = $workerClient->createJob(
                 $message->getJobId(),
                 $resultsJob->token,
                 $message->maximumDurationInSeconds,
                 $serializedSuite
             );
-
-            $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
-                $message->getJobId(),
-                $message->machineIpAddress,
-                $workerJob,
-            ));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
         }
+
+        $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
+            $message->getJobId(),
+            $message->machineIpAddress,
+            $workerJob,
+        ));
     }
 }
