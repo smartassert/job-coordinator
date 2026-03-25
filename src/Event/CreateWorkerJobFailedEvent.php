@@ -15,5 +15,11 @@ class CreateWorkerJobFailedEvent extends Event implements JobEventInterface
      */
     public function __construct(
         private readonly string $jobId,
+        private readonly \Throwable $exception,
     ) {}
+
+    public function getException(): \Throwable
+    {
+        return $this->exception;
+    }
 }
