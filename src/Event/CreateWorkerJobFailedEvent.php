@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
+use App\Enum\WorkerJobCreationStage;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class CreateWorkerJobFailedEvent extends Event implements JobEventInterface
@@ -15,8 +16,14 @@ class CreateWorkerJobFailedEvent extends Event implements JobEventInterface
      */
     public function __construct(
         private readonly string $jobId,
+        private readonly WorkerJobCreationStage $stage,
         private readonly \Throwable $exception,
     ) {}
+
+    public function getStage(): WorkerJobCreationStage
+    {
+        return $this->stage;
+    }
 
     public function getException(): \Throwable
     {

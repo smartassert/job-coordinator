@@ -30,20 +30,17 @@ class WorkerJobCreationFailure
 
     /**
      * @param non-empty-string $id
-     * @param class-string     $exceptionClass
      */
     public function __construct(
         string $id,
         WorkerJobCreationStage $stage,
-        string $exceptionClass,
-        int $exceptionCode,
-        string $exceptionMessage
+        \Throwable $exception,
     ) {
         $this->id = $id;
         $this->stage = $stage->value;
-        $this->exceptionClass = $exceptionClass;
-        $this->exceptionCode = $exceptionCode;
-        $this->exceptionMessage = $exceptionMessage;
+        $this->exceptionClass = $exception::class;
+        $this->exceptionCode = $exception->getCode();
+        $this->exceptionMessage = $exception->getMessage();
     }
 
     /**
