@@ -10,6 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ResultsJobCreatedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
 {
     use GetJobIdTrait;
+    use GetAuthenticationTokenTrait;
 
     /**
      * @param non-empty-string $authenticationToken
@@ -20,9 +21,4 @@ class ResultsJobCreatedEvent extends Event implements JobEventInterface, Authent
         private readonly string $jobId,
         public readonly ResultsJob $resultsJob,
     ) {}
-
-    public function getAuthenticationToken(): string
-    {
-        return $this->authenticationToken;
-    }
 }

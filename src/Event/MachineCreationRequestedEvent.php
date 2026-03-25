@@ -9,6 +9,8 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class MachineCreationRequestedEvent extends AbstractMachineEvent implements JobEventInterface, AuthenticatingEvent
 {
+    use GetAuthenticationTokenTrait;
+
     /**
      * @param non-empty-string $authenticationToken
      */
@@ -22,10 +24,5 @@ class MachineCreationRequestedEvent extends AbstractMachineEvent implements JobE
     public function getJobId(): string
     {
         return $this->getMachine()->id;
-    }
-
-    public function getAuthenticationToken(): string
-    {
-        return $this->authenticationToken;
     }
 }
