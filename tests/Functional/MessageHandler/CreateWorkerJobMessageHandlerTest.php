@@ -131,7 +131,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
         $this->assertNoStartWorkerJobMessageDispatched();
 
-        $expectedEvent = new CreateWorkerJobFailedEvent($jobId);
+        $expectedEvent = new CreateWorkerJobFailedEvent($jobId, $serializedSuiteReadException);
         self::assertEquals([$expectedEvent], $this->eventRecorder->all(CreateWorkerJobFailedEvent::class));
     }
 
@@ -202,7 +202,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
         $this->assertNoStartWorkerJobMessageDispatched();
 
-        $expectedEvent = new CreateWorkerJobFailedEvent($jobId);
+        $expectedEvent = new CreateWorkerJobFailedEvent($jobId, $workerJobCreateException);
         self::assertEquals([$expectedEvent], $this->eventRecorder->all(CreateWorkerJobFailedEvent::class));
     }
 

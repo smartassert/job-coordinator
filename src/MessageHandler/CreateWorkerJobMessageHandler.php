@@ -64,7 +64,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
                 $serializedSuiteEntity->id
             );
         } catch (\Throwable $e) {
-            $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent($message->getJobId()));
+            $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent($message->getJobId(), $e));
 
             throw new UnrecoverableRemoteJobActionException($e, $message);
         }
@@ -77,7 +77,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
                 $serializedSuite
             );
         } catch (\Throwable $e) {
-            $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent($message->getJobId()));
+            $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent($message->getJobId(), $e));
 
             throw new UnrecoverableRemoteJobActionException($e, $message);
         }
