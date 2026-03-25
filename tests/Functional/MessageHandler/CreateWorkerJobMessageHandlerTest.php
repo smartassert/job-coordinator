@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\SerializedSuite;
+use App\Entity\WorkerJobCreationFailure;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
+use App\Enum\WorkerJobCreationStage;
+use App\Event\CreateWorkerJobFailedEvent;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
@@ -16,6 +19,7 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Repository\WorkerJobCreationFailureRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -87,8 +91,13 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeReadSerializedSuiteThrowsException(): void
     {
+        $workerJobCreationFailureRepository = self::getContainer()->get(WorkerJobCreationFailureRepository::class);
+        \assert($workerJobCreationFailureRepository instanceof WorkerJobCreationFailureRepository);
+
         $job = $this->createJob();
         $jobId = $job->getId();
+
+        self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
@@ -115,20 +124,49 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $machineIpAddress
         );
 
+        $exception = null;
+
         try {
             $handler($message);
-            self::fail(RemoteJobActionException::class . ' not thrown');
-        } catch (RemoteJobActionException $e) {
-            self::assertSame($serializedSuiteReadException, $e->getPreviousException());
-            self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-            $this->assertNoStartWorkerJobMessageDispatched();
+        } catch (RemoteJobActionException $exception) {
         }
+
+        if (null === $exception) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        }
+
+        self::assertSame($serializedSuiteReadException, $exception->getPreviousException());
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
+        $this->assertNoStartWorkerJobMessageDispatched();
+
+        $expectedEvent = new CreateWorkerJobFailedEvent(
+            $jobId,
+            WorkerJobCreationStage::SERIALIZED_SUITE_READ,
+            $serializedSuiteReadException
+        );
+        self::assertEquals([$expectedEvent], $this->eventRecorder->all(CreateWorkerJobFailedEvent::class));
+
+        $expectedEntity = new WorkerJobCreationFailure(
+            $jobId,
+            WorkerJobCreationStage::SERIALIZED_SUITE_READ,
+            $serializedSuiteReadException
+        );
+
+        self::assertEquals(
+            $expectedEntity,
+            $workerJobCreationFailureRepository->find($jobId)
+        );
     }
 
     public function testInvokeCreateWorkerJobThrowsException(): void
     {
+        $workerJobCreationFailureRepository = self::getContainer()->get(WorkerJobCreationFailureRepository::class);
+        \assert($workerJobCreationFailureRepository instanceof WorkerJobCreationFailureRepository);
+
         $job = $this->createJob();
         $jobId = $job->getId();
+
+        self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);
@@ -177,14 +215,38 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $machineIpAddress
         );
 
+        $exception = null;
+
         try {
             $handler($message);
-            self::fail(RemoteJobActionException::class . ' not thrown');
-        } catch (RemoteJobActionException $e) {
-            self::assertSame($workerJobCreateException, $e->getPreviousException());
-            self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
-            $this->assertNoStartWorkerJobMessageDispatched();
+        } catch (RemoteJobActionException $exception) {
         }
+
+        if (null === $exception) {
+            self::fail(RemoteJobActionException::class . ' not thrown');
+        }
+
+        self::assertSame($workerJobCreateException, $exception->getPreviousException());
+        self::assertEquals([], $this->eventRecorder->all(CreateWorkerJobRequestedEvent::class));
+        $this->assertNoStartWorkerJobMessageDispatched();
+
+        $expectedEvent = new CreateWorkerJobFailedEvent(
+            $jobId,
+            WorkerJobCreationStage::WORKER_JOB_CREATE,
+            $workerJobCreateException
+        );
+        self::assertEquals([$expectedEvent], $this->eventRecorder->all(CreateWorkerJobFailedEvent::class));
+
+        $expectedEntity = new WorkerJobCreationFailure(
+            $jobId,
+            WorkerJobCreationStage::WORKER_JOB_CREATE,
+            $workerJobCreateException
+        );
+
+        self::assertEquals(
+            $expectedEntity,
+            $workerJobCreationFailureRepository->find($jobId)
+        );
     }
 
     public function testInvokeSuccess(): void

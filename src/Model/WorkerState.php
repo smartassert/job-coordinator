@@ -52,4 +52,9 @@ class WorkerState implements SerializeToArrayInterface
     {
         return $this->applicationState->getMetaState();
     }
+
+    public function withApplicationState(WorkerComponentStateInterface $applicationState): self
+    {
+        return new self($applicationState, $this->compilationState, $this->executionState, $this->eventDeliveryState);
+    }
 }

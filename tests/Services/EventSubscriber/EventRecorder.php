@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\EventSubscriber;
 
+use App\Event\CreateWorkerJobFailedEvent;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobCreatedEvent;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
@@ -82,6 +83,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             JobRemoteRequestMessageCreatedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            CreateWorkerJobFailedEvent::class => [
                 ['addEvent', 1000],
             ],
         ];

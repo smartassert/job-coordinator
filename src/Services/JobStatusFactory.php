@@ -10,10 +10,12 @@ use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\NamedJobComponent;
 use App\Model\RemoteRequestCollection;
+use App\Model\WorkerJobJobComponent;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Repository\WorkerJobCreationFailureRepository;
 
 readonly class JobStatusFactory
 {
@@ -25,6 +27,7 @@ readonly class JobStatusFactory
         private WorkerStateFactory $workerStateFactory,
         private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
+        private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
     ) {}
 
     public function create(JobInterface $job): JobStatus
@@ -47,7 +50,10 @@ readonly class JobStatusFactory
             new NamedJobComponent(JobComponentName::RESULTS_JOB, $resultsJob),
             new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
             new NamedJobComponent(JobComponentName::MACHINE, $machine),
-            new NamedJobComponent(JobComponentName::WORKER_JOB, $workerJobState),
+            new WorkerJobJobComponent(
+                $workerJobState,
+                $this->workerJobCreationFailureRepository->find($job->getId())
+            ),
         ]);
 
         return new JobStatus(
