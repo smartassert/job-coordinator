@@ -10,11 +10,13 @@ use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
 use App\Model\WorkerJob;
 use App\Repository\WorkerComponentStateRepository;
+use App\Repository\WorkerJobCreationFailureRepository;
 
 class WorkerJobFactory
 {
     public function __construct(
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
+        private readonly WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
     ) {}
 
     public function createForJob(JobInterface $job): WorkerJob
@@ -24,6 +26,7 @@ class WorkerJobFactory
             $this->createComponentState($job, WorkerComponentName::COMPILATION),
             $this->createComponentState($job, WorkerComponentName::EXECUTION),
             $this->createComponentState($job, WorkerComponentName::EVENT_DELIVERY),
+            $this->workerJobCreationFailureRepository->find($job->getId())
         );
     }
 
