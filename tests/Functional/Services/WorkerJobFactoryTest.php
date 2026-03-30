@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\WorkerComponentState;
+use App\Entity\WorkerJobCreationFailure;
 use App\Enum\WorkerComponentName;
+use App\Enum\WorkerJobCreationStage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerJob;
 use App\Repository\WorkerComponentStateRepository;
+use App\Repository\WorkerJobCreationFailureRepository as FailureRepository;
 use App\Services\WorkerJobFactory;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,19 +47,25 @@ class WorkerJobFactoryTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, WorkerComponentStateRepository): void $componentStatesCreator
-     * @param callable(JobInterface): WorkerJob                            $expectedWorkerJobCreator
+     * @param callable(JobInterface, WorkerComponentStateRepository): void         $componentStatesCreator
+     * @param callable(JobInterface, FailureRepository): ?WorkerJobCreationFailure $workerJobCreationFailureCreator
+     * @param callable(JobInterface): WorkerJob                                    $expectedWorkerJobCreator
      */
     #[DataProvider('createForJobDataProvider')]
     public function testCreateForJob(
         callable $componentStatesCreator,
+        callable $workerJobCreationFailureCreator,
         callable $expectedWorkerJobCreator,
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
+        $workerJobCreationFailureRepository = self::getContainer()->get(FailureRepository::class);
+        \assert($workerJobCreationFailureRepository instanceof FailureRepository);
+
         $componentStatesCreator($job, $this->workerComponentStateRepository);
+        $workerJobCreationFailureCreator($job, $workerJobCreationFailureRepository);
 
         $workerJob = $this->workerJobFactory->createForJob($job);
 
@@ -69,18 +78,45 @@ class WorkerJobFactoryTest extends WebTestCase
     public static function createForJobDataProvider(): array
     {
         return [
-            'no component state entities' => [
+            'no component state entities, no creation failure' => [
                 'componentStatesCreator' => function () {},
+                'workerJobCreationFailureCreator' => function () {},
                 'expectedWorkerJobCreator' => function () {
                     return new WorkerJob(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
+                        null,
                     );
                 },
             ],
-            'application component state entity only' => [
+            'no component state entities, has creation failure' => [
+                'componentStatesCreator' => function () {},
+                'workerJobCreationFailureCreator' => function (JobInterface $job, FailureRepository $repository) {
+                    $failure = new WorkerJobCreationFailure(
+                        $job->getId(),
+                        WorkerJobCreationStage::WORKER_JOB_CREATE,
+                        new \RuntimeException('exception message', 123),
+                    );
+
+                    $repository->save($failure);
+                },
+                'expectedWorkerJobCreator' => function (JobInterface $job) {
+                    return new WorkerJob(
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new PendingWorkerComponentState(),
+                        new WorkerJobCreationFailure(
+                            $job->getId(),
+                            WorkerJobCreationStage::WORKER_JOB_CREATE,
+                            new \RuntimeException('exception message', 123),
+                        ),
+                    );
+                },
+            ],
+            'application component state entity only, no creation failure' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -90,6 +126,7 @@ class WorkerJobFactoryTest extends WebTestCase
                             ->setState('awaiting-job')
                     );
                 },
+                'workerJobCreationFailureCreator' => function () {},
                 'expectedWorkerJobCreator' => function (JobInterface $job) {
                     return new WorkerJob(
                         new WorkerComponentState(
@@ -100,10 +137,11 @@ class WorkerJobFactoryTest extends WebTestCase
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
+                        null,
                     );
                 },
             ],
-            'execution component state entity only' => [
+            'execution component state entity only, no creation failure' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -113,6 +151,7 @@ class WorkerJobFactoryTest extends WebTestCase
                             ->setState('awaiting')
                     );
                 },
+                'workerJobCreationFailureCreator' => function () {},
                 'expectedWorkerJobCreator' => function (JobInterface $job) {
                     return new WorkerJob(
                         new PendingWorkerComponentState(),
@@ -123,10 +162,11 @@ class WorkerJobFactoryTest extends WebTestCase
                         )
                             ->setState('awaiting'),
                         new PendingWorkerComponentState(),
+                        null,
                     );
                 },
             ],
-            'all component states' => [
+            'all component states, no creation failure' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -161,6 +201,7 @@ class WorkerJobFactoryTest extends WebTestCase
                             ->setState('running')
                     );
                 },
+                'workerJobCreationFailureCreator' => function () {},
                 'expectedWorkerJobCreator' => function (JobInterface $job) {
                     return new WorkerJob(
                         new WorkerComponentState(
@@ -184,6 +225,7 @@ class WorkerJobFactoryTest extends WebTestCase
                             WorkerComponentName::EVENT_DELIVERY,
                         )
                             ->setState('running'),
+                        null,
                     );
                 },
             ],

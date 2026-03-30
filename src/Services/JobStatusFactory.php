@@ -10,12 +10,10 @@ use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\NamedJobComponent;
 use App\Model\RemoteRequestCollection;
-use App\Model\WorkerJobJobComponent;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Repository\WorkerJobCreationFailureRepository;
 
 readonly class JobStatusFactory
 {
@@ -24,10 +22,9 @@ readonly class JobStatusFactory
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private MachineRepository $machineRepository,
-        private WorkerJobFactory $workerStateFactory,
+        private WorkerJobFactory $workerJobFactory,
         private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
-        private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
     ) {}
 
     public function create(JobInterface $job): JobStatus
@@ -36,24 +33,21 @@ readonly class JobStatusFactory
         $resultsJob = $this->resultsJobRepository->find($job->getId());
         $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
         $machine = $this->machineRepository->find($job->getId());
-        $workerJobState = $this->workerStateFactory->createForJob($job);
+        $workerJob = $this->workerJobFactory->createForJob($job);
 
         $jobMetaState = $this->metaStateReducer->reduce([
             $preparationState->getMetaState(),
             $resultsJob?->getMetaState(),
             $serializedSuite?->getMetaState(),
             $machine?->getMetaState(),
-            $workerJobState->getMetaState(),
+            $workerJob->getMetaState(),
         ]);
 
         $components = new JobComponents([
             new NamedJobComponent(JobComponentName::RESULTS_JOB, $resultsJob),
             new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
             new NamedJobComponent(JobComponentName::MACHINE, $machine),
-            new WorkerJobJobComponent(
-                $workerJobState,
-                $this->workerJobCreationFailureRepository->find($job->getId())
-            ),
+            $workerJob,
         ]);
 
         return new JobStatus(

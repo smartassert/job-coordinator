@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\WorkerJobCreationFailure;
+use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
 
 /**
@@ -19,42 +21,50 @@ use App\Enum\WorkerComponentName;
  *     compilation: SerializedWorkerComponentState,
  *     execution: SerializedWorkerComponentState,
  *     event_delivery: SerializedWorkerComponentState
- *   }
+ *   },
+ *   failure?: WorkerJobCreationFailure
  * }
  */
-class WorkerJob implements SerializeToArrayInterface
+class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,
         private readonly WorkerComponentStateInterface $compilationState,
         private readonly WorkerComponentStateInterface $executionState,
         private readonly WorkerComponentStateInterface $eventDeliveryState,
+        private readonly ?WorkerJobCreationFailure $failure,
     ) {}
+
+    public function getName(): JobComponentName
+    {
+        return JobComponentName::WORKER_JOB;
+    }
 
     /**
      * @return SerializedWorkerState
      */
     public function jsonSerialize(): array
     {
-        return array_merge(
-            $this->applicationState->toArray(),
-            [
-                'components' => [
-                    WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
-                    WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
-                    WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
-                ],
-            ]
-        );
+        $applicationState = $this->failure instanceof WorkerJobCreationFailure
+            ? new FailedWorkerComponentState()
+            : $this->applicationState;
+
+        $data = $applicationState->toArray();
+        $data['components'] = [
+            WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
+            WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
+            WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
+        ];
+
+        if (null !== $this->failure) {
+            $data['creation_failure'] = $this->failure->jsonSerialize();
+        }
+
+        return $data;
     }
 
     public function getMetaState(): MetaState
     {
         return $this->applicationState->getMetaState();
-    }
-
-    public function withApplicationState(WorkerComponentStateInterface $applicationState): self
-    {
-        return new self($applicationState, $this->compilationState, $this->executionState, $this->eventDeliveryState);
     }
 }
