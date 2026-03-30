@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Model\JobComponent;
 
 use App\Enum\JobComponentName;
+use App\Model\SerializeToArrayInterface;
 
 readonly class NamedJobComponent implements NamedJobComponentInterface
 {
