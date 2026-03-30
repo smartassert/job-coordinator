@@ -26,7 +26,9 @@ use App\Model\WorkerComponentStateInterface;
  *     execution: SerializedWorkerComponentState,
  *     event_delivery: SerializedWorkerComponentState
  *   },
- *   failure?: WorkerJobCreationFailure
+ *   failure?: WorkerJobCreationFailure,
+ *   preparation: array{},
+ *   requests: array{}
  * }
  */
 class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
@@ -63,6 +65,9 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
         if (null !== $this->failure) {
             $data['creation_failure'] = $this->failure->jsonSerialize();
         }
+
+        $data['preparation'] = [];
+        $data['requests'] = [];
 
         return $data;
     }
