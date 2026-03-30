@@ -71,4 +71,18 @@ readonly class RemoteRequestType implements \Stringable
     {
         return new RemoteRequestType(JobComponentName::MACHINE, RemoteRequestAction::TERMINATE);
     }
+
+    /**
+     * @return RemoteRequestType[]
+     */
+    public static function getAllForComponent(JobComponentName $componentName): array
+    {
+        $types = [];
+
+        foreach (RemoteRequestAction::cases() as $action) {
+            $types[] = new RemoteRequestType($componentName, $action);
+        }
+
+        return $types;
+    }
 }
