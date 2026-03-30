@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Enum\JobComponentName;
+use App\Model\JobComponent\NamedJobComponentInterface;
 
 readonly class JobComponents implements \JsonSerializable
 {
