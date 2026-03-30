@@ -1422,7 +1422,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     ],
                                 ],
                                 'preparation' => [],
-                                'requests' => [],
+                                'requests' => [
+                                    [
+                                        'type' => 'worker-job/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'network',
+                                                    'code' => 6,
+                                                    'message' => 'hostname lookup failed',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ],
                         'service_requests' => [
