@@ -9,18 +9,18 @@ use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\PendingWorkerComponentState;
-use App\Model\WorkerState;
+use App\Model\WorkerJob;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\WorkerStateFactory;
+use App\Services\WorkerJobFactory;
 use App\Tests\Services\Factory\JobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class WorkerStateFactoryTest extends WebTestCase
+class WorkerJobFactoryTest extends WebTestCase
 {
     private WorkerComponentStateRepository $workerComponentStateRepository;
-    private WorkerStateFactory $workerStateFactory;
+    private WorkerJobFactory $workerJobFactory;
 
     protected function setUp(): void
     {
@@ -38,19 +38,19 @@ class WorkerStateFactoryTest extends WebTestCase
 
         $this->workerComponentStateRepository = $workerComponentStateRepository;
 
-        $workerStateFactory = self::getContainer()->get(WorkerStateFactory::class);
-        \assert($workerStateFactory instanceof WorkerStateFactory);
-        $this->workerStateFactory = $workerStateFactory;
+        $workerJobFactory = self::getContainer()->get(WorkerJobFactory::class);
+        \assert($workerJobFactory instanceof WorkerJobFactory);
+        $this->workerJobFactory = $workerJobFactory;
     }
 
     /**
      * @param callable(JobInterface, WorkerComponentStateRepository): void $componentStatesCreator
-     * @param callable(JobInterface): WorkerState                          $expectedWorkerStateCreator
+     * @param callable(JobInterface): WorkerJob                            $expectedWorkerJobCreator
      */
     #[DataProvider('createForJobDataProvider')]
     public function testCreateForJob(
         callable $componentStatesCreator,
-        callable $expectedWorkerStateCreator,
+        callable $expectedWorkerJobCreator,
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -58,9 +58,9 @@ class WorkerStateFactoryTest extends WebTestCase
 
         $componentStatesCreator($job, $this->workerComponentStateRepository);
 
-        $workerState = $this->workerStateFactory->createForJob($job);
+        $workerJob = $this->workerJobFactory->createForJob($job);
 
-        self::assertEquals($expectedWorkerStateCreator($job), $workerState);
+        self::assertEquals($expectedWorkerJobCreator($job), $workerJob);
     }
 
     /**
@@ -71,8 +71,8 @@ class WorkerStateFactoryTest extends WebTestCase
         return [
             'no component state entities' => [
                 'componentStatesCreator' => function () {},
-                'expectedWorkerStateCreator' => function () {
-                    return new WorkerState(
+                'expectedWorkerJobCreator' => function () {
+                    return new WorkerJob(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
@@ -90,8 +90,8 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setState('awaiting-job')
                     );
                 },
-                'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    return new WorkerState(
+                'expectedWorkerJobCreator' => function (JobInterface $job) {
+                    return new WorkerJob(
                         new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,
@@ -113,8 +113,8 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setState('awaiting')
                     );
                 },
-                'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    return new WorkerState(
+                'expectedWorkerJobCreator' => function (JobInterface $job) {
+                    return new WorkerJob(
                         new PendingWorkerComponentState(),
                         new PendingWorkerComponentState(),
                         new WorkerComponentState(
@@ -161,8 +161,8 @@ class WorkerStateFactoryTest extends WebTestCase
                             ->setState('running')
                     );
                 },
-                'expectedWorkerStateCreator' => function (JobInterface $job) {
-                    return new WorkerState(
+                'expectedWorkerJobCreator' => function (JobInterface $job) {
+                    return new WorkerJob(
                         new WorkerComponentState(
                             $job->getId(),
                             WorkerComponentName::APPLICATION,

@@ -24,7 +24,7 @@ readonly class JobStatusFactory
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private MachineRepository $machineRepository,
-        private WorkerStateFactory $workerStateFactory,
+        private WorkerJobFactory $workerStateFactory,
         private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
         private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,

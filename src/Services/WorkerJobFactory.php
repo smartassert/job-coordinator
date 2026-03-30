@@ -8,18 +8,18 @@ use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
-use App\Model\WorkerState;
+use App\Model\WorkerJob;
 use App\Repository\WorkerComponentStateRepository;
 
-class WorkerStateFactory
+class WorkerJobFactory
 {
     public function __construct(
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
     ) {}
 
-    public function createForJob(JobInterface $job): WorkerState
+    public function createForJob(JobInterface $job): WorkerJob
     {
-        return new WorkerState(
+        return new WorkerJob(
             $this->createComponentState($job, WorkerComponentName::APPLICATION),
             $this->createComponentState($job, WorkerComponentName::COMPILATION),
             $this->createComponentState($job, WorkerComponentName::EXECUTION),
