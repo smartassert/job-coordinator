@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enum\WorkerComponentName;
+use App\Model\JobComponent\WorkerJob;
 use App\Model\JobInterface;
 use App\Model\PendingWorkerComponentState;
 use App\Model\WorkerComponentStateInterface;
-use App\Model\WorkerJob;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
 
