@@ -27,7 +27,7 @@ class MachineHandler extends AbstractJobComponentHandler implements JobComponent
         return self::JOB_COMPONENT === $componentName;
     }
 
-    public function getComponentPreparation(string $jobId): ?ComponentPreparation
+    public function getComponentPreparation(string $jobId): ComponentPreparation
     {
         return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForMachineCreation());
     }
