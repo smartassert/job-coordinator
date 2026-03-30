@@ -7,7 +7,7 @@ namespace App\Model\JobComponent;
 use App\Entity\WorkerJobCreationFailure;
 use App\Enum\JobComponentName;
 use App\Model\FailedWorkerComponentState;
-use App\Model\WorkerState;
+use App\Model\WorkerJob;
 
 readonly class WorkerJobJobComponent implements NamedJobComponentInterface
 {
