@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponentName;
 use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -116,5 +117,40 @@ class RemoteRequestRepository extends ServiceEntityRepository
         ];
 
         return $this->count($criteria) > 0;
+    }
+
+    /**
+     * @return RemoteRequest[]
+     */
+    public function findAllForJobAndComponent(string $jobId, JobComponentName $component): array
+    {
+        $types = RemoteRequestType::getAllForComponent($component);
+        $typesAsStrings = [];
+        foreach ($types as $type) {
+            $typesAsStrings[] = (string) $type;
+        }
+
+        $queryBuilder = $this->createQueryBuilder('RemoteRequest');
+        $queryBuilder
+            ->where('RemoteRequest.jobId = :JobId')
+            ->andWhere('RemoteRequest.type IN (:Types)')
+            ->setParameter('JobId', $jobId)
+            ->setParameter('Types', $typesAsStrings)
+            ->orderBy('RemoteRequest.index', 'ASC')
+        ;
+
+        $query = $queryBuilder->getQuery();
+        $result = $query->getResult();
+
+        $remoteRequests = [];
+        if (is_iterable($result)) {
+            foreach ($result as $remoteRequest) {
+                if ($remoteRequest instanceof RemoteRequest) {
+                    $remoteRequests[] = $remoteRequest;
+                }
+            }
+        }
+
+        return $remoteRequests;
     }
 }
