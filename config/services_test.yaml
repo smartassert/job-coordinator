@@ -44,7 +44,7 @@ services:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
-    App\Services\WorkerStateFactory:
+    App\Services\WorkerJobFactory:
         public: true
 
     App\Services\PreparationStateFactory:

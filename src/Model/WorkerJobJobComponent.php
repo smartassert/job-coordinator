@@ -10,7 +10,7 @@ use App\Enum\JobComponentName;
 readonly class WorkerJobJobComponent implements NamedJobComponentInterface
 {
     public function __construct(
-        private WorkerState $component,
+        private WorkerJob $component,
         private ?WorkerJobCreationFailure $failure,
     ) {}
 
