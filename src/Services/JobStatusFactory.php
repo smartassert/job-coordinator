@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enum\JobComponentName;
 use App\Model\JobComponent\NamedJobComponent;
-use App\Model\JobComponent\WorkerJobJobComponent;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
