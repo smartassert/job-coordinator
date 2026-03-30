@@ -9,11 +9,13 @@ use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
 use App\Model\FailedWorkerComponentState;
 use App\Model\MetaState;
+use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
 use App\Model\WorkerComponentStateInterface;
 
 /**
  * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
+ * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: ?non-empty-string,
@@ -28,7 +30,7 @@ use App\Model\WorkerComponentStateInterface;
  *   },
  *   failure?: WorkerJobCreationFailure,
  *   preparation: array{},
- *   requests: array{}
+ *   requests: SerializedRemoteRequestCollection
  * }
  */
 class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
@@ -39,6 +41,7 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
         private readonly WorkerComponentStateInterface $executionState,
         private readonly WorkerComponentStateInterface $eventDeliveryState,
         private readonly ?WorkerJobCreationFailure $failure,
+        private readonly RemoteRequestCollection $requests,
     ) {}
 
     public function getName(): JobComponentName
@@ -67,7 +70,7 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
         }
 
         $data['preparation'] = [];
-        $data['requests'] = [];
+        $data['requests'] = $this->requests->jsonSerialize();
 
         return $data;
     }
