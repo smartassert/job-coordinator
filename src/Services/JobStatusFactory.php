@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enum\JobComponentName;
+use App\Model\JobComponent\NamedJobComponent;
+use App\Model\JobComponent\WorkerJobJobComponent;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
-use App\Model\NamedJobComponent;
 use App\Model\RemoteRequestCollection;
-use App\Model\WorkerJobJobComponent;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;

@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Model\JobComponent;
 
 use App\Entity\WorkerJobCreationFailure;
 use App\Enum\JobComponentName;
+use App\Model\FailedWorkerComponentState;
+use App\Model\WorkerState;
 
 readonly class WorkerJobJobComponent implements NamedJobComponentInterface
 {
