@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enum\JobComponentName;
+use App\Model\JobComponent\Machine;
 use App\Model\JobComponent\NamedJobComponent;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
@@ -32,21 +33,24 @@ readonly class JobStatusFactory
         $preparationState = $this->preparationStateFactory->create($job);
         $resultsJob = $this->resultsJobRepository->find($job->getId());
         $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
-        $machine = $this->machineRepository->find($job->getId());
+
+        $machineEntity = $this->machineRepository->find($job->getId());
+        $machine = new Machine($machineEntity);
+
         $workerJob = $this->workerJobFactory->createForJob($job);
 
         $jobMetaState = $this->metaStateReducer->reduce([
             $preparationState->getMetaState(),
             $resultsJob?->getMetaState(),
             $serializedSuite?->getMetaState(),
-            $machine?->getMetaState(),
+            $machineEntity?->getMetaState(),
             $workerJob->getMetaState(),
         ]);
 
         $components = new JobComponents([
             new NamedJobComponent(JobComponentName::RESULTS_JOB, $resultsJob),
             new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
-            new NamedJobComponent(JobComponentName::MACHINE, $machine),
+            $machine,
             $workerJob,
         ]);
 
