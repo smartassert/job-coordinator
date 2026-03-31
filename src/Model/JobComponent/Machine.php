@@ -21,7 +21,7 @@ use App\Model\SerializeToArrayInterface;
 readonly class Machine implements SerializeToArrayInterface, NamedJobComponentInterface
 {
     public function __construct(
-        private MachineEntity $entity,
+        private ?MachineEntity $entity,
     ) {}
 
     public function getName(): JobComponentName
@@ -35,10 +35,10 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
     public function jsonSerialize(): array
     {
         return [
-            'state_category' => $this->entity->getStateCategory(),
-            'ip_address' => $this->entity->getIp(),
-            'action_failure' => $this->entity->getActionFailure(),
-            'meta_state' => $this->entity->getMetaState(),
+            'state_category' => $this->entity?->getStateCategory() ?? null,
+            'ip_address' => $this->entity?->getIp() ?? null,
+            'action_failure' => $this->entity?->getActionFailure() ?? null,
+            'meta_state' => $this->entity?->getMetaState() ?? new MetaState(false, false),
         ];
     }
 }
