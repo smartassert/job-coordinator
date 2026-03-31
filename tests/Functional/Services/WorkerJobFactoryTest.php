@@ -7,8 +7,13 @@ namespace App\Tests\Functional\Services;
 use App\Entity\RemoteRequest;
 use App\Entity\WorkerComponentState;
 use App\Entity\WorkerJobCreationFailure;
+use App\Enum\JobComponentName;
+use App\Enum\PreparationState;
+use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Enum\WorkerJobCreationStage;
+use App\Model\ComponentPreparation;
+use App\Model\JobComponent\Preparation;
 use App\Model\JobComponent\WorkerJob;
 use App\Model\JobInterface;
 use App\Model\MetaState;
@@ -88,7 +93,7 @@ class WorkerJobFactoryTest extends WebTestCase
     public static function createForJobDataProvider(): array
     {
         return [
-            'no component state entities, no remote requests, no creation failure' => [
+            'no component states, no remote requests, no creation failure, "pending" preparation' => [
                 'componentStatesCreator' => function () {},
                 'workerJobCreationFailureCreator' => function () {},
                 'remoteRequestsCreator' => function (JobInterface $job, RemoteRequestRepository $repository) {},
@@ -100,10 +105,18 @@ class WorkerJobFactoryTest extends WebTestCase
                         new PendingWorkerComponentState(),
                         null,
                         new RemoteRequestCollection([]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::PENDING,
+                                null,
+                            ),
+                            RequestState::PENDING,
+                        ),
                     );
                 },
             ],
-            'no component state entities, no remote requests, has creation failure' => [
+            'no component states, no remote requests, has creation failure, "pending" preparation' => [
                 'componentStatesCreator' => function () {},
                 'workerJobCreationFailureCreator' => function (JobInterface $job, FailureRepository $repository) {
                     $failure = new WorkerJobCreationFailure(
@@ -127,10 +140,18 @@ class WorkerJobFactoryTest extends WebTestCase
                             new \RuntimeException('exception message', 123),
                         ),
                         new RemoteRequestCollection([]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::PENDING,
+                                null,
+                            ),
+                            RequestState::PENDING,
+                        ),
                     );
                 },
             ],
-            'no component state entities, no remote requests, has remote requests' => [
+            'no component states, no remote requests, has remote requests, "preparing" preparation' => [
                 'componentStatesCreator' => function () {},
                 'workerJobCreationFailureCreator' => function () {},
                 'remoteRequestsCreator' => function (JobInterface $job, RemoteRequestRepository $repository) {
@@ -153,10 +174,18 @@ class WorkerJobFactoryTest extends WebTestCase
                             new RemoteRequest($job->getId(), RemoteRequestType::createForWorkerJobCreation(), 0),
                             new RemoteRequest($job->getId(), RemoteRequestType::createForWorkerJobRetrieval(), 0),
                         ]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::PREPARING,
+                                null,
+                            ),
+                            RequestState::REQUESTING,
+                        ),
                     );
                 },
             ],
-            'application component state entity only, no remote requests, no creation failure' => [
+            'application component state only, no remote requests, no creation failure, "succeeded" preparation' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -180,10 +209,18 @@ class WorkerJobFactoryTest extends WebTestCase
                         new PendingWorkerComponentState(),
                         null,
                         new RemoteRequestCollection([]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::SUCCEEDED,
+                                null,
+                            ),
+                            RequestState::SUCCEEDED,
+                        ),
                     );
                 },
             ],
-            'execution component state entity only, no remote requests, no creation failure' => [
+            'execution component state only, no remote requests, no creation failure, "succeeded" preparation' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -207,10 +244,18 @@ class WorkerJobFactoryTest extends WebTestCase
                         new PendingWorkerComponentState(),
                         null,
                         new RemoteRequestCollection([]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::SUCCEEDED,
+                                null,
+                            ),
+                            RequestState::SUCCEEDED,
+                        ),
                     );
                 },
             ],
-            'all component states, no remote requests, no creation failure' => [
+            'all component states, no remote requests, no creation failure, "succeeded" preparation' => [
                 'componentStatesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
                         new WorkerComponentState(
@@ -272,6 +317,14 @@ class WorkerJobFactoryTest extends WebTestCase
                             ->setState('running'),
                         null,
                         new RemoteRequestCollection([]),
+                        new Preparation(
+                            new ComponentPreparation(
+                                JobComponentName::WORKER_JOB,
+                                PreparationState::SUCCEEDED,
+                                null,
+                            ),
+                            RequestState::SUCCEEDED,
+                        ),
                     );
                 },
             ],
