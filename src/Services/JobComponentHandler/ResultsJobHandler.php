@@ -27,12 +27,12 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
         return self::JOB_COMPONENT === $componentName;
     }
 
-    public function getComponentPreparation(string $jobId): ?ComponentPreparation
+    public function getComponentPreparation(string $jobId): ComponentPreparation
     {
         return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForResultsJobCreation());
     }
 
-    public function getRequestState(string $jobId): ?RequestState
+    public function getRequestState(string $jobId): RequestState
     {
         return $this->doGetRequestState($jobId, RemoteRequestType::createForResultsJobCreation());
     }

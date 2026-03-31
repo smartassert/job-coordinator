@@ -12,9 +12,9 @@ interface JobComponentHandlerInterface
 {
     public function handles(JobComponentName $componentName): bool;
 
-    public function getComponentPreparation(string $jobId): ?ComponentPreparation;
+    public function getComponentPreparation(string $jobId): ComponentPreparation;
 
-    public function getRequestState(string $jobId): ?RequestState;
+    public function getRequestState(string $jobId): RequestState;
 
     public function hasFailed(string $jobId): ?bool;
 }
