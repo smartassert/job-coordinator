@@ -6,7 +6,9 @@ namespace App\Tests\Services;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
+use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class EntityRemover
@@ -14,7 +16,9 @@ readonly class EntityRemover
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RemoteRequestRepository $remoteRequestRepository,
+        private RemoteRequestFailureRepository $remoteRequestFailureRepository,
         private JobRepository $jobRepository,
+        private ResultsJobRepository $resultsJobRepository,
     ) {}
 
     /**
@@ -46,6 +50,24 @@ readonly class EntityRemover
     {
         foreach ($this->remoteRequestRepository->findAll() as $remoteRequest) {
             $this->entityManager->remove($remoteRequest);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeAllRemoteRequestFailures(): void
+    {
+        foreach ($this->remoteRequestFailureRepository->findAll() as $remoteRequestFailure) {
+            $this->entityManager->remove($remoteRequestFailure);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeAllResultsJobs(): void
+    {
+        foreach ($this->resultsJobRepository->findAll() as $entity) {
+            $this->entityManager->remove($entity);
         }
 
         $this->entityManager->flush();
