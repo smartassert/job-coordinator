@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
+use App\Model\JobComponent\Preparation;
 use App\Model\JobComponent\WorkerJob;
 use App\Model\JobInterface;
 use App\Model\PendingWorkerComponentState;
@@ -14,17 +15,22 @@ use App\Model\WorkerComponentStateInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
+use App\Services\JobComponentHandler\WorkerJobHandler;
 
-class WorkerJobFactory
+readonly class WorkerJobFactory
 {
     public function __construct(
-        private readonly WorkerComponentStateRepository $workerComponentStateRepository,
-        private readonly WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
+        private WorkerComponentStateRepository $workerComponentStateRepository,
+        private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
         private RemoteRequestRepository $remoteRequestRepository,
+        private WorkerJobHandler $handler,
     ) {}
 
     public function createForJob(JobInterface $job): WorkerJob
     {
+        $componentPreparation = $this->handler->getComponentPreparation($job->getId());
+        $requestState = $this->handler->getRequestState($job->getId());
+
         return new WorkerJob(
             $this->createComponentState($job, WorkerComponentName::APPLICATION),
             $this->createComponentState($job, WorkerComponentName::COMPILATION),
@@ -34,6 +40,7 @@ class WorkerJobFactory
             new RemoteRequestCollection(
                 $this->remoteRequestRepository->findAllForJobAndComponent($job->getId(), JobComponentName::WORKER_JOB)
             ),
+            new Preparation($componentPreparation, $requestState),
         );
     }
 
