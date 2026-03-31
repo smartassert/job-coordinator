@@ -15,7 +15,9 @@ use App\Model\SerializeToArrayInterface;
  *   state_category: ?non-empty-string,
  *   ip_address: ?non-empty-string,
  *   action_failure: ?MachineActionFailure,
- *   meta_state: MetaState
+ *   meta_state: MetaState,
+ *   requests: array{},
+ *   preparation: array{}
  * }
  */
 readonly class Machine implements SerializeToArrayInterface, NamedJobComponentInterface
@@ -39,6 +41,8 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
             'ip_address' => $this->entity?->getIp() ?? null,
             'action_failure' => $this->entity?->getActionFailure() ?? null,
             'meta_state' => $this->entity?->getMetaState() ?? new MetaState(false, false),
+            'requests' => [],
+            'preparation' => [],
         ];
     }
 }
