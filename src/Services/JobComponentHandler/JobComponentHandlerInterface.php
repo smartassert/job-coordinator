@@ -14,7 +14,7 @@ interface JobComponentHandlerInterface
 
     public function getComponentPreparation(string $jobId): ComponentPreparation;
 
-    public function getRequestState(string $jobId): ?RequestState;
+    public function getRequestState(string $jobId): RequestState;
 
     public function hasFailed(string $jobId): ?bool;
 }

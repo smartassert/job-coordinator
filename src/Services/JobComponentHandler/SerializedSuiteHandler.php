@@ -32,7 +32,7 @@ class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobC
         return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForSerializedSuiteCreation());
     }
 
-    public function getRequestState(string $jobId): ?RequestState
+    public function getRequestState(string $jobId): RequestState
     {
         return $this->doGetRequestState($jobId, RemoteRequestType::createForSerializedSuiteCreation());
     }
