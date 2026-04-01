@@ -41,6 +41,8 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                     'ended' => false,
                     'succeeded' => false,
                 ],
+                'requests' => [],
+                'preparation' => [],
             ],
             $machineData
         );
