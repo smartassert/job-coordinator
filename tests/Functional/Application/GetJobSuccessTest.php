@@ -52,6 +52,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
      */
     #[DataProvider('getDataProvider')]
     #[DataProvider('workerJobCreationFailedDataProvider')]
+    #[DataProvider('workerJobComponentDataProvider')]
     public function testGetSuccess(
         StagingConfiguration $stagingConfiguration,
         callable $expectedSerializedJobCreator
@@ -906,129 +907,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
-            'has machine, has worker state' => [
-                'stagingConfiguration' => new StagingConfiguration()
-                    ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
-                        \assert('' !== $jobId);
-
-                        $machine = new Machine(
-                            $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            new MetaState(false, false),
-                        );
-                        $machine = $machine->setIp(md5((string) rand()));
-
-                        $repository->save($machine);
-
-                        return $machine;
-                    })
-                    ->withWorkerComponentStatesCreator(
-                        function (string $jobId, WorkerComponentStateRepository $repository) {
-                            \assert('' !== $jobId);
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::APPLICATION)
-                                    ->setState('running')
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::COMPILATION)
-                                    ->setState('complete')
-                                    ->setMetaState(new MetaState(true, true))
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::EXECUTION)
-                                    ->setState('running')
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::EVENT_DELIVERY)
-                                    ->setState('running')
-                            );
-                        }
-                    ),
-                'expectedSerializedJobCreator' => function (
-                    JobInterface $job,
-                    ?SerializedSuite $serializedSuite,
-                    Machine $machine,
-                ) {
-                    return [
-                        'id' => $job->getId(),
-                        'suite_id' => $job->getSuiteId(),
-                        'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
-                        'created_at' => $job->toArray()['created_at'],
-                        'meta_state' => [
-                            'ended' => false,
-                            'succeeded' => false,
-                        ],
-                        'preparation' => [
-                            'state' => 'preparing',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'succeeded',
-                            ],
-                            'failures' => [],
-                        ],
-                        'components' => [
-                            'results-job' => null,
-                            'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => $machine->getStateCategory(),
-                                'ip_address' => $machine->getIp(),
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                            ],
-                            'worker-job' => [
-                                'state' => 'running',
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'components' => [
-                                    'compilation' => [
-                                        'state' => 'complete',
-                                        'meta_state' => [
-                                            'ended' => true,
-                                            'succeeded' => true,
-                                        ],
-                                    ],
-                                    'execution' => [
-                                        'state' => 'running',
-                                        'meta_state' => [
-                                            'ended' => false,
-                                            'succeeded' => false,
-                                        ],
-                                    ],
-                                    'event_delivery' => [
-                                        'state' => 'running',
-                                        'meta_state' => [
-                                            'ended' => false,
-                                            'succeeded' => false,
-                                        ],
-                                    ],
-                                ],
-                                'preparation' => [
-                                    'state' => 'succeeded',
-                                    'request_state' => 'succeeded',
-                                ],
-                                'requests' => [],
-                            ],
-                        ],
-                        'service_requests' => [],
-                    ];
-                },
-            ],
             'has machine, has action failure' => [
                 'stagingConfiguration' => new StagingConfiguration()
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
@@ -1782,10 +1660,236 @@ class GetJobSuccessTest extends AbstractApplicationTest
         ];
     }
 
-    public static function workerJobPreparationComponentDataProvider(): array
+    /**
+     * @return array<mixed>
+     */
+    public static function workerJobComponentDataProvider(): array
     {
-        return [
+        $stagingConfiguration = new StagingConfiguration()
+            ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
+                \assert('' !== $jobId);
 
+                $machine = new Machine(
+                    $jobId,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    new MetaState(false, false),
+                );
+                $machine = $machine->setIp(md5((string) rand()));
+
+                $repository->save($machine);
+
+                return $machine;
+            });
+
+        $expectedSerializedJobCreatorCreator = function (array $workerComponentsData) {
+            return function (
+                JobInterface $job,
+                ?SerializedSuite $serializedSuite,
+                Machine $machine
+            ) use ($workerComponentsData) {
+                return [
+                    'id' => $job->getId(),
+                    'suite_id' => $job->getSuiteId(),
+                    'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
+                    'created_at' => $job->toArray()['created_at'],
+                    'meta_state' => [
+                        'ended' => false,
+                        'succeeded' => false,
+                    ],
+                    'preparation' => [
+                        'state' => 'preparing',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                        'request_states' => [
+                            'results-job' => 'pending',
+                            'serialized-suite' => 'pending',
+                            'machine' => 'succeeded',
+                            'worker-job' => 'succeeded',
+                        ],
+                        'failures' => [],
+                    ],
+                    'components' => [
+                        'results-job' => null,
+                        'serialized-suite' => null,
+                        'machine' => [
+                            'state_category' => $machine->getStateCategory(),
+                            'ip_address' => $machine->getIp(),
+                            'action_failure' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                        'worker-job' => [
+                            'state' => 'running',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                            'components' => $workerComponentsData,
+                            'preparation' => [
+                                'state' => 'succeeded',
+                                'request_state' => 'succeeded',
+                            ],
+                            'requests' => [],
+                        ],
+                    ],
+                    'service_requests' => [],
+                ];
+            };
+        };
+
+        return [
+            'worker-job: application running, compilation complete' => [
+                'stagingConfiguration' => $stagingConfiguration
+                    ->withWorkerComponentStatesCreator(
+                        function (string $jobId, WorkerComponentStateRepository $repository) {
+                            \assert('' !== $jobId);
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::APPLICATION)
+                                    ->setState('running')
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::COMPILATION)
+                                    ->setState('complete')
+                                    ->setMetaState(new MetaState(true, true))
+                            );
+                        }
+                    ),
+                'expectedSerializedJobCreator' => $expectedSerializedJobCreatorCreator([
+                    'compilation' => [
+                        'state' => 'complete',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                    ],
+                    'execution' => [
+                        'state' => 'pending',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                    'event_delivery' => [
+                        'state' => 'pending',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                ]),
+
+            ],
+            'worker-job: application running, compilation complete, execution running' => [
+                'stagingConfiguration' => $stagingConfiguration
+                    ->withWorkerComponentStatesCreator(
+                        function (string $jobId, WorkerComponentStateRepository $repository) {
+                            \assert('' !== $jobId);
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::APPLICATION)
+                                    ->setState('running')
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::COMPILATION)
+                                    ->setState('complete')
+                                    ->setMetaState(new MetaState(true, true))
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::EXECUTION)
+                                    ->setState('running')
+                                    ->setMetaState(new MetaState(false, false))
+                            );
+                        }
+                    ),
+                'expectedSerializedJobCreator' => $expectedSerializedJobCreatorCreator([
+                    'compilation' => [
+                        'state' => 'complete',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                    ],
+                    'execution' => [
+                        'state' => 'running',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                    'event_delivery' => [
+                        'state' => 'pending',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                ]),
+
+            ],
+            'worker-job: all components complete' => [
+                'stagingConfiguration' => $stagingConfiguration
+                    ->withWorkerComponentStatesCreator(
+                        function (string $jobId, WorkerComponentStateRepository $repository) {
+                            \assert('' !== $jobId);
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::APPLICATION)
+                                    ->setState('running')
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::COMPILATION)
+                                    ->setState('complete')
+                                    ->setMetaState(new MetaState(true, true))
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::EXECUTION)
+                                    ->setState('complete')
+                                    ->setMetaState(new MetaState(true, true))
+                            );
+
+                            $repository->save(
+                                new WorkerComponentState($jobId, WorkerComponentName::EVENT_DELIVERY)
+                                    ->setState('complete')
+                                    ->setMetaState(new MetaState(true, true))
+                            );
+                        }
+                    ),
+                'expectedSerializedJobCreator' => $expectedSerializedJobCreatorCreator([
+                    'compilation' => [
+                        'state' => 'complete',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                    ],
+                    'execution' => [
+                        'state' => 'complete',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                    ],
+                    'event_delivery' => [
+                        'state' => 'complete',
+                        'meta_state' => [
+                            'ended' => true,
+                            'succeeded' => true,
+                        ],
+                    ],
+                ]),
+
+            ],
         ];
     }
 
