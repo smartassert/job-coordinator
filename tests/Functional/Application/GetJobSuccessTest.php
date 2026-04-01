@@ -221,6 +221,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -309,6 +311,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -426,6 +430,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -557,6 +563,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -647,6 +655,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -750,6 +760,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -838,6 +850,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -946,6 +960,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1069,6 +1085,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'running',
@@ -1201,6 +1219,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'running',
@@ -1351,6 +1371,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'running',
@@ -1488,6 +1510,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1659,6 +1683,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => false,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1816,6 +1842,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => true,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'complete',
@@ -1960,6 +1988,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => true,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'failed',
@@ -2112,6 +2142,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => true,
                                 ],
+                                'preparation' => [],
+                                'requests' => [],
                             ],
                             'worker-job' => [
                                 'state' => 'failed',
