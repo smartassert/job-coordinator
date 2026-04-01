@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enum\JobComponentName;
-use App\Model\JobComponent\Machine;
 use App\Model\JobComponent\NamedJobComponent;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\RemoteRequestCollection;
-use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -22,7 +20,7 @@ readonly class JobStatusFactory
         private PreparationStateFactory $preparationStateFactory,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
-        private MachineRepository $machineRepository,
+        private MachineComponentFactory $machineComponentFactory,
         private WorkerJobFactory $workerJobFactory,
         private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
@@ -34,8 +32,7 @@ readonly class JobStatusFactory
         $resultsJob = $this->resultsJobRepository->find($job->getId());
         $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
 
-        $machineEntity = $this->machineRepository->find($job->getId());
-        $machine = new Machine($machineEntity);
+        $machine = $this->machineComponentFactory->createForJob($job);
 
         $workerJob = $this->workerJobFactory->createForJob($job);
 
@@ -43,7 +40,7 @@ readonly class JobStatusFactory
             $preparationState->getMetaState(),
             $resultsJob?->getMetaState(),
             $serializedSuite?->getMetaState(),
-            $machineEntity?->getMetaState(),
+            $machine->getMetaState(),
             $workerJob->getMetaState(),
         ]);
 
