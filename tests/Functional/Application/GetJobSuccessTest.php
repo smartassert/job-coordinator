@@ -1680,7 +1680,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 $repository->save($machine);
 
                 return $machine;
-            });
+            })
+        ;
 
         $expectedSerializedJobCreatorCreator = function (array $workerComponentsData) {
             return function (
@@ -1784,7 +1785,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                     ],
                 ]),
-
             ],
             'worker-job: application running, compilation complete, execution running' => [
                 'stagingConfiguration' => $stagingConfiguration
@@ -1833,7 +1833,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                     ],
                 ]),
-
             ],
             'worker-job: all components complete' => [
                 'stagingConfiguration' => $stagingConfiguration
@@ -1888,7 +1887,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                     ],
                 ]),
-
             ],
         ];
     }
@@ -1941,7 +1939,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 $repository->save($machine);
 
                 return $machine;
-            });
+            })
+        ;
 
         $expectedSerializedJobCreatorCreator = function (array $creationFailureData) {
             return function (
@@ -2043,21 +2042,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
         return [
             'worker job creation failed; serialized suite read failure' => [
                 'stagingConfiguration' => $stagingConfiguration->withWorkerJobCreationFailureCreator(
-                        function (string $jobId, WorkerJobCreationFailureRepository $repository) {
-                            \assert('' !== $jobId);
+                    function (string $jobId, WorkerJobCreationFailureRepository $repository) {
+                        \assert('' !== $jobId);
 
-                            $repository->save(
-                                new WorkerJobCreationFailure(
-                                    $jobId,
-                                    WorkerJobCreationStage::SERIALIZED_SUITE_READ,
-                                    new \Exception(
-                                        'exception message',
-                                        123
-                                    )
+                        $repository->save(
+                            new WorkerJobCreationFailure(
+                                $jobId,
+                                WorkerJobCreationStage::SERIALIZED_SUITE_READ,
+                                new \Exception(
+                                    'exception message',
+                                    123
                                 )
-                            );
-                        }
-                    ),
+                            )
+                        );
+                    }
+                ),
                 'expectedSerializedJobCreator' => $expectedSerializedJobCreatorCreator([
                     'stage' => WorkerJobCreationStage::SERIALIZED_SUITE_READ->value,
                     'exception' => [
@@ -2069,21 +2068,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ],
             'worker job creation failed; job creation failure' => [
                 'stagingConfiguration' => $stagingConfiguration->withWorkerJobCreationFailureCreator(
-                        function (string $jobId, WorkerJobCreationFailureRepository $repository) {
-                            \assert('' !== $jobId);
+                    function (string $jobId, WorkerJobCreationFailureRepository $repository) {
+                        \assert('' !== $jobId);
 
-                            $repository->save(
-                                new WorkerJobCreationFailure(
-                                    $jobId,
-                                    WorkerJobCreationStage::WORKER_JOB_CREATE,
-                                    new \Exception(
-                                        'exception message',
-                                        123
-                                    )
+                        $repository->save(
+                            new WorkerJobCreationFailure(
+                                $jobId,
+                                WorkerJobCreationStage::WORKER_JOB_CREATE,
+                                new \Exception(
+                                    'exception message',
+                                    123
                                 )
-                            );
-                        }
-                    ),
+                            )
+                        );
+                    }
+                ),
                 'expectedSerializedJobCreator' => $expectedSerializedJobCreatorCreator([
                     'stage' => WorkerJobCreationStage::WORKER_JOB_CREATE->value,
                     'exception' => [
