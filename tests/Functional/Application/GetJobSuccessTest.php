@@ -1050,33 +1050,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $repository->save($machine);
 
                         return $machine;
-                    })
-                    ->withWorkerComponentStatesCreator(
-                        function (string $jobId, WorkerComponentStateRepository $repository) {
-                            \assert('' !== $jobId);
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::APPLICATION)
-                                    ->setState('running')
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::COMPILATION)
-                                    ->setState('complete')
-                                    ->setMetaState(new MetaState(true, true))
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::EXECUTION)
-                                    ->setState('running')
-                            );
-
-                            $repository->save(
-                                new WorkerComponentState($jobId, WorkerComponentName::EVENT_DELIVERY)
-                                    ->setState('running')
-                            );
-                        }
-                    ),
+                    }),
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
@@ -1101,7 +1075,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'results-job' => 'pending',
                                 'serialized-suite' => 'pending',
                                 'machine' => 'succeeded',
-                                'worker-job' => 'succeeded',
+                                'worker-job' => 'pending',
                             ],
                             'failures' => [],
                         ],
@@ -1122,28 +1096,28 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'worker-job' => [
-                                'state' => 'running',
+                                'state' => 'pending',
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
                                 'components' => [
                                     'compilation' => [
-                                        'state' => 'complete',
+                                        'state' => 'pending',
                                         'meta_state' => [
-                                            'ended' => true,
-                                            'succeeded' => true,
+                                            'ended' => false,
+                                            'succeeded' => false,
                                         ],
                                     ],
                                     'execution' => [
-                                        'state' => 'running',
+                                        'state' => 'pending',
                                         'meta_state' => [
                                             'ended' => false,
                                             'succeeded' => false,
                                         ],
                                     ],
                                     'event_delivery' => [
-                                        'state' => 'running',
+                                        'state' => 'pending',
                                         'meta_state' => [
                                             'ended' => false,
                                             'succeeded' => false,
@@ -1151,8 +1125,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     ],
                                 ],
                                 'preparation' => [
-                                    'state' => 'succeeded',
-                                    'request_state' => 'succeeded',
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
                                 ],
                                 'requests' => [],
                             ],
@@ -1805,6 +1779,13 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ];
                 },
             ],
+        ];
+    }
+
+    public static function workerJobPreparationComponentDataProvider(): array
+    {
+        return [
+
         ];
     }
 
