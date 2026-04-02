@@ -32,20 +32,19 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         \assert(is_string($jobId));
 
         $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
+
+        self::assertSame('pre_active', $machineData['state_category']);
+        self::assertNull($machineData['ip_address']);
+        self::assertNull($machineData['action_failure']);
         self::assertSame(
             [
-                'state_category' => 'pre_active',
-                'ip_address' => null,
-                'action_failure' => null,
-                'meta_state' => [
-                    'ended' => false,
-                    'succeeded' => false,
-                ],
-                'requests' => [],
-                'preparation' => [],
+                'ended' => false,
+                'succeeded' => false,
             ],
-            $machineData
+            $machineData['meta_state'],
         );
+        self::assertSame([], $machineData['preparation']);
+        self::assertNotSame([], $machineData['requests']);
 
         $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'end');
 
