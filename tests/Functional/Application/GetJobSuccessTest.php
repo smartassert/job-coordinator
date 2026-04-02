@@ -352,7 +352,52 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'request_state' => 'halted',
                                 ],
                             ],
-                            'serialized-suite' => null,
+                            'serialized-suite' => [
+                                'state' => null,
+                                'is_prepared' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [
+                                    [
+                                        'type' => 'serialized-suite/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'halted',
+                                            ],
+                                        ],
+                                    ],
+                                    [
+                                        'type' => 'serialized-suite/retrieve',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'network',
+                                                    'code' => 6,
+                                                    'message' => 'unable to resolve host "sources.example.com"',
+                                                ],
+                                            ],
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'http',
+                                                    'code' => 503,
+                                                    'message' => 'service unavailable',
+                                                ],
+                                            ],
+                                            [
+                                                'state' => 'succeeded',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
@@ -676,6 +721,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => true,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
                                 ],
                             ],
                             'machine' => null,
@@ -1161,6 +1211,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => true,
                                 ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'succeeded',
+                                    'request_state' => 'succeeded',
+                                ],
                             ],
                             'machine' => [
                                 'state_category' => $machine->getStateCategory(),
@@ -1339,7 +1394,38 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     ],
                                 ],
                             ],
-                            'serialized-suite' => null,
+                            'serialized-suite' => [
+                                'state' => null,
+                                'is_prepared' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [
+                                    [
+                                        'type' => 'serialized-suite/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'network',
+                                                    'code' => 28,
+                                                    'message' => 'connection timed out',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'preparation' => [
+                                    'state' => 'failed',
+                                    'request_state' => 'failed',
+                                    'failure' => [
+                                        'type' => 'http',
+                                        'code' => 500,
+                                        'message' => 'internal server error',
+                                    ],
+                                ],
+                            ],
                             'machine' => [
                                 'state_category' => null,
                                 'ip_address' => null,
@@ -1709,6 +1795,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => true,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'succeeded',
+                                    'request_state' => 'succeeded',
                                 ],
                             ],
                             'machine' => [
@@ -2104,6 +2195,11 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => true,
                                 'succeeded' => true,
+                            ],
+                            'requests' => [],
+                            'preparation' => [
+                                'state' => 'succeeded',
+                                'request_state' => 'succeeded',
                             ],
                         ],
                         'machine' => [

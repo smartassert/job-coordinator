@@ -11,16 +11,15 @@ use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
-use App\Repository\SerializedSuiteRepository;
 
 readonly class JobStatusFactory
 {
     public function __construct(
         private PreparationStateFactory $preparationStateFactory,
-        private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobComponentFactory $resultsJobComponentFactory,
         private MachineComponentFactory $machineComponentFactory,
         private WorkerJobFactory $workerJobFactory,
+        private SerializedSuiteComponentFactory $serializedSuiteComponentFactory,
         private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
     ) {}
@@ -28,16 +27,16 @@ readonly class JobStatusFactory
     public function create(JobInterface $job): JobStatus
     {
         $preparationState = $this->preparationStateFactory->create($job);
-        $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
 
         $resultsJob = $this->resultsJobComponentFactory->createForJob($job);
         $machine = $this->machineComponentFactory->createForJob($job);
         $workerJob = $this->workerJobFactory->createForJob($job);
+        $serializedSuite = $this->serializedSuiteComponentFactory->createForJob($job);
 
         $jobMetaState = $this->metaStateReducer->reduce([
             $preparationState->getMetaState(),
             $resultsJob->getMetaState(),
-            $serializedSuite?->getMetaState(),
+            $serializedSuite->getMetaState(),
             $machine->getMetaState(),
             $workerJob->getMetaState(),
         ]);
@@ -50,9 +49,13 @@ readonly class JobStatusFactory
             ? new NamedJobComponent(JobComponentName::MACHINE, null)
             : $machine;
 
+        $serializedSuiteComponent = $serializedSuite->isEmpty()
+            ? new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, null)
+            : $serializedSuite;
+
         $components = new JobComponents([
             $resultsJobComponent,
-            new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
+            $serializedSuiteComponent,
             $machineComponent,
             $workerJob,
         ]);
