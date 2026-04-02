@@ -34,7 +34,7 @@ use App\Model\WorkerComponentStateInterface;
  *   requests: SerializedRemoteRequestCollection
  * }
  */
-class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
+class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,

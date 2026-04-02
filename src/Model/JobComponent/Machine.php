@@ -24,18 +24,13 @@ use App\Model\SerializeToArrayInterface;
  *   preparation: SerializedPreparation
  * }
  */
-readonly class Machine implements SerializeToArrayInterface, NamedJobComponentInterface
+readonly class Machine implements SerializeToArrayInterface, JobComponentInterface
 {
     public function __construct(
         private ?MachineEntity $entity,
         private RemoteRequestCollection $requests,
         private Preparation $preparation,
     ) {}
-
-    public function isEmpty(): bool
-    {
-        return null === $this->entity && $this->requests->isEmpty();
-    }
 
     public function getName(): JobComponentName
     {
@@ -48,10 +43,14 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
     }
 
     /**
-     * @return SerializedMachine
+     * @return ?SerializedMachine
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): ?array
     {
+        if (null === $this->entity && $this->requests->isEmpty()) {
+            return null;
+        }
+
         return [
             'state_category' => $this->entity?->getStateCategory() ?? null,
             'ip_address' => $this->entity?->getIp() ?? null,

@@ -22,18 +22,13 @@ use App\Model\SerializeToArrayInterface;
  *   preparation: SerializedPreparation
  * }
  */
-readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponentInterface
+readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInterface
 {
     public function __construct(
         private ?ResultsJobEntity $entity,
         private RemoteRequestCollection $requests,
         private Preparation $preparation,
     ) {}
-
-    public function isEmpty(): bool
-    {
-        return null === $this->entity && $this->requests->isEmpty();
-    }
 
     public function getName(): JobComponentName
     {
@@ -46,10 +41,14 @@ readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponen
     }
 
     /**
-     * @return SerializedResultsJob
+     * @return ?SerializedResultsJob
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): ?array
     {
+        if (null === $this->entity && $this->requests->isEmpty()) {
+            return null;
+        }
+
         return [
             'state' => $this->entity?->getState() ?? null,
             'end_state' => $this->entity?->getEndState() ?? null,

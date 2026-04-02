@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\JobComponentName;
-use App\Model\JobComponent\NamedJobComponent;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
@@ -41,22 +39,10 @@ readonly class JobStatusFactory
             $workerJob->getMetaState(),
         ]);
 
-        $resultsJobComponent = $resultsJob->isEmpty()
-            ? new NamedJobComponent(JobComponentName::RESULTS_JOB, null)
-            : $resultsJob;
-
-        $machineComponent = $machine->isEmpty()
-            ? new NamedJobComponent(JobComponentName::MACHINE, null)
-            : $machine;
-
-        $serializedSuiteComponent = $serializedSuite->isEmpty()
-            ? new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, null)
-            : $serializedSuite;
-
         $components = new JobComponents([
-            $resultsJobComponent,
-            $serializedSuiteComponent,
-            $machineComponent,
+            $resultsJob,
+            $serializedSuite,
+            $machine,
             $workerJob,
         ]);
 
