@@ -13,6 +13,7 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
+ * @phpstan-import-type SerializedPreparation from Preparation
  *
  * @phpstan-type SerializedMachine array{
  *   state_category: ?non-empty-string,
@@ -20,7 +21,7 @@ use App\Model\SerializeToArrayInterface;
  *   action_failure: ?MachineActionFailure,
  *   meta_state: MetaState,
  *   requests: SerializedRemoteRequestCollection,
- *   preparation: array{}
+ *   preparation: SerializedPreparation
  * }
  */
 readonly class Machine implements SerializeToArrayInterface, NamedJobComponentInterface
@@ -28,6 +29,7 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
     public function __construct(
         private ?MachineEntity $entity,
         private RemoteRequestCollection $requests,
+        private Preparation $preparation,
     ) {}
 
     public function getName(): JobComponentName
@@ -51,7 +53,7 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
             'action_failure' => $this->entity?->getActionFailure() ?? null,
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests->jsonSerialize(),
-            'preparation' => [],
+            'preparation' => $this->preparation->jsonSerialize(),
         ];
     }
 }

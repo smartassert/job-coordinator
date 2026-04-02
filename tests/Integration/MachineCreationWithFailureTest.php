@@ -43,7 +43,13 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
             ],
             $machineData['meta_state'],
         );
-        self::assertSame([], $machineData['preparation']);
+        self::assertSame(
+            [
+                'state' => 'succeeded',
+                'request_state' => 'succeeded',
+            ],
+            $machineData['preparation']
+        );
         self::assertNotSame([], $machineData['requests']);
 
         $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'end');
@@ -67,7 +73,13 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
             ],
             $machineData['meta_state'],
         );
-        self::assertSame([], $machineData['preparation']);
+        self::assertSame(
+            [
+                'state' => 'succeeded',
+                'request_state' => 'succeeded',
+            ],
+            $machineData['preparation']
+        );
         self::assertNotSame([], $machineData['requests']);
     }
 
