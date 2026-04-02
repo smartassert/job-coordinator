@@ -52,6 +52,11 @@ class ResultsJob implements SerializeToArrayInterface
         $this->stateIsSucceeded = $metaState->succeeded;
     }
 
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
     /**
      * @param non-empty-string $state
      */
@@ -60,6 +65,11 @@ class ResultsJob implements SerializeToArrayInterface
         $this->state = $state;
 
         return $this;
+    }
+
+    public function getEndState(): ?string
+    {
+        return $this->endState;
     }
 
     public function hasEndState(): bool

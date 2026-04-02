@@ -481,6 +481,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'requests' => [],
+                                'preparation' => [],
                             ],
                             'serialized-suite' => null,
                             'machine' => [
@@ -586,6 +588,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'requests' => [],
+                                'preparation' => [],
                             ],
                             'serialized-suite' => null,
                             'machine' => [
@@ -1174,6 +1178,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
+                                'requests' => [],
+                                'preparation' => [],
                             ],
                             'serialized-suite' => [
                                 'state' => 'prepared',
@@ -1687,6 +1693,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => true,
                                     'succeeded' => true,
                                 ],
+                                'requests' => [],
+                                'preparation' => [],
                             ],
                             'serialized-suite' => [
                                 'state' => 'prepared',
@@ -2077,6 +2085,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => true,
                                 'succeeded' => true,
                             ],
+                            'requests' => [],
+                            'preparation' => [],
                         ],
                         'serialized-suite' => [
                             'state' => 'prepared',

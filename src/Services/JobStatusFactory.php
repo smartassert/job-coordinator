@@ -11,15 +11,14 @@ use App\Model\JobInterface;
 use App\Model\JobStatus;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
-use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
 readonly class JobStatusFactory
 {
     public function __construct(
         private PreparationStateFactory $preparationStateFactory,
-        private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
+        private ResultsJobComponentFactory $resultsJobComponentFactory,
         private MachineComponentFactory $machineComponentFactory,
         private WorkerJobFactory $workerJobFactory,
         private RemoteRequestRepository $remoteRequestRepository,
@@ -29,23 +28,26 @@ readonly class JobStatusFactory
     public function create(JobInterface $job): JobStatus
     {
         $preparationState = $this->preparationStateFactory->create($job);
-        $resultsJob = $this->resultsJobRepository->find($job->getId());
         $serializedSuite = $this->serializedSuiteRepository->get($job->getId());
 
+        $resultsJob = $this->resultsJobComponentFactory->createForJob($job);
         $machine = $this->machineComponentFactory->createForJob($job);
-
         $workerJob = $this->workerJobFactory->createForJob($job);
 
         $jobMetaState = $this->metaStateReducer->reduce([
             $preparationState->getMetaState(),
-            $resultsJob?->getMetaState(),
+            $resultsJob->getMetaState(),
             $serializedSuite?->getMetaState(),
             $machine->getMetaState(),
             $workerJob->getMetaState(),
         ]);
 
+        $resultsJobComponent = $resultsJob->isEmpty()
+            ? new NamedJobComponent(JobComponentName::RESULTS_JOB, null)
+            : $resultsJob;
+
         $components = new JobComponents([
-            new NamedJobComponent(JobComponentName::RESULTS_JOB, $resultsJob),
+            $resultsJobComponent,
             new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
             $machine,
             $workerJob,
