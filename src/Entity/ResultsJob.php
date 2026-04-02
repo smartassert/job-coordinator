@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
-use App\Model\SerializeToArrayInterface;
 use App\Repository\ResultsJobRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
-class ResultsJob implements SerializeToArrayInterface
+class ResultsJob
 {
     #[ORM\Column(length: 32)]
     public readonly string $token;
@@ -98,21 +97,5 @@ class ResultsJob implements SerializeToArrayInterface
         $this->stateIsSucceeded = $metaState->succeeded;
 
         return $this;
-    }
-
-    /**
-     * @return array{
-     *     'state': ?non-empty-string,
-     *     'end_state': ?non-empty-string,
-     *     'meta_state': MetaState,
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state' => '' === $this->state ? null : $this->state,
-            'end_state' => '' === $this->endState ? null : $this->endState,
-            'meta_state' => new MetaState($this->stateIsEnded, $this->stateIsSucceeded),
-        ];
     }
 }
