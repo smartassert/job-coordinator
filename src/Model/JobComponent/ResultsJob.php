@@ -12,13 +12,14 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
+ * @phpstan-import-type SerializedPreparation from Preparation
  *
  * @phpstan-type SerializedResultsJob array{
  *   state: ?string,
  *   end_state: ?string,
  *   meta_state: MetaState,
  *   requests: SerializedRemoteRequestCollection,
- *   preparation: array{}
+ *   preparation: SerializedPreparation
  * }
  */
 readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponentInterface
@@ -26,6 +27,7 @@ readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponen
     public function __construct(
         private ?ResultsJobEntity $entity,
         private RemoteRequestCollection $requests,
+        private Preparation $preparation,
     ) {}
 
     public function isEmpty(): bool
@@ -53,7 +55,7 @@ readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponen
             'end_state' => $this->entity?->getEndState() ?? null,
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests->jsonSerialize(),
-            'preparation' => [],
+            'preparation' => $this->preparation->jsonSerialize(),
         ];
     }
 }
