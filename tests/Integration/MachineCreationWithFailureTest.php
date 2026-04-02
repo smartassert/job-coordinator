@@ -48,26 +48,28 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         );
 
         $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'end');
+
+        self::assertSame('end', $machineData['state_category']);
+        self::assertNull($machineData['ip_address']);
         self::assertSame(
             [
-                'state_category' => 'end',
-                'ip_address' => null,
-                'action_failure' => [
-                    'action' => 'find',
-                    'type' => 'vendor_authentication_failure',
-                    'context' => [
-                        'provider' => null,
-                    ],
+                'action' => 'find',
+                'type' => 'vendor_authentication_failure',
+                'context' => [
+                    'provider' => null,
                 ],
-                'meta_state' => [
-                    'ended' => true,
-                    'succeeded' => false,
-                ],
-                'requests' => [],
-                'preparation' => [],
             ],
-            $machineData
+            $machineData['action_failure'],
         );
+        self::assertSame(
+            [
+                'ended' => true,
+                'succeeded' => false,
+            ],
+            $machineData['meta_state'],
+        );
+        self::assertSame([], $machineData['preparation']);
+        self::assertNotSame([], $machineData['requests']);
     }
 
     protected static function createSuiteId(): string
