@@ -17,11 +17,16 @@ namespace App\Model;
 class RemoteRequestCollection implements \JsonSerializable
 {
     /**
-     * @param iterable<RemoteRequestInterface&TypedRemoteRequestInterface> $requests
+     * @param array<RemoteRequestInterface&TypedRemoteRequestInterface> $requests
      */
     public function __construct(
-        private readonly iterable $requests,
+        private readonly array $requests,
     ) {}
+
+    public function isEmpty(): bool
+    {
+        return 0 === count($this->requests);
+    }
 
     /**
      * @return SerializedRemoteRequestCollection
