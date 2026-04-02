@@ -772,7 +772,16 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
-                                'requests' => [],
+                                'requests' => [
+                                    [
+                                        'type' => 'machine/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'requesting',
+                                            ],
+                                        ],
+                                    ],
+                                ],
                                 'preparation' => [],
                             ],
                             'worker-job' => [
@@ -1299,7 +1308,21 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'ended' => false,
                                     'succeeded' => false,
                                 ],
-                                'requests' => [],
+                                'requests' => [
+                                    [
+                                        'type' => 'machine/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'http',
+                                                    'code' => 500,
+                                                    'message' => 'internal server error',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
                                 'preparation' => [],
                             ],
                             'worker-job' => [
