@@ -192,7 +192,25 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [
+                                    [
+                                        'type' => 'results-job/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'requesting',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'preparation' => [],
+                            ],
                             'serialized-suite' => null,
                             'machine' => null,
                             'worker-job' => [
@@ -309,7 +327,25 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'failures' => [],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [
+                                    [
+                                        'type' => 'results-job/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'halted',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'preparation' => [],
+                            ],
                             'serialized-suite' => null,
                             'machine' => null,
                             'worker-job' => [
@@ -1256,7 +1292,30 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [
+                                    [
+                                        'type' => 'results-job/create',
+                                        'attempts' => [
+                                            [
+                                                'state' => 'failed',
+                                                'failure' => [
+                                                    'type' => 'http',
+                                                    'code' => 503,
+                                                    'message' => 'service unavailable',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'preparation' => [],
+                            ],
                             'serialized-suite' => null,
                             'machine' => [
                                 'state_category' => null,
