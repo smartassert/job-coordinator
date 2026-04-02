@@ -7,14 +7,17 @@ namespace App\Model\JobComponent;
 use App\Entity\ResultsJob as ResultsJobEntity;
 use App\Enum\JobComponentName;
 use App\Model\MetaState;
+use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
 
 /**
+ * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
+ *
  * @phpstan-type SerializedResultsJob array{
  *   state: ?string,
  *   end_state: ?string,
  *   meta_state: MetaState,
- *   requests: array{},
+ *   requests: SerializedRemoteRequestCollection,
  *   preparation: array{}
  * }
  */
@@ -22,11 +25,12 @@ readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponen
 {
     public function __construct(
         private ?ResultsJobEntity $entity,
+        private RemoteRequestCollection $requests,
     ) {}
 
     public function isEmpty(): bool
     {
-        return null === $this->entity;
+        return null === $this->entity && $this->requests->isEmpty();
     }
 
     public function getName(): JobComponentName
@@ -48,7 +52,7 @@ readonly class ResultsJob implements SerializeToArrayInterface, NamedJobComponen
             'state' => $this->entity?->getState() ?? null,
             'end_state' => $this->entity?->getEndState() ?? null,
             'meta_state' => $this->getMetaState(),
-            'requests' => [],
+            'requests' => $this->requests->jsonSerialize(),
             'preparation' => [],
         ];
     }
