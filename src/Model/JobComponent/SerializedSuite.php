@@ -22,7 +22,7 @@ use App\Model\SerializeToArrayInterface;
  *   preparation: SerializedPreparation
  * }
  */
-readonly class SerializedSuite implements SerializeToArrayInterface, NamedJobComponentInterface
+readonly class SerializedSuite implements SerializeToArrayInterface, JobComponentInterface
 {
     public function __construct(
         private ?SerializedSuiteEntity $entity,
@@ -46,10 +46,14 @@ readonly class SerializedSuite implements SerializeToArrayInterface, NamedJobCom
     }
 
     /**
-     * @return SerializedSerializedSuite
+     * @return ?SerializedSerializedSuite
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): ?array
     {
+        if (null === $this->entity && $this->requests->isEmpty()) {
+            return null;
+        }
+
         return [
             'state' => $this->entity?->getState() ?? null,
             'is_prepared' => $this->entity?->isPrepared() ?? false,

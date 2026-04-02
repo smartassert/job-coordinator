@@ -6,7 +6,7 @@ namespace App\Model\JobComponent;
 
 use App\Enum\JobComponentName;
 
-interface NamedJobComponentInterface extends \JsonSerializable
+interface JobComponentInterface extends \JsonSerializable
 {
     public function getName(): JobComponentName;
 

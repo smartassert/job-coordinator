@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Enum\JobComponentName;
-use App\Model\JobComponent\NamedJobComponentInterface;
+use App\Model\JobComponent\JobComponentInterface;
 
 readonly class JobComponents implements \JsonSerializable
 {
     /**
-     * @param NamedJobComponentInterface[] $components
+     * @param JobComponentInterface[] $components
      */
     public function __construct(
         private array $components,
     ) {}
 
     /**
-     * @return array<value-of<JobComponentName>, NamedJobComponentInterface>
+     * @return array<value-of<JobComponentName>, JobComponentInterface>
      */
     public function jsonSerialize(): array
     {
