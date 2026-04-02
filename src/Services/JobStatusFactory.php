@@ -46,10 +46,14 @@ readonly class JobStatusFactory
             ? new NamedJobComponent(JobComponentName::RESULTS_JOB, null)
             : $resultsJob;
 
+        $machineComponent = $machine->isEmpty()
+            ? new NamedJobComponent(JobComponentName::MACHINE, null)
+            : $machine;
+
         $components = new JobComponents([
             $resultsJobComponent,
             new NamedJobComponent(JobComponentName::SERIALIZED_SUITE, $serializedSuite),
-            $machine,
+            $machineComponent,
             $workerJob,
         ]);
 

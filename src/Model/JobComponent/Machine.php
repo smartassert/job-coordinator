@@ -32,6 +32,11 @@ readonly class Machine implements SerializeToArrayInterface, NamedJobComponentIn
         private Preparation $preparation,
     ) {}
 
+    public function isEmpty(): bool
+    {
+        return null === $this->entity && $this->requests->isEmpty();
+    }
+
     public function getName(): JobComponentName
     {
         return JobComponentName::MACHINE;

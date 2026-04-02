@@ -116,20 +116,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'components' => [
                             'results-job' => null,
                             'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
@@ -207,20 +194,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'components' => [
                             'results-job' => null,
                             'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
@@ -337,20 +311,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'components' => [
                             'results-job' => null,
                             'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
@@ -485,20 +446,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'preparation' => [],
                             ],
                             'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
@@ -592,20 +540,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'preparation' => [],
                             ],
                             'serialized-suite' => null,
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
@@ -695,20 +630,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'succeeded' => true,
                                 ],
                             ],
-                            'machine' => [
-                                'state_category' => null,
-                                'ip_address' => null,
-                                'action_failure' => null,
-                                'meta_state' => [
-                                    'ended' => false,
-                                    'succeeded' => false,
-                                ],
-                                'requests' => [],
-                                'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
-                                ],
-                            ],
+                            'machine' => null,
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
