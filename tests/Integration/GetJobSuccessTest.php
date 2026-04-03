@@ -84,12 +84,24 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $threshold = 60;
         $count = 0;
 
-        while (
-            null === ($jobData['preparation']['failures']['serialized-suite'] ?? null)
-            && $count < $threshold
-        ) {
+        $serializedSuiteFailure = null;
+
+        while (null === $serializedSuiteFailure && $count < $threshold) {
             sleep(1);
             $jobData = $this->getJobData($apiToken, $jobId);
+
+            $componentsData = $jobData['components'] ?? [];
+            $componentsData = is_array($componentsData) ? $componentsData : [];
+
+            $serializedSuiteData = $componentsData['serialized-suite'] ?? [];
+            $serializedSuiteData = is_array($serializedSuiteData) ? $serializedSuiteData : [];
+
+            $preparationData = $serializedSuiteData['preparation'] ?? [];
+            $preparationData = is_array($preparationData) ? $preparationData : [];
+
+            $serializedSuiteFailure = $preparationData['failure'] ?? null;
+            $serializedSuiteFailure = is_array($serializedSuiteFailure) ? $serializedSuiteFailure : null;
+
             ++$count;
         }
 
@@ -100,23 +112,16 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertSame('failed', $jobData['preparation']['state']);
         self::assertSame(
             [
-                'serialized-suite' => [
-                    'type' => 'http',
-                    'code' => 403,
-                    'message' => 'Forbidden',
-                ],
+                'type' => 'http',
+                'code' => 403,
+                'message' => 'Forbidden',
             ],
-            $jobData['preparation']['failures'],
+            $serializedSuiteFailure,
         );
     }
 
     /**
-     * @return array{
-     *     'preparation': array{
-     *       'state': string,
-     *       'failures': ?array<mixed>
-     *     }
-     * }
+     * @return array<mixed>
      */
     private function getJobData(string $apiToken, string $jobId): array
     {
@@ -129,9 +134,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
         $responseData = json_decode($getResponse->getBody()->getContents(), true);
 
         \assert(is_array($responseData));
-        \assert(is_array($responseData['preparation']));
-        \assert(is_string($responseData['preparation']['state']));
-        \assert(is_array($responseData['preparation']['failures']));
 
         return $responseData;
     }
