@@ -354,7 +354,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'serialized-suite' => [
                                 'state' => null,
-                                'is_prepared' => null,
+                                'is_prepared' => false,
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
@@ -394,8 +394,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     ],
                                 ],
                                 'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
+                                    'state' => 'preparing',
+                                    'request_state' => 'halted',
                                 ],
                             ],
                             'machine' => null,
@@ -724,8 +724,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                                 'requests' => [],
                                 'preparation' => [
-                                    'state' => 'pending',
-                                    'request_state' => 'pending',
+                                    'state' => 'succeeded',
+                                    'request_state' => 'succeeded',
                                 ],
                             ],
                             'machine' => null,
@@ -1396,7 +1396,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'serialized-suite' => [
                                 'state' => null,
-                                'is_prepared' => null,
+                                'is_prepared' => false,
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
@@ -1420,9 +1420,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'failed',
                                     'request_state' => 'failed',
                                     'failure' => [
-                                        'type' => 'http',
-                                        'code' => 500,
-                                        'message' => 'internal server error',
+                                        'type' => 'network',
+                                        'code' => 28,
+                                        'message' => 'connection timed out',
                                     ],
                                 ],
                             ],
