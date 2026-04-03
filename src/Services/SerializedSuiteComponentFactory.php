@@ -11,14 +11,14 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobComponentHandler\MachineHandler;
+use App\Services\JobComponentHandler\SerializedSuiteHandler;
 
 readonly class SerializedSuiteComponentFactory
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
         private RemoteRequestRepository $remoteRequestRepository,
-        private MachineHandler $handler,
+        private SerializedSuiteHandler $handler,
     ) {}
 
     public function createForJob(JobInterface $job): SerializedSuite
