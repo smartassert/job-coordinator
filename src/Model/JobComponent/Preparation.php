@@ -25,6 +25,11 @@ readonly class Preparation implements \JsonSerializable
         private RequestState $requestState,
     ) {}
 
+    public function hasFailure(): bool
+    {
+        return $this->componentPreparation->failure instanceof RemoteRequestFailure;
+    }
+
     /**
      * @return SerializedPreparation
      */

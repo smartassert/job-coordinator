@@ -61,6 +61,7 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
             : $this->applicationState;
 
         $data = $applicationState->toArray();
+        $data['meta_state'] = $this->getMetaState()->jsonSerialize();
         $data['components'] = [
             WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
             WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
@@ -79,6 +80,10 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
 
     public function getMetaState(): MetaState
     {
+        if ($this->preparation->hasFailure() || $this->failure instanceof WorkerJobCreationFailure) {
+            return new MetaState(true, false);
+        }
+
         return $this->applicationState->getMetaState();
     }
 }
