@@ -1366,7 +1366,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => null,
                                 'end_state' => null,
                                 'meta_state' => [
-                                    'ended' => false,
+                                    'ended' => true,
                                     'succeeded' => false,
                                 ],
                                 'requests' => [
@@ -1398,7 +1398,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => null,
                                 'is_prepared' => false,
                                 'meta_state' => [
-                                    'ended' => false,
+                                    'ended' => true,
                                     'succeeded' => false,
                                 ],
                                 'requests' => [
@@ -1431,7 +1431,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ip_address' => null,
                                 'action_failure' => null,
                                 'meta_state' => [
-                                    'ended' => false,
+                                    'ended' => true,
                                     'succeeded' => false,
                                 ],
                                 'requests' => [
@@ -1462,7 +1462,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'worker-job' => [
                                 'state' => 'pending',
                                 'meta_state' => [
-                                    'ended' => false,
+                                    'ended' => true,
                                     'succeeded' => false,
                                 ],
                                 'components' => [
@@ -2158,7 +2158,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     'maximum_duration_in_seconds' => $job->getMaximumDurationInSeconds(),
                     'created_at' => $job->toArray()['created_at'],
                     'meta_state' => [
-                        'ended' => false,
+                        'ended' => true,
                         'succeeded' => false,
                     ],
                     'preparation' => [
