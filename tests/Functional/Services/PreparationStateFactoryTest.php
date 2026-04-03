@@ -122,7 +122,6 @@ class PreparationStateFactoryTest extends WebTestCase
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
                     ],
-                    [],
                 ),
             ],
             'succeeded' => [
@@ -163,7 +162,6 @@ class PreparationStateFactoryTest extends WebTestCase
                         'machine' => RequestState::SUCCEEDED,
                         'worker-job' => RequestState::SUCCEEDED,
                     ],
-                    [],
                 ),
             ],
             'preparing' => [
@@ -184,7 +182,6 @@ class PreparationStateFactoryTest extends WebTestCase
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
                     ],
-                    [],
                 ),
             ],
             'failed, single component failure' => [
@@ -210,13 +207,6 @@ class PreparationStateFactoryTest extends WebTestCase
                         'serialized-suite' => RequestState::PENDING,
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
-                    ],
-                    [
-                        'results-job' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::HTTP,
-                            503,
-                            'service unavailable'
-                        ),
                     ],
                 ),
             ],
@@ -253,18 +243,6 @@ class PreparationStateFactoryTest extends WebTestCase
                         'serialized-suite' => RequestState::FAILED,
                         'machine' => RequestState::PENDING,
                         'worker-job' => RequestState::PENDING,
-                    ],
-                    [
-                        'results-job' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::HTTP,
-                            503,
-                            'service unavailable'
-                        ),
-                        'serialized-suite' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::NETWORK,
-                            28,
-                            'connection timed out'
-                        ),
                     ],
                 ),
             ],
