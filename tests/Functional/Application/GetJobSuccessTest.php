@@ -111,7 +111,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -189,7 +188,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -327,7 +325,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -519,7 +516,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -616,7 +612,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -711,7 +706,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'pending',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -801,7 +795,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'requesting',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -921,7 +914,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -1028,7 +1020,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -1188,7 +1179,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker-job' => 'succeeded',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -1337,28 +1327,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'serialized-suite' => 'failed',
                                 'machine' => 'failed',
                                 'worker-job' => 'failed',
-                            ],
-                            'failures' => [
-                                'results-job' => [
-                                    'type' => 'http',
-                                    'code' => 503,
-                                    'message' => 'service unavailable',
-                                ],
-                                'serialized-suite' => [
-                                    'type' => 'network',
-                                    'code' => 28,
-                                    'message' => 'connection timed out',
-                                ],
-                                'machine' => [
-                                    'type' => 'http',
-                                    'code' => 500,
-                                    'message' => 'internal server error',
-                                ],
-                                'worker-job' => [
-                                    'type' => 'network',
-                                    'code' => 6,
-                                    'message' => 'hostname lookup failed',
-                                ],
                             ],
                         ],
                         'components' => [
@@ -1614,7 +1582,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker-job' => 'pending',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => null,
@@ -1773,7 +1740,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'machine' => 'succeeded',
                                 'worker-job' => 'succeeded',
                             ],
-                            'failures' => [],
                         ],
                         'components' => [
                             'results-job' => [
@@ -1909,7 +1875,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'machine' => 'succeeded',
                             'worker-job' => 'succeeded',
                         ],
-                        'failures' => [],
                     ],
                     'components' => [
                         'results-job' => null,
@@ -2173,7 +2138,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'machine' => 'succeeded',
                             'worker-job' => 'pending',
                         ],
-                        'failures' => [],
                     ],
                     'components' => [
                         'results-job' => [
