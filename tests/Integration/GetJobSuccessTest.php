@@ -109,6 +109,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
             self::fail('Tried ' . $count . ' times to get expected failed serialized suite state.');
         }
 
+        \assert(is_array($jobData['preparation']));
+
         self::assertSame('failed', $jobData['preparation']['state']);
         self::assertSame(
             [
