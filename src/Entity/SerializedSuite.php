@@ -5,22 +5,11 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
-use App\Model\SerializeToArrayInterface;
 use App\Repository\SerializedSuiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @phpstan-type SerializedSerializedSuite array{
- *   state: non-empty-string,
- *   is_prepared: bool,
- *   meta_state: array{
- *     ended: bool,
- *     succeeded: bool
- *   },
- *  }
- */
 #[ORM\Entity(repositoryClass: SerializedSuiteRepository::class)]
-class SerializedSuite implements SerializeToArrayInterface
+class SerializedSuite
 {
     #[ORM\Column(length: 32, unique: true, nullable: false)]
     public string $id;
@@ -89,22 +78,6 @@ class SerializedSuite implements SerializeToArrayInterface
     public function hasFailed(): bool
     {
         return true === $this->hasEndState() && false === $this->isPrepared();
-    }
-
-    /**
-     * @return ?SerializedSerializedSuite
-     */
-    public function jsonSerialize(): ?array
-    {
-        if ('' === $this->state) {
-            return null;
-        }
-
-        return [
-            'state' => $this->state,
-            'is_prepared' => $this->isPrepared(),
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
-        ];
     }
 
     public function setMetaState(MetaState $metaState): self

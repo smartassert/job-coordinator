@@ -114,16 +114,7 @@ class PreparationStateFactoryTest extends WebTestCase
             'pending' => [
                 'entityCreator' => function () {},
                 'remoteRequestCreator' => function () {},
-                'expected' => new PreparationState(
-                    PreparationStateEnum::PENDING,
-                    [
-                        'results-job' => RequestState::PENDING,
-                        'serialized-suite' => RequestState::PENDING,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                    [],
-                ),
+                'expected' => new PreparationState(PreparationStateEnum::PENDING),
             ],
             'succeeded' => [
                 'entityCreator' => function (
@@ -155,16 +146,7 @@ class PreparationStateFactoryTest extends WebTestCase
                     );
                 },
                 'remoteRequestCreator' => function () {},
-                'expected' => new PreparationState(
-                    PreparationStateEnum::SUCCEEDED,
-                    [
-                        'results-job' => RequestState::SUCCEEDED,
-                        'serialized-suite' => RequestState::SUCCEEDED,
-                        'machine' => RequestState::SUCCEEDED,
-                        'worker-job' => RequestState::SUCCEEDED,
-                    ],
-                    [],
-                ),
+                'expected' => new PreparationState(PreparationStateEnum::SUCCEEDED),
             ],
             'preparing' => [
                 'entityCreator' => function () {},
@@ -176,16 +158,7 @@ class PreparationStateFactoryTest extends WebTestCase
                         new RemoteRequest($job->getId(), RemoteRequestType::createForResultsJobCreation(), 0)
                     );
                 },
-                'expected' => new PreparationState(
-                    PreparationStateEnum::PREPARING,
-                    [
-                        'results-job' => RequestState::REQUESTING,
-                        'serialized-suite' => RequestState::PENDING,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                    [],
-                ),
+                'expected' => new PreparationState(PreparationStateEnum::PREPARING),
             ],
             'failed, single component failure' => [
                 'entityCreator' => function () {},
@@ -203,22 +176,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             ))
                     );
                 },
-                'expected' => new PreparationState(
-                    PreparationStateEnum::FAILED,
-                    [
-                        'results-job' => RequestState::FAILED,
-                        'serialized-suite' => RequestState::PENDING,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                    [
-                        'results-job' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::HTTP,
-                            503,
-                            'service unavailable'
-                        ),
-                    ],
-                ),
+                'expected' => new PreparationState(PreparationStateEnum::FAILED),
             ],
             'failed, multiple component failures' => [
                 'entityCreator' => function () {},
@@ -246,27 +204,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             ))
                     );
                 },
-                'expected' => new PreparationState(
-                    PreparationStateEnum::FAILED,
-                    [
-                        'results-job' => RequestState::FAILED,
-                        'serialized-suite' => RequestState::FAILED,
-                        'machine' => RequestState::PENDING,
-                        'worker-job' => RequestState::PENDING,
-                    ],
-                    [
-                        'results-job' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::HTTP,
-                            503,
-                            'service unavailable'
-                        ),
-                        'serialized-suite' => new RemoteRequestFailure(
-                            RemoteRequestFailureType::NETWORK,
-                            28,
-                            'connection timed out'
-                        ),
-                    ],
-                ),
+                'expected' => new PreparationState(PreparationStateEnum::FAILED),
             ],
         ];
     }

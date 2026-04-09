@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
+use App\Enum\JobComponentName;
 use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
@@ -13,6 +14,7 @@ use App\Repository\RemoteRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRepositoryTest extends WebTestCase
 {
@@ -232,6 +234,79 @@ class RemoteRequestRepositoryTest extends WebTestCase
                 },
                 'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
                 'expected' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @param callable(string): RemoteRequest[] $remoteRequestsCreator
+     * @param RemoteRequest[]                   $expected
+     */
+    #[DataProvider('findAllForJobAndComponentDataProvider')]
+    public function testFindAllForJobAndComponent(
+        string $jobId,
+        JobComponentName $component,
+        callable $remoteRequestsCreator,
+        array $expected,
+    ): void {
+        $remoteRequests = $remoteRequestsCreator($jobId);
+        foreach ($remoteRequests as $remoteRequest) {
+            $this->remoteRequestRepository->save($remoteRequest);
+        }
+
+        $remoteRequests = $this->remoteRequestRepository->findAllForJobAndComponent($jobId, $component);
+
+        self::assertEquals($expected, $remoteRequests);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function findAllForJobAndComponentDataProvider(): array
+    {
+        $jobId = (string) new Ulid();
+
+        return [
+            'no remote requests' => [
+                'jobId' => $jobId,
+                'component' => JobComponentName::RESULTS_JOB,
+                'remoteRequestsCreator' => function () {
+                    return [];
+                },
+                'expected' => [],
+            ],
+            'no matching requests' => [
+                'jobId' => $jobId,
+                'component' => JobComponentName::RESULTS_JOB,
+                'remoteRequestsCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return [
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineRetrieval(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineTermination(), 0),
+                    ];
+                },
+                'expected' => [],
+            ],
+            'has matching remote requests for component' => [
+                'jobId' => $jobId,
+                'component' => JobComponentName::RESULTS_JOB,
+                'remoteRequestsCreator' => function (string $jobId) {
+                    \assert('' !== $jobId);
+
+                    return [
+                        new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineRetrieval(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForMachineTermination(), 0),
+                        new RemoteRequest($jobId, RemoteRequestType::createForResultsJobRetrieval(), 0),
+                    ];
+                },
+                'expected' => [
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
+                    new RemoteRequest($jobId, RemoteRequestType::createForResultsJobRetrieval(), 0),
+                ],
             ],
         ];
     }
