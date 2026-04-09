@@ -29,8 +29,8 @@ services:
     _instanceof:
         App\Services\RemoteRequestFailureFactory\ExceptionHandlerInterface:
             tags: ['app.remote_request_failure_factory.exception_handler']
-        App\Services\JobComponentPreparationFactory\JobComponentHandlerInterface:
-            tags: ['app.job_component_handler.component_handler']
+        App\Services\JobComponentPreparationFactory\JobComponentPreparationFactoryInterface:
+            tags: ['app.job_component.preparation_factory']
         App\ReadinessAssessor\ReadinessHandlerInterface:
             tags: ['app.readiness_assessor.handler']
         App\Services\RemoteRequestStateTracker\EventHandlerInterface:
@@ -106,7 +106,7 @@ services:
 
     App\Services\ComponentPreparationFactory:
         arguments:
-            $jobComponentHandlers: !tagged_iterator 'app.job_component_handler.component_handler'
+            $jobComponentHandlers: !tagged_iterator 'app.job_component.preparation_factory'
 
     SmartAssert\ServiceClient\ResponseFactory\ResponseFactory:
         factory: ['SmartAssert\ServiceClient\ResponseFactory\ResponseFactory', 'createFactory']

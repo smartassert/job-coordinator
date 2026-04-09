@@ -6,12 +6,12 @@ namespace App\Services;
 
 use App\Enum\JobComponentName;
 use App\Model\ComponentPreparation;
-use App\Services\JobComponentPreparationFactory\JobComponentHandlerInterface;
+use App\Services\JobComponentPreparationFactory\JobComponentPreparationFactoryInterface;
 
 readonly class ComponentPreparationFactory
 {
     /**
-     * @param JobComponentHandlerInterface[] $jobComponentHandlers
+     * @param JobComponentPreparationFactoryInterface[] $jobComponentHandlers
      */
     public function __construct(
         private iterable $jobComponentHandlers,

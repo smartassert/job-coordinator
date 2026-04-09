@@ -10,7 +10,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 
-class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
+class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
     private const JobComponentName JOB_COMPONENT = JobComponentName::SERIALIZED_SUITE;
 

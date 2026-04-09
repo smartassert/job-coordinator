@@ -10,7 +10,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 
-class WorkerJobHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
+class WorkerJobHandler extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
     private const JobComponentName JOB_COMPONENT = JobComponentName::WORKER_JOB;
 
