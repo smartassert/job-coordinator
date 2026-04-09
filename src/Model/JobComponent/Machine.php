@@ -51,14 +51,10 @@ readonly class Machine implements SerializeToArrayInterface, JobComponentInterfa
     }
 
     /**
-     * @return ?SerializedMachine
+     * @return SerializedMachine
      */
-    public function jsonSerialize(): ?array
+    public function jsonSerialize(): array
     {
-        if (null === $this->entity && $this->requests->isEmpty()) {
-            return null;
-        }
-
         return [
             'state_category' => $this->entity?->getStateCategory() ?? null,
             'ip_address' => $this->entity?->getIp() ?? null,

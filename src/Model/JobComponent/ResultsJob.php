@@ -49,14 +49,10 @@ readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInte
     }
 
     /**
-     * @return ?SerializedResultsJob
+     * @return SerializedResultsJob
      */
-    public function jsonSerialize(): ?array
+    public function jsonSerialize(): array
     {
-        if (null === $this->entity && $this->requests->isEmpty()) {
-            return null;
-        }
-
         return [
             'state' => $this->entity?->getState() ?? null,
             'end_state' => $this->entity?->getEndState() ?? null,
