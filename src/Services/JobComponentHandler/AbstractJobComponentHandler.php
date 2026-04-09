@@ -18,17 +18,6 @@ abstract class AbstractJobComponentHandler implements JobComponentHandlerInterfa
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    protected function doGetRequestState(string $jobId, RemoteRequestType $creationType): RequestState
-    {
-        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return RequestState::SUCCEEDED;
-        }
-
-        $requestState = $this->remoteRequestRepository->findNewest($jobId, $creationType)?->getState();
-
-        return null === $requestState ? RequestState::PENDING : $requestState;
-    }
-
     protected function doGetComponentPreparation(string $jobId, RemoteRequestType $creationType): ComponentPreparation
     {
         if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
