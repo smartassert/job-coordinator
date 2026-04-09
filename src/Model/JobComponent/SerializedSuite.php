@@ -54,14 +54,10 @@ readonly class SerializedSuite implements SerializeToArrayInterface, JobComponen
     }
 
     /**
-     * @return ?SerializedSerializedSuite
+     * @return SerializedSerializedSuite
      */
-    public function jsonSerialize(): ?array
+    public function jsonSerialize(): array
     {
-        if (null === $this->entity && $this->requests->isEmpty()) {
-            return null;
-        }
-
         return [
             'state' => $this->entity?->getState() ?? null,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
