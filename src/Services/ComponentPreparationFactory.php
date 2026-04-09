@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Enum\JobComponentName;
 use App\Model\ComponentPreparation;
-use App\Services\JobComponentHandler\JobComponentHandlerInterface;
+use App\Services\JobComponentPreparationFactory\JobComponentHandlerInterface;
 
 readonly class ComponentPreparationFactory
 {

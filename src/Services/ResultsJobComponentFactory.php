@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
-use App\Services\JobComponentHandler\ResultsJobHandler;
+use App\Services\JobComponentPreparationFactory\ResultsJobHandler;
 use App\Services\RequestStateRetriever\ResultsJobRetriever;
 
 readonly class ResultsJobComponentFactory

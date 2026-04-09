@@ -29,7 +29,7 @@ services:
     _instanceof:
         App\Services\RemoteRequestFailureFactory\ExceptionHandlerInterface:
             tags: ['app.remote_request_failure_factory.exception_handler']
-        App\Services\JobComponentHandler\JobComponentHandlerInterface:
+        App\Services\JobComponentPreparationFactory\JobComponentHandlerInterface:
             tags: ['app.job_component_handler.component_handler']
         App\ReadinessAssessor\ReadinessHandlerInterface:
             tags: ['app.readiness_assessor.handler']

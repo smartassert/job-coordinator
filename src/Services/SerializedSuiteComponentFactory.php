@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobComponentHandler\SerializedSuiteHandler;
+use App\Services\JobComponentPreparationFactory\SerializedSuiteHandler;
 use App\Services\RequestStateRetriever\SerializedSuiteRetriever;
 
 readonly class SerializedSuiteComponentFactory

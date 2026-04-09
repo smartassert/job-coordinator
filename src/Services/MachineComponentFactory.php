@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Services\JobComponentHandler\MachineHandler;
+use App\Services\JobComponentPreparationFactory\MachineHandler;
 use App\Services\RequestStateRetriever\MachineRetriever;
 
 readonly class MachineComponentFactory

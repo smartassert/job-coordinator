@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentHandler;
+namespace App\Services\JobComponentPreparationFactory;
 
 use App\Enum\PreparationState;
 use App\Enum\RequestState;

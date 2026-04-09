@@ -15,7 +15,7 @@ use App\Model\WorkerComponentStateInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
-use App\Services\JobComponentHandler\WorkerJobHandler;
+use App\Services\JobComponentPreparationFactory\WorkerJobHandler;
 use App\Services\RequestStateRetriever\WorkerJobRetriever;
 
 readonly class WorkerJobFactory
