@@ -16,6 +16,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
 use App\Services\JobComponentHandler\WorkerJobHandler;
+use App\Services\RequestStateRetriever\WorkerJobRetriever;
 
 readonly class WorkerJobFactory
 {
@@ -24,12 +25,13 @@ readonly class WorkerJobFactory
         private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
         private RemoteRequestRepository $remoteRequestRepository,
         private WorkerJobHandler $handler,
+        private WorkerJobRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): WorkerJob
     {
         $componentPreparation = $this->handler->getComponentPreparation($job->getId());
-        $requestState = $this->handler->getRequestState($job->getId());
+        $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new WorkerJob(
             $this->createComponentState($job, WorkerComponentName::APPLICATION),
