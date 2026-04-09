@@ -7,7 +7,7 @@ namespace App\Model;
 interface SerializeToArrayInterface extends \JsonSerializable
 {
     /**
-     * @return null|array<mixed>
+     * @return array<mixed>
      */
-    public function jsonSerialize(): ?array;
+    public function jsonSerialize(): array;
 }
