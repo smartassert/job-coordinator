@@ -12,6 +12,7 @@ use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobComponentHandler\ResultsJobHandler;
+use App\Services\RequestStateRetriever\ResultsJobRetriever;
 
 readonly class ResultsJobComponentFactory
 {
@@ -19,12 +20,13 @@ readonly class ResultsJobComponentFactory
         private ResultsJobRepository $resultsJobRepository,
         private RemoteRequestRepository $remoteRequestRepository,
         private ResultsJobHandler $handler,
+        private ResultsJobRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): ResultsJob
     {
         $componentPreparation = $this->handler->getComponentPreparation($job->getId());
-        $requestState = $this->handler->getRequestState($job->getId());
+        $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new ResultsJob(
             $this->resultsJobRepository->find($job->getId()),

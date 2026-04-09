@@ -12,6 +12,7 @@ use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\JobComponentHandler\SerializedSuiteHandler;
+use App\Services\RequestStateRetriever\SerializedSuiteRetriever;
 
 readonly class SerializedSuiteComponentFactory
 {
@@ -19,12 +20,13 @@ readonly class SerializedSuiteComponentFactory
         private SerializedSuiteRepository $serializedSuiteRepository,
         private RemoteRequestRepository $remoteRequestRepository,
         private SerializedSuiteHandler $handler,
+        private SerializedSuiteRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): SerializedSuite
     {
         $componentPreparation = $this->handler->getComponentPreparation($job->getId());
-        $requestState = $this->handler->getRequestState($job->getId());
+        $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new SerializedSuite(
             $this->serializedSuiteRepository->find($job->getId()),
