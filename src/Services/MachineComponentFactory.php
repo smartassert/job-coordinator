@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
-use App\Services\JobComponentPreparationFactory\MachineHandler;
+use App\Services\JobComponentPreparationFactory\MachineFactory;
 use App\Services\RequestStateRetriever\MachineRetriever;
 
 readonly class MachineComponentFactory
@@ -19,13 +19,13 @@ readonly class MachineComponentFactory
     public function __construct(
         private MachineRepository $machineRepository,
         private RemoteRequestRepository $remoteRequestRepository,
-        private MachineHandler $handler,
+        private MachineFactory $componentPreparationFactory,
         private MachineRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): Machine
     {
-        $componentPreparation = $this->handler->getComponentPreparation($job->getId());
+        $componentPreparation = $this->componentPreparationFactory->getComponentPreparation($job->getId());
         $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new Machine(

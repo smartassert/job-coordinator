@@ -10,7 +10,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 
-class MachineHandler extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
+class MachineFactory extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
     private const JobComponentName JOB_COMPONENT = JobComponentName::MACHINE;
 
