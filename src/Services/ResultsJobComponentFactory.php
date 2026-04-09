@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
-use App\Services\JobComponentPreparationFactory\ResultsJobHandler;
+use App\Services\JobComponentPreparationFactory\ResultsJobFactory;
 use App\Services\RequestStateRetriever\ResultsJobRetriever;
 
 readonly class ResultsJobComponentFactory
@@ -19,13 +19,13 @@ readonly class ResultsJobComponentFactory
     public function __construct(
         private ResultsJobRepository $resultsJobRepository,
         private RemoteRequestRepository $remoteRequestRepository,
-        private ResultsJobHandler $handler,
+        private ResultsJobFactory $componentPreparationFactory,
         private ResultsJobRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): ResultsJob
     {
-        $componentPreparation = $this->handler->getComponentPreparation($job->getId());
+        $componentPreparation = $this->componentPreparationFactory->getComponentPreparation($job->getId());
         $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new ResultsJob(
