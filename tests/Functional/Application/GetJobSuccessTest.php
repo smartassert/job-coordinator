@@ -113,7 +113,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => null,
                             'machine' => null,
                             'worker-job' => [
@@ -708,7 +720,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => [
                                 'state' => 'prepared',
                                 'is_prepared' => true,
@@ -797,7 +821,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => null,
                             'machine' => [
                                 'state_category' => null,
@@ -916,7 +952,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => null,
                             'machine' => [
                                 'state_category' => $machine->getStateCategory(),
@@ -1022,7 +1070,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => null,
                             'machine' => [
                                 'state_category' => $machine->getStateCategory(),
@@ -1584,7 +1644,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'components' => [
-                            'results-job' => null,
+                            'results-job' => [
+                                'state' => null,
+                                'end_state' => null,
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                                'requests' => [],
+                                'preparation' => [
+                                    'state' => 'pending',
+                                    'request_state' => 'pending',
+                                ],
+                            ],
                             'serialized-suite' => null,
                             'machine' => [
                                 'state_category' => $machine->getStateCategory(),
@@ -1877,7 +1949,19 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                     ],
                     'components' => [
-                        'results-job' => null,
+                        'results-job' => [
+                            'state' => null,
+                            'end_state' => null,
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                            'requests' => [],
+                            'preparation' => [
+                                'state' => 'pending',
+                                'request_state' => 'pending',
+                            ],
+                        ],
                         'serialized-suite' => null,
                         'machine' => [
                             'state_category' => $machine->getStateCategory(),
