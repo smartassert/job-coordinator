@@ -183,7 +183,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -298,16 +297,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'request_state' => 'pending',
                                 ],
                                 'requests' => [],
-                            ],
-                        ],
-                        'service_requests' => [
-                            [
-                                'type' => 'results-job/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'requesting',
-                                    ],
-                                ],
                             ],
                         ],
                     ];
@@ -489,48 +478,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [
-                            [
-                                'type' => 'results-job/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'halted',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'serialized-suite/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'halted',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'serialized-suite/retrieve',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 6,
-                                            'message' => 'unable to resolve host "sources.example.com"',
-                                        ],
-                                    ],
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'http',
-                                            'code' => 503,
-                                            'message' => 'service unavailable',
-                                        ],
-                                    ],
-                                    [
-                                        'state' => 'succeeded',
-                                    ],
-                                ],
-                            ],
-                        ],
                     ];
                 },
             ],
@@ -645,7 +592,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -760,7 +706,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -873,7 +818,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -988,16 +932,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'request_state' => 'pending',
                                 ],
                                 'requests' => [],
-                            ],
-                        ],
-                        'service_requests' => [
-                            [
-                                'type' => 'machine/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'requesting',
-                                    ],
-                                ],
                             ],
                         ],
                     ];
@@ -1118,7 +1052,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -1246,7 +1179,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -1419,7 +1351,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -1638,60 +1569,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                         ],
-                        'service_requests' => [
-                            [
-                                'type' => 'machine/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'http',
-                                            'code' => 500,
-                                            'message' => 'internal server error',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'results-job/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'http',
-                                            'code' => 503,
-                                            'message' => 'service unavailable',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'serialized-suite/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 28,
-                                            'message' => 'connection timed out',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'worker-job/create',
-                                'attempts' => [
-                                    [
-                                        'state' => 'failed',
-                                        'failure' => [
-                                            'type' => 'network',
-                                            'code' => 6,
-                                            'message' => 'hostname lookup failed',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
                     ];
                 },
             ],
@@ -1810,7 +1687,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -1986,7 +1862,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'requests' => [],
                             ],
                         ],
-                        'service_requests' => [],
                     ];
                 },
             ],
@@ -2093,7 +1968,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'requests' => [],
                         ],
                     ],
-                    'service_requests' => [],
                 ];
             };
         };
@@ -2397,7 +2271,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'requests' => [],
                         ],
                     ],
-                    'service_requests' => [],
                 ];
             };
         };

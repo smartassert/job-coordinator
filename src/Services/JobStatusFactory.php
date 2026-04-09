@@ -7,8 +7,6 @@ namespace App\Services;
 use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
-use App\Model\RemoteRequestCollection;
-use App\Repository\RemoteRequestRepository;
 
 readonly class JobStatusFactory
 {
@@ -18,7 +16,6 @@ readonly class JobStatusFactory
         private MachineComponentFactory $machineComponentFactory,
         private WorkerJobFactory $workerJobFactory,
         private SerializedSuiteComponentFactory $serializedSuiteComponentFactory,
-        private RemoteRequestRepository $remoteRequestRepository,
         private MetaStateReducer $metaStateReducer,
     ) {}
 
@@ -46,14 +43,6 @@ readonly class JobStatusFactory
             $workerJob,
         ]);
 
-        return new JobStatus(
-            $job,
-            $jobMetaState,
-            $preparationState,
-            $components,
-            new RemoteRequestCollection(
-                $this->remoteRequestRepository->findBy(['jobId' => $job->getId()], ['id' => 'ASC'])
-            ),
-        );
+        return new JobStatus($job, $jobMetaState, $preparationState, $components);
     }
 }
