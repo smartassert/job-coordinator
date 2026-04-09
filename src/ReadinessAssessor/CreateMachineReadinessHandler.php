@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RequestState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobComponentHandler\SerializedSuiteHandler;
 
 readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterface
 {
@@ -17,7 +18,7 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
         private MachineRepository $machineRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteHandler $serializedSuiteJobComponentHandler,
+        private RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
     public function handles(RemoteRequestType $type): bool
@@ -31,7 +32,7 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
             return MessageHandlingReadiness::NEVER;
         }
 
-        if ($this->serializedSuiteJobComponentHandler->hasFailed($jobId)) {
+        if ($this->hasFailedRemoteRequest($jobId)) {
             return MessageHandlingReadiness::NEVER;
         }
 
@@ -45,5 +46,19 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
         }
 
         return MessageHandlingReadiness::NOW;
+    }
+
+    private function hasFailedRemoteRequest(string $jobId): bool
+    {
+        $remoteRequest = $this->remoteRequestRepository->findNewest(
+            $jobId,
+            RemoteRequestType::createForSerializedSuiteCreation()
+        );
+
+        if (null === $remoteRequest) {
+            return false;
+        }
+
+        return RequestState::FAILED === $remoteRequest->getState();
     }
 }
