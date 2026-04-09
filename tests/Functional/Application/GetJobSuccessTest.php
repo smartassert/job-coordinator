@@ -105,12 +105,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -218,12 +212,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'requesting',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
                             ],
                         ],
                         'components' => [
@@ -380,12 +368,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'halted',
-                                'serialized-suite' => 'halted',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
                             ],
                         ],
                         'components' => [
@@ -585,12 +567,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'succeeded',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -706,12 +682,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'succeeded',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -825,12 +795,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'succeeded',
-                                'machine' => 'pending',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -938,12 +902,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'requesting',
-                                'worker-job' => 'pending',
                             ],
                         ],
                         'components' => [
@@ -1082,12 +1040,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -1211,12 +1163,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => false,
                                 'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'pending',
                             ],
                         ],
                         'components' => [
@@ -1395,12 +1341,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => true,
                                 'succeeded' => true,
                             ],
-                            'request_states' => [
-                                'results-job' => 'succeeded',
-                                'serialized-suite' => 'succeeded',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'succeeded',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -1543,12 +1483,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             'meta_state' => [
                                 'ended' => true,
                                 'succeeded' => false,
-                            ],
-                            'request_states' => [
-                                'results-job' => 'failed',
-                                'serialized-suite' => 'failed',
-                                'machine' => 'failed',
-                                'worker-job' => 'failed',
                             ],
                         ],
                         'components' => [
@@ -1798,12 +1732,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => false,
                                 'succeeded' => false,
                             ],
-                            'request_states' => [
-                                'results-job' => 'pending',
-                                'serialized-suite' => 'pending',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'pending',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -1980,12 +1908,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'ended' => true,
                                 'succeeded' => true,
                             ],
-                            'request_states' => [
-                                'results-job' => 'succeeded',
-                                'serialized-suite' => 'succeeded',
-                                'machine' => 'succeeded',
-                                'worker-job' => 'succeeded',
-                            ],
                         ],
                         'components' => [
                             'results-job' => [
@@ -2114,12 +2036,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'meta_state' => [
                             'ended' => false,
                             'succeeded' => false,
-                        ],
-                        'request_states' => [
-                            'results-job' => 'pending',
-                            'serialized-suite' => 'pending',
-                            'machine' => 'succeeded',
-                            'worker-job' => 'succeeded',
                         ],
                     ],
                     'components' => [
@@ -2401,12 +2317,6 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         'meta_state' => [
                             'ended' => false,
                             'succeeded' => false,
-                        ],
-                        'request_states' => [
-                            'results-job' => 'succeeded',
-                            'serialized-suite' => 'succeeded',
-                            'machine' => 'succeeded',
-                            'worker-job' => 'pending',
                         ],
                     ],
                     'components' => [
