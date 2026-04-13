@@ -11,7 +11,7 @@ use App\Model\JobInterface;
 use App\Model\RemoteRequestCollection;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\JobComponentPreparationFactory\SerializedSuiteHandler;
+use App\Services\JobComponentPreparationFactory\SerializedSuiteFactory;
 use App\Services\RequestStateRetriever\SerializedSuiteRetriever;
 
 readonly class SerializedSuiteComponentFactory
@@ -19,13 +19,13 @@ readonly class SerializedSuiteComponentFactory
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,
         private RemoteRequestRepository $remoteRequestRepository,
-        private SerializedSuiteHandler $handler,
+        private SerializedSuiteFactory $componentPreparationFactory,
         private SerializedSuiteRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): SerializedSuite
     {
-        $componentPreparation = $this->handler->getComponentPreparation($job->getId());
+        $componentPreparation = $this->componentPreparationFactory->getComponentPreparation($job->getId());
         $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new SerializedSuite(
