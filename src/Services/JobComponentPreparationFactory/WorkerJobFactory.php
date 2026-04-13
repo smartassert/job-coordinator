@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentHandler;
+namespace App\Services\JobComponentPreparationFactory;
 
 use App\Enum\JobComponentName;
 use App\Model\ComponentPreparation;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
-use App\Repository\ResultsJobRepository;
+use App\Repository\WorkerComponentStateRepository;
 
-class ResultsJobHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
+class WorkerJobFactory extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
-    private const JobComponentName JOB_COMPONENT = JobComponentName::RESULTS_JOB;
+    private const JobComponentName JOB_COMPONENT = JobComponentName::WORKER_JOB;
 
     public function __construct(
-        ResultsJobRepository $entityRepository,
+        WorkerComponentStateRepository $entityRepository,
         RemoteRequestRepository $remoteRequestRepository,
     ) {
         parent::__construct($entityRepository, $remoteRequestRepository);
@@ -28,6 +28,6 @@ class ResultsJobHandler extends AbstractJobComponentHandler implements JobCompon
 
     public function getComponentPreparation(string $jobId): ComponentPreparation
     {
-        return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForResultsJobCreation());
+        return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForWorkerJobCreation());
     }
 }

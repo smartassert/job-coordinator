@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentHandler;
+namespace App\Services\JobComponentPreparationFactory;
 
 use App\Enum\JobComponentName;
 use App\Model\ComponentPreparation;
 
-interface JobComponentHandlerInterface
+interface JobComponentPreparationFactoryInterface
 {
     public function handles(JobComponentName $componentName): bool;
 

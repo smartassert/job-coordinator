@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentHandler;
+namespace App\Services\JobComponentPreparationFactory;
 
 use App\Enum\JobComponentName;
 use App\Model\ComponentPreparation;
@@ -10,7 +10,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 
-class SerializedSuiteHandler extends AbstractJobComponentHandler implements JobComponentHandlerInterface
+class SerializedSuiteFactory extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
     private const JobComponentName JOB_COMPONENT = JobComponentName::SERIALIZED_SUITE;
 

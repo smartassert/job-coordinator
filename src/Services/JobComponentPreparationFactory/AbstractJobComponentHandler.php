@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentHandler;
+namespace App\Services\JobComponentPreparationFactory;
 
 use App\Enum\PreparationState;
 use App\Enum\RequestState;
@@ -11,23 +11,12 @@ use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
 
-abstract class AbstractJobComponentHandler implements JobComponentHandlerInterface
+abstract class AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
 {
     public function __construct(
         protected readonly JobComponentRepositoryInterface $entityRepository,
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {}
-
-    protected function doGetRequestState(string $jobId, RemoteRequestType $creationType): RequestState
-    {
-        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return RequestState::SUCCEEDED;
-        }
-
-        $requestState = $this->remoteRequestRepository->findNewest($jobId, $creationType)?->getState();
-
-        return null === $requestState ? RequestState::PENDING : $requestState;
-    }
 
     protected function doGetComponentPreparation(string $jobId, RemoteRequestType $creationType): ComponentPreparation
     {
