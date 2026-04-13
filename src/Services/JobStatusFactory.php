@@ -14,7 +14,7 @@ readonly class JobStatusFactory
         private PreparationStateFactory $preparationStateFactory,
         private ResultsJobComponentFactory $resultsJobComponentFactory,
         private MachineComponentFactory $machineComponentFactory,
-        private WorkerJobFactory $workerJobFactory,
+        private WorkerJobComponentFactory $workerJobComponentFactory,
         private SerializedSuiteComponentFactory $serializedSuiteComponentFactory,
         private MetaStateReducer $metaStateReducer,
     ) {}
@@ -25,7 +25,7 @@ readonly class JobStatusFactory
 
         $resultsJob = $this->resultsJobComponentFactory->createForJob($job);
         $machine = $this->machineComponentFactory->createForJob($job);
-        $workerJob = $this->workerJobFactory->createForJob($job);
+        $workerJob = $this->workerJobComponentFactory->createForJob($job);
         $serializedSuite = $this->serializedSuiteComponentFactory->createForJob($job);
 
         $jobMetaState = $this->metaStateReducer->reduce([

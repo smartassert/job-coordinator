@@ -15,22 +15,22 @@ use App\Model\WorkerComponentStateInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
-use App\Services\JobComponentPreparationFactory\WorkerJobHandler;
+use App\Services\JobComponentPreparationFactory\WorkerJobFactory;
 use App\Services\RequestStateRetriever\WorkerJobRetriever;
 
-readonly class WorkerJobFactory
+readonly class WorkerJobComponentFactory
 {
     public function __construct(
         private WorkerComponentStateRepository $workerComponentStateRepository,
         private WorkerJobCreationFailureRepository $workerJobCreationFailureRepository,
         private RemoteRequestRepository $remoteRequestRepository,
-        private WorkerJobHandler $handler,
+        private WorkerJobFactory $componentPreparationFactory,
         private WorkerJobRetriever $requestStateRetriever,
     ) {}
 
     public function createForJob(JobInterface $job): WorkerJob
     {
-        $componentPreparation = $this->handler->getComponentPreparation($job->getId());
+        $componentPreparation = $this->componentPreparationFactory->getComponentPreparation($job->getId());
         $requestState = $this->requestStateRetriever->retrieve($job->getId());
 
         return new WorkerJob(
