@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Enum\PreparationState;
-use App\Model\ComponentPreparation;
 use App\Services\PreparationStateReducer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -13,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 class PreparationStateReducerTest extends TestCase
 {
     /**
-     * @param ComponentPreparation[] $componentPreparationStates
+     * @param PreparationState[] $preparationStates
      */
     #[DataProvider('reduceDataProvider')]
-    public function testReduce(array $componentPreparationStates, PreparationState $expected): void
+    public function testReduce(array $preparationStates, PreparationState $expected): void
     {
-        self::assertSame($expected, new PreparationStateReducer()->reduce($componentPreparationStates));
+        self::assertSame($expected, new PreparationStateReducer()->reduce($preparationStates));
     }
 
     /**
@@ -27,38 +26,42 @@ class PreparationStateReducerTest extends TestCase
     public static function reduceDataProvider(): array
     {
         return [
+            'empty' => [
+                'preparationStates' => [],
+                'expected' => PreparationState::PENDING,
+            ],
             'any occurrence of "failed" is "failed"' => [
-                'componentPreparationStates' => [
-                    new ComponentPreparation(PreparationState::FAILED),
-                    new ComponentPreparation(PreparationState::PENDING),
-                    new ComponentPreparation(PreparationState::PREPARING),
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
+                'preparationStates' => [
+                    PreparationState::FAILED,
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
+                    PreparationState::SUCCEEDED,
                 ],
                 'expected' => PreparationState::FAILED,
             ],
             'all "succeeded" is "succeeded"' => [
-                'componentPreparationStates' => [
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
+                'preparationStates' => [
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
                 ],
                 'expected' => PreparationState::SUCCEEDED,
             ],
             'all "pending" is "pending"' => [
-                'componentPreparationStates' => [
-                    new ComponentPreparation(PreparationState::PENDING),
-                    new ComponentPreparation(PreparationState::PENDING),
-                    new ComponentPreparation(PreparationState::PENDING),
-                    new ComponentPreparation(PreparationState::PENDING),
+                'preparationStates' => [
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
                 'expected' => PreparationState::PENDING,
             ],
             'any occurrence of "preparing" without any "failure" is "preparing"' => [
-                'componentPreparationStates' => [
-                    new ComponentPreparation(PreparationState::PREPARING),
-                    new ComponentPreparation(PreparationState::PENDING),
-                    new ComponentPreparation(PreparationState::SUCCEEDED),
+                'preparationStates' => [
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
+                    PreparationState::SUCCEEDED,
                 ],
                 'expected' => PreparationState::PREPARING,
             ],

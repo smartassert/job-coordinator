@@ -29,12 +29,12 @@ services:
     _instanceof:
         App\Services\RemoteRequestFailureFactory\ExceptionHandlerInterface:
             tags: ['app.remote_request_failure_factory.exception_handler']
-        App\Services\JobComponentPreparationFactory\JobComponentPreparationFactoryInterface:
-            tags: ['app.job_component.preparation_factory']
         App\ReadinessAssessor\ReadinessHandlerInterface:
             tags: ['app.readiness_assessor.handler']
         App\Services\RemoteRequestStateTracker\EventHandlerInterface:
             tags: ['app.remote_request_state_tracker.event_handler']
+        App\Services\JobComponentPreparationStateRetriever\JobComponentPreparationStateRetrieverInterface:
+            tags: ['app.job_component.preparation_state_retriever']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -104,10 +104,6 @@ services:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_failure_factory.exception_handler'
 
-    App\Services\ComponentPreparationFactory:
-        arguments:
-            $jobComponentHandlers: !tagged_iterator 'app.job_component.preparation_factory'
-
     SmartAssert\ServiceClient\ResponseFactory\ResponseFactory:
         factory: ['SmartAssert\ServiceClient\ResponseFactory\ResponseFactory', 'createFactory']
 
@@ -125,3 +121,7 @@ services:
     App\Services\RemoteRequestStateTracker\RemoteRequestStateTracker:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_state_tracker.event_handler'
+
+    App\Services\PreparationStateRetriever:
+        arguments:
+            $retrievers: !tagged_iterator 'app.job_component.preparation_state_retriever'

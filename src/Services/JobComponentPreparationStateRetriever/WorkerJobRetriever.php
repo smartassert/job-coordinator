@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Services\JobComponentPreparationFactory;
+namespace App\Services\JobComponentPreparationStateRetriever;
 
-use App\Model\ComponentPreparation;
+use App\Enum\PreparationState;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\WorkerComponentStateRepository;
 
-class WorkerJobFactory extends AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
+class WorkerJobRetriever extends AbstractRetriever implements JobComponentPreparationStateRetrieverInterface
 {
     public function __construct(
         WorkerComponentStateRepository $entityRepository,
@@ -18,8 +18,8 @@ class WorkerJobFactory extends AbstractJobComponentHandler implements JobCompone
         parent::__construct($entityRepository, $remoteRequestRepository);
     }
 
-    public function getComponentPreparation(string $jobId): ComponentPreparation
+    public function get(string $jobId): PreparationState
     {
-        return $this->doGetComponentPreparation($jobId, RemoteRequestType::createForWorkerJobCreation());
+        return $this->doGet($jobId, RemoteRequestType::createForWorkerJobCreation());
     }
 }
