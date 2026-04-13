@@ -23,8 +23,9 @@ class WorkerJobFactory extends AbstractFactory
     public function create(string $jobId): Preparation
     {
         return new Preparation(
-            $this->doGetComponentPreparation($jobId, RemoteRequestType::createForWorkerJobCreation()),
+            $this->getPreparationState($jobId, RemoteRequestType::createForWorkerJobCreation()),
             $this->requestStateRetriever->retrieve($jobId),
+            $this->getRemoteRequestFailure($jobId, RemoteRequestType::createForWorkerJobCreation()),
         );
     }
 }

@@ -23,8 +23,9 @@ class MachineFactory extends AbstractFactory
     public function create(string $jobId): Preparation
     {
         return new Preparation(
-            $this->doGetComponentPreparation($jobId, RemoteRequestType::createForMachineCreation()),
+            $this->getPreparationState($jobId, RemoteRequestType::createForMachineCreation()),
             $this->requestStateRetriever->retrieve($jobId),
+            $this->getRemoteRequestFailure($jobId, RemoteRequestType::createForMachineCreation()),
         );
     }
 }

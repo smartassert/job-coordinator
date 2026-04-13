@@ -23,8 +23,9 @@ class ResultsJobFactory extends AbstractFactory
     public function create(string $jobId): Preparation
     {
         return new Preparation(
-            $this->doGetComponentPreparation($jobId, RemoteRequestType::createForResultsJobCreation()),
+            $this->getPreparationState($jobId, RemoteRequestType::createForResultsJobCreation()),
             $this->requestStateRetriever->retrieve($jobId),
+            $this->getRemoteRequestFailure($jobId, RemoteRequestType::createForResultsJobCreation()),
         );
     }
 }

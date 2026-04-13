@@ -13,7 +13,6 @@ use App\Enum\PreparationState;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
-use App\Model\ComponentPreparation;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -69,7 +68,7 @@ class PreparationStateRetrieverTest extends WebTestCase
      *   WorkerComponentStateRepository,
      * ): void $entityCreator
      * @param callable(JobInterface, RemoteRequestRepository): void $remoteRequestsCreator
-     * @param ComponentPreparation[]                                $expected
+     * @param PreparationState[]                                    $expected
      */
     #[DataProvider('getAllDataProvider')]
     public function testGetAll(

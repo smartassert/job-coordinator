@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\JobComponentPreparationFactory;
 
+use App\Entity\RemoteRequestFailure;
 use App\Enum\PreparationState;
 use App\Enum\RequestState;
-use App\Model\ComponentPreparation;
 use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
@@ -18,24 +18,39 @@ abstract class AbstractFactory
         protected readonly RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    protected function doGetComponentPreparation(string $jobId, RemoteRequestType $creationType): ComponentPreparation
+    protected function getRemoteRequestFailure(string $jobId, RemoteRequestType $creationType): ?RemoteRequestFailure
     {
         if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return new ComponentPreparation(PreparationState::SUCCEEDED);
+            return null;
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
         if (null === $remoteRequest) {
-            return new ComponentPreparation(PreparationState::PENDING);
+            return null;
         }
 
         if (RequestState::FAILED === $remoteRequest->getState()) {
-            return new ComponentPreparation(
-                PreparationState::FAILED,
-                $remoteRequest->getFailure()
-            );
+            return $remoteRequest->getFailure();
         }
 
-        return new ComponentPreparation(PreparationState::PREPARING);
+        return null;
+    }
+
+    protected function getPreparationState(string $jobId, RemoteRequestType $creationType): PreparationState
+    {
+        if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
+            return PreparationState::SUCCEEDED;
+        }
+
+        $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
+        if (null === $remoteRequest) {
+            return PreparationState::PENDING;
+        }
+
+        if (RequestState::FAILED === $remoteRequest->getState()) {
+            return PreparationState::FAILED;
+        }
+
+        return PreparationState::PREPARING;
     }
 }

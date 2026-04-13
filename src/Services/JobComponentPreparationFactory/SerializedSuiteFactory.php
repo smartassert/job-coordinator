@@ -23,8 +23,9 @@ class SerializedSuiteFactory extends AbstractFactory
     public function create(string $jobId): Preparation
     {
         return new Preparation(
-            $this->doGetComponentPreparation($jobId, RemoteRequestType::createForSerializedSuiteCreation()),
+            $this->getPreparationState($jobId, RemoteRequestType::createForSerializedSuiteCreation()),
             $this->requestStateRetriever->retrieve($jobId),
+            $this->getRemoteRequestFailure($jobId, RemoteRequestType::createForSerializedSuiteCreation()),
         );
     }
 }
