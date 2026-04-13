@@ -11,7 +11,7 @@ use App\Model\RemoteRequestType;
 use App\Repository\JobComponentRepositoryInterface;
 use App\Repository\RemoteRequestRepository;
 
-abstract class AbstractJobComponentHandler implements JobComponentPreparationFactoryInterface
+abstract class AbstractFactory
 {
     public function __construct(
         protected readonly JobComponentRepositoryInterface $entityRepository,
