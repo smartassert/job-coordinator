@@ -9,12 +9,10 @@ use App\Entity\RemoteRequest;
 use App\Entity\RemoteRequestFailure;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerComponentState;
-use App\Enum\JobComponentName;
 use App\Enum\PreparationState;
 use App\Enum\RemoteRequestFailureType;
 use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
-use App\Model\ComponentPreparation;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -23,25 +21,25 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\ComponentPreparationFactory;
+use App\Services\PreparationStateRetriever;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class ComponentPreparationFactoryTest extends WebTestCase
+class PreparationStateRetrieverTest extends WebTestCase
 {
-    private ComponentPreparationFactory $componentPreparationFactory;
+    private PreparationStateRetriever $retriever;
     private RemoteRequestRepository $remoteRequestRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $componentPreparationFactory = self::getContainer()->get(ComponentPreparationFactory::class);
-        \assert($componentPreparationFactory instanceof ComponentPreparationFactory);
-        $this->componentPreparationFactory = $componentPreparationFactory;
+        $retriever = self::getContainer()->get(PreparationStateRetriever::class);
+        \assert($retriever instanceof PreparationStateRetriever);
+        $this->retriever = $retriever;
 
         $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
         \assert($remoteRequestRepository instanceof RemoteRequestRepository);
@@ -70,7 +68,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
      *   WorkerComponentStateRepository,
      * ): void $entityCreator
      * @param callable(JobInterface, RemoteRequestRepository): void $remoteRequestsCreator
-     * @param ComponentPreparation[]                                $expected
+     * @param PreparationState[]                                    $expected
      */
     #[DataProvider('getAllDataProvider')]
     public function testGetAll(
@@ -104,7 +102,7 @@ class ComponentPreparationFactoryTest extends WebTestCase
 
         $remoteRequestsCreator($job, $this->remoteRequestRepository);
 
-        self::assertEquals($expected, $this->componentPreparationFactory->getAll($job->getId()));
+        self::assertEquals($expected, $this->retriever->getAll($job->getId()));
     }
 
     /**
@@ -141,46 +139,15 @@ class ComponentPreparationFactoryTest extends WebTestCase
             );
         };
 
-        $expectedAllSuccess = [
-            JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                JobComponentName::RESULTS_JOB,
-                PreparationState::SUCCEEDED
-            ),
-            JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                JobComponentName::SERIALIZED_SUITE,
-                PreparationState::SUCCEEDED
-            ),
-            JobComponentName::MACHINE->value => new ComponentPreparation(
-                JobComponentName::MACHINE,
-                PreparationState::SUCCEEDED
-            ),
-            JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                JobComponentName::WORKER_JOB,
-                PreparationState::SUCCEEDED
-            ),
-        ];
-
         return [
             'no entities, no remote requests' => [
                 'entityCreator' => function () {},
                 'remoteRequestsCreator' => function () {},
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single serialized-suite/create request with state "requesting"' => [
@@ -195,22 +162,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PREPARING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single machine/create request with state "requesting"' => [
@@ -225,22 +180,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PREPARING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single machine/start-job request with state "requesting"' => [
@@ -255,22 +198,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PREPARING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
                 ],
             ],
             'no entities, single results/create request with state "requesting"' => [
@@ -285,22 +216,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PREPARING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single results/create request with state "halted"' => [
@@ -315,22 +234,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PREPARING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single results/create request with state "pending"' => [
@@ -345,22 +252,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::PREPARING
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::PREPARING,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single results/create request of state "failed", no remote request failure' => [
@@ -375,22 +270,10 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::FAILED
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::FAILED,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'no entities, single results/create request of state "failed", has remote request failure' => [
@@ -410,33 +293,21 @@ class ComponentPreparationFactoryTest extends WebTestCase
                     );
                 },
                 'expected' => [
-                    JobComponentName::RESULTS_JOB->value => new ComponentPreparation(
-                        JobComponentName::RESULTS_JOB,
-                        PreparationState::FAILED,
-                        new RemoteRequestFailure(
-                            RemoteRequestFailureType::HTTP,
-                            503,
-                            'service unavailable'
-                        )
-                    ),
-                    JobComponentName::SERIALIZED_SUITE->value => new ComponentPreparation(
-                        JobComponentName::SERIALIZED_SUITE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::MACHINE->value => new ComponentPreparation(
-                        JobComponentName::MACHINE,
-                        PreparationState::PENDING
-                    ),
-                    JobComponentName::WORKER_JOB->value => new ComponentPreparation(
-                        JobComponentName::WORKER_JOB,
-                        PreparationState::PENDING
-                    ),
+                    PreparationState::PENDING,
+                    PreparationState::FAILED,
+                    PreparationState::PENDING,
+                    PreparationState::PENDING,
                 ],
             ],
             'has entities, no remote requests' => [
                 'entityCreator' => $allEntitiesCreator,
                 'remoteRequestsCreator' => function () {},
-                'expected' => $expectedAllSuccess,
+                'expected' => [
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                ],
             ],
             'has results job entity, has failed request for all components' => [
                 'entityCreator' => $allEntitiesCreator,
@@ -464,7 +335,12 @@ class ComponentPreparationFactoryTest extends WebTestCase
                             ->setState(RequestState::FAILED)
                     );
                 },
-                'expected' => $expectedAllSuccess,
+                'expected' => [
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                    PreparationState::SUCCEEDED,
+                ],
             ],
         ];
     }

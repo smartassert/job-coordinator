@@ -44,7 +44,7 @@ services:
         arguments:
             $httpClient: '@app.tests.integration.http.client'
 
-    App\Services\WorkerJobFactory:
+    App\Services\WorkerJobComponentFactory:
         public: true
 
     App\Services\PreparationStateFactory:
@@ -75,4 +75,7 @@ services:
         public: true
 
     App\Tests\Services\EntityRemover:
+        public: true
+
+    App\Tests\Services\Stager:
         public: true

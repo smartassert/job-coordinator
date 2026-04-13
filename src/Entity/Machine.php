@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\MetaState;
-use App\Model\SerializeToArrayInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine implements SerializeToArrayInterface
+class Machine
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -121,23 +120,5 @@ class Machine implements SerializeToArrayInterface
     public function getMetaState(): MetaState
     {
         return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
-    }
-
-    /**
-     * @return array{
-     *   state_category: ?non-empty-string,
-     *   ip_address: ?non-empty-string,
-     *   action_failure: ?MachineActionFailure,
-     *   'meta_state': MetaState,
-     * }
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state_category' => '' === $this->stateCategory ? null : $this->stateCategory,
-            'ip_address' => $this->getIp(),
-            'action_failure' => $this->actionFailure,
-            'meta_state' => new MetaState($this->stateIsEnded, $this->stateIsSucceeded),
-        ];
     }
 }

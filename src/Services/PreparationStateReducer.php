@@ -10,9 +10,9 @@ use App\Model\ComponentPreparation;
 class PreparationStateReducer
 {
     /**
-     * @param ComponentPreparation[] $componentPreparationStates
+     * @param PreparationState[] $preparationStates
      */
-    public function reduce(array $componentPreparationStates): PreparationState
+    public function reduce(array $preparationStates): PreparationState
     {
         /**
          * @param null|PreparationState $previous
@@ -20,28 +20,26 @@ class PreparationStateReducer
          *
          * @return PreparationState
          */
-        $reducer = function (?PreparationState $previous, ComponentPreparation $item): PreparationState {
-            $current = $item->state;
-
+        $reducer = function (?PreparationState $previous, PreparationState $item): PreparationState {
             if (null === $previous) {
-                return $current;
+                return $item;
             }
 
-            if (PreparationState::FAILED === $previous || PreparationState::FAILED === $current) {
+            if (PreparationState::FAILED === $previous || PreparationState::FAILED === $item) {
                 return PreparationState::FAILED;
             }
 
-            if (PreparationState::SUCCEEDED === $previous && PreparationState::SUCCEEDED === $current) {
+            if (PreparationState::SUCCEEDED === $previous && PreparationState::SUCCEEDED === $item) {
                 return PreparationState::SUCCEEDED;
             }
 
-            if (PreparationState::PENDING === $previous && PreparationState::PENDING === $current) {
+            if (PreparationState::PENDING === $previous && PreparationState::PENDING === $item) {
                 return PreparationState::PENDING;
             }
 
             return PreparationState::PREPARING;
         };
 
-        return array_reduce($componentPreparationStates, $reducer) ?? PreparationState::PENDING;
+        return array_reduce($preparationStates, $reducer) ?? PreparationState::PENDING;
     }
 }

@@ -14,7 +14,6 @@ readonly class JobStatus implements \JsonSerializable
         private MetaState $metaState,
         private PreparationState $preparationState,
         private JobComponents $components,
-        private RemoteRequestCollection $serviceRequests,
     ) {}
 
     /**
@@ -28,7 +27,6 @@ readonly class JobStatus implements \JsonSerializable
                 'meta_state' => $this->metaState,
                 'preparation' => $this->preparationState,
                 'components' => $this->components,
-                'service_requests' => $this->serviceRequests,
             ]
         );
     }

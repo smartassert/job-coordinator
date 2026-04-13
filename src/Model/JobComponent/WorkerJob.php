@@ -2,14 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Model\JobComponent;
 
 use App\Entity\WorkerJobCreationFailure;
 use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
+use App\Model\FailedWorkerComponentState;
+use App\Model\MetaState;
+use App\Model\RemoteRequestCollection;
+use App\Model\SerializeToArrayInterface;
+use App\Model\WorkerComponentStateInterface;
 
 /**
  * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
+ * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
+ * @phpstan-import-type SerializedPreparation from Preparation
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: ?non-empty-string,
@@ -22,10 +29,12 @@ use App\Enum\WorkerComponentName;
  *     execution: SerializedWorkerComponentState,
  *     event_delivery: SerializedWorkerComponentState
  *   },
- *   failure?: WorkerJobCreationFailure
+ *   failure?: WorkerJobCreationFailure,
+ *   preparation: SerializedPreparation,
+ *   requests: SerializedRemoteRequestCollection
  * }
  */
-class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
+class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,
@@ -33,6 +42,8 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
         private readonly WorkerComponentStateInterface $executionState,
         private readonly WorkerComponentStateInterface $eventDeliveryState,
         private readonly ?WorkerJobCreationFailure $failure,
+        private readonly RemoteRequestCollection $requests,
+        private readonly Preparation $preparation,
     ) {}
 
     public function getName(): JobComponentName
@@ -50,6 +61,7 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
             : $this->applicationState;
 
         $data = $applicationState->toArray();
+        $data['meta_state'] = $this->getMetaState()->jsonSerialize();
         $data['components'] = [
             WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
             WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
@@ -60,11 +72,18 @@ class WorkerJob implements SerializeToArrayInterface, NamedJobComponentInterface
             $data['creation_failure'] = $this->failure->jsonSerialize();
         }
 
+        $data['preparation'] = $this->preparation->jsonSerialize();
+        $data['requests'] = $this->requests->jsonSerialize();
+
         return $data;
     }
 
     public function getMetaState(): MetaState
     {
+        if ($this->preparation->hasFailure() || $this->failure instanceof WorkerJobCreationFailure) {
+            return new MetaState(true, false);
+        }
+
         return $this->applicationState->getMetaState();
     }
 }
