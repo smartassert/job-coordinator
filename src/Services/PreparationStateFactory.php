@@ -11,7 +11,7 @@ use App\Model\PreparationState;
 class PreparationStateFactory
 {
     public function __construct(
-        private readonly ComponentPreparationFactory $componentPreparationFactory,
+        private readonly PreparationStateRetriever $preparationStateRetriever,
         private readonly PreparationStateReducer $preparationStateReducer,
     ) {}
 
@@ -22,8 +22,8 @@ class PreparationStateFactory
 
     public function createState(string $jobId): PreparationStateEnum
     {
-        $componentPreparationStates = $this->componentPreparationFactory->getAll($jobId);
-
-        return $this->preparationStateReducer->reduce($componentPreparationStates);
+        return $this->preparationStateReducer->reduce(
+            $this->preparationStateRetriever->getAll($jobId)
+        );
     }
 }
