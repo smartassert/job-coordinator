@@ -21,22 +21,21 @@ abstract class AbstractJobComponentHandler implements JobComponentPreparationFac
     protected function doGetComponentPreparation(string $jobId, RemoteRequestType $creationType): ComponentPreparation
     {
         if ($this->entityRepository->count(['jobId' => $jobId]) > 0) {
-            return new ComponentPreparation($creationType->componentName, PreparationState::SUCCEEDED);
+            return new ComponentPreparation(PreparationState::SUCCEEDED);
         }
 
         $remoteRequest = $this->remoteRequestRepository->findNewest($jobId, $creationType);
         if (null === $remoteRequest) {
-            return new ComponentPreparation($creationType->componentName, PreparationState::PENDING);
+            return new ComponentPreparation(PreparationState::PENDING);
         }
 
         if (RequestState::FAILED === $remoteRequest->getState()) {
             return new ComponentPreparation(
-                $creationType->componentName,
                 PreparationState::FAILED,
                 $remoteRequest->getFailure()
             );
         }
 
-        return new ComponentPreparation($creationType->componentName, PreparationState::PREPARING);
+        return new ComponentPreparation(PreparationState::PREPARING);
     }
 }
