@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\RemoteRequestFailure;
+use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
+use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
-use App\Model\ComponentPreparation;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
@@ -21,13 +22,14 @@ use App\Model\ComponentPreparation;
 readonly class Preparation implements \JsonSerializable
 {
     public function __construct(
-        private ComponentPreparation $componentPreparation,
+        private PreparationState $preparationState,
         private RequestState $requestState,
+        private ?RemoteRequestFailureEntity $remoteRequestFailure = null,
     ) {}
 
     public function hasFailure(): bool
     {
-        return $this->componentPreparation->failure instanceof RemoteRequestFailure;
+        return $this->remoteRequestFailure instanceof RemoteRequestFailure;
     }
 
     /**
@@ -36,12 +38,12 @@ readonly class Preparation implements \JsonSerializable
     public function jsonSerialize(): array
     {
         $data = [
-            'state' => $this->componentPreparation->state->value,
+            'state' => $this->preparationState->value,
             'request_state' => $this->requestState->value,
         ];
 
-        if ($this->componentPreparation->failure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->componentPreparation->failure->jsonSerialize();
+        if ($this->remoteRequestFailure instanceof RemoteRequestFailure) {
+            $data['failure'] = $this->remoteRequestFailure->jsonSerialize();
         }
 
         return $data;
