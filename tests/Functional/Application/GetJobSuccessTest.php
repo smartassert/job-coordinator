@@ -1450,7 +1450,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'serialized-suite' => [
-                                'state' => null,
+                                'state' => 'failed',
                                 'is_prepared' => false,
                                 'meta_state' => [
                                     'ended' => true,
