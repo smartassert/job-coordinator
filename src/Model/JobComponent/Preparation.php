@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\RemoteRequestFailure;
-use App\Entity\RemoteRequestFailure as RemoteRequestFailureEntity;
 use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
@@ -24,7 +23,7 @@ readonly class Preparation implements \JsonSerializable
     public function __construct(
         private PreparationState $preparationState,
         private RequestState $requestState,
-        private ?RemoteRequestFailureEntity $remoteRequestFailure = null,
+        private ?RemoteRequestFailure $remoteRequestFailure = null,
     ) {}
 
     public function hasFailure(): bool
