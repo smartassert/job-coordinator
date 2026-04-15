@@ -67,7 +67,7 @@ class WorkerComponentState implements WorkerComponentStateInterface
         return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
     }
 
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'state' => '' === $this->state ? null : $this->state,

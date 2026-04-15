@@ -10,12 +10,12 @@ namespace App\Model;
  *   meta_state: MetaState
  * }
  */
-interface WorkerComponentStateInterface
+interface WorkerComponentStateInterface extends \JsonSerializable
 {
+    public function getMetaState(): MetaState;
+
     /**
      * @return SerializedWorkerComponentState
      */
-    public function toArray(): array;
-
-    public function getMetaState(): MetaState;
+    public function jsonSerialize(): array;
 }

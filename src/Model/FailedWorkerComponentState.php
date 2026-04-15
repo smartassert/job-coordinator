@@ -6,7 +6,7 @@ namespace App\Model;
 
 class FailedWorkerComponentState implements WorkerComponentStateInterface
 {
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'state' => 'failed',
