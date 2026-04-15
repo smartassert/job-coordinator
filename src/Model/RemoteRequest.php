@@ -20,7 +20,7 @@ class RemoteRequest implements RemoteRequestInterface
     /**
      * @return SerializedRemoteRequest
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $data = [
             'state' => $this->state->value,

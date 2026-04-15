@@ -6,11 +6,16 @@ namespace App\Model;
 
 class PendingWorkerComponentState implements WorkerComponentStateInterface
 {
-    public function toArray(): array
+    public function getState(): string
+    {
+        return 'pending';
+    }
+
+    public function jsonSerialize(): array
     {
         return [
             'state' => 'pending',
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState(),
         ];
     }
 

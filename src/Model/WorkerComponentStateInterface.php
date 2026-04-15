@@ -7,18 +7,17 @@ namespace App\Model;
 /**
  * @phpstan-type SerializedWorkerComponentState array{
  *   state: ?non-empty-string,
- *   meta_state: array{
- *     ended: bool,
- *     succeeded: bool
- *   }
+ *   meta_state: MetaState
  * }
  */
-interface WorkerComponentStateInterface
+interface WorkerComponentStateInterface extends \JsonSerializable
 {
+    public function getState(): string;
+
+    public function getMetaState(): MetaState;
+
     /**
      * @return SerializedWorkerComponentState
      */
-    public function toArray(): array;
-
-    public function getMetaState(): MetaState;
+    public function jsonSerialize(): array;
 }

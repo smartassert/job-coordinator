@@ -44,6 +44,11 @@ class WorkerComponentState implements WorkerComponentStateInterface
         $this->stateIsSucceeded = false;
     }
 
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
     /**
      * @param non-empty-string $state
      */
@@ -67,11 +72,11 @@ class WorkerComponentState implements WorkerComponentStateInterface
         return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
     }
 
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'state' => '' === $this->state ? null : $this->state,
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState(),
         ];
     }
 }

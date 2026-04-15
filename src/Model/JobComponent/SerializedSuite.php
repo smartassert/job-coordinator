@@ -11,15 +11,12 @@ use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
 
 /**
- * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
- * @phpstan-import-type SerializedPreparation from Preparation
- *
  * @phpstan-type SerializedSerializedSuite array{
  *   state: ?string,
  *   is_prepared: bool,
  *   meta_state: MetaState,
- *   requests: SerializedRemoteRequestCollection,
- *   preparation: SerializedPreparation
+ *   requests: RemoteRequestCollection,
+ *   preparation: Preparation
  * }
  */
 readonly class SerializedSuite implements SerializeToArrayInterface, JobComponentInterface
@@ -67,8 +64,8 @@ readonly class SerializedSuite implements SerializeToArrayInterface, JobComponen
             'state' => $state,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
             'meta_state' => $this->getMetaState(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'requests' => $this->requests,
+            'preparation' => $this->preparation,
         ];
     }
 }

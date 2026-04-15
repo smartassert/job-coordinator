@@ -8,17 +8,15 @@ use App\Entity\RemoteRequestFailure;
 use App\Enum\RequestState;
 
 /**
- * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
- *
  * @phpstan-type SerializedRemoteRequest array{
  *   state: value-of<RequestState>,
  *   failure?: RemoteRequestFailure
  * }
  */
-interface RemoteRequestInterface
+interface RemoteRequestInterface extends \JsonSerializable
 {
     /**
      * @return SerializedRemoteRequest
      */
-    public function toArray(): array;
+    public function jsonSerialize(): array;
 }
