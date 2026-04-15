@@ -9,11 +9,6 @@ use App\Model\RemoteRequestFailure;
 
 class ThrowableExceptionHandler implements ExceptionHandlerInterface
 {
-    public static function getDefaultPriority(): int
-    {
-        return -1;
-    }
-
     public function handle(\Throwable $throwable): ?RemoteRequestFailure
     {
         return new RemoteRequestFailure(
