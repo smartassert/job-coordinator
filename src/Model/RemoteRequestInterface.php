@@ -13,10 +13,10 @@ use App\Enum\RequestState;
  *   failure?: RemoteRequestFailure
  * }
  */
-interface RemoteRequestInterface
+interface RemoteRequestInterface extends \JsonSerializable
 {
     /**
      * @return SerializedRemoteRequest
      */
-    public function toArray(): array;
+    public function jsonSerialize(): array;
 }
