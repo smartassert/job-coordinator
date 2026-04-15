@@ -1418,8 +1418,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'components' => [
                             'results-job' => [
-                                'state' => null,
-                                'end_state' => null,
+                                'state' => 'ended',
+                                'end_state' => 'failed',
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => false,
