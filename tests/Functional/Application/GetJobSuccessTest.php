@@ -1515,7 +1515,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'worker-job' => [
-                                'state' => 'pending',
+                                'state' => 'failed',
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => false,

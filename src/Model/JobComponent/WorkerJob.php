@@ -56,7 +56,7 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
      */
     public function jsonSerialize(): array
     {
-        $applicationState = $this->failure instanceof WorkerJobCreationFailure
+        $applicationState = $this->hasFailed()
             ? new FailedWorkerComponentState()
             : $this->applicationState;
 
@@ -80,10 +80,15 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
 
     public function getMetaState(): MetaState
     {
-        if ($this->preparation->hasFailure() || $this->failure instanceof WorkerJobCreationFailure) {
+        if ($this->hasFailed()) {
             return new MetaState(true, false);
         }
 
         return $this->applicationState->getMetaState();
+    }
+
+    private function hasFailed(): bool
+    {
+        return $this->preparation->hasFailure() || $this->failure instanceof WorkerJobCreationFailure;
     }
 }
