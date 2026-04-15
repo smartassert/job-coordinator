@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkerJobCreationFailureRepository::class)]
-class WorkerJobCreationFailure
+class WorkerJobCreationFailure implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]

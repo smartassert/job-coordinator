@@ -26,7 +26,7 @@ use App\Model\WorkerComponentStateInterface;
  *   },
  *   failure?: WorkerJobCreationFailure,
  *   preparation: Preparation,
- *   requests: SerializedRemoteRequestCollection
+ *   requests: RemoteRequestCollection
  * }
  */
 class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
@@ -51,27 +51,21 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
      */
     public function jsonSerialize(): array
     {
-        $applicationState = $this->hasFailed()
-            ? new FailedWorkerComponentState()
-            : $this->applicationState;
-
         $data = [
-            'state' => $applicationState->getState(),
+            'state' => $this->getState(),
             'meta_state' => $this->getMetaState(),
-        ];
-
-        $data['components'] = [
-            WorkerComponentName::COMPILATION->value => $this->compilationState,
-            WorkerComponentName::EXECUTION->value => $this->executionState,
-            WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState,
+            'components' => [
+                WorkerComponentName::COMPILATION->value => $this->compilationState,
+                WorkerComponentName::EXECUTION->value => $this->executionState,
+                WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState,
+            ],
+            'preparation' => $this->preparation,
+            'requests' => $this->requests,
         ];
 
         if (null !== $this->failure) {
-            $data['creation_failure'] = $this->failure->jsonSerialize();
+            $data['creation_failure'] = $this->failure;
         }
-
-        $data['preparation'] = $this->preparation;
-        $data['requests'] = $this->requests->jsonSerialize();
 
         return $data;
     }
@@ -88,5 +82,14 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
     private function hasFailed(): bool
     {
         return $this->preparation->hasFailure() || $this->failure instanceof WorkerJobCreationFailure;
+    }
+
+    private function getState(): string
+    {
+        $applicationState = $this->hasFailed()
+            ? new FailedWorkerComponentState()
+            : $this->applicationState;
+
+        return $applicationState->getState();
     }
 }
