@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-/**
- * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
- */
 readonly class JobStatus implements \JsonSerializable
 {
     public function __construct(
