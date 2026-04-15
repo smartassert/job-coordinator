@@ -1482,7 +1482,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => null,
+                                'state_category' => 'end',
                                 'ip_address' => null,
                                 'action_failure' => null,
                                 'meta_state' => [
