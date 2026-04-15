@@ -10,7 +10,7 @@ class FailedWorkerComponentState implements WorkerComponentStateInterface
     {
         return [
             'state' => 'failed',
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState(),
         ];
     }
 
