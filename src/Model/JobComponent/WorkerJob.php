@@ -14,8 +14,6 @@ use App\Model\SerializeToArrayInterface;
 use App\Model\WorkerComponentStateInterface;
 
 /**
- * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
- *
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
  *   meta_state: MetaState,
