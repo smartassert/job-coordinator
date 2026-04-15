@@ -11,12 +11,6 @@ use App\Enum\RequestState;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
- *
- * @phpstan-type SerializedPreparation array{
- *   state: value-of<PreparationStateEnum>,
- *   request_state: value-of<RequestState>,
- *   failure?: SerializedRemoteRequestFailure
- * }
  */
 readonly class Preparation implements \JsonSerializable
 {
@@ -32,7 +26,11 @@ readonly class Preparation implements \JsonSerializable
     }
 
     /**
-     * @return SerializedPreparation
+     * @return array{
+     *   state: value-of<PreparationStateEnum>,
+     *   request_state: value-of<RequestState>,
+     *   failure?: SerializedRemoteRequestFailure
+     * }
      */
     public function jsonSerialize(): array
     {
