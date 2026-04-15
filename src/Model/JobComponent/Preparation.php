@@ -28,7 +28,7 @@ readonly class Preparation implements \JsonSerializable
 
     public function hasFailure(): bool
     {
-        return $this->remoteRequestFailure instanceof RemoteRequestFailure;
+        return PreparationState::FAILED === $this->preparationState;
     }
 
     /**
