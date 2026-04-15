@@ -53,9 +53,17 @@ readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInte
      */
     public function jsonSerialize(): array
     {
+        $state = $this->entity?->getState() ?? null;
+        $endState = $this->entity?->getEndState() ?? null;
+
+        if ($this->preparation->hasFailure()) {
+            $state = 'ended';
+            $endState = 'failed';
+        }
+
         return [
-            'state' => $this->entity?->getState() ?? null,
-            'end_state' => $this->entity?->getEndState() ?? null,
+            'state' => $state,
+            'end_state' => $endState,
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation->jsonSerialize(),

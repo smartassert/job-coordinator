@@ -58,8 +58,13 @@ readonly class SerializedSuite implements SerializeToArrayInterface, JobComponen
      */
     public function jsonSerialize(): array
     {
+        $state = $this->entity?->getState() ?? null;
+        if ($this->preparation->hasFailure()) {
+            $state = 'failed';
+        }
+
         return [
-            'state' => $this->entity?->getState() ?? null,
+            'state' => $state,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests->jsonSerialize(),

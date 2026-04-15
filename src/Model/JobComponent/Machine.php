@@ -55,8 +55,13 @@ readonly class Machine implements SerializeToArrayInterface, JobComponentInterfa
      */
     public function jsonSerialize(): array
     {
+        $stateCategory = $this->entity?->getStateCategory() ?? null;
+        if ($this->preparation->hasFailure()) {
+            $stateCategory = 'end';
+        }
+
         return [
-            'state_category' => $this->entity?->getStateCategory() ?? null,
+            'state_category' => $stateCategory,
             'ip_address' => $this->entity?->getIp() ?? null,
             'action_failure' => $this->entity?->getActionFailure() ?? null,
             'meta_state' => $this->getMetaState(),

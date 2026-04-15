@@ -1418,8 +1418,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'components' => [
                             'results-job' => [
-                                'state' => null,
-                                'end_state' => null,
+                                'state' => 'ended',
+                                'end_state' => 'failed',
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => false,
@@ -1450,7 +1450,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'serialized-suite' => [
-                                'state' => null,
+                                'state' => 'failed',
                                 'is_prepared' => false,
                                 'meta_state' => [
                                     'ended' => true,
@@ -1482,7 +1482,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => null,
+                                'state_category' => 'end',
                                 'ip_address' => null,
                                 'action_failure' => null,
                                 'meta_state' => [
@@ -1515,7 +1515,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'worker-job' => [
-                                'state' => 'pending',
+                                'state' => 'failed',
                                 'meta_state' => [
                                     'ended' => true,
                                     'succeeded' => false,
