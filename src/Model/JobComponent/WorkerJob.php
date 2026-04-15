@@ -17,11 +17,8 @@ use App\Model\WorkerComponentStateInterface;
  * @phpstan-import-type SerializedRemoteRequestCollection from RemoteRequestCollection
  *
  * @phpstan-type SerializedWorkerState array{
- *   state: ?non-empty-string,
- *   meta_state: array{
- *     ended: bool,
- *     succeeded: bool
- *   },
+ *   state: string,
+ *   meta_state: MetaState,
  *   components: array{
  *     compilation: WorkerComponentStateInterface,
  *     execution: WorkerComponentStateInterface,
@@ -58,9 +55,11 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
             ? new FailedWorkerComponentState()
             : $this->applicationState;
 
-        $data = $applicationState->jsonSerialize();
+        $data = [
+            'state' => $applicationState->getState(),
+            'meta_state' => $this->getMetaState(),
+        ];
 
-        $data['meta_state'] = $this->getMetaState()->jsonSerialize();
         $data['components'] = [
             WorkerComponentName::COMPILATION->value => $this->compilationState,
             WorkerComponentName::EXECUTION->value => $this->executionState,

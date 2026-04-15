@@ -6,6 +6,11 @@ namespace App\Model;
 
 class PendingWorkerComponentState implements WorkerComponentStateInterface
 {
+    public function getState(): string
+    {
+        return 'pending';
+    }
+
     public function jsonSerialize(): array
     {
         return [

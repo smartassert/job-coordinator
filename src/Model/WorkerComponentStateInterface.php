@@ -12,6 +12,8 @@ namespace App\Model;
  */
 interface WorkerComponentStateInterface extends \JsonSerializable
 {
+    public function getState(): string;
+
     public function getMetaState(): MetaState;
 
     /**

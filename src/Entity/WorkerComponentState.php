@@ -44,6 +44,11 @@ class WorkerComponentState implements WorkerComponentStateInterface
         $this->stateIsSucceeded = false;
     }
 
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
     /**
      * @param non-empty-string $state
      */
