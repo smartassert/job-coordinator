@@ -40,7 +40,7 @@ class ResultsJobFactory implements EventSubscriberInterface
         if (null === $resultsJob) {
             $resultsJob = new ResultsJob(
                 $job->getId(),
-                $event->resultsJob->token,
+                $event->resultsJob->authenticator,
                 $event->resultsJob->state->state,
                 $event->resultsJob->state->endState,
                 new MetaState(

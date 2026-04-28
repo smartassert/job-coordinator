@@ -74,7 +74,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
                 'label' => $resultsJobModel->label,
-                'token' => $resultsJobModel->token,
+                'event_add_url' => $resultsJobModel->authenticator,
                 'state' => $resultsJobModel->state->state,
                 'end_state' => $resultsJobModel->state->endState,
             ])),
@@ -94,7 +94,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals(
             new ResultsJobEntity(
                 $resultsJobModel->label,
-                $resultsJobModel->token,
+                $resultsJobModel->authenticator,
                 $resultsJobModel->state->state,
                 $resultsJobModel->state->endState,
                 new MetaState(
