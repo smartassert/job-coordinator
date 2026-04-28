@@ -21,7 +21,7 @@ use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use SmartAssert\ResultsClient\Client as ResultsClient;
+use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;

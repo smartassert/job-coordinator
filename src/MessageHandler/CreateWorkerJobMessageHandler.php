@@ -77,7 +77,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         try {
             $workerJob = $workerClient->createJob(
                 $message->getJobId(),
-                $resultsJob->token,
+                $resultsJob->eventAddUrl,
                 $message->maximumDurationInSeconds,
                 $serializedSuite
             );

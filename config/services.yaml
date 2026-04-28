@@ -68,7 +68,8 @@ services:
 
     SmartAssert\ResultsClient\EventFactory: ~
 
-    SmartAssert\ResultsClient\Client:
+    SmartAssert\ResultsClient\ClientInterface:
+        class: SmartAssert\ResultsClient\Client
         arguments:
             $baseUrl: '%env(string:RESULTS_BASE_URL)%'
 

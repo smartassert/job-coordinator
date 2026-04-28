@@ -11,8 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ResultsJobRepository::class)]
 class ResultsJob
 {
-    #[ORM\Column(length: 32)]
-    public readonly string $token;
+    #[ORM\Column(length: 255)]
+    public readonly string $eventAddUrl;
 
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
@@ -32,19 +32,19 @@ class ResultsJob
 
     /**
      * @param non-empty-string  $jobId
-     * @param non-empty-string  $token
+     * @param non-empty-string  $eventAddUrl
      * @param non-empty-string  $state
      * @param ?non-empty-string $endState
      */
     public function __construct(
         string $jobId,
-        string $token,
+        string $eventAddUrl,
         string $state,
         ?string $endState,
         MetaState $metaState,
     ) {
         $this->jobId = $jobId;
-        $this->token = $token;
+        $this->eventAddUrl = $eventAddUrl;
         $this->state = $state;
         $this->endState = $endState;
         $this->stateIsEnded = $metaState->ended;
