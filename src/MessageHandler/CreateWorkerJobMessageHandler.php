@@ -57,7 +57,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
             return;
         }
 
-        $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
+        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
         try {
             $serializedSuite = $this->serializedSuiteClient->read(

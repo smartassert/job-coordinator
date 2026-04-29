@@ -65,7 +65,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with('http://' . $machineIpAddress)
+            ->with($machineIpAddress)
             ->andReturn($workerClient)
         ;
 
@@ -138,7 +138,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with('http://' . $machineIpAddress)
+            ->with($machineIpAddress)
             ->andReturn($workerClient)
         ;
 
