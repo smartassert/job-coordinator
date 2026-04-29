@@ -126,3 +126,18 @@ services:
     App\Services\PreparationStateRetriever:
         arguments:
             $retrievers: !tagged_iterator 'app.job_component.preparation_state_retriever'
+
+    app.services.http-client.worker-client:
+        class: GuzzleHttp\Client
+        arguments:
+            $config:
+                verify: false
+
+    app.services.service-client.worker-client:
+        class: SmartAssert\ServiceClient\Client
+        arguments:
+            $httpClient: '@app.services.http-client.worker-client'
+
+    App\Services\WorkerClientFactory:
+        arguments:
+            $serviceClient: '@app.services.service-client.worker-client'
