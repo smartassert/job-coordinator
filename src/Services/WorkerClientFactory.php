@@ -17,8 +17,8 @@ class WorkerClientFactory
         private readonly JobFactory $jobFactory,
     ) {}
 
-    public function create(string $baseUrl): Client
+    public function create(string $ipAddress): Client
     {
-        return new Client($baseUrl, $this->serviceClient, $this->eventFactory, $this->jobFactory);
+        return new Client('https://' . $ipAddress, $this->serviceClient, $this->eventFactory, $this->jobFactory);
     }
 }

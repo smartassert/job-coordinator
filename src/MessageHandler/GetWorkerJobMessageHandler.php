@@ -40,7 +40,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
             return;
         }
 
-        $workerClient = $this->workerClientFactory->create('http://' . $message->machineIpAddress);
+        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
         try {
             $this->eventDispatcher->dispatch(new WorkerStateRetrievedEvent(
