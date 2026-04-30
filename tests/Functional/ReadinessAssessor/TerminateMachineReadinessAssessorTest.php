@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
+use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RequestState;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\TerminateMachineReadinessHandler;
 use App\Repository\MachineRepository;
+use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -43,7 +46,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, MachineRepository, ResultsJobFactory): void $setup
+     * @param callable(JobInterface, MachineRepository, ResultsJobFactory, RemoteRequestRepository): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -58,7 +61,10 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $setup($job, $machineRepository, $resultsJobFactory);
+        $remoteRequestRepository = self::getContainer()->get(RemoteRequestRepository::class);
+        \assert($remoteRequestRepository instanceof RemoteRequestRepository);
+
+        $setup($job, $machineRepository, $resultsJobFactory, $remoteRequestRepository);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -72,6 +78,31 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
             'machine does not exist' => [
                 'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::NEVER,
+            ],
+            'worker job preparation has failed' => [
+                'setup' => function (
+                    JobInterface $job,
+                    MachineRepository $machineRepository,
+                    ResultsJobFactory $resultsJobFactory,
+                    RemoteRequestRepository $remoteRequestRepository
+                ): void {
+                    $machineRepository->save(
+                        new Machine(
+                            $job->getId(),
+                            'state',
+                            'state-category',
+                            new MetaState(false, false),
+                        )
+                    );
+
+                    $workerJobCreationRequest = new RemoteRequest(
+                        $job->getId(),
+                        RemoteRequestType::createForWorkerJobCreation()
+                    );
+                    $workerJobCreationRequest = $workerJobCreationRequest->setState(RequestState::FAILED);
+                    $remoteRequestRepository->save($workerJobCreationRequest);
+                },
+                'expected' => MessageHandlingReadiness::NOW,
             ],
             'results job does not exist' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
