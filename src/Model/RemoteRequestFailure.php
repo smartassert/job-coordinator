@@ -18,4 +18,14 @@ class RemoteRequestFailure
         $this->code = $code;
         $this->message = $message;
     }
+
+    public static function createForApplicationErrorState(
+        JobComponentErrorState $jobComponentErrorState
+    ): RemoteRequestFailure {
+        return new RemoteRequestFailure(
+            RemoteRequestFailureType::APPLICATION,
+            0,
+            (string) $jobComponentErrorState,
+        );
+    }
 }
