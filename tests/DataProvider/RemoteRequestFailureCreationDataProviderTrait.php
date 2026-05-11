@@ -11,6 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Response\Response as ServiceClientResponse;
+use SmartAssert\WorkerClient\Model\JobCreationException;
 
 trait RemoteRequestFailureCreationDataProviderTrait
 {
@@ -52,6 +53,12 @@ trait RemoteRequestFailureCreationDataProviderTrait
                 'expectedType' => RemoteRequestFailureType::UNKNOWN,
                 'expectedCode' => 123,
                 'expectedMessage' => 'generic exception message',
+            ],
+            JobCreationException::class => [
+                'throwable' => new JobCreationException('source/manifest/empty_test_path_collection', []),
+                'expectedType' => RemoteRequestFailureType::APPLICATION,
+                'expectedCode' => 0,
+                'expectedMessage' => 'worker-job:source/manifest/empty_test_path_collection',
             ],
         ];
     }

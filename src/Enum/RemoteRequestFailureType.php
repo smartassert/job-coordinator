@@ -6,6 +6,7 @@ namespace App\Enum;
 
 enum RemoteRequestFailureType: string
 {
+    case APPLICATION = 'application';
     case HTTP = 'http';
     case NETWORK = 'network';
     case UNKNOWN = 'unknown';
