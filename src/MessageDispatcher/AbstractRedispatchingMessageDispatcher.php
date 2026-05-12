@@ -13,7 +13,7 @@ abstract readonly class AbstractRedispatchingMessageDispatcher extends AbstractM
     public function redispatch(MessageNotHandleableEvent $event): void
     {
         $message = $event->message;
-        $readiness = $this->readinessAssessor->isReady($message->getRemoteRequestType(), $message->getJobId());
+        $readiness = $this->readinessAssessor->isReady($message);
 
         if (
             !$this->handles($message)

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Model\RemoteRequestType;
+use App\Message\JobRemoteRequestMessageInterface;
 
 interface ReadinessAssessorInterface
 {
-    public function isReady(RemoteRequestType $type, string $jobId): MessageHandlingReadiness;
+    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness;
 }

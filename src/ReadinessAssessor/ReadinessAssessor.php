@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Model\RemoteRequestType;
+use App\Message\JobRemoteRequestMessageInterface;
 
 readonly class ReadinessAssessor implements ReadinessAssessorInterface
 {
@@ -30,11 +30,12 @@ readonly class ReadinessAssessor implements ReadinessAssessorInterface
         $this->assessors = $filteredAssessors;
     }
 
-    public function isReady(RemoteRequestType $type, string $jobId): MessageHandlingReadiness
+    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
     {
         foreach ($this->assessors as $assessor) {
-            if ($assessor->handles($type)) {
-                return $assessor->isReady($jobId);
+            $readiness = $assessor->isReady($message);
+            if (null !== $readiness) {
+                return $readiness;
             }
         }
 

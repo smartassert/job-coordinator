@@ -7,9 +7,9 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\WorkerComponentName;
+use App\Message\GetWorkerJobMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetWorkerJobReadinessHandler;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -28,20 +28,6 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
         $this->assessor = $assessor;
     }
 
-    public function testHandles(): void
-    {
-        self::assertTrue($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
-
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
-    }
-
     /**
      * @param callable(JobInterface, WorkerComponentStateRepository): void $setup
      */
@@ -57,7 +43,9 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $workerComponentStateRepository);
 
-        self::assertSame($expected, $this->assessor->isReady($job->getId()));
+        $message = new GetWorkerJobMessage($job->getId(), '127.0.0.1');
+
+        self::assertSame($expected, $this->assessor->isReady($message));
     }
 
     /**

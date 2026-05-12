@@ -10,10 +10,10 @@ use App\Enum\MessageState;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -35,9 +35,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $type, string $passedJobId) use ($message) {
-                self::assertTrue($type->equals($message->getRemoteRequestType()));
-                self::assertSame($passedJobId, $message->getJobId());
+            ->withArgs(function (JobRemoteRequestMessageInterface $passedMessage) use ($message) {
+                self::assertTrue($passedMessage->getRemoteRequestType()->equals($message->getRemoteRequestType()));
+                self::assertSame($passedMessage->getJobId(), $message->getJobId());
 
                 return true;
             })

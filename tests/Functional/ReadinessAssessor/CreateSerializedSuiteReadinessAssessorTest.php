@@ -6,9 +6,9 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
+use App\Message\CreateSerializedSuiteMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -28,20 +28,6 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
         $this->assessor = $assessor;
     }
 
-    public function testHandles(): void
-    {
-        self::assertTrue($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
-
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
-    }
-
     /**
      * @param callable(JobInterface, SerializedSuiteRepository): void $setup
      */
@@ -57,7 +43,14 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
 
         $setup($job, $serializedSuiteRepository);
 
-        self::assertSame($expected, $this->assessor->isReady($job->getId()));
+        $message = new CreateSerializedSuiteMessage(
+            'authentication-token',
+            $job->getId(),
+            (string) new Ulid(),
+            []
+        );
+
+        self::assertSame($expected, $this->assessor->isReady($message));
     }
 
     /**

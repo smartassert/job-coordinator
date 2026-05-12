@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\ReadinessAssessor;
 
+use App\Enum\JobComponentName;
 use App\Enum\MessageHandlingReadiness;
-use App\Model\RemoteRequestType;
+use App\Enum\RemoteRequestAction;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\MachineRepository;
 
 readonly class GetMachineReadinessHandler implements ReadinessHandlerInterface
@@ -14,14 +16,18 @@ readonly class GetMachineReadinessHandler implements ReadinessHandlerInterface
         private MachineRepository $machineRepository,
     ) {}
 
-    public function handles(RemoteRequestType $type): bool
+    public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
     {
-        return RemoteRequestType::createForMachineRetrieval()->equals($type);
-    }
+        $requestType = $message->getRemoteRequestType();
+        if (JobComponentName::MACHINE !== $requestType->componentName) {
+            return null;
+        }
 
-    public function isReady(string $jobId): MessageHandlingReadiness
-    {
-        $machine = $this->machineRepository->find($jobId);
+        if (RemoteRequestAction::RETRIEVE !== $requestType->action) {
+            return null;
+        }
+
+        $machine = $this->machineRepository->find($message->getJobId());
         if (null === $machine) {
             return MessageHandlingReadiness::NEVER;
         }

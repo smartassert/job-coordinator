@@ -6,13 +6,15 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
+use App\Message\GetMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetMachineReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
+use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetMachineReadinessAssessorTest extends WebTestCase
@@ -25,20 +27,6 @@ class GetMachineReadinessAssessorTest extends WebTestCase
         \assert($assessor instanceof GetMachineReadinessHandler);
 
         $this->assessor = $assessor;
-    }
-
-    public function testHandles(): void
-    {
-        self::assertTrue($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
-
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
     }
 
     /**
@@ -56,7 +44,24 @@ class GetMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository);
 
-        self::assertSame($expected, $this->assessor->isReady($job->getId()));
+        $message = new GetMachineMessage(
+            'authentication-token',
+            $job->getId(),
+            new WorkerManagerClientMachine(
+                'machine-id',
+                'state',
+                'state-category',
+                ['127.0.0.1'],
+                null,
+                false,
+                false,
+                false,
+                false,
+                new WorkerManagerClientMetaState(false, false)
+            ),
+        );
+
+        self::assertSame($expected, $this->assessor->isReady($message));
     }
 
     /**
