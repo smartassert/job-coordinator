@@ -30,7 +30,7 @@ abstract readonly class AbstractMessageHandler
      */
     protected function assessReadiness(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
     {
-        $readiness = $this->readinessAssessor->isReady($message->getRemoteRequestType(), $message->getJobId());
+        $readiness = $this->readinessAssessor->isReady($message);
 
         if (MessageHandlingReadiness::NOW === $readiness) {
             $message->setState(MessageState::HANDLING);

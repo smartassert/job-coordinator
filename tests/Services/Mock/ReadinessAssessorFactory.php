@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Services\Mock;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use PHPUnit\Framework\TestCase;
@@ -19,9 +20,9 @@ class ReadinessAssessorFactory
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (RemoteRequestType $passedType, string $passedJobId) use ($type, $jobId) {
-                TestCase::assertTrue($passedType->equals($type));
-                TestCase::assertSame($passedJobId, $jobId);
+            ->withArgs(function (JobRemoteRequestMessageInterface $message) use ($type, $jobId) {
+                TestCase::assertTrue($message->getRemoteRequestType()->equals($type));
+                TestCase::assertSame($message->getJobId(), $jobId);
 
                 return true;
             })

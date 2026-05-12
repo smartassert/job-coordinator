@@ -17,7 +17,7 @@ abstract readonly class AbstractMessageDispatcher
 
     protected function isNeverReady(JobRemoteRequestMessageInterface $message): bool
     {
-        $readiness = $this->readinessAssessor->isReady($message->getRemoteRequestType(), $message->getJobId());
+        $readiness = $this->readinessAssessor->isReady($message);
 
         return MessageHandlingReadiness::NEVER === $readiness;
     }

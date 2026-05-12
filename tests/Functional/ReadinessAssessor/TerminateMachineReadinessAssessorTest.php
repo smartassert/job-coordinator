@@ -8,6 +8,7 @@ use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
+use App\Message\TerminateMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -31,20 +32,6 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
         $this->assessor = $assessor;
     }
 
-    public function testHandles(): void
-    {
-        self::assertTrue($this->assessor->handles(RemoteRequestType::createForMachineTermination()));
-
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForMachineRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
-        self::assertFalse($this->assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
-    }
-
     /**
      * @param callable(JobInterface, MachineRepository, ResultsJobFactory, RemoteRequestRepository): void $setup
      */
@@ -66,7 +53,9 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository, $resultsJobFactory, $remoteRequestRepository);
 
-        self::assertSame($expected, $this->assessor->isReady($job->getId()));
+        $message = new TerminateMachineMessage('authentication-token', $job->getId());
+
+        self::assertSame($expected, $this->assessor->isReady($message));
     }
 
     /**

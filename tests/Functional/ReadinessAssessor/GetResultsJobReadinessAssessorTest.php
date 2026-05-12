@@ -7,9 +7,9 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
+use App\Message\GetResultsJobStateMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\GetResultsJobReadinessHandler;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
@@ -21,23 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetResultsJobReadinessAssessorTest extends WebTestCase
 {
-    public function testHandles(): void
-    {
-        $assessor = self::getContainer()->get(GetResultsJobReadinessHandler::class);
-        \assert($assessor instanceof GetResultsJobReadinessHandler);
-
-        self::assertTrue($assessor->handles(RemoteRequestType::createForResultsJobRetrieval()));
-
-        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineCreation()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForResultsJobCreation()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteCreation()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobCreation()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineRetrieval()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForSerializedSuiteRetrieval()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForWorkerJobRetrieval()));
-        self::assertFalse($assessor->handles(RemoteRequestType::createForMachineTermination()));
-    }
-
     /**
      * @param callable(JobInterface, ResultsJobFactory, MachineRepository): void $setup
      * @param callable(JobInterface): PreparationStateFactory                    $preparationStateFactoryCreator
@@ -70,7 +53,9 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
             $machineRepository
         );
 
-        self::assertSame($expected, $assessor->isReady($job->getId()));
+        $message = new GetResultsJobStateMessage('authentication-token', $job->getId());
+
+        self::assertSame($expected, $assessor->isReady($message));
     }
 
     /**
