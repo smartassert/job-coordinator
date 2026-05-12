@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\ReadinessAssessor;
 
-use App\Enum\JobComponentName;
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteRequestAction;
 use App\Message\JobRemoteRequestMessageInterface;
+use App\Model\RemoteRequestType;
 use App\Repository\SerializedSuiteRepository;
 
 readonly class GetSerializedSuiteReadinessHandler implements ReadinessHandlerInterface
@@ -18,12 +17,7 @@ readonly class GetSerializedSuiteReadinessHandler implements ReadinessHandlerInt
 
     public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
     {
-        $requestType = $message->getRemoteRequestType();
-        if (JobComponentName::SERIALIZED_SUITE !== $requestType->componentName) {
-            return null;
-        }
-
-        if (RemoteRequestAction::RETRIEVE !== $requestType->action) {
+        if (!RemoteRequestType::createForSerializedSuiteRetrieval()->equals($message->getRemoteRequestType())) {
             return null;
         }
 
