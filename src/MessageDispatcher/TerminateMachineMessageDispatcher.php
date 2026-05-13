@@ -32,7 +32,7 @@ readonly class TerminateMachineMessageDispatcher implements EventSubscriberInter
     public function dispatchImmediately(ResultsJobStateRetrievedEvent $event): void
     {
         $message = new TerminateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }

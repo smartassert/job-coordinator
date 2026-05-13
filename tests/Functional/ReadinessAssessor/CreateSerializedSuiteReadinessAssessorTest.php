@@ -6,7 +6,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
-use App\Message\CreateSerializedSuiteMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor;
@@ -43,14 +42,7 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
 
         $setup($job, $serializedSuiteRepository);
 
-        $message = new CreateSerializedSuiteMessage(
-            'authentication-token',
-            $job->getId(),
-            (string) new Ulid(),
-            []
-        );
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

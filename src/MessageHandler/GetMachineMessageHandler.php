@@ -35,7 +35,7 @@ final readonly class GetMachineMessageHandler extends AbstractMessageHandler
      */
     public function __invoke(GetMachineMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {

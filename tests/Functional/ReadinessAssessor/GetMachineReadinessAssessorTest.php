@@ -6,15 +6,12 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
-use App\Message\GetMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetMachineReadinessAssessorTest extends WebTestCase
@@ -44,24 +41,7 @@ class GetMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository);
 
-        $message = new GetMachineMessage(
-            'authentication-token',
-            $job->getId(),
-            new WorkerManagerClientMachine(
-                'machine-id',
-                'state',
-                'state-category',
-                ['127.0.0.1'],
-                null,
-                false,
-                false,
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false)
-            ),
-        );
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

@@ -8,7 +8,6 @@ use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
-use App\Message\TerminateMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -53,9 +52,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository, $resultsJobFactory, $remoteRequestRepository);
 
-        $message = new TerminateMachineMessage('authentication-token', $job->getId());
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

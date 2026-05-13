@@ -75,23 +75,12 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = (string) new Ulid();
-
         $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
-        $message = new CreateSerializedSuiteMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->getSuiteId(),
-            $event->parameters
-        );
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateSerializedSuiteMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

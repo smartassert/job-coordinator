@@ -38,7 +38,7 @@ readonly class CreateSerializedSuiteMessageDispatcher implements EventSubscriber
             $event->parameters
         );
 
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }

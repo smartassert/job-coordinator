@@ -42,7 +42,7 @@ readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInt
             $event->serializedSuite->getId()
         );
 
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }

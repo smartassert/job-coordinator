@@ -148,16 +148,11 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
         $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
-        $message = new CreateMachineMessage('api token', $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
@@ -177,11 +172,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
@@ -198,16 +189,10 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $message = new CreateMachineMessage('api token', $job->getId());
-
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($job->getId())
             ->andReturn($readiness)
         ;
 

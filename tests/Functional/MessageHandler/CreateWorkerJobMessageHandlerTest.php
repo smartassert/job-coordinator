@@ -56,7 +56,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($message)
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::EVENTUALLY)
         ;
 
@@ -77,7 +77,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($message)
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

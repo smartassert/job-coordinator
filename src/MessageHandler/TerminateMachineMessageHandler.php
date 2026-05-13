@@ -35,7 +35,7 @@ final readonly class TerminateMachineMessageHandler extends AbstractMessageHandl
      */
     public function __invoke(TerminateMachineMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {

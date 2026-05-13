@@ -35,7 +35,7 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {

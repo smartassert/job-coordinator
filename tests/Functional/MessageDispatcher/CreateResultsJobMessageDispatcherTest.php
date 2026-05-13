@@ -66,16 +66,11 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
         $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
-        $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateResultsJobMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

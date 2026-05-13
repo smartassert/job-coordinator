@@ -7,7 +7,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\WorkerComponentName;
-use App\Message\GetWorkerJobMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetWorkerJobReadinessAssessor;
@@ -43,9 +42,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $workerComponentStateRepository);
 
-        $message = new GetWorkerJobMessage($job->getId(), '127.0.0.1');
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

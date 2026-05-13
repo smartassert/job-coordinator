@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\MachineRepository;
 
 readonly class GetMachineReadinessAssessor implements ReadinessAssessorInterface
@@ -14,9 +13,9 @@ readonly class GetMachineReadinessAssessor implements ReadinessAssessorInterface
         private MachineRepository $machineRepository,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
+    public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $machine = $this->machineRepository->find($message->getJobId());
+        $machine = $this->machineRepository->find($jobId);
         if (null === $machine) {
             return MessageHandlingReadiness::NEVER;
         }

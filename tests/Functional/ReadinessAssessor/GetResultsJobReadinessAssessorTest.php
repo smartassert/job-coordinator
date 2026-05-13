@@ -7,7 +7,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\PreparationState;
-use App\Message\GetResultsJobStateMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
@@ -53,9 +52,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
             $machineRepository
         );
 
-        $message = new GetResultsJobStateMessage('authentication-token', $job->getId());
-
-        self::assertSame($expected, $assessor->isReady($message));
+        self::assertSame($expected, $assessor->isReady($job->getId()));
     }
 
     /**

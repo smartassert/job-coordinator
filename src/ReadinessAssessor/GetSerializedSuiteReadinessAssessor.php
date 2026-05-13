@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\SerializedSuiteRepository;
 
 readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorInterface
@@ -14,9 +13,9 @@ readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorI
         private SerializedSuiteRepository $serializedSuiteRepository,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
+    public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $serializedSuite = $this->serializedSuiteRepository->find($message->getJobId());
+        $serializedSuite = $this->serializedSuiteRepository->find($jobId);
         if (null === $serializedSuite || $serializedSuite->hasEndState()) {
             return MessageHandlingReadiness::NEVER;
         }

@@ -75,21 +75,10 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             )
         );
 
-        $message = new CreateWorkerJobMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $job->getMaximumDurationInSeconds(),
-            $event->ipAddress
-        );
-
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateWorkerJobMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
@@ -174,21 +163,11 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         );
 
         $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
-        $message = new CreateWorkerJobMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $job->getMaximumDurationInSeconds(),
-            $event->ipAddress
-        );
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (CreateWorkerJobMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 

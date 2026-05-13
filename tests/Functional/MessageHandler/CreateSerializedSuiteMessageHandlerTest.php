@@ -169,7 +169,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($message)
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

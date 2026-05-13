@@ -49,7 +49,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
             $event->ipAddress
         );
 
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
@@ -64,7 +64,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
             return;
         }
 
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
 
         if (MessageHandlingReadiness::NEVER === $event->readiness || MessageHandlingReadiness::NEVER === $readiness) {
             return;

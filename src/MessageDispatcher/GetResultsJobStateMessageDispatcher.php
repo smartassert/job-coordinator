@@ -36,7 +36,7 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
     public function dispatch(ResultsJobCreatedEvent|ResultsJobStateRetrievedEvent $event): void
     {
         $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }

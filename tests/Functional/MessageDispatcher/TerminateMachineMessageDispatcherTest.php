@@ -75,7 +75,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
             $jobId,
             new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
         );
-        $message = new TerminateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -83,11 +82,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (TerminateMachineMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

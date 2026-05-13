@@ -6,7 +6,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
-use App\Message\GetSerializedSuiteMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
@@ -14,7 +13,6 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
 {
@@ -36,14 +34,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
         $assessor = self::getContainer()->get(GetSerializedSuiteReadinessAssessor::class);
         \assert($assessor instanceof GetSerializedSuiteReadinessAssessor);
 
-        $message = new GetSerializedSuiteMessage(
-            'authentication-token',
-            $job->getId(),
-            (string) new Ulid(),
-            (string) new Ulid(),
-        );
-
-        self::assertSame($expected, $assessor->isReady($message));
+        self::assertSame($expected, $assessor->isReady($job->getId()));
     }
 
     /**

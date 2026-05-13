@@ -35,7 +35,7 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
      */
     public function __invoke(GetResultsJobStateMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {

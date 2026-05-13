@@ -6,7 +6,6 @@ namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
-use App\Message\CreateWorkerJobMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
@@ -47,14 +46,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $serializedSuiteRepository, $resultsJobFactory);
 
-        $message = new CreateWorkerJobMessage(
-            'authentication-token',
-            $job->getId(),
-            600,
-            '127.0.0.1',
-        );
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

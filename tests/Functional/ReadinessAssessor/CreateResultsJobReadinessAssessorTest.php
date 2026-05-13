@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Message\CreateResultsJobMessage;
 use App\Model\JobInterface;
 use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
@@ -40,9 +39,7 @@ class CreateResultsJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $resultsJobFactory);
 
-        $message = new CreateResultsJobMessage('authentication-token', $job->getId());
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

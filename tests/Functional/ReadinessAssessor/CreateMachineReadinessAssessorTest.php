@@ -9,7 +9,6 @@ use App\Entity\RemoteRequest;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
-use App\Message\CreateMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
@@ -56,9 +55,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
             ]
         );
 
-        $message = new CreateMachineMessage('authentication-token', $job->getId());
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

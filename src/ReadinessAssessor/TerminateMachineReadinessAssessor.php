@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobComponentPreparationFactory\WorkerJobFactory as WorkerJobPreparationFactory;
@@ -18,10 +17,8 @@ readonly class TerminateMachineReadinessAssessor implements ReadinessAssessorInt
         private WorkerJobPreparationFactory $workerJobPreparationFactory,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
+    public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $jobId = $message->getJobId();
-
         if (!$this->machineRepository->has($jobId)) {
             return MessageHandlingReadiness::NEVER;
         }

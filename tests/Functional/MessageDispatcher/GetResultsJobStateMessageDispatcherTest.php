@@ -85,16 +85,10 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
-
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
@@ -123,16 +117,10 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
-
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 

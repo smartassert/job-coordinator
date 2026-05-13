@@ -73,7 +73,6 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
 
         $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
-        $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -81,11 +80,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (GetWorkerJobMessage $passedMessage) use ($message) {
-                self::assertEquals($message, $passedMessage);
-
-                return true;
-            })
+            ->with($jobId)
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 

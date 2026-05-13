@@ -59,7 +59,7 @@ readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
             $event->getMachine()
         );
 
-        $readiness = $this->readinessAssessor->isReady($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
