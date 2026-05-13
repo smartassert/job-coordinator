@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessAssessorInterface $readinessAssessor,
+        private ReadinessHandlerInterface $readinessAssessor,
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,

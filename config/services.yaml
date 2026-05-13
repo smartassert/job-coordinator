@@ -141,3 +141,39 @@ services:
     App\Services\WorkerClientFactory:
         arguments:
             $serviceClient: '@app.services.service-client.worker-client'
+
+    App\MessageHandler\CreateMachineMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessHandler'
+
+    App\MessageHandler\CreateResultsJobMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessHandler'
+
+    App\MessageHandler\CreateSerializedSuiteMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler'
+
+    App\MessageHandler\CreateWorkerJobMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\CreateWorkerJobReadinessHandler'
+
+    App\MessageHandler\GetMachineMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessHandler'
+
+    App\MessageHandler\GetResultsJobStateMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessHandler'
+
+    App\MessageHandler\GetSerializedSuiteMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetSerializedSuiteReadinessHandler'
+
+    App\MessageHandler\GetWorkerJobMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerJobReadinessHandler'
+
+    App\MessageHandler\TerminateMachineMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessHandler'

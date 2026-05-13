@@ -12,7 +12,9 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Model\MetaState;
+use App\ReadinessAssessor\GetResultsJobReadinessHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -33,11 +35,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $jobId = (string) new Ulid();
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $resultsClient = self::getContainer()->get(ResultsClient::class);
         \assert($resultsClient instanceof ResultsClient);
@@ -56,11 +58,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $jobId = (string) new Ulid();
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NOW
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NOW);
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
@@ -105,8 +107,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             ])),
         ]);
 
-        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($assessor instanceof ReadinessAssessorInterface);
+        $assessor = self::getContainer()->get(GetResultsJobReadinessHandler::class);
+        \assert($assessor instanceof ReadinessHandlerInterface);
 
         $handler = $this->createHandler($assessor, $resultsClient);
 
@@ -136,7 +138,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     }
 
     private function createHandler(
-        ReadinessAssessorInterface $readinessAssessor,
+        ReadinessHandlerInterface $readinessAssessor,
         ResultsClient $resultsClient,
     ): GetResultsJobStateMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);

@@ -14,7 +14,9 @@ use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\GetSerializedSuiteMessageHandler;
 use App\Model\JobInterface;
 use App\Model\MetaState;
+use App\ReadinessAssessor\GetSerializedSuiteReadinessHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\Log\LoggerInterface;
@@ -32,17 +34,11 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $serializedSuiteId = (string) new Ulid();
         $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (JobRemoteRequestMessageInterface $passedMessage) use ($message) {
-                self::assertTrue($passedMessage->getRemoteRequestType()->equals($message->getRemoteRequestType()));
-                self::assertSame($passedMessage->getJobId(), $message->getJobId());
-
-                return true;
-            })
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -104,8 +100,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($assessor instanceof ReadinessAssessorInterface);
+        $assessor = self::getContainer()->get(GetSerializedSuiteReadinessHandler::class);
+        \assert($assessor instanceof ReadinessHandlerInterface);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);

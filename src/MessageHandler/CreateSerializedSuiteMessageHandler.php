@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessAssessorInterface $readinessAssessor,
+        private ReadinessHandlerInterface $readinessAssessor,
         private SerializedSuiteClient $serializedSuiteClient,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,

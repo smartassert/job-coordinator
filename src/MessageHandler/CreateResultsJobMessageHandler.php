@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateResultsJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessAssessorInterface $readinessAssessor,
+        private ReadinessHandlerInterface $readinessAssessor,
         private ResultsClient $resultsClient,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,

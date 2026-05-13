@@ -12,7 +12,9 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
+use App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -45,8 +47,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(CreateSerializedSuiteReadinessHandler::class);
+        \assert($readinessAssessor instanceof ReadinessHandlerInterface);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -108,8 +110,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(CreateSerializedSuiteReadinessHandler::class);
+        \assert($readinessAssessor instanceof ReadinessHandlerInterface);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);
@@ -166,17 +168,11 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->withArgs(function (JobRemoteRequestMessageInterface $passedMessage) use ($message) {
-                self::assertTrue($passedMessage->getRemoteRequestType()->equals($message->getRemoteRequestType()));
-                self::assertSame($passedMessage->getJobId(), $message->getJobId());
-
-                return true;
-            })
-            ->andReturn(MessageHandlingReadiness::NEVER)
-        ;
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);

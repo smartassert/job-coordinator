@@ -15,7 +15,9 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
 use App\Model\MetaState;
+use App\ReadinessAssessor\GetMachineReadinessHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
@@ -57,11 +59,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $machine = MachineFactory::createRandomForJob($jobId);
         $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NOW
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NOW);
 
         $workerManagerException = new \Exception('Failed to create machine');
 
@@ -105,8 +107,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             )
         ));
 
-        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(GetMachineReadinessHandler::class);
+        \assert($readinessAssessor instanceof ReadinessHandlerInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -195,8 +197,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ),
         ));
 
-        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(GetMachineReadinessHandler::class);
+        \assert($readinessAssessor instanceof ReadinessHandlerInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -355,8 +357,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ),
         ));
 
-        $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
-        \assert($readinessAssessor instanceof ReadinessAssessorInterface);
+        $readinessAssessor = self::getContainer()->get(GetMachineReadinessHandler::class);
+        \assert($readinessAssessor instanceof ReadinessHandlerInterface);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create([
@@ -433,11 +435,11 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             new WorkerManagerClientMetaState(false, false),
         );
         $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($message)
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $handler = $this->createHandler(
             HttpMockedWorkerManagerClientFactory::create(),
@@ -464,7 +466,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         WorkerManagerClient $workerManagerClient,
-        ReadinessAssessorInterface $readinessAssessor,
+        ReadinessHandlerInterface $readinessAssessor,
     ): GetMachineMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessAssessorInterface $readinessAssessor,
+        private ReadinessHandlerInterface $readinessAssessor,
         private WorkerManagerClient $workerManagerClient,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,
