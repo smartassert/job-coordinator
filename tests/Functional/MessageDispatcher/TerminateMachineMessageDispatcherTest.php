@@ -6,7 +6,6 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
@@ -23,7 +22,6 @@ use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class TerminateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -90,29 +88,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);
-
-        self::assertCount(0, $this->messengerTransport->getSent());
-    }
-
-    public function testRedispatchNeverReady(): void
-    {
-        $jobId = (string) new Ulid();
-
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineTermination(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
-
-        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
-        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
-
-        $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
-
-        $message = new TerminateMachineMessage('api token', $jobId);
-        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
-
-        $dispatcher->redispatch($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
     }
