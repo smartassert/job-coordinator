@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class GetSerializedSuiteReadinessHandler implements ReadinessHandlerInterface
+readonly class GetSerializedSuiteReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,

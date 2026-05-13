@@ -7,7 +7,7 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Message\CreateResultsJobMessage;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\CreateResultsJobReadinessHandler;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -15,12 +15,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CreateResultsJobReadinessAssessorTest extends WebTestCase
 {
-    private CreateResultsJobReadinessHandler $assessor;
+    private CreateResultsJobReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateResultsJobReadinessHandler::class);
-        \assert($assessor instanceof CreateResultsJobReadinessHandler);
+        $assessor = self::getContainer()->get(CreateResultsJobReadinessAssessor::class);
+        \assert($assessor instanceof CreateResultsJobReadinessAssessor);
 
         $this->assessor = $assessor;
     }

@@ -12,8 +12,8 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\MessageHandler\CreateResultsJobMessageHandler;
 use App\Model\MetaState;
-use App\ReadinessAssessor\CreateResultsJobReadinessHandler;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -33,7 +33,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
@@ -63,8 +63,8 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
 
-        $assessor = self::getContainer()->get(CreateResultsJobReadinessHandler::class);
-        \assert($assessor instanceof CreateResultsJobReadinessHandler);
+        $assessor = self::getContainer()->get(CreateResultsJobReadinessAssessor::class);
+        \assert($assessor instanceof CreateResultsJobReadinessAssessor);
 
         $resultsJobModel = new ResultsJobModel(
             $job->getId(),
@@ -117,7 +117,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
 
         $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
@@ -147,7 +147,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         ResultsClient $resultsClient,
-        ReadinessHandlerInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ): CreateResultsJobMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);

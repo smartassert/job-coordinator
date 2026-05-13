@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class TerminateMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
         private WorkerManagerClient $workerManagerClient,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,

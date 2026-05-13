@@ -9,7 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Message\GetSerializedSuiteMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\GetSerializedSuiteReadinessHandler;
+use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,8 +33,8 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
 
         $setup($job, $serializedSuiteRepository);
 
-        $assessor = self::getContainer()->get(GetSerializedSuiteReadinessHandler::class);
-        \assert($assessor instanceof GetSerializedSuiteReadinessHandler);
+        $assessor = self::getContainer()->get(GetSerializedSuiteReadinessAssessor::class);
+        \assert($assessor instanceof GetSerializedSuiteReadinessAssessor);
 
         $message = new GetSerializedSuiteMessage(
             'authentication-token',

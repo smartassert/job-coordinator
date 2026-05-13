@@ -7,14 +7,14 @@ namespace App\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**

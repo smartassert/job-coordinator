@@ -12,7 +12,7 @@ use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
@@ -31,7 +31,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
@@ -53,7 +53,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
@@ -86,7 +86,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
@@ -169,7 +169,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         WorkerClientFactory $workerClientFactory,
-        ReadinessHandlerInterface $readinessAssessor,
+        ReadinessAssessorInterface $readinessAssessor,
     ): GetWorkerJobMessageHandler {
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);

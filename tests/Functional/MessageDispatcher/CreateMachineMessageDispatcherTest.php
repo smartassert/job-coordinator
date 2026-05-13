@@ -15,7 +15,7 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -150,7 +150,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
         $message = new CreateMachineMessage('api token', $jobId);
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
@@ -174,7 +174,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         $message = new CreateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
@@ -200,7 +200,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $message = new CreateMachineMessage('api token', $job->getId());
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (CreateMachineMessage $passedMessage) use ($message) {
@@ -236,7 +236,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    private function createDispatcher(ReadinessHandlerInterface $assessor): CreateMachineMessageDispatcher
+    private function createDispatcher(ReadinessAssessorInterface $assessor): CreateMachineMessageDispatcher
     {
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);

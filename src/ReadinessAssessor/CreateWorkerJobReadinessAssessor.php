@@ -9,7 +9,7 @@ use App\Message\JobRemoteRequestMessageInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class CreateWorkerJobReadinessHandler implements ReadinessHandlerInterface
+readonly class CreateWorkerJobReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private SerializedSuiteRepository $serializedSuiteRepository,

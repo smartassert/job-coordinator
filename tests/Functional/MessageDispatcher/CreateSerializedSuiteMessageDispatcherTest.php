@@ -9,7 +9,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -84,7 +84,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
             $event->parameters
         );
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (CreateSerializedSuiteMessage $passedMessage) use ($message) {

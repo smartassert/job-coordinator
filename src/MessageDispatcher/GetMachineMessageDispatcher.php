@@ -12,7 +12,7 @@ use App\Event\MachineEventInterface as MachineEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\Messenger\NonDelayedStamp;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
@@ -20,7 +20,7 @@ readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**

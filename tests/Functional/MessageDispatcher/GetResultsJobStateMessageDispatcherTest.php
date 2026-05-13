@@ -12,7 +12,7 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
@@ -87,7 +87,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {
@@ -125,7 +125,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {

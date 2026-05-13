@@ -9,7 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Message\GetMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\GetMachineReadinessHandler;
+use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,12 +19,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetMachineReadinessAssessorTest extends WebTestCase
 {
-    private GetMachineReadinessHandler $assessor;
+    private GetMachineReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(GetMachineReadinessHandler::class);
-        \assert($assessor instanceof GetMachineReadinessHandler);
+        $assessor = self::getContainer()->get(GetMachineReadinessAssessor::class);
+        \assert($assessor instanceof GetMachineReadinessAssessor);
 
         $this->assessor = $assessor;
     }

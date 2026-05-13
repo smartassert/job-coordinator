@@ -10,7 +10,7 @@ use App\Enum\PreparationState;
 use App\Message\GetResultsJobStateMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\GetResultsJobReadinessHandler;
+use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\PreparationStateFactory;
@@ -47,7 +47,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
         $setup($job, $resultsJobFactory, $machineRepository);
         $jobPreparationInspector = $preparationStateFactoryCreator($job);
 
-        $assessor = new GetResultsJobReadinessHandler(
+        $assessor = new GetResultsJobReadinessAssessor(
             $resultsJobRepository,
             $jobPreparationInspector,
             $machineRepository

@@ -8,14 +8,14 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\GetResultsJobStateMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**

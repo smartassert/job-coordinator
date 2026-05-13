@@ -13,7 +13,7 @@ use App\Message\CreateMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\CreateMachineReadinessHandler;
+use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -26,12 +26,12 @@ use Symfony\Component\Uid\Ulid;
 
 class CreateMachineReadinessAssessorTest extends WebTestCase
 {
-    private CreateMachineReadinessHandler $assessor;
+    private CreateMachineReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(CreateMachineReadinessHandler::class);
-        \assert($assessor instanceof CreateMachineReadinessHandler);
+        $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
+        \assert($assessor instanceof CreateMachineReadinessAssessor);
 
         $this->assessor = $assessor;
     }

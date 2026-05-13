@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,7 +16,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
         private JobStore $jobStore,
     ) {}
 

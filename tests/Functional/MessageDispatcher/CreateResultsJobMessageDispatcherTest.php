@@ -9,7 +9,7 @@ use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -68,7 +68,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
         $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
 
-        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
             ->withArgs(function (CreateResultsJobMessage $passedMessage) use ($message) {

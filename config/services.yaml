@@ -139,72 +139,72 @@ services:
 
     App\MessageHandler\CreateMachineMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessHandler'
+            $readinessAssessor: '@CreateMachineReadinessAssessor'
 
     App\MessageHandler\CreateResultsJobMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessHandler'
+            $readinessAssessor: '@CreateResultsJobReadinessAssessor'
 
     App\MessageHandler\CreateSerializedSuiteMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler'
+            $readinessAssessor: '@CreateSerializedSuiteReadinessAssessor'
 
     App\MessageHandler\CreateWorkerJobMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateWorkerJobReadinessHandler'
+            $readinessAssessor: '@CreateWorkerJobReadinessAssessor'
 
     App\MessageHandler\GetMachineMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessHandler'
+            $readinessAssessor: '@GetMachineReadinessAssessor'
 
     App\MessageHandler\GetResultsJobStateMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessHandler'
+            $readinessAssessor: '@GetResultsJobReadinessAssessor'
 
     App\MessageHandler\GetSerializedSuiteMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetSerializedSuiteReadinessHandler'
+            $readinessAssessor: '@GetSerializedSuiteReadinessAssessor'
 
     App\MessageHandler\GetWorkerJobMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerJobReadinessHandler'
+            $readinessAssessor: '@GetWorkerJobReadinessAssessor'
 
     App\MessageHandler\TerminateMachineMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessHandler'
+            $readinessAssessor: '@TerminateMachineReadinessAssessor'
 
     App\MessageDispatcher\CreateMachineMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessHandler'
+            $readinessAssessor: '@CreateMachineReadinessAssessor'
 
     App\MessageDispatcher\CreateResultsJobMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessHandler'
+            $readinessAssessor: '@CreateResultsJobReadinessAssessor'
 
     App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler'
+            $readinessAssessor: '@CreateSerializedSuiteReadinessAssessor'
 
     App\MessageDispatcher\CreateWorkerJobMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\CreateWorkerJobReadinessHandler'
+            $readinessAssessor: '@CreateWorkerJobReadinessAssessor'
 
     App\MessageDispatcher\GetMachineMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessHandler'
+            $readinessAssessor: '@GetMachineReadinessAssessor'
 
     App\MessageDispatcher\GetResultsJobStateMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessHandler'
+            $readinessAssessor: '@GetResultsJobReadinessAssessor'
 
     App\MessageDispatcher\GetSerializedSuiteMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetSerializedSuiteReadinessHandler'
+            $readinessAssessor: '@GetSerializedSuiteReadinessAssessor'
 
     App\MessageDispatcher\GetWorkerJobMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerJobReadinessHandler'
+            $readinessAssessor: '@GetWorkerJobReadinessAssessor'
 
     App\MessageDispatcher\TerminateMachineMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessHandler'
+            $readinessAssessor: '@TerminateMachineReadinessAssessor'

@@ -11,7 +11,7 @@ use App\Event\CreateWorkerJobRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Exception\UnrecoverableRemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClient $serializedSuiteClient,

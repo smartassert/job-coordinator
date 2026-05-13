@@ -13,7 +13,7 @@ use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterface
+readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,

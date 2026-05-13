@@ -10,7 +10,7 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Services\JobComponentPreparationFactory\WorkerJobFactory as WorkerJobPreparationFactory;
 
-readonly class TerminateMachineReadinessHandler implements ReadinessHandlerInterface
+readonly class TerminateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,

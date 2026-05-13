@@ -6,22 +6,17 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\Repository\MachineRepository;
+use App\Repository\ResultsJobRepository;
 
-readonly class GetMachineReadinessHandler implements ReadinessHandlerInterface
+readonly class CreateResultsJobReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
-        private MachineRepository $machineRepository,
+        private ResultsJobRepository $resultsJobRepository,
     ) {}
 
     public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
     {
-        $machine = $this->machineRepository->find($message->getJobId());
-        if (null === $machine) {
-            return MessageHandlingReadiness::NEVER;
-        }
-
-        if ($machine->getMetaState()->ended) {
+        if ($this->resultsJobRepository->has($message->getJobId())) {
             return MessageHandlingReadiness::NEVER;
         }
 

@@ -10,14 +10,14 @@ use App\Event\JobEventInterface;
 use App\Event\MachineIpAddressInterface;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
-use App\ReadinessAssessor\ReadinessHandlerInterface;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private ReadinessHandlerInterface $readinessAssessor,
+        private ReadinessAssessorInterface $readinessAssessor,
     ) {}
 
     /**

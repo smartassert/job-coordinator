@@ -7,7 +7,7 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Message\JobRemoteRequestMessageInterface;
 
-interface ReadinessHandlerInterface
+interface ReadinessAssessorInterface
 {
     public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness;
 }
