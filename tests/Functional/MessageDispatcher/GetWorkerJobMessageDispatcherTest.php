@@ -7,11 +7,14 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerStateRetrievedEvent;
+use App\Message\CreateMachineMessage;
+use App\Message\CreateWorkerJobMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -74,15 +77,20 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
 
         $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
+        $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForWorkerJobRetrieval(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (GetWorkerJobMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);

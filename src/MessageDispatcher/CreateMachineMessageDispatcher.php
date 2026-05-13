@@ -9,17 +9,15 @@ use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateMachineMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class CreateMachineMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        JobRemoteRequestMessageDispatcher $messageDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
-    ) {
-        parent::__construct($messageDispatcher, $readinessAssessor);
-    }
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessHandlerInterface $readinessAssessor,
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
@@ -42,7 +40,8 @@ readonly class CreateMachineMessageDispatcher extends AbstractMessageDispatcher 
     public function dispatchImmediately(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
         $message = new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message);
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

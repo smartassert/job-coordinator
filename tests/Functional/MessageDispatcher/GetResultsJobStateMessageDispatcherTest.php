@@ -8,11 +8,13 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\JobEventInterface;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Message\CreateWorkerJobMessage;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -86,11 +88,17 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForResultsJobRetrieval(),
-            $job->getId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
+
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 
@@ -117,11 +125,17 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForResultsJobRetrieval(),
-            $job->getId(),
-            MessageHandlingReadiness::NOW
-        );
+        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
+
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (GetResultsJobStateMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NOW);
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 

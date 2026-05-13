@@ -6,10 +6,12 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
+use App\Message\CreateMachineMessage;
 use App\Message\CreateResultsJobMessage;
 use App\MessageDispatcher\CreateResultsJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -66,20 +68,23 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = (string) new Ulid();
+        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
+        $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForResultsJobCreation(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (CreateResultsJobMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
         $dispatcher = new CreateResultsJobMessageDispatcher($messageDispatcher, $assessor);
-
-        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
-
         $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());

@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
 use App\Message\GetResultsJobStateMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetResultsJobStateMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        JobRemoteRequestMessageDispatcher $messageDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
-    ) {
-        parent::__construct($messageDispatcher, $readinessAssessor);
-    }
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessHandlerInterface $readinessAssessor,
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
@@ -37,7 +36,8 @@ readonly class GetResultsJobStateMessageDispatcher extends AbstractMessageDispat
     public function dispatch(ResultsJobCreatedEvent|ResultsJobStateRetrievedEvent $event): void
     {
         $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message);
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

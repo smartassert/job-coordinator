@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class CreateResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        JobRemoteRequestMessageDispatcher $messageDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
-    ) {
-        parent::__construct($messageDispatcher, $readinessAssessor);
-    }
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessHandlerInterface $readinessAssessor,
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
@@ -33,7 +32,8 @@ readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatch
     public function dispatchImmediately(JobCreatedEvent $event): void
     {
         $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message);
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

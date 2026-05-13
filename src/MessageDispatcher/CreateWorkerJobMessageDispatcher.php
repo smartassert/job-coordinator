@@ -8,19 +8,17 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        JobRemoteRequestMessageDispatcher $messageDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessHandlerInterface $readinessAssessor,
         private JobStore $jobStore,
-    ) {
-        parent::__construct($messageDispatcher, $readinessAssessor);
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
@@ -51,7 +49,8 @@ readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatche
             $event->ipAddress
         );
 
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message);
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

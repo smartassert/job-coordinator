@@ -6,10 +6,12 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\JobCreatedEvent;
+use App\Message\CreateResultsJobMessage;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -77,19 +79,28 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForSerializedSuiteCreation(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
+        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
+        $message = new CreateSerializedSuiteMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $event->getSuiteId(),
+            $event->parameters
         );
+
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (CreateSerializedSuiteMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
         $dispatcher = new CreateSerializedSuiteMessageDispatcher($messageDispatcher, $assessor);
-
-        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
-
         $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());

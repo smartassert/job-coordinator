@@ -7,11 +7,13 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
+use App\Message\CreateSerializedSuiteMessage;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
@@ -58,18 +60,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForWorkerJobCreation(),
-            $job->getId(),
-            MessageHandlingReadiness::NEVER
-        );
-
-        $dispatcher = new CreateWorkerJobMessageDispatcher(
-            $jobRemoteRequestMessageDispatcher,
-            $assessor,
-            $jobStore,
-        );
-
         $event = new MachineIsActiveEvent(
             md5((string) rand()),
             $job->getId(),
@@ -89,6 +79,29 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             )
         );
 
+        $message = new CreateWorkerJobMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $job->getMaximumDurationInSeconds(),
+            $event->ipAddress
+        );
+
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (CreateWorkerJobMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
+
+        $dispatcher = new CreateWorkerJobMessageDispatcher(
+            $jobRemoteRequestMessageDispatcher,
+            $assessor,
+            $jobStore,
+        );
+
         $dispatcher->dispatchImmediately($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
@@ -104,7 +117,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $readinessAssessor = \Mockery::mock(ReadinessHandlerInterface::class);
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
@@ -148,17 +161,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForWorkerJobCreation(),
-            $job->getId(),
-            MessageHandlingReadiness::NOW
-        );
-
-        $dispatcher = new CreateWorkerJobMessageDispatcher(
-            $jobRemoteRequestMessageDispatcher,
-            $assessor,
-            $jobStore,
-        );
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
@@ -176,6 +178,28 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         );
 
         $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
+        $message = new CreateWorkerJobMessage(
+            $event->getAuthenticationToken(),
+            $event->getJobId(),
+            $job->getMaximumDurationInSeconds(),
+            $event->ipAddress
+        );
+
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (CreateWorkerJobMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NOW);
+
+        $dispatcher = new CreateWorkerJobMessageDispatcher(
+            $jobRemoteRequestMessageDispatcher,
+            $assessor,
+            $jobStore,
+        );
 
         $dispatcher->dispatchImmediately($event);
 

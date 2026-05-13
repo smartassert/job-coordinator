@@ -7,12 +7,14 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobStateRetrievedEvent;
+use App\Message\GetWorkerJobMessage;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -76,15 +78,20 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
             $jobId,
             new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
         );
+        $message = new TerminateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineTermination(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessHandlerInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->withArgs(function (TerminateMachineMessage $passedMessage) use ($message) {
+                self::assertEquals($message, $passedMessage);
+
+                return true;
+            })
+            ->andReturn(MessageHandlingReadiness::NEVER);
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);
