@@ -6,10 +6,18 @@ namespace App\MessageDispatcher;
 
 use App\Event\JobCreatedEvent;
 use App\Message\CreateResultsJobMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class CreateResultsJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        JobRemoteRequestMessageDispatcher $messageDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
+    ) {
+        parent::__construct($messageDispatcher, $readinessAssessor);
+    }
+
     /**
      * @return array<class-string, array<mixed>>
      */

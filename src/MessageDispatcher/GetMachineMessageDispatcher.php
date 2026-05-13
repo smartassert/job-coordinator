@@ -11,11 +11,19 @@ use App\Event\MachineEventInterface as MachineEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\Messenger\NonDelayedStamp;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        JobRemoteRequestMessageDispatcher $messageDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
+    ) {
+        parent::__construct($messageDispatcher, $readinessAssessor);
+    }
+
     /**
      * @return array<class-string, array<mixed>>
      */

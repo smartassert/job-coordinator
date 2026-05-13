@@ -7,10 +7,18 @@ namespace App\MessageDispatcher;
 use App\Event\JobCreatedEvent;
 use App\Message\CreateSerializedSuiteMessage;
 use App\MessageDispatcher\AbstractMessageDispatcher as BaseMessageDispatcher;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class CreateSerializedSuiteMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        JobRemoteRequestMessageDispatcher $messageDispatcher,
+        ReadinessAssessorInterface $readinessAssessor,
+    ) {
+        parent::__construct($messageDispatcher, $readinessAssessor);
+    }
+
     /**
      * @return array<class-string, array<mixed>>
      */

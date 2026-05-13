@@ -17,8 +17,8 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
 {
     public function __construct(
         JobRemoteRequestMessageDispatcher $messageDispatcher,
-        private JobStore $jobStore,
         ReadinessAssessorInterface $readinessAssessor,
+        private JobStore $jobStore,
     ) {
         parent::__construct($messageDispatcher, $readinessAssessor);
     }
