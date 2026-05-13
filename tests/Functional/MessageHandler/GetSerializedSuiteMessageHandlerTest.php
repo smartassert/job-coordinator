@@ -54,9 +54,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($logger instanceof LoggerInterface);
 
         $handler = new GetSerializedSuiteMessageHandler(
+            $assessor,
             \Mockery::mock(SerializedSuiteClient::class),
             $eventDispatcher,
-            $assessor,
             $messageBus,
             $logger,
         );
@@ -114,9 +114,9 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($logger instanceof LoggerInterface);
 
         $handler = new GetSerializedSuiteMessageHandler(
+            $assessor,
             $serializedSuiteClient,
             $eventDispatcher,
-            $assessor,
             $messageBus,
             $logger,
         );

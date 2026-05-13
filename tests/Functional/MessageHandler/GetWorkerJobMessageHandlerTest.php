@@ -182,9 +182,9 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($logger instanceof LoggerInterface);
 
         return new GetWorkerJobMessageHandler(
+            $readinessAssessor,
             $workerClientFactory,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );

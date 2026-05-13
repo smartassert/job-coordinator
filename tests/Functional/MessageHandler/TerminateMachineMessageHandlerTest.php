@@ -158,9 +158,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($logger instanceof LoggerInterface);
 
         return new TerminateMachineMessageHandler(
+            $readinessAssessor,
             $workerManagerClient,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );

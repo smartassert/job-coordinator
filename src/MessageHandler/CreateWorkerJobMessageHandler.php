@@ -26,16 +26,16 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
+        private ReadinessAssessorInterface $readinessAssessor,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClient $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
     ) {
-        parent::__construct($eventDispatcher, $readinessAssessor, $messageBus, $logger);
+        parent::__construct($eventDispatcher, $messageBus, $logger);
     }
 
     /**
@@ -44,7 +44,9 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
      */
     public function __invoke(CreateWorkerJobMessage $message): void
     {
-        $readiness = $this->assessReadiness($message);
+        $readiness = $this->readinessAssessor->isReady($message);
+        $this->setMessageState($message, $readiness);
+
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }

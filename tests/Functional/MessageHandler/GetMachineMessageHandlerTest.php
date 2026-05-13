@@ -476,9 +476,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($logger instanceof LoggerInterface);
 
         return new GetMachineMessageHandler(
+            $readinessAssessor,
             $workerManagerClient,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );

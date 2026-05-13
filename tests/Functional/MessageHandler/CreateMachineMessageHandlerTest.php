@@ -195,6 +195,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
-        return new CreateMachineMessageHandler($workerManagerClient, $eventDispatcher, $assessor, $messageBus, $logger);
+        return new CreateMachineMessageHandler($assessor, $workerManagerClient, $eventDispatcher, $messageBus, $logger);
     }
 }

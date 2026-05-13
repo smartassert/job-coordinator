@@ -20,13 +20,13 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class GetMachineMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
+        private ReadinessAssessorInterface $readinessAssessor,
         private WorkerManagerClient $workerManagerClient,
         EventDispatcherInterface $eventDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
     ) {
-        parent::__construct($eventDispatcher, $readinessAssessor, $messageBus, $logger);
+        parent::__construct($eventDispatcher, $messageBus, $logger);
     }
 
     /**
@@ -35,7 +35,9 @@ final readonly class GetMachineMessageHandler extends AbstractMessageHandler
      */
     public function __invoke(GetMachineMessage $message): void
     {
-        $readiness = $this->assessReadiness($message);
+        $readiness = $this->readinessAssessor->isReady($message);
+        $this->setMessageState($message, $readiness);
+
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }

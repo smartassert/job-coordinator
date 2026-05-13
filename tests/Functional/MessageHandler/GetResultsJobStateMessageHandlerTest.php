@@ -149,9 +149,9 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($logger instanceof LoggerInterface);
 
         return new GetResultsJobStateMessageHandler(
+            $readinessAssessor,
             $resultsClient,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );
