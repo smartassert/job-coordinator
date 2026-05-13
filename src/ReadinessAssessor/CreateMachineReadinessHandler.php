@@ -22,12 +22,8 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
         private RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
+    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
     {
-        if (!RemoteRequestType::createForMachineCreation()->equals($message->getRemoteRequestType())) {
-            return null;
-        }
-
         $jobId = $message->getJobId();
 
         if ($this->machineRepository->has($jobId)) {

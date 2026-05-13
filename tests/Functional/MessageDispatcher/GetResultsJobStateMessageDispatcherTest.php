@@ -8,15 +8,12 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\JobEventInterface;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Message\CreateWorkerJobMessage;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -98,7 +95,8 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 
@@ -135,7 +133,8 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 

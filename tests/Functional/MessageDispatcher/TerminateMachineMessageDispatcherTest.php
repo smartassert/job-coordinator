@@ -7,18 +7,15 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobStateRetrievedEvent;
-use App\Message\GetWorkerJobMessage;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
@@ -91,7 +88,8 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);

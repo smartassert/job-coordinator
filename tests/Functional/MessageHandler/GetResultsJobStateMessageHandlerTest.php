@@ -13,13 +13,11 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetResultsJobReadinessHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -39,7 +37,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $resultsClient = self::getContainer()->get(ResultsClient::class);
         \assert($resultsClient instanceof ResultsClient);
@@ -62,7 +61,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $resultsClientException = new \Exception('Failed to get results job status');
 

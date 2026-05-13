@@ -14,7 +14,6 @@ use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateMachineReadinessHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -23,7 +22,6 @@ use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -42,7 +40,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::EVENTUALLY);
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
@@ -66,7 +65,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
@@ -90,7 +90,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $workerManagerException = new \Exception('Failed to create machine');
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);

@@ -9,5 +9,5 @@ use App\Message\JobRemoteRequestMessageInterface;
 
 interface ReadinessHandlerInterface
 {
-    public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness;
+    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness;
 }

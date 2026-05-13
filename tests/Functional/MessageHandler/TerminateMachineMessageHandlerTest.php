@@ -10,12 +10,10 @@ use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -33,7 +31,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::EVENTUALLY);
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
@@ -56,7 +55,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
@@ -79,7 +79,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $workerManagerException = new \Exception('Failed to terminate machine');
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
@@ -103,7 +104,8 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $machine = MachineFactory::create(
             $jobId,

@@ -12,12 +12,10 @@ use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -37,7 +35,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class), $assessor);
 
@@ -58,7 +57,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $workerClientException = new \Exception('Failed to get worker state');
         $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
@@ -90,7 +90,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),

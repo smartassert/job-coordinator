@@ -17,7 +17,6 @@ use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateWorkerJobReadinessHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -27,7 +26,6 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
@@ -59,7 +57,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::EVENTUALLY);
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 
@@ -79,7 +78,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 

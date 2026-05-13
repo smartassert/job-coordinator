@@ -15,8 +15,6 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -24,7 +22,6 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -161,7 +158,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = $this->createDispatcher($assessor);
 
@@ -184,7 +182,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = $this->createDispatcher($assessor);
         $dispatcher->redispatch($event);
@@ -209,7 +208,8 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn($readiness);
+            ->andReturn($readiness)
+        ;
 
         $dispatcher = $this->createDispatcher($assessor);
 

@@ -10,10 +10,8 @@ use App\Enum\MessageState;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageHandler\CreateSerializedSuiteMessageHandler;
 use App\ReadinessAssessor\CreateSerializedSuiteReadinessHandler;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -172,7 +170,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $assessor
             ->shouldReceive('isReady')
             ->with($message)
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
         \assert($messageBus instanceof MessageBusInterface);

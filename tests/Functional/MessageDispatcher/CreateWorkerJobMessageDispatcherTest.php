@@ -7,17 +7,13 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
-use App\Message\CreateSerializedSuiteMessage;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\ReadinessAssessor\ReadinessHandlerInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -94,7 +90,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NEVER);
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
@@ -161,7 +158,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
@@ -193,7 +189,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
                 return true;
             })
-            ->andReturn(MessageHandlingReadiness::NOW);
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,

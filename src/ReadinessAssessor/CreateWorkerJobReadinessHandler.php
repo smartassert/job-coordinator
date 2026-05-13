@@ -6,7 +6,6 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\Model\RemoteRequestType;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
@@ -17,12 +16,8 @@ readonly class CreateWorkerJobReadinessHandler implements ReadinessHandlerInterf
         private ResultsJobRepository $resultsJobRepository,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
+    public function isReady(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
     {
-        if (!RemoteRequestType::createForWorkerJobCreation()->equals($message->getRemoteRequestType())) {
-            return null;
-        }
-
         $jobId = $message->getJobId();
 
         $serializedSuite = $this->serializedSuiteRepository->get($jobId);

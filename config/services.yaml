@@ -114,11 +114,6 @@ services:
 
     SmartAssert\ServiceRequest\Parameter\Validator\PositiveIntegerParameterValidator: ~
 
-    App\ReadinessAssessor\ReadinessAssessorInterface:
-        class: App\ReadinessAssessor\ReadinessAssessor
-        arguments:
-            $assessors: !tagged_iterator 'app.readiness_assessor.handler'
-
     App\Services\RemoteRequestStateTracker\RemoteRequestStateTracker:
         arguments:
             $handlers: !tagged_iterator 'app.remote_request_state_tracker.event_handler'
