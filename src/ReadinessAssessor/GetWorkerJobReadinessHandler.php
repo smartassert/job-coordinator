@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\ReadinessAssessor;
 
 use App\Entity\WorkerComponentState;
-use App\Enum\JobComponentName;
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteRequestAction;
 use App\Message\JobRemoteRequestMessageInterface;
+use App\Model\RemoteRequestType;
 use App\Repository\WorkerComponentStateRepository;
 
 readonly class GetWorkerJobReadinessHandler implements ReadinessHandlerInterface
@@ -19,12 +18,7 @@ readonly class GetWorkerJobReadinessHandler implements ReadinessHandlerInterface
 
     public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
     {
-        $requestType = $message->getRemoteRequestType();
-        if (JobComponentName::WORKER_JOB !== $requestType->componentName) {
-            return null;
-        }
-
-        if (RemoteRequestAction::RETRIEVE !== $requestType->action) {
+        if (!RemoteRequestType::createForWorkerJobRetrieval()->equals($message->getRemoteRequestType())) {
             return null;
         }
 

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\ReadinessAssessor;
 
-use App\Enum\JobComponentName;
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteRequestAction;
 use App\Enum\RequestState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
@@ -26,12 +24,7 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
 
     public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
     {
-        $requestType = $message->getRemoteRequestType();
-        if (JobComponentName::MACHINE !== $requestType->componentName) {
-            return null;
-        }
-
-        if (RemoteRequestAction::CREATE !== $requestType->action) {
+        if (!RemoteRequestType::createForMachineCreation()->equals($message->getRemoteRequestType())) {
             return null;
         }
 
