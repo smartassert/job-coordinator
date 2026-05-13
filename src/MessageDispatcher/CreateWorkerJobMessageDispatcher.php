@@ -4,24 +4,21 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
-use App\Message\JobRemoteRequestMessageInterface;
-use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
+readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
-        JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
         private JobStore $jobStore,
-        ReadinessAssessorInterface $readinessAssessor,
-    ) {
-        parent::__construct($messageDispatcher, $readinessAssessor);
-    }
+    ) {}
 
     /**
      * @return array<class-string, array<mixed>>
@@ -52,15 +49,27 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
             $event->ipAddress
         );
 
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 
         $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 
-    protected function handles(JobRemoteRequestMessageInterface $message): bool
+    public function redispatch(MessageNotHandleableEvent $event): void
     {
-        return $message instanceof CreateWorkerJobMessage;
+        $message = $event->message;
+        if (!$message instanceof CreateWorkerJobMessage) {
+            return;
+        }
+
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+
+        if (MessageHandlingReadiness::NEVER === $event->readiness || MessageHandlingReadiness::NEVER === $readiness) {
+            return;
+        }
+
+        $this->messageDispatcher->dispatch($message);
     }
 }

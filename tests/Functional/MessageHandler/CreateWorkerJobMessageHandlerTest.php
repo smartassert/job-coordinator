@@ -16,6 +16,7 @@ use App\Message\CreateWorkerJobMessage;
 use App\MessageHandler\CreateWorkerJobMessageHandler;
 use App\Model\JobInterface;
 use App\Model\MetaState;
+use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -25,7 +26,6 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
@@ -53,11 +53,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::EVENTUALLY
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 
@@ -73,11 +74,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = (string) new Ulid();
         $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $handler = $this->createHandler(readinessAssessor: $assessor);
 
@@ -384,7 +386,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
         if (null === $readinessAssessor) {
-            $readinessAssessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+            $readinessAssessor = self::getContainer()->get(CreateWorkerJobReadinessAssessor::class);
             \assert($readinessAssessor instanceof ReadinessAssessorInterface);
         }
 
@@ -395,12 +397,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($logger instanceof LoggerInterface);
 
         return new CreateWorkerJobMessageHandler(
+            $readinessAssessor,
             $serializedSuiteRepository,
             $resultsJobRepository,
             $serializedSuiteClient,
             $workerClientFactory,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );

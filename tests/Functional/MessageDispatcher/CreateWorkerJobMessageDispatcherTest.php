@@ -10,12 +10,10 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -58,18 +56,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForWorkerJobCreation(),
-            $job->getId(),
-            MessageHandlingReadiness::NEVER
-        );
-
-        $dispatcher = new CreateWorkerJobMessageDispatcher(
-            $jobRemoteRequestMessageDispatcher,
-            $jobStore,
-            $assessor,
-        );
-
         $event = new MachineIsActiveEvent(
             md5((string) rand()),
             $job->getId(),
@@ -87,6 +73,19 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
                 false,
                 new WorkerManagerClientMetaState(false, false),
             )
+        );
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $dispatcher = new CreateWorkerJobMessageDispatcher(
+            $jobRemoteRequestMessageDispatcher,
+            $assessor,
+            $jobStore,
         );
 
         $dispatcher->dispatchImmediately($event);
@@ -108,8 +107,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
-            $jobStore,
             $readinessAssessor,
+            $jobStore,
         );
 
         $event = new MachineIsActiveEvent(
@@ -148,18 +147,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForWorkerJobCreation(),
-            $job->getId(),
-            MessageHandlingReadiness::NOW
-        );
-
-        $dispatcher = new CreateWorkerJobMessageDispatcher(
-            $jobRemoteRequestMessageDispatcher,
-            $jobStore,
-            $assessor,
-        );
-
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
@@ -176,6 +163,19 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         );
 
         $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $dispatcher = new CreateWorkerJobMessageDispatcher(
+            $jobRemoteRequestMessageDispatcher,
+            $assessor,
+            $jobStore,
+        );
 
         $dispatcher->dispatchImmediately($event);
 

@@ -12,9 +12,8 @@ use App\Message\GetResultsJobStateMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
-use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -86,11 +85,12 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForResultsJobRetrieval(),
-            $job->getId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 
@@ -117,11 +117,12 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForResultsJobRetrieval(),
-            $job->getId(),
-            MessageHandlingReadiness::NOW
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
 

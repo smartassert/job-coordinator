@@ -12,12 +12,12 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\Model\MetaState;
+use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -33,11 +33,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $jobId = (string) new Ulid();
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $resultsClient = self::getContainer()->get(ResultsClient::class);
         \assert($resultsClient instanceof ResultsClient);
@@ -56,11 +57,12 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     {
         $jobId = (string) new Ulid();
         $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
-        $assessor = ReadinessAssessorFactory::create(
-            $message->getRemoteRequestType(),
-            $message->getJobId(),
-            MessageHandlingReadiness::NOW
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
 
         $resultsClientException = new \Exception('Failed to get results job status');
 
@@ -105,7 +107,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             ])),
         ]);
 
-        $assessor = self::getContainer()->get(ReadinessAssessorInterface::class);
+        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
         \assert($assessor instanceof ReadinessAssessorInterface);
 
         $handler = $this->createHandler($assessor, $resultsClient);
@@ -149,9 +151,9 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         \assert($logger instanceof LoggerInterface);
 
         return new GetResultsJobStateMessageHandler(
+            $readinessAssessor,
             $resultsClient,
             $eventDispatcher,
-            $readinessAssessor,
             $messageBus,
             $logger,
         );

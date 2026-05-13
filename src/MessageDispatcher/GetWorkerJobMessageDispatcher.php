@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIpAddressInterface;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetWorkerJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
+    ) {}
+
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -31,7 +38,8 @@ readonly class GetWorkerJobMessageDispatcher extends AbstractMessageDispatcher i
     public function dispatchImmediately(JobEventInterface&MachineIpAddressInterface $event): void
     {
         $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

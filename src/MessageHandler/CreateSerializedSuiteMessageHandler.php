@@ -20,13 +20,13 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
+        private ReadinessAssessorInterface $readinessAssessor,
         private SerializedSuiteClient $serializedSuiteClient,
         EventDispatcherInterface $eventDispatcher,
-        ReadinessAssessorInterface $readinessAssessor,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
     ) {
-        parent::__construct($eventDispatcher, $readinessAssessor, $messageBus, $logger);
+        parent::__construct($eventDispatcher, $messageBus, $logger);
     }
 
     /**
@@ -35,7 +35,9 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        $readiness = $this->assessReadiness($message);
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        $this->setMessageState($message, $readiness);
+
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }

@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Message\GetSerializedSuiteMessage;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetSerializedSuiteMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
+    ) {}
+
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -35,7 +42,8 @@ readonly class GetSerializedSuiteMessageDispatcher extends AbstractMessageDispat
             $event->serializedSuite->getId()
         );
 
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

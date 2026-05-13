@@ -8,7 +8,6 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Message\MessageNotHandleableMessage;
-use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,7 +19,6 @@ abstract readonly class AbstractMessageHandler
 {
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
-        private ReadinessAssessorInterface $readinessAssessor,
         private MessageBusInterface $messageBus,
         private LoggerInterface $logger,
     ) {}
@@ -28,10 +26,10 @@ abstract readonly class AbstractMessageHandler
     /**
      * @throws ExceptionInterface
      */
-    protected function assessReadiness(JobRemoteRequestMessageInterface $message): MessageHandlingReadiness
-    {
-        $readiness = $this->readinessAssessor->isReady($message);
-
+    protected function setMessageState(
+        JobRemoteRequestMessageInterface $message,
+        MessageHandlingReadiness $readiness
+    ): void {
         if (MessageHandlingReadiness::NOW === $readiness) {
             $message->setState(MessageState::HANDLING);
         }
@@ -47,8 +45,6 @@ abstract readonly class AbstractMessageHandler
         if (MessageHandlingReadiness::NOW !== $readiness) {
             $this->handleNonHandleableMessage($message, $readiness);
         }
-
-        return $readiness;
     }
 
     /**

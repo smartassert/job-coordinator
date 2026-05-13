@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\AuthenticatingEventInterface as AuthenticatingEvent;
 use App\Event\JobEventInterface as JobEvent;
 use App\Event\MachineCreationRequestedEvent;
@@ -11,11 +12,17 @@ use App\Event\MachineEventInterface as MachineEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\Messenger\NonDelayedStamp;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
-readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
+readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 {
+    public function __construct(
+        private JobRemoteRequestMessageDispatcher $messageDispatcher,
+        private ReadinessAssessorInterface $readinessAssessor,
+    ) {}
+
     /**
      * @return array<class-string, array<mixed>>
      */
@@ -52,7 +59,8 @@ readonly class GetMachineMessageDispatcher extends AbstractMessageDispatcher imp
             $event->getMachine()
         );
 
-        if ($this->isNeverReady($message)) {
+        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 

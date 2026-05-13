@@ -12,11 +12,10 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
@@ -80,11 +79,12 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineTermination(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = new TerminateMachineMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);

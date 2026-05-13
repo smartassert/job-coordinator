@@ -8,11 +8,10 @@ use App\Entity\Machine;
 use App\Entity\RemoteRequest;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
-use App\Message\TerminateMachineMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
-use App\ReadinessAssessor\TerminateMachineReadinessHandler;
+use App\ReadinessAssessor\TerminateMachineReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -22,12 +21,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TerminateMachineReadinessAssessorTest extends WebTestCase
 {
-    private TerminateMachineReadinessHandler $assessor;
+    private TerminateMachineReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(TerminateMachineReadinessHandler::class);
-        \assert($assessor instanceof TerminateMachineReadinessHandler);
+        $assessor = self::getContainer()->get(TerminateMachineReadinessAssessor::class);
+        \assert($assessor instanceof TerminateMachineReadinessAssessor);
 
         $this->assessor = $assessor;
     }
@@ -53,9 +52,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
 
         $setup($job, $machineRepository, $resultsJobFactory, $remoteRequestRepository);
 
-        $message = new TerminateMachineMessage('authentication-token', $job->getId());
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

@@ -15,7 +15,6 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\Model\RemoteRequestType;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
@@ -23,7 +22,6 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Mock\ReadinessAssessorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -149,16 +147,16 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNeverReady(): void
     {
         $jobId = (string) new Ulid();
+        $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineCreation(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
 
         $dispatcher = $this->createDispatcher($assessor);
-
-        $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
 
         $dispatcher->dispatchImmediately($event);
 
@@ -168,18 +166,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function testRedispatchNeverReady(): void
     {
         $jobId = (string) new Ulid();
-
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineCreation(),
-            $jobId,
-            MessageHandlingReadiness::NEVER
-        );
-
-        $dispatcher = $this->createDispatcher($assessor);
-
         $message = new CreateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $dispatcher = $this->createDispatcher($assessor);
         $dispatcher->redispatch($event);
 
         $this->assertNoMessagesAreDispatched();
@@ -192,11 +189,12 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $assessor = ReadinessAssessorFactory::create(
-            RemoteRequestType::createForMachineCreation(),
-            $job->getId(),
-            $readiness
-        );
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn($readiness)
+        ;
 
         $dispatcher = $this->createDispatcher($assessor);
 

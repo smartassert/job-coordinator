@@ -7,10 +7,9 @@ namespace App\Tests\Functional\ReadinessAssessor;
 use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\WorkerComponentName;
-use App\Message\GetWorkerJobMessage;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\GetWorkerJobReadinessHandler;
+use App\ReadinessAssessor\GetWorkerJobReadinessAssessor;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -18,12 +17,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetWorkerJobReadinessAssessorTest extends WebTestCase
 {
-    private GetWorkerJobReadinessHandler $assessor;
+    private GetWorkerJobReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(GetWorkerJobReadinessHandler::class);
-        \assert($assessor instanceof GetWorkerJobReadinessHandler);
+        $assessor = self::getContainer()->get(GetWorkerJobReadinessAssessor::class);
+        \assert($assessor instanceof GetWorkerJobReadinessAssessor);
 
         $this->assessor = $assessor;
     }
@@ -43,9 +42,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
 
         $setup($job, $workerComponentStateRepository);
 
-        $message = new GetWorkerJobMessage($job->getId(), '127.0.0.1');
-
-        self::assertSame($expected, $this->assessor->isReady($message));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**

@@ -6,14 +6,13 @@ namespace App\ReadinessAssessor;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\RequestState;
-use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 
-readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterface
+readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,
@@ -22,14 +21,8 @@ readonly class CreateMachineReadinessHandler implements ReadinessHandlerInterfac
         private RemoteRequestRepository $remoteRequestRepository,
     ) {}
 
-    public function isReady(JobRemoteRequestMessageInterface $message): ?MessageHandlingReadiness
+    public function isReady(string $jobId): MessageHandlingReadiness
     {
-        if (!RemoteRequestType::createForMachineCreation()->equals($message->getRemoteRequestType())) {
-            return null;
-        }
-
-        $jobId = $message->getJobId();
-
         if ($this->machineRepository->has($jobId)) {
             return MessageHandlingReadiness::NEVER;
         }
