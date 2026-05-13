@@ -66,8 +66,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
-            $jobStore,
             $assessor,
+            $jobStore,
         );
 
         $event = new MachineIsActiveEvent(
@@ -108,8 +108,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
-            $jobStore,
             $readinessAssessor,
+            $jobStore,
         );
 
         $event = new MachineIsActiveEvent(
@@ -156,8 +156,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
-            $jobStore,
             $assessor,
+            $jobStore,
         );
 
         $machineIpAddress = '127.0.0.1';

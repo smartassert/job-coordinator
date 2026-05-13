@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
+use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
-use App\Message\JobRemoteRequestMessageInterface;
-use App\MessageDispatcher\AbstractRedispatchingMessageDispatcher as BaseMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher implements EventSubscriberInterface
+readonly class CreateWorkerJobMessageDispatcher extends AbstractMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         JobRemoteRequestMessageDispatcher $messageDispatcher,
@@ -59,8 +58,19 @@ readonly class CreateWorkerJobMessageDispatcher extends BaseMessageDispatcher im
         $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
     }
 
-    protected function handles(JobRemoteRequestMessageInterface $message): bool
+    public function redispatch(MessageNotHandleableEvent $event): void
     {
-        return $message instanceof CreateWorkerJobMessage;
+        $message = $event->message;
+        if (!$message instanceof CreateWorkerJobMessage) {
+            return;
+        }
+
+        $readiness = $this->readinessAssessor->isReady($message);
+
+        if (MessageHandlingReadiness::NEVER === $event->readiness || MessageHandlingReadiness::NEVER === $readiness) {
+            return;
+        }
+
+        $this->messageDispatcher->dispatch($message);
     }
 }
