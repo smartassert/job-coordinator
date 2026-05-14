@@ -30,7 +30,7 @@ class MachineMutator implements EventSubscriberInterface
                 ['setStateOnMachineStateChangeEvent', 1000],
             ],
             MachineIsActiveEvent::class => [
-                ['setIpOnMachineIsActiveEvent', 1000],
+                ['handleMachineIsActiveEvent', 1000],
             ],
             MachineHasActionFailureEvent::class => [
                 ['setActionFailureOnMachineHasActionFailureEvent', 1000],
@@ -62,7 +62,7 @@ class MachineMutator implements EventSubscriberInterface
         $this->machineRepository->save($machineEntity);
     }
 
-    public function setIpOnMachineIsActiveEvent(MachineIsActiveEvent $event): void
+    public function handleMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {
@@ -75,6 +75,7 @@ class MachineMutator implements EventSubscriberInterface
         }
 
         $machineEntity->setIp($event->ipAddress);
+        $machineEntity->setIsActive();
 
         $this->machineRepository->save($machineEntity);
     }
