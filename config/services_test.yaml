@@ -79,6 +79,3 @@ services:
 
     App\Tests\Services\Stager:
         public: true
-
-    App\ReadinessAssessor\GetWorkerStateReadinessAssessor:
-        public: true
