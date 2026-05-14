@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
@@ -54,6 +55,9 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
                 ['removeMachineTerminationRequests', 0],
             ],
             WorkerStateRetrievedEvent::class => [
+                ['removeWorkerJobGetRequests', 0],
+            ],
+            MachineIsReadyEvent::class => [
                 ['removeWorkerStateGetRequests', 0],
             ],
         ];
@@ -99,9 +103,14 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         $this->removeForEventAndType($event, RemoteRequestType::createForMachineTermination());
     }
 
-    public function removeWorkerStateGetRequests(WorkerStateRetrievedEvent $event): void
+    public function removeWorkerJobGetRequests(WorkerStateRetrievedEvent $event): void
     {
         $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobRetrieval());
+    }
+
+    public function removeWorkerStateGetRequests(MachineIsReadyEvent $event): void
+    {
+        $this->removeForEventAndType($event, RemoteRequestType::createForWorkerStateRetrieval());
     }
 
     private function removeForEventAndType(JobEventInterface $event, RemoteRequestType $type): void
