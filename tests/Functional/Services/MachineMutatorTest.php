@@ -8,6 +8,7 @@ use App\Entity\Machine;
 use App\Entity\MachineActionFailure;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\JobInterface;
 use App\Repository\MachineRepository;
@@ -83,6 +84,10 @@ class MachineMutatorTest extends WebTestCase
             MachineHasActionFailureEvent::class => [
                 'expectedListenedForEvent' => MachineHasActionFailureEvent::class,
                 'expectedMethod' => 'setActionFailureOnMachineHasActionFailureEvent',
+            ],
+            MachineIsReadyEvent::class => [
+                'expectedListenedForEvent' => MachineIsReadyEvent::class,
+                'expectedMethod' => 'handleMachineIsReadyEvent',
             ],
         ];
     }
@@ -535,6 +540,121 @@ class MachineMutatorTest extends WebTestCase
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
                         )
+                    ;
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @param callable(JobFactory): ?JobInterface              $jobCreator
+     * @param callable(?JobInterface, MachineRepository): void $machineCreator
+     * @param callable(?JobInterface): MachineIsReadyEvent     $eventCreator
+     * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
+     */
+    #[DataProvider('handleMachineIsReadyEventDataProvider')]
+    public function testHandleMachineIsReadyEvent(
+        callable $jobCreator,
+        callable $machineCreator,
+        callable $eventCreator,
+        callable $expectedMachineCreator,
+    ): void {
+        $job = $jobCreator($this->jobFactory);
+        $machineCreator($job, $this->machineRepository);
+
+        $event = $eventCreator($job);
+
+        $this->machineMutator->handleMachineIsReadyEvent($event);
+
+        $machine = null === $job
+            ? null
+            : $this->machineRepository->find($job->getId());
+
+        self::assertEquals($expectedMachineCreator($job), $machine);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function handleMachineIsReadyEventDataProvider(): array
+    {
+        $jobCreator = function (JobFactory $jobFactory) {
+            return $jobFactory->createRandom();
+        };
+
+        $machineId = (string) new Ulid();
+
+        $arbitraryMachine = MachineFactory::create(
+            $machineId,
+            md5((string) rand()),
+            md5((string) rand()),
+            [md5((string) rand())],
+            false,
+            true,
+            false,
+            false,
+            new WorkerManagerClientMetaState(false, false),
+        );
+
+        return [
+            'no job' => [
+                'jobCreator' => function () {
+                    return null;
+                },
+                'machineCreator' => function () {},
+                'eventCreator' => function () use ($arbitraryMachine) {
+                    $jobId = (string) new Ulid();
+
+                    return new MachineIsReadyEvent(
+                        md5((string) rand()),
+                        $jobId,
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'no machine' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function () {},
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsReadyEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
+                },
+                'expectedMachineCreator' => function () {
+                    return null;
+                },
+            ],
+            'has machine' => [
+                'jobCreator' => $jobCreator,
+                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                    $machine = new Machine($job->getId(), 'up/started', 'pre_active')
+                        ->setIp('127.0.0.1')
+                    ;
+                    $machine = $machine->setIsActive();
+                    $machineRepository->save($machine);
+
+                    return $machine;
+                },
+                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                    return new MachineIsReadyEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        '127.0.0.1',
+                        $arbitraryMachine,
+                    );
+                },
+                'expectedMachineCreator' => function (JobInterface $job) {
+                    return new Machine($job->getId(), 'up/started', 'pre_active')
+                        ->setIp('127.0.0.1')
+                        ->setIsActive()
+                        ->setIsReady()
                     ;
                 },
             ],

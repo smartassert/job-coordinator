@@ -8,6 +8,7 @@ use App\Entity\Machine;
 use App\Entity\MachineActionFailure;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
@@ -34,6 +35,9 @@ class MachineMutator implements EventSubscriberInterface
             ],
             MachineHasActionFailureEvent::class => [
                 ['setActionFailureOnMachineHasActionFailureEvent', 1000],
+            ],
+            MachineIsReadyEvent::class => [
+                ['handleMachineIsReadyEvent', 1000],
             ],
         ];
     }
@@ -76,6 +80,23 @@ class MachineMutator implements EventSubscriberInterface
 
         $machineEntity->setIp($event->ipAddress);
         $machineEntity->setIsActive();
+
+        $this->machineRepository->save($machineEntity);
+    }
+
+    public function handleMachineIsReadyEvent(MachineIsReadyEvent $event): void
+    {
+        $job = $this->jobStore->retrieve($event->getJobId());
+        if (null === $job) {
+            return;
+        }
+
+        $machineEntity = $this->machineRepository->find($job->getId());
+        if (!$machineEntity instanceof Machine) {
+            return;
+        }
+
+        $machineEntity->setIsReady();
 
         $this->machineRepository->save($machineEntity);
     }
