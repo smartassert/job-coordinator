@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
@@ -40,7 +40,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testIsEventSubscriber(): void
     {
-        self::assertArrayHasKey(MachineIsActiveEvent::class, $this->dispatcher::getSubscribedEvents());
+        self::assertArrayHasKey(MachineIsReadyEvent::class, $this->dispatcher::getSubscribedEvents());
         self::assertArrayHasKey(MessageNotHandleableEvent::class, $this->dispatcher::getSubscribedEvents());
     }
 
@@ -56,7 +56,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
 
-        $event = new MachineIsActiveEvent(
+        $event = new MachineIsReadyEvent(
             md5((string) rand()),
             $job->getId(),
             '127.0.0.1',
@@ -111,7 +111,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $jobStore,
         );
 
-        $event = new MachineIsActiveEvent(
+        $event = new MachineIsReadyEvent(
             md5((string) rand()),
             $jobId,
             '127.0.0.1',
@@ -162,7 +162,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             new WorkerManagerClientMetaState(true, false),
         );
 
-        $event = new MachineIsActiveEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
+        $event = new MachineIsReadyEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
