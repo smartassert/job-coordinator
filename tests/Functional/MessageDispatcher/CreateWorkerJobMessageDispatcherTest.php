@@ -13,8 +13,6 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -60,19 +58,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             md5((string) rand()),
             $job->getId(),
             '127.0.0.1',
-            MachineFactory::create(
-                $job->getId(),
-                'state',
-                'state-category',
-                [
-                    '127.0.0.1',
-                ],
-                false,
-                false,
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false),
-            )
         );
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -115,19 +100,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             md5((string) rand()),
             $jobId,
             '127.0.0.1',
-            MachineFactory::create(
-                $jobId,
-                'state',
-                'state-category',
-                [
-                    '127.0.0.1',
-                ],
-                false,
-                false,
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false),
-            )
         );
 
         $dispatcher->dispatchImmediately($event);
@@ -150,19 +122,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = md5((string) rand());
 
-        $machine = MachineFactory::create(
-            $job->getId(),
-            'find/not-findable',
-            'end',
-            [],
-            true,
-            false,
-            false,
-            true,
-            new WorkerManagerClientMetaState(true, false),
-        );
-
-        $event = new MachineIsReadyEvent($authenticationToken, $job->getId(), $machineIpAddress, $machine);
+        $event = new MachineIsReadyEvent($authenticationToken, $job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

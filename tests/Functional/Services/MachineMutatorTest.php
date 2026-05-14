@@ -582,34 +582,19 @@ class MachineMutatorTest extends WebTestCase
             return $jobFactory->createRandom();
         };
 
-        $machineId = (string) new Ulid();
-
-        $arbitraryMachine = MachineFactory::create(
-            $machineId,
-            md5((string) rand()),
-            md5((string) rand()),
-            [md5((string) rand())],
-            false,
-            true,
-            false,
-            false,
-            new WorkerManagerClientMetaState(false, false),
-        );
-
         return [
             'no job' => [
                 'jobCreator' => function () {
                     return null;
                 },
                 'machineCreator' => function () {},
-                'eventCreator' => function () use ($arbitraryMachine) {
+                'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
                     return new MachineIsReadyEvent(
                         md5((string) rand()),
                         $jobId,
                         '127.0.0.1',
-                        $arbitraryMachine,
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -619,12 +604,11 @@ class MachineMutatorTest extends WebTestCase
             'no machine' => [
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (JobInterface $job) {
                     return new MachineIsReadyEvent(
                         md5((string) rand()),
                         $job->getId(),
                         '127.0.0.1',
-                        $arbitraryMachine,
                     );
                 },
                 'expectedMachineCreator' => function () {
@@ -642,12 +626,11 @@ class MachineMutatorTest extends WebTestCase
 
                     return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (JobInterface $job) {
                     return new MachineIsReadyEvent(
                         md5((string) rand()),
                         $job->getId(),
                         '127.0.0.1',
-                        $arbitraryMachine,
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
