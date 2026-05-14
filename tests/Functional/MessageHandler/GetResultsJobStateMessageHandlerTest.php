@@ -11,7 +11,6 @@ use App\Event\ResultsJobStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\Model\MetaState;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
@@ -87,12 +86,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $machine = new Machine(
-            $job->getId(),
-            'up/active',
-            'up',
-            new MetaState(false, false),
-        );
+        $machine = new Machine($job->getId(), 'up/active', 'up');
         $machineRepository->save($machine);
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);

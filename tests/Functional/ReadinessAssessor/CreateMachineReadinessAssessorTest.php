@@ -69,14 +69,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $machineRepository = $services[MachineRepository::class];
                     \assert($machineRepository instanceof MachineRepository);
 
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],

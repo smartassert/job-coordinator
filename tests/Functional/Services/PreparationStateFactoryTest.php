@@ -134,12 +134,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             new MetaState(false, false),
                         )
                     );
-                    $machineRepository->save(new Machine(
-                        $job->getId(),
-                        md5((string) rand()),
-                        md5((string) rand()),
-                        new MetaState(false, false),
-                    ));
+                    $machineRepository->save(new Machine($job->getId(), md5((string) rand()), md5((string) rand())));
                     $workerComponentStateRepository->save(
                         new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('awaiting-job')

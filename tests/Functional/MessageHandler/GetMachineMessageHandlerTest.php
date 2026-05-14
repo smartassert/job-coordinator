@@ -96,15 +96,19 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
-            $job->getId(),
-            $previous->state,
-            $previous->stateCategory,
-            new MetaState(
-                $previous->metaState->ended,
-                $previous->metaState->succeeded,
+
+        $machineRepository->save(
+            new MachineEntity(
+                $job->getId(),
+                $previous->state,
+                $previous->stateCategory,
+            )->setMetaState(
+                new MetaState(
+                    $previous->metaState->ended,
+                    $previous->metaState->succeeded,
+                ),
             )
-        ));
+        );
 
         $readinessAssessor = self::getContainer()->get(GetMachineReadinessAssessor::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
@@ -186,15 +190,19 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
-            $job->getId(),
-            $previous->state,
-            $previous->stateCategory,
-            new MetaState(
-                $previous->metaState->ended,
-                $previous->metaState->succeeded,
-            ),
-        ));
+
+        $machineRepository->save(
+            new MachineEntity(
+                $job->getId(),
+                $previous->state,
+                $previous->stateCategory,
+            )->setMetaState(
+                new MetaState(
+                    $previous->metaState->ended,
+                    $previous->metaState->succeeded,
+                ),
+            )
+        );
 
         $readinessAssessor = self::getContainer()->get(GetMachineReadinessAssessor::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
@@ -346,15 +354,19 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
-            $job->getId(),
-            $previous->state,
-            $previous->stateCategory,
-            new MetaState(
-                $previous->metaState->ended,
-                $previous->metaState->succeeded,
-            ),
-        ));
+
+        $machineRepository->save(
+            new MachineEntity(
+                $job->getId(),
+                $previous->state,
+                $previous->stateCategory,
+            )->setMetaState(
+                new MetaState(
+                    $previous->metaState->ended,
+                    $previous->metaState->succeeded,
+                ),
+            )
+        );
 
         $readinessAssessor = self::getContainer()->get(GetMachineReadinessAssessor::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
