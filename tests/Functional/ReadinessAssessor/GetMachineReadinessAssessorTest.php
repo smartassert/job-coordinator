@@ -56,27 +56,17 @@ class GetMachineReadinessAssessorTest extends WebTestCase
             ],
             'machine has end state' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(true, false),
-                        )
-                    );
+                    $machine = new Machine($job->getId(), 'state', 'state-category')
+                        ->setMetaState(new MetaState(true, false))
+                    ;
+
+                    $machineRepository->save($machine);
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
             'ready' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
                 },
                 'expected' => MessageHandlingReadiness::NOW,
             ],

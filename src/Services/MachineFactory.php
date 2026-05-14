@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
-use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -43,15 +42,7 @@ class MachineFactory implements EventSubscriberInterface
             return;
         }
 
-        $entity = new Machine(
-            $job->getId(),
-            $machine->state,
-            $machine->stateCategory,
-            new MetaState(
-                $machine->metaState->ended,
-                $machine->metaState->succeeded,
-            )
-        );
+        $entity = new Machine($job->getId(), $machine->state, $machine->stateCategory);
         $this->machineRepository->save($entity);
     }
 }

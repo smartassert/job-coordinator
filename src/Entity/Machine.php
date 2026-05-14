@@ -42,13 +42,12 @@ class Machine
         string $jobId,
         string $state,
         string $stateCategory,
-        MetaState $metaState,
     ) {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
-        $this->stateIsEnded = $metaState->ended;
-        $this->stateIsSucceeded = $metaState->succeeded;
+        $this->stateIsEnded = false;
+        $this->stateIsSucceeded = false;
     }
 
     /**

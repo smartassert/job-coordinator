@@ -942,12 +942,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine(
-                            $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            new MetaState(false, false),
-                        );
+                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
                         $machine = $machine->setIp(md5((string) rand()));
 
                         $repository->save($machine);
@@ -1060,12 +1055,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine(
-                            $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            new MetaState(false, false),
-                        );
+                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
                         $machine = $machine->setIp(md5((string) rand()));
                         $machine->setActionFailure(new MachineActionFailure(
                             $jobId,
@@ -1215,12 +1205,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine(
-                            $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            new MetaState(false, false),
-                        );
+                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
                         $machine = $machine->setIp(md5((string) rand()));
 
                         $repository->save($machine);
@@ -1577,12 +1562,9 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine(
-                            $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            new MetaState(true, false),
-                        );
+                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
+
+                        $machine = $machine->setMetaState(new MetaState(true, false));
                         $machine = $machine->setIp(md5((string) rand()));
 
                         $repository->save($machine);
@@ -1723,12 +1705,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine(
-                            $jobId,
-                            'complete',
-                            'end',
-                            new MetaState(true, true),
-                        );
+                        $machine = new Machine($jobId, 'complete', 'end');
+                        $machine = $machine->setMetaState(new MetaState(true, true));
                         $machine = $machine->setIp(md5((string) rand()));
 
                         $repository->save($machine);
@@ -1877,12 +1855,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                 \assert('' !== $jobId);
 
-                $machine = new Machine(
-                    $jobId,
-                    md5((string) rand()),
-                    md5((string) rand()),
-                    new MetaState(false, false),
-                );
+                $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
                 $machine = $machine->setIp(md5((string) rand()));
 
                 $repository->save($machine);
@@ -2157,12 +2130,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                 \assert('' !== $jobId);
 
-                $machine = new Machine(
-                    $jobId,
-                    'complete',
-                    'end',
-                    new MetaState(true, true),
-                );
+                $machine = new Machine($jobId, 'complete', 'end');
+                $machine = $machine->setMetaState(new MetaState(true, true));
                 $machine = $machine->setIp(md5((string) rand()));
 
                 $repository->save($machine);

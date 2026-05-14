@@ -72,14 +72,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                     ResultsJobFactory $resultsJobFactory,
                     RemoteRequestRepository $remoteRequestRepository
                 ): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
 
                     $workerJobCreationRequest = new RemoteRequest(
                         $job->getId(),
@@ -92,14 +85,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
             ],
             'results job does not exist' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
                 },
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
@@ -109,14 +95,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                     MachineRepository $machineRepository,
                     ResultsJobFactory $resultsJobFactory
                 ): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
 
                     $resultsJobFactory->create($job);
                 },
@@ -128,14 +107,7 @@ class TerminateMachineReadinessAssessorTest extends WebTestCase
                     MachineRepository $machineRepository,
                     ResultsJobFactory $resultsJobFactory
                 ): void {
-                    $machineRepository->save(
-                        new Machine(
-                            $job->getId(),
-                            'state',
-                            'state-category',
-                            new MetaState(false, false),
-                        )
-                    );
+                    $machineRepository->save(new Machine($job->getId(), 'state', 'state-category'));
 
                     $resultsJobFactory->create(
                         job: $job,

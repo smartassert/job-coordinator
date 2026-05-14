@@ -160,12 +160,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $createdMachine = $machineRepository->find($job->getId());
         self::assertEquals(
-            new Machine(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                new MetaState(false, false),
-            ),
+            new Machine($job->getId(), 'create/requested', 'pre_active'),
             $createdMachine
         );
 

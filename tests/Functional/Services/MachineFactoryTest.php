@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
-use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -135,12 +134,7 @@ class MachineFactoryTest extends WebTestCase
                 'expectedMachineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return new Machine(
-                        $jobId,
-                        'find/finding',
-                        'find',
-                        new MetaState(false, false),
-                    );
+                    return new Machine($jobId, 'find/finding', 'find');
                 },
             ],
             'with failed state' => [
@@ -162,12 +156,7 @@ class MachineFactoryTest extends WebTestCase
                 'expectedMachineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return new Machine(
-                        $jobId,
-                        'find/not-findable',
-                        'end',
-                        new MetaState(true, false),
-                    );
+                    return new Machine($jobId, 'find/not-findable', 'end');
                 },
             ],
         ];

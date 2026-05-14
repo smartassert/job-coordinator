@@ -184,14 +184,20 @@ class GetMachineMessageDispatcherTest extends WebTestCase
     {
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save(new MachineEntity(
+
+        $entity = new MachineEntity(
             $machine->id,
             $machine->state,
             $machine->stateCategory,
+        );
+
+        $entity->setMetaState(
             new MetaState(
                 $machine->metaState->ended,
                 $machine->metaState->succeeded,
-            ),
-        ));
+            )
+        );
+
+        $machineRepository->save($entity);
     }
 }

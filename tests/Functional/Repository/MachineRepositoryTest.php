@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Repository;
 
 use App\Entity\Machine;
-use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Uid\Ulid;
@@ -32,12 +31,7 @@ class MachineRepositoryTest extends WebTestCase
     {
         $jobId = (string) new Ulid();
 
-        $machine = new Machine(
-            $jobId,
-            'up/active',
-            'active',
-            new MetaState(false, false),
-        );
+        $machine = new Machine($jobId, 'up/active', 'active');
         $this->machineRepository->save($machine);
 
         self::assertTrue($this->machineRepository->has($jobId));
