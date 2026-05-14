@@ -146,6 +146,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -262,6 +263,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -441,6 +443,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -555,6 +558,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -669,6 +673,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -781,6 +786,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'pending',
                                     'request_state' => 'pending',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -897,6 +903,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'preparing',
                                     'request_state' => 'requesting',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1010,6 +1017,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'succeeded',
                                     'request_state' => 'succeeded',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1132,6 +1140,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'succeeded',
                                     'request_state' => 'succeeded',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1207,6 +1216,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
                         $machine = $machine->setIp(md5((string) rand()));
+                        $machine->setIsActive();
 
                         $repository->save($machine);
 
@@ -1299,6 +1309,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'succeeded',
                                     'request_state' => 'succeeded',
                                 ],
+                                'is_active' => true,
                             ],
                             'worker-job' => [
                                 'state' => 'running',
@@ -1498,6 +1509,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                         'message' => 'internal server error',
                                     ],
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'failed',
@@ -1632,6 +1644,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'succeeded',
                                     'request_state' => 'succeeded',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'pending',
@@ -1803,6 +1816,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                     'state' => 'succeeded',
                                     'request_state' => 'succeeded',
                                 ],
+                                'is_active' => false,
                             ],
                             'worker-job' => [
                                 'state' => 'complete',
@@ -1926,6 +1940,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => 'succeeded',
                                 'request_state' => 'succeeded',
                             ],
+                            'is_active' => false,
                         ],
                         'worker-job' => [
                             'state' => 'running',
@@ -2202,6 +2217,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'state' => 'succeeded',
                                 'request_state' => 'succeeded',
                             ],
+                            'is_active' => false,
                         ],
                         'worker-job' => [
                             'state' => 'failed',

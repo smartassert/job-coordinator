@@ -78,7 +78,7 @@ class MachineMutatorTest extends WebTestCase
             ],
             MachineIsActiveEvent::class => [
                 'expectedListenedForEvent' => MachineIsActiveEvent::class,
-                'expectedMethod' => 'setIpOnMachineIsActiveEvent',
+                'expectedMethod' => 'handleMachineIsActiveEvent',
             ],
             MachineHasActionFailureEvent::class => [
                 'expectedListenedForEvent' => MachineHasActionFailureEvent::class,
@@ -222,8 +222,8 @@ class MachineMutatorTest extends WebTestCase
      * @param callable(?JobInterface): MachineIsActiveEvent    $eventCreator
      * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
      */
-    #[DataProvider('setIpOnMachineIsActiveEventDataProvider')]
-    public function testSetIpOnMachineIsActiveEvent(
+    #[DataProvider('handleMachineIsActiveEventDataProvider')]
+    public function testHandleMachineIsActiveEvent(
         callable $jobCreator,
         callable $machineCreator,
         callable $eventCreator,
@@ -234,7 +234,7 @@ class MachineMutatorTest extends WebTestCase
 
         $event = $eventCreator($job);
 
-        $this->machineMutator->setIpOnMachineIsActiveEvent($event);
+        $this->machineMutator->handleMachineIsActiveEvent($event);
 
         $machine = null === $job
             ? null
@@ -246,7 +246,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public static function setIpOnMachineIsActiveEventDataProvider(): array
+    public static function handleMachineIsActiveEventDataProvider(): array
     {
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();
@@ -322,6 +322,7 @@ class MachineMutatorTest extends WebTestCase
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
+                        ->setIsActive()
                     ;
                 },
             ],
@@ -344,6 +345,7 @@ class MachineMutatorTest extends WebTestCase
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
+                        ->setIsActive()
                     ;
                 },
             ],
@@ -368,6 +370,7 @@ class MachineMutatorTest extends WebTestCase
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.2')
+                        ->setIsActive()
                     ;
                 },
             ],

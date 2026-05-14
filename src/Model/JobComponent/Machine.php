@@ -18,7 +18,8 @@ use App\Model\SerializeToArrayInterface;
  *   action_failure: ?MachineActionFailure,
  *   meta_state: MetaState,
  *   requests: RemoteRequestCollection,
- *   preparation: Preparation
+ *   preparation: Preparation,
+ *   is_active: bool,
  * }
  */
 readonly class Machine implements SerializeToArrayInterface, JobComponentInterface
@@ -64,6 +65,7 @@ readonly class Machine implements SerializeToArrayInterface, JobComponentInterfa
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests,
             'preparation' => $this->preparation,
+            'is_active' => $this->entity?->getIsActive() ?? false,
         ];
     }
 }
