@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Entity\SerializedSuite;
 use App\Entity\WorkerJobCreationFailure;
 use App\Enum\MessageHandlingReadiness;
@@ -18,6 +19,7 @@ use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
@@ -99,6 +101,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $this->createJob();
         $jobId = $job->getId();
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIsActive();
+        $machineRepository->save($machine);
+
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
@@ -167,6 +175,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $job = $this->createJob();
         $jobId = $job->getId();
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIsActive();
+        $machineRepository->save($machine);
 
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
@@ -255,6 +269,12 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $job = $this->createJob();
         $jobId = $job->getId();
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIsActive();
+        $machineRepository->save($machine);
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
         $this->createResultsJob($job);

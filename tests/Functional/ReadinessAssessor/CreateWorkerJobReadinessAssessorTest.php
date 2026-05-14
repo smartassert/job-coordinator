@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\ReadinessAssessor;
 
+use App\Entity\Machine;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
+use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -29,7 +31,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface, SerializedSuiteRepository, ResultsJobFactory): void $setup
+     * @param callable(JobInterface, SerializedSuiteRepository, ResultsJobFactory, MachineRepository): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
     public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
@@ -44,7 +46,10 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
 
-        $setup($job, $serializedSuiteRepository, $resultsJobFactory);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $setup($job, $serializedSuiteRepository, $resultsJobFactory, $machineRepository);
 
         self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
@@ -110,7 +115,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
-            'ready' => [
+            'machine does not exist' => [
                 'setup' => function (
                     JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository,
@@ -128,6 +133,57 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository->save($serializedSuite);
 
                     $resultsJobFactory->create($job);
+                },
+                'expected' => MessageHandlingReadiness::EVENTUALLY,
+            ],
+            'machine is not active' => [
+                'setup' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository,
+                    ResultsJobFactory $resultsJobFactory,
+                    MachineRepository $machineRepository,
+                ): void {
+                    $serializedSuiteId = (string) new Ulid();
+
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'prepared',
+                        new MetaState(true, true),
+                    );
+
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    $resultsJobFactory->create($job);
+
+                    $machine = new Machine($job->getId(), 'find/finding', 'pre_active');
+                    $machineRepository->save($machine);
+                },
+                'expected' => MessageHandlingReadiness::EVENTUALLY,
+            ],
+            'is ready' => [
+                'setup' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository,
+                    ResultsJobFactory $resultsJobFactory,
+                    MachineRepository $machineRepository,
+                ): void {
+                    $serializedSuiteId = (string) new Ulid();
+
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'prepared',
+                        new MetaState(true, true),
+                    );
+
+                    $serializedSuiteRepository->save($serializedSuite);
+
+                    $resultsJobFactory->create($job);
+
+                    $machine = new Machine($job->getId(), 'up/acive', 'active');
+                    $machine->setIsActive();
+                    $machineRepository->save($machine);
                 },
                 'expected' => MessageHandlingReadiness::NOW,
             ],
