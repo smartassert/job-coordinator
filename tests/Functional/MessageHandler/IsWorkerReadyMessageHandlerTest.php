@@ -10,7 +10,7 @@ use App\Event\MachineIsReadyEvent;
 use App\Message\GetResultsJobStateMessage;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
-use App\MessageHandler\GetWorkerStateMessageHandler;
+use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
@@ -23,7 +23,7 @@ use SmartAssert\ServiceClient\Exception\CurlException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
-class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
@@ -222,7 +222,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
     private function createHandler(
         WorkerClientFactory $workerClientFactory,
         ReadinessAssessorInterface $readinessAssessor,
-    ): GetWorkerStateMessageHandler {
+    ): IsWorkerReadyMessageHandler {
         $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
         \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
 
@@ -235,7 +235,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
-        return new GetWorkerStateMessageHandler(
+        return new IsWorkerReadyMessageHandler(
             $readinessAssessor,
             $workerClientFactory,
             $eventDispatcher,
