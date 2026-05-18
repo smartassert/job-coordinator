@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
 use App\Message\IsWorkerReadyMessage;
-use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
+use App\MessageDispatcher\IsWorkerReadyMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -18,17 +18,17 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Uid\Ulid;
 
-class GetWorkerStateMessageDispatcherTest extends WebTestCase
+class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 {
-    private GetWorkerStateMessageDispatcher $dispatcher;
+    private IsWorkerReadyMessageDispatcher $dispatcher;
     private InMemoryTransport $messengerTransport;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::getContainer()->get(GetWorkerStateMessageDispatcher::class);
-        \assert($dispatcher instanceof GetWorkerStateMessageDispatcher);
+        $dispatcher = self::getContainer()->get(IsWorkerReadyMessageDispatcher::class);
+        \assert($dispatcher instanceof IsWorkerReadyMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $messengerTransport = self::getContainer()->get('messenger.transport.async');
@@ -92,7 +92,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
-        $dispatcher = new GetWorkerStateMessageDispatcher($messageDispatcher, $assessor);
+        $dispatcher = new IsWorkerReadyMessageDispatcher($messageDispatcher, $assessor);
         $dispatcher->dispatchImmediately($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());

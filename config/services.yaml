@@ -211,6 +211,6 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessAssessor'
 
-    App\MessageDispatcher\GetWorkerStateMessageDispatcher:
+    App\MessageDispatcher\IsWorkerReadyMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'

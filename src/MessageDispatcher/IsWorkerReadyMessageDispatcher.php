@@ -10,7 +10,7 @@ use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetWorkerStateMessageDispatcher implements EventSubscriberInterface
+readonly class IsWorkerReadyMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
