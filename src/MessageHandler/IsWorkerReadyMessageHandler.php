@@ -23,7 +23,7 @@ final readonly class IsWorkerReadyMessageHandler extends AbstractMessageHandler
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,
-        LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
         parent::__construct($eventDispatcher, $messageBus, $logger);
     }
@@ -43,6 +43,12 @@ final readonly class IsWorkerReadyMessageHandler extends AbstractMessageHandler
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
         $isReady = $workerClient->isReady();
+        $this->logger->info(sprintf(
+            '%s isReady for "%s": %s',
+            $message::class,
+            $message->getJobId(),
+            $isReady ? 'is ready' : 'is not ready'
+        ));
 
         if (!$isReady) {
             $this->handleNonHandleableMessage($message, MessageHandlingReadiness::EVENTUALLY);
