@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\RemoteRequestType;
 
-class GetWorkerStateMessage extends AbstractAuthenticatedRemoteRequestMessage
+class IsWorkerReadyMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $jobId

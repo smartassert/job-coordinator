@@ -6,7 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
-use App\Message\GetWorkerStateMessage;
+use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,7 +31,7 @@ readonly class GetWorkerStateMessageDispatcher implements EventSubscriberInterfa
 
     public function dispatchImmediately(MachineIsActiveEvent $event): void
     {
-        $message = new GetWorkerStateMessage(
+        $message = new IsWorkerReadyMessage(
             $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->ipAddress

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
-use App\Message\GetWorkerStateMessage;
+use App\Message\IsWorkerReadyMessage;
 use App\MessageDispatcher\GetWorkerStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
@@ -121,7 +121,7 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $expectedMessage = new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress);
+        $expectedMessage = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

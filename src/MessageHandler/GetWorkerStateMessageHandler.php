@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsReadyEvent;
-use App\Message\GetWorkerStateMessage;
+use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -31,7 +31,7 @@ final readonly class GetWorkerStateMessageHandler extends AbstractMessageHandler
     /**
      * @throws ExceptionInterface
      */
-    public function __invoke(GetWorkerStateMessage $message): void
+    public function __invoke(IsWorkerReadyMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);

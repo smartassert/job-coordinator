@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\MachineIsReadyEvent;
 use App\Message\GetResultsJobStateMessage;
-use App\Message\GetWorkerStateMessage;
+use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerStateMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -30,7 +30,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $authenticationToken = (string) new Ulid();
 
-        $message = new GetWorkerStateMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -53,7 +53,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = (string) new Ulid();
         $authenticationToken = (string) new Ulid();
 
-        $message = new GetWorkerStateMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -77,7 +77,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationToken = (string) new Ulid();
         $machineIpAddress = '127.0.0.1';
 
-        $message = new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -108,7 +108,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationToken = (string) new Ulid();
         $machineIpAddress = '127.0.0.1';
 
-        $message = new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -144,7 +144,7 @@ class GetWorkerStateMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationToken = (string) new Ulid();
         $machineIpAddress = '127.0.0.1';
 
-        $message = new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
