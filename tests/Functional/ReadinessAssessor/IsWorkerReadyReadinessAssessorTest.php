@@ -8,20 +8,20 @@ use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Model\JobInterface;
 use App\Model\MetaState;
-use App\ReadinessAssessor\GetWorkerStateReadinessAssessor;
+use App\ReadinessAssessor\IsWorkerReadyReadinessAssessor;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class GetWorkerStateReadinessAssessorTest extends WebTestCase
+class IsWorkerReadyReadinessAssessorTest extends WebTestCase
 {
-    private GetWorkerStateReadinessAssessor $assessor;
+    private IsWorkerReadyReadinessAssessor $assessor;
 
     protected function setUp(): void
     {
-        $assessor = self::getContainer()->get(GetWorkerStateReadinessAssessor::class);
-        \assert($assessor instanceof GetWorkerStateReadinessAssessor);
+        $assessor = self::getContainer()->get(IsWorkerReadyReadinessAssessor::class);
+        \assert($assessor instanceof IsWorkerReadyReadinessAssessor);
 
         $this->assessor = $assessor;
     }

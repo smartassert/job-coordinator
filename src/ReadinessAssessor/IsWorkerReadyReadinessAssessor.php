@@ -7,7 +7,7 @@ namespace App\ReadinessAssessor;
 use App\Enum\MessageHandlingReadiness;
 use App\Repository\MachineRepository;
 
-readonly class GetWorkerStateReadinessAssessor implements ReadinessAssessorInterface
+readonly class IsWorkerReadyReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
         private MachineRepository $machineRepository,

@@ -173,7 +173,7 @@ services:
 
     App\MessageHandler\GetWorkerStateMessageHandler:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerStateReadinessAssessor'
+            $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'
 
     App\MessageDispatcher\CreateMachineMessageDispatcher:
         arguments:
@@ -213,4 +213,4 @@ services:
 
     App\MessageDispatcher\GetWorkerStateMessageDispatcher:
         arguments:
-            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerStateReadinessAssessor'
+            $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'
