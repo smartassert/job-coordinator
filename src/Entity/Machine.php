@@ -36,6 +36,9 @@ class Machine
     #[ORM\Column]
     private bool $isActive;
 
+    #[ORM\Column]
+    private bool $isReady;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
@@ -52,6 +55,7 @@ class Machine
         $this->stateIsEnded = false;
         $this->stateIsSucceeded = false;
         $this->isActive = false;
+        $this->isReady = false;
     }
 
     /**
@@ -135,5 +139,17 @@ class Machine
     public function getIsActive(): bool
     {
         return $this->isActive;
+    }
+
+    public function setIsReady(): self
+    {
+        $this->isReady = true;
+
+        return $this;
+    }
+
+    public function getIsReady(): bool
+    {
+        return $this->isReady;
     }
 }

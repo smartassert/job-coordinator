@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
@@ -83,6 +84,10 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
             ],
             WorkerStateRetrievedEvent::class => [
                 'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
+                'expectedMethod' => 'removeWorkerJobGetRequests',
+            ],
+            MachineIsReadyEvent::class => [
+                'expectedListenedForEvent' => MachineIsReadyEvent::class,
                 'expectedMethod' => 'removeWorkerStateGetRequests',
             ],
         ];

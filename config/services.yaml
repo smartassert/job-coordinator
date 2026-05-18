@@ -171,6 +171,10 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessAssessor'
 
+    App\MessageHandler\IsWorkerReadyMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'
+
     App\MessageDispatcher\CreateMachineMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessAssessor'
@@ -206,3 +210,7 @@ services:
     App\MessageDispatcher\TerminateMachineMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessAssessor'
+
+    App\MessageDispatcher\IsWorkerReadyMessageDispatcher:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'

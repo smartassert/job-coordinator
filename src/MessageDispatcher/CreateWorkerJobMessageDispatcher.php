@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -26,7 +26,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
     public static function getSubscribedEvents(): array
     {
         return [
-            MachineIsActiveEvent::class => [
+            MachineIsReadyEvent::class => [
                 ['dispatchImmediately', 100],
             ],
             MessageNotHandleableEvent::class => [
@@ -35,7 +35,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
         ];
     }
 
-    public function dispatchImmediately(MachineIsActiveEvent $event): void
+    public function dispatchImmediately(MachineIsReadyEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {

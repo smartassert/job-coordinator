@@ -1,0 +1,246 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Functional\MessageHandler;
+
+use App\Enum\MessageHandlingReadiness;
+use App\Enum\MessageState;
+use App\Event\MachineIsReadyEvent;
+use App\Message\GetResultsJobStateMessage;
+use App\Message\IsWorkerReadyMessage;
+use App\MessageHandler\GetResultsJobStateMessageHandler;
+use App\MessageHandler\IsWorkerReadyMessageHandler;
+use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\WorkerComponentStateRepository;
+use App\Services\WorkerClientFactory;
+use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use SmartAssert\ServiceClient\Exception\CurlException;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Uid\Ulid;
+
+class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
+{
+    public function testInvokeNotHandleable(): void
+    {
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class), $assessor);
+
+        self::assertSame(MessageState::HANDLING, $message->getState());
+
+        $handler($message);
+
+        self::assertSame(MessageState::STOPPED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
+    }
+
+    public function testInvokeNotYetHandleable(): void
+    {
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::EVENTUALLY)
+        ;
+
+        $handler = $this->createHandler(\Mockery::mock(WorkerClientFactory::class), $assessor);
+
+        self::assertSame(MessageState::HANDLING, $message->getState());
+
+        $handler($message);
+
+        self::assertSame(MessageState::HALTED, $message->getState());
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
+    }
+
+    public function testInvokeWorkerClientThrowsException(): void
+    {
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
+        $machineIpAddress = '127.0.0.1';
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $workerClientException = new \Exception('Failed to get worker state');
+        $workerClient = HttpMockedWorkerClientFactory::create([$workerClientException]);
+
+        $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
+        $workerClientFactory
+            ->shouldReceive('create')
+            ->with($machineIpAddress)
+            ->andReturn($workerClient)
+        ;
+
+        $handler = $this->createHandler($workerClientFactory, $assessor);
+
+        $handler($message);
+
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
+    }
+
+    public function testInvokeSuccessIsNotReady(): void
+    {
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
+        $machineIpAddress = '127.0.0.1';
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $workerClient = HttpMockedWorkerClientFactory::create([
+            new CurlException(
+                new Request('GET', 'https://example.com/'),
+                7,
+                'Failed to connect() to host or proxy.'
+            ),
+        ]);
+
+        $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
+        $workerClientFactory
+            ->shouldReceive('create')
+            ->with($machineIpAddress)
+            ->andReturn($workerClient)
+        ;
+
+        $handler = $this->createHandler($workerClientFactory, $assessor);
+
+        $handler($message);
+
+        $this->assertMessageNotHandleableMessageIsDispatched($message);
+    }
+
+    public function testInvokeSuccessIsReady(): void
+    {
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
+        $machineIpAddress = '127.0.0.1';
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($jobId)
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $workerClient = HttpMockedWorkerClientFactory::create([
+            new Response(
+                200,
+                ['content-type' => 'application/json'],
+                (string) json_encode([
+                    'application' => [
+                        'state' => 'awaiting-job',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                    'compilation' => [
+                        'state' => 'awaiting',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                    'execution' => [
+                        'state' => 'awaiting',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                    'event_delivery' => [
+                        'state' => 'awaiting',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                        ],
+                    ],
+                ])
+            ),
+        ]);
+
+        $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
+        $workerClientFactory
+            ->shouldReceive('create')
+            ->with($machineIpAddress)
+            ->andReturn($workerClient)
+        ;
+
+        $handler = $this->createHandler($workerClientFactory, $assessor);
+
+        $handler($message);
+
+        $events = $this->eventRecorder->all(MachineIsReadyEvent::class);
+        $event = $events[0] ?? null;
+
+        self::assertEquals(
+            new MachineIsReadyEvent($authenticationToken, $jobId, $machineIpAddress),
+            $event
+        );
+    }
+
+    protected function getHandlerClass(): string
+    {
+        return GetResultsJobStateMessageHandler::class;
+    }
+
+    protected function getHandledMessageClass(): string
+    {
+        return GetResultsJobStateMessage::class;
+    }
+
+    private function createHandler(
+        WorkerClientFactory $workerClientFactory,
+        ReadinessAssessorInterface $readinessAssessor,
+    ): IsWorkerReadyMessageHandler {
+        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
+        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
+
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+
+        $messageBus = self::getContainer()->get(MessageBusInterface::class);
+        \assert($messageBus instanceof MessageBusInterface);
+
+        $logger = self::getContainer()->get(LoggerInterface::class);
+        \assert($logger instanceof LoggerInterface);
+
+        return new IsWorkerReadyMessageHandler(
+            $readinessAssessor,
+            $workerClientFactory,
+            $eventDispatcher,
+            $messageBus,
+            $logger,
+        );
+    }
+}
