@@ -16,6 +16,7 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Uid\Ulid;
 
 class GetWorkerStateMessageDispatcherTest extends WebTestCase
 {
@@ -99,7 +100,8 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelySuccess(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = (string) new Ulid();
+        $authenticationToken = (string) new Ulid();
 
         $machineIpAddress = '127.0.0.1';
         $machine = new Machine(
@@ -115,11 +117,11 @@ class GetWorkerStateMessageDispatcherTest extends WebTestCase
             new MetaState(false, false),
         );
 
-        $event = new MachineIsActiveEvent('authentication-token', $jobId, $machineIpAddress, $machine);
+        $event = new MachineIsActiveEvent($authenticationToken, $jobId, $machineIpAddress, $machine);
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $expectedMessage = new GetWorkerStateMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerStateMessage($authenticationToken, $jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

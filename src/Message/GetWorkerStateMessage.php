@@ -6,17 +6,18 @@ namespace App\Message;
 
 use App\Model\RemoteRequestType;
 
-class GetWorkerStateMessage extends AbstractRemoteRequestMessage
+class GetWorkerStateMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $machineIpAddress
      */
     public function __construct(
+        string $authenticationToken,
         string $jobId,
         public readonly string $machineIpAddress
     ) {
-        parent::__construct($jobId);
+        parent::__construct($authenticationToken, $jobId);
     }
 
     public function getRemoteRequestType(): RemoteRequestType
