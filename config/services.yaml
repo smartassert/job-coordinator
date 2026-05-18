@@ -171,6 +171,10 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\TerminateMachineReadinessAssessor'
 
+    App\MessageHandler\GetWorkerStateMessageHandler:
+        arguments:
+            $readinessAssessor: '@App\ReadinessAssessor\GetWorkerStateReadinessAssessor'
+
     App\MessageDispatcher\CreateMachineMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessAssessor'

@@ -11,6 +11,7 @@ use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MachineIsReadyEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Event\MachineTerminationRequestedEvent;
@@ -86,6 +87,9 @@ class EventRecorder implements EventSubscriberInterface, \Countable
                 ['addEvent', 1000],
             ],
             CreateWorkerJobFailedEvent::class => [
+                ['addEvent', 1000],
+            ],
+            MachineIsReadyEvent::class => [
                 ['addEvent', 1000],
             ],
         ];
