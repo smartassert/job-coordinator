@@ -54,15 +54,16 @@ class IsWorkerReadyReadinessAssessorTest extends WebTestCase
                 'setup' => function (): void {},
                 'expected' => MessageHandlingReadiness::EVENTUALLY,
             ],
-            'machine is not ready' => [
+            'machine is already ready' => [
                 'setup' => function (
                     JobInterface $job,
                     MachineRepository $machineRepository
                 ): void {
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active');
+                    $machine = $machine->setIsReady();
                     $machineRepository->save($machine);
                 },
-                'expected' => MessageHandlingReadiness::EVENTUALLY,
+                'expected' => MessageHandlingReadiness::NEVER,
             ],
             'machine has ended' => [
                 'setup' => function (
@@ -75,13 +76,12 @@ class IsWorkerReadyReadinessAssessorTest extends WebTestCase
                 },
                 'expected' => MessageHandlingReadiness::NEVER,
             ],
-            'machine is ready' => [
+            'machine is not already ready' => [
                 'setup' => function (
                     JobInterface $job,
                     MachineRepository $machineRepository
                 ): void {
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active');
-                    $machine = $machine->setIsReady();
                     $machineRepository->save($machine);
                 },
                 'expected' => MessageHandlingReadiness::NOW,

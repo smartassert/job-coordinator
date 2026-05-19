@@ -24,8 +24,8 @@ readonly class IsWorkerReadyReadinessAssessor implements ReadinessAssessorInterf
             return MessageHandlingReadiness::NEVER;
         }
 
-        if (false === $machine->getIsReady()) {
-            return MessageHandlingReadiness::EVENTUALLY;
+        if (true === $machine->getIsReady()) {
+            return MessageHandlingReadiness::NEVER;
         }
 
         return MessageHandlingReadiness::NOW;
