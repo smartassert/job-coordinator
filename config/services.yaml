@@ -87,13 +87,21 @@ services:
 
     SmartAssert\SourcesClient\SerializedSuiteClient: ~
 
-    SmartAssert\WorkerClient\ResourceReferenceFactory: ~
+    SmartAssert\WorkerClient\Factory\ResourceReferenceFactory: ~
 
-    SmartAssert\WorkerClient\EventFactory: ~
+    SmartAssert\WorkerClient\Factory\EventFactory: ~
 
-    SmartAssert\WorkerClient\TestFactory: ~
+    SmartAssert\WorkerClient\Factory\TestFactory: ~
 
-    SmartAssert\WorkerClient\JobFactory: ~
+    SmartAssert\WorkerClient\Factory\JobFactory: ~
+
+    SmartAssert\WorkerClient\Factory\ApplicationStateFactory: ~
+
+    SmartAssert\WorkerClient\Factory\JobCreationExceptionFactory: ~
+
+    SmartAssert\WorkerClient\Factory\ComponentMetaStateFactory: ~
+
+    SmartAssert\WorkerClient\Factory\ComponentStateFactory: ~
 
     App\Messenger\DelayMiddleware:
         arguments:
