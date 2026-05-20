@@ -160,6 +160,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'application' => [
                         'state' => 'awaiting-job',
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => false,
                             'succeeded' => false,
                         ],
@@ -167,6 +168,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'compilation' => [
                         'state' => 'awaiting',
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => false,
                             'succeeded' => false,
                         ],
@@ -174,6 +176,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'execution' => [
                         'state' => 'awaiting',
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => false,
                             'succeeded' => false,
                         ],
@@ -181,6 +184,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'event_delivery' => [
                         'state' => 'awaiting',
                         'meta_state' => [
+                            'pending' => false,
                             'ended' => false,
                             'succeeded' => false,
                         ],
