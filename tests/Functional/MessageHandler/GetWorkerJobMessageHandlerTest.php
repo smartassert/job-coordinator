@@ -94,10 +94,22 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         ;
 
         $retrievedWorkerState = new ApplicationState(
-            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
-            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
-            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
-            new ComponentState(md5((string) rand()), new MetaState((bool) rand(0, 1), (bool) rand(0, 1))),
+            new ComponentState(
+                md5((string) rand()),
+                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+            ),
+            new ComponentState(
+                md5((string) rand()),
+                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+            ),
+            new ComponentState(
+                md5((string) rand()),
+                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+            ),
+            new ComponentState(
+                md5((string) rand()),
+                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+            ),
         );
 
         $workerClient = HttpMockedWorkerClientFactory::create([
@@ -106,6 +118,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'state' => $retrievedWorkerState->applicationState->state,
                     'is_end_state' => $retrievedWorkerState->applicationState->metaState->ended,
                     'meta_state' => [
+                        'pending' => $retrievedWorkerState->applicationState->metaState->pending,
                         'ended' => $retrievedWorkerState->applicationState->metaState->ended,
                         'succeeded' => $retrievedWorkerState->applicationState->metaState->succeeded,
                     ],
@@ -114,6 +127,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'state' => $retrievedWorkerState->compilationState->state,
                     'is_end_state' => $retrievedWorkerState->compilationState->metaState->ended,
                     'meta_state' => [
+                        'pending' => $retrievedWorkerState->compilationState->metaState->pending,
                         'ended' => $retrievedWorkerState->compilationState->metaState->ended,
                         'succeeded' => $retrievedWorkerState->compilationState->metaState->succeeded,
                     ],
@@ -122,6 +136,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'state' => $retrievedWorkerState->executionState->state,
                     'is_end_state' => $retrievedWorkerState->executionState->metaState->ended,
                     'meta_state' => [
+                        'pending' => $retrievedWorkerState->executionState->metaState->pending,
                         'ended' => $retrievedWorkerState->executionState->metaState->ended,
                         'succeeded' => $retrievedWorkerState->executionState->metaState->succeeded,
                     ],
@@ -130,6 +145,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                     'state' => $retrievedWorkerState->eventDeliveryState->state,
                     'is_end_state' => $retrievedWorkerState->eventDeliveryState->metaState->ended,
                     'meta_state' => [
+                        'pending' => $retrievedWorkerState->eventDeliveryState->metaState->pending,
                         'ended' => $retrievedWorkerState->eventDeliveryState->metaState->ended,
                         'succeeded' => $retrievedWorkerState->eventDeliveryState->metaState->succeeded,
                     ],

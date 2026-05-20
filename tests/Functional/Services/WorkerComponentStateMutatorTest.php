@@ -85,10 +85,10 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $jobId = (string) new Ulid();
 
         $irrelevantApplicationState = new WorkerClientApplicationState(
-            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
-            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
-            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
-            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
+            new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
         );
 
         $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
@@ -165,16 +165,16 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     {
         $applicationStates = [
             new WorkerClientApplicationState(
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
             ),
             new WorkerClientApplicationState(
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
             ),
         ];
 
