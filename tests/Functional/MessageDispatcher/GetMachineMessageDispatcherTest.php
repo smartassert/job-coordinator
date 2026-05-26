@@ -83,7 +83,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             false,
-            new WorkerManagerClientMetaState(false, false),
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $this->persistMachine($machine);
@@ -120,7 +120,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             true,
-            new WorkerManagerClientMetaState(true, false),
+            new WorkerManagerClientMetaState(true, false, true),
         );
 
         $this->persistMachine($machine);
@@ -150,7 +150,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             false,
             false,
             false,
-            new WorkerManagerClientMetaState(false, false),
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $this->persistMachine($machine);

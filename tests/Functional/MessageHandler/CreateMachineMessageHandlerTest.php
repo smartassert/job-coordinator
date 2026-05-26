@@ -143,7 +143,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             false,
             false,
-            new WorkerManagerClientMetaState(false, false),
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([

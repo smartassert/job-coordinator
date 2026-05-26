@@ -77,7 +77,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             true,
             false,
             false,
-            new MetaState(false, false),
+            new MetaState(false, false, false),
         );
 
         $event = new MachineIsActiveEvent('authentication-token', $jobId, $machineIpAddress, $machine);
@@ -114,7 +114,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             true,
             false,
             false,
-            new MetaState(false, false),
+            new MetaState(false, false, false),
         );
 
         $event = new MachineIsActiveEvent($authenticationToken, $jobId, $machineIpAddress, $machine);

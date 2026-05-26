@@ -60,7 +60,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                     true,
                     false,
                     false,
-                    new WorkerManagerClientMetaState(false, false)
+                    new WorkerManagerClientMetaState(false, false, true)
                 )
             )
         );
@@ -261,7 +261,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                     true,
                     false,
                     false,
-                    new WorkerManagerClientMetaState(false, false),
+                    new WorkerManagerClientMetaState(false, false, true),
                 )
             )
         );
