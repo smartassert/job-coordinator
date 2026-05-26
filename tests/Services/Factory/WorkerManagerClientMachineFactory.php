@@ -41,6 +41,7 @@ class WorkerManagerClientMachineFactory
             new MetaState(
                 $metaState->ended,
                 $metaState->succeeded,
+                $metaState->pending,
             )
         );
     }
@@ -53,7 +54,9 @@ class WorkerManagerClientMachineFactory
         $hasFailedState = (bool) rand(0, 1);
         $hasActiveState = (bool) rand(0, 1);
         $hasEndingState = (bool) rand(0, 1);
-        $hasEndState = (bool) rand(0, 1);
+        $hasEnded = (bool) rand(0, 1);
+        $hasSucceeded = $hasEnded && !$hasFailedState;
+        $isPending = !$hasEnded && !$hasActiveState;
 
         return self::create(
             $jobId,
@@ -63,8 +66,12 @@ class WorkerManagerClientMachineFactory
             $hasFailedState,
             $hasActiveState,
             $hasEndingState,
-            $hasEndState,
-            new MetaState($hasEndState, $hasEndState && !$hasFailedState),
+            $hasEnded,
+            new MetaState(
+                ended: $hasEnded,
+                succeeded: $hasSucceeded,
+                pending: $isPending,
+            ),
         );
     }
 }
