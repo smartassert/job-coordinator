@@ -22,7 +22,7 @@ class SourcesClientSerializedSuiteFactory
             $suiteId,
             [],
             'requested',
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             null,
             null
         );

@@ -93,7 +93,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $job->getSuiteId(),
             $serializedSuiteParameters,
             'requested',
-            new SourcesClientMetaState(false, false),
+            new SourcesClientMetaState(false, false, true),
             null,
             null,
         );
