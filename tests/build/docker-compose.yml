@@ -31,7 +31,7 @@ services:
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
 
   results-service:
-    image: ghcr.io/smartassert/results:6.0
+    image: ghcr.io/smartassert/results:7.0
     container_name: results-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/results?serverVersion=12&charset=utf8
@@ -63,6 +63,7 @@ services:
       PRIMARY_DIGITALOCEAN_API_TOKEN: intentionally_invalid_primary_token
       SECONDARY_DIGITALOCEAN_API_TOKEN: intentionally_invalid_secondary_token
       IS_READY: 1
+      WORKER_SSH_KEY_ID: 12345
     depends_on:
       - postgres
 

@@ -23,7 +23,7 @@ class ResultsClientJobFactory
         ?string $endState = null,
         ?MetaState $metaState = null,
     ): Job {
-        $metaState = $metaState ?? new MetaState(false, false);
+        $metaState = $metaState ?? new MetaState(false, false, false);
 
         return new Job($label, $token, new JobState($state, $endState, $metaState));
     }
@@ -34,7 +34,6 @@ class ResultsClientJobFactory
             md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
-            null
         );
     }
 }

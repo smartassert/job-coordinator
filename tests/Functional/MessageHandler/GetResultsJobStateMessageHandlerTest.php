@@ -115,7 +115,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             new ResultsJobStateRetrievedEvent(
                 self::$apiToken,
                 $job->getId(),
-                new ResultsJobState($resultsJobState, null, new ResultsClientMetaState(false, false))
+                new ResultsJobState(
+                    $resultsJobState,
+                    null,
+                    new ResultsClientMetaState(false, false, true),
+                )
             ),
             $event
         );

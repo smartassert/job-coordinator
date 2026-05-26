@@ -61,7 +61,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
                 'action' => 'find',
                 'type' => 'vendor_authentication_failure',
                 'context' => [
-                    'provider' => null,
+                    'provider' => 'digitalocean',
                 ],
             ],
             $machineData['action_failure'],
