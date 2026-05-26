@@ -112,7 +112,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
             $suiteId,
             [],
             $serializedSuiteState,
-            new SourcesClientMetaState(false, false),
+            new SourcesClientMetaState(false, false, true),
             null,
             null
         );
