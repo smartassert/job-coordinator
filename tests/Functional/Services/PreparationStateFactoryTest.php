@@ -131,7 +131,7 @@ class PreparationStateFactoryTest extends WebTestCase
                             $job->getId(),
                             md5((string) rand()),
                             md5((string) rand()),
-                            new MetaState(false, false),
+                            new MetaState(false, false, true),
                         )
                     );
                     $machineRepository->save(new Machine($job->getId(), md5((string) rand()), md5((string) rand())));

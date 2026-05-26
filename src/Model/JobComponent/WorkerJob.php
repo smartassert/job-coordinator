@@ -71,7 +71,7 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
     public function getMetaState(): MetaState
     {
         if ($this->hasFailed()) {
-            return new MetaState(true, false);
+            return new MetaState(true, false, false);
         }
 
         return $this->applicationState->getMetaState();

@@ -33,6 +33,9 @@ class WorkerComponentState implements WorkerComponentStateInterface
     #[ORM\Column]
     private bool $stateIsSucceeded;
 
+    #[ORM\Column]
+    private bool $isPending;
+
     /**
      * @param non-empty-string $jobId
      */
@@ -42,6 +45,7 @@ class WorkerComponentState implements WorkerComponentStateInterface
         $this->componentName = $componentName;
         $this->stateIsEnded = false;
         $this->stateIsSucceeded = false;
+        $this->isPending = true;
     }
 
     public function getState(): string
@@ -63,13 +67,14 @@ class WorkerComponentState implements WorkerComponentStateInterface
     {
         $this->stateIsEnded = $metaState->ended;
         $this->stateIsSucceeded = $metaState->succeeded;
+        $this->isPending = $metaState->pending;
 
         return $this;
     }
 
     public function getMetaState(): MetaState
     {
-        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
     }
 
     public function jsonSerialize(): array

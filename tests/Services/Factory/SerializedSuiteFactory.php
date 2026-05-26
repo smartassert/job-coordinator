@@ -24,7 +24,7 @@ readonly class SerializedSuiteFactory
             $job->getId(),
             $serializedSuiteId,
             $state,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
         );
 
         $this->serializedSuiteRepository->save($serializedSuite);

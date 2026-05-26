@@ -160,7 +160,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'requested',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
@@ -184,7 +184,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'requested',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
                 },
             ],
@@ -198,7 +198,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'requested',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
@@ -222,7 +222,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
                 },
             ],

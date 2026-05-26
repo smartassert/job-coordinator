@@ -89,7 +89,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             $serializedSuiteId,
                             'preparing',
-                            new MetaState(false, false),
+                            new MetaState(false, false, true),
                         )
                     );
                 },
@@ -123,7 +123,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             $serializedSuiteId,
                             'prepared',
-                            new MetaState(true, true),
+                            new MetaState(true, true, false),
                         )
                     );
                 },
@@ -141,7 +141,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                             $job->getId(),
                             $serializedSuiteId,
                             'prepared',
-                            new MetaState(true, true),
+                            new MetaState(true, true, false),
                         )
                     );
 

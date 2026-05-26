@@ -33,7 +33,8 @@ readonly class PreparationState implements \JsonSerializable
     {
         return new MetaState(
             PreparationStateEnum::isEndState($this->state),
-            PreparationStateEnum::isSuccessState($this->state)
+            PreparationStateEnum::isSuccessState($this->state),
+            PreparationStateEnum::isPendingState($this->state),
         );
     }
 }

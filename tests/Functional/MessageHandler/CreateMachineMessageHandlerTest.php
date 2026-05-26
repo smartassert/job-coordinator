@@ -123,7 +123,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 $job->getId(),
                 $serializedSuiteId,
                 'prepared',
-                new MetaState(true, true),
+                new MetaState(true, true, false),
             )
         );
 

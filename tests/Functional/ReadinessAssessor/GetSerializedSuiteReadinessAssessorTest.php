@@ -53,7 +53,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         md5((string) rand()),
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -66,7 +66,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         md5((string) rand()),
                         'preparing',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);

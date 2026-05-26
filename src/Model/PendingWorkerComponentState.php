@@ -21,6 +21,6 @@ class PendingWorkerComponentState implements WorkerComponentStateInterface
 
     public function getMetaState(): MetaState
     {
-        return new MetaState(false, false);
+        return new MetaState(false, false, true);
     }
 }

@@ -30,6 +30,9 @@ class ResultsJob
     #[ORM\Column]
     private bool $stateIsSucceeded;
 
+    #[ORM\Column]
+    private bool $isPending;
+
     /**
      * @param non-empty-string  $jobId
      * @param non-empty-string  $eventAddUrl
@@ -49,6 +52,7 @@ class ResultsJob
         $this->endState = $endState;
         $this->stateIsEnded = $metaState->ended;
         $this->stateIsSucceeded = $metaState->succeeded;
+        $this->isPending = $metaState->pending;
     }
 
     public function getState(): string
@@ -88,13 +92,14 @@ class ResultsJob
 
     public function getMetaState(): MetaState
     {
-        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
     }
 
     public function setMetaState(MetaState $metaState): self
     {
         $this->stateIsEnded = $metaState->ended;
         $this->stateIsSucceeded = $metaState->succeeded;
+        $this->isPending = $metaState->pending;
 
         return $this;
     }

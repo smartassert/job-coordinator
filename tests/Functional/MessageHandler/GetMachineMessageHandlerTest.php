@@ -106,6 +106,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 new MetaState(
                     $previous->metaState->ended,
                     $previous->metaState->succeeded,
+                    $previous->metaState->pending,
                 ),
             )
         );
@@ -200,6 +201,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 new MetaState(
                     $previous->metaState->ended,
                     $previous->metaState->succeeded,
+                    $previous->metaState->pending,
                 ),
             )
         );
@@ -364,6 +366,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                 new MetaState(
                     $previous->metaState->ended,
                     $previous->metaState->succeeded,
+                    $previous->metaState->pending,
                 ),
             )
         );

@@ -35,11 +35,11 @@ readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInte
     public function getMetaState(): MetaState
     {
         if ($this->preparation->hasFailure()) {
-            return new MetaState(true, false);
+            return new MetaState(true, false, false);
         }
 
         if (null === $this->entity) {
-            return new MetaState(false, false);
+            return new MetaState(false, false, true);
         }
 
         return $this->entity->getMetaState();

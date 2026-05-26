@@ -184,7 +184,7 @@ class ResultsJobMutatorTest extends WebTestCase
                         $resultsJobToken,
                         'awaiting-events',
                         null,
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
                 },
             ],
@@ -215,7 +215,7 @@ class ResultsJobMutatorTest extends WebTestCase
                         $resultsJobToken,
                         'complete',
                         'ended',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
                 },
             ],

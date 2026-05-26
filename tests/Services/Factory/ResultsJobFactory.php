@@ -29,7 +29,7 @@ readonly class ResultsJobFactory
     ): ResultsJob {
         $token = $token ?? md5((string) rand());
         $state = is_string($state) ? $state : md5((string) rand());
-        $metaState = $metaState ?? new MetaState(false, false);
+        $metaState = $metaState ?? new MetaState(false, false, true);
 
         $resultsJob = new ResultsJob($job->getId(), $token, $state, $endState, $metaState);
 

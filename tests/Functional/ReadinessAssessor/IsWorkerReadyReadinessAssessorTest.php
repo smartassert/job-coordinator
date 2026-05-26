@@ -71,7 +71,7 @@ class IsWorkerReadyReadinessAssessorTest extends WebTestCase
                     MachineRepository $machineRepository
                 ): void {
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active');
-                    $machine = $machine->setMetaState(new MetaState(true, true));
+                    $machine = $machine->setMetaState(new MetaState(true, true, false));
                     $machineRepository->save($machine);
                 },
                 'expected' => MessageHandlingReadiness::NEVER,

@@ -101,7 +101,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
             $job->getId(),
             md5((string) rand()),
             'prepared',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
         );
         $this->serializedSuiteRepository->save($serializedSuite);
 

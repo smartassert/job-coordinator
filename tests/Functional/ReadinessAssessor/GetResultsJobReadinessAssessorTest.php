@@ -73,7 +73,7 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
                     $resultsJobFactory->create(
                         job: $job,
                         endState: 'end-state',
-                        metaState: new MetaState(true, false),
+                        metaState: new MetaState(true, false, false),
                     );
                 },
                 'preparationStateFactoryCreator' => function (): PreparationStateFactory {

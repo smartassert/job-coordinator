@@ -14,22 +14,24 @@ readonly class MetaStateReducer
     public function reduce(array $metaStates): MetaState
     {
         if ($this->hasAnyComponentFailed($metaStates)) {
-            return new MetaState(true, false);
+            return new MetaState(true, false, false);
         }
 
         $ended = true;
         $succeeded = true;
+        $pending = true;
 
         foreach ($metaStates as $metaState) {
             if (null === $metaState) {
-                $metaState = new MetaState(false, false);
+                $metaState = new MetaState(false, false, true);
             }
 
             $ended = $ended && $metaState->ended;
             $succeeded = $succeeded && $metaState->succeeded;
+            $pending = $pending && $metaState->pending;
         }
 
-        return new MetaState($ended, $succeeded);
+        return new MetaState($ended, $succeeded, $pending);
     }
 
     /**

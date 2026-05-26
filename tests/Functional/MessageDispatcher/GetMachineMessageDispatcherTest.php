@@ -195,6 +195,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             new MetaState(
                 $machine->metaState->ended,
                 $machine->metaState->succeeded,
+                $machine->metaState->pending,
             )
         );
 

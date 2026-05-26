@@ -11,6 +11,7 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineIsReadyEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\JobInterface;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
@@ -215,7 +216,13 @@ class MachineMutatorTest extends WebTestCase
                     );
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
-                    return new Machine($job->getId(), 'up/active', 'active');
+                    return new Machine(
+                        $job->getId(),
+                        'up/active',
+                        'active'
+                    )
+                        ->setMetaState(new MetaState(false, false, false))
+                    ;
                 },
             ],
         ];

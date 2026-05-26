@@ -126,7 +126,7 @@ class ResultsJobFactoryTest extends WebTestCase
                 $resultsJobToken,
                 $resultsJobState,
                 $resultsJobEndState,
-                new MetaState(false, false),
+                new MetaState(false, false, true),
             ),
             $resultsJobEntity
         );
