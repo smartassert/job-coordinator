@@ -24,6 +24,7 @@ class HttpResponseFactory
             'meta_state' => [
                 'ended' => $machine->metaState->ended,
                 'succeeded' => $machine->metaState->succeeded,
+                'pending' => $machine->metaState->pending,
             ],
         ]));
     }

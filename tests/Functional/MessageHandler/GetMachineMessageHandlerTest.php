@@ -150,7 +150,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -163,7 +163,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
             ],
@@ -238,7 +238,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -251,7 +251,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
@@ -267,7 +267,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             false,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, true),
                         ),
                         MachineFactory::create(
                             $job->getId(),
@@ -278,7 +278,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             false,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, true),
                         )
                     );
                 },
@@ -294,7 +294,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -307,7 +307,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         true,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, false),
                     );
                 },
                 'expectedEventCreator' => function (JobInterface $job, string $authenticationToken) {
@@ -326,7 +326,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                         )
                     );
                 },
@@ -410,7 +410,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         true,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, false),
                     );
                 },
                 'currentMachineCreator' => function (JobInterface $job) {
@@ -423,7 +423,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                         false,
                         false,
                         true,
-                        new WorkerManagerClientMetaState(true, true),
+                        new WorkerManagerClientMetaState(true, true, true),
                     );
                 },
                 'expectedEventClass' => MachineStateChangeEvent::class,
@@ -443,7 +443,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             true,
             false,
             false,
-            new WorkerManagerClientMetaState(false, false),
+            new WorkerManagerClientMetaState(false, false, false),
         );
         $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);

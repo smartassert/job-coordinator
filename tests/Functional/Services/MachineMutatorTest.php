@@ -182,7 +182,7 @@ class MachineMutatorTest extends WebTestCase
                             false,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, true),
                         )
                     );
                 },
@@ -210,7 +210,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                         )
                     );
                 },
@@ -268,7 +268,7 @@ class MachineMutatorTest extends WebTestCase
             true,
             false,
             false,
-            new WorkerManagerClientMetaState(false, false),
+            new WorkerManagerClientMetaState(false, false, false),
         );
 
         return [
@@ -438,7 +438,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -464,7 +464,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -493,7 +493,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
                         ),
                     );
@@ -530,7 +530,7 @@ class MachineMutatorTest extends WebTestCase
                             true,
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false),
+                            new WorkerManagerClientMetaState(false, false, false),
                             new ActionFailure('new_action', 'new_type', []),
                         ),
                     );

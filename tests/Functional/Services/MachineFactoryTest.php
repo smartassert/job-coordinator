@@ -128,7 +128,7 @@ class MachineFactoryTest extends WebTestCase
                         false,
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false),
+                        new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -150,7 +150,7 @@ class MachineFactoryTest extends WebTestCase
                         false,
                         false,
                         true,
-                        new WorkerManagerClientMetaState(true, false),
+                        new WorkerManagerClientMetaState(true, false, true),
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
