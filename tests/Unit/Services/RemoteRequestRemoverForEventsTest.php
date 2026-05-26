@@ -225,7 +225,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 new ResultsJobState(
                     'irrelevant',
                     'irrelevant',
-                    new ResultsClientMetaState(false, false),
+                    new ResultsClientMetaState(false, false, false),
                 )
             )
         );

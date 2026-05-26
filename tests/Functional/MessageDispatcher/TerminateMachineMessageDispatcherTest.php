@@ -73,7 +73,11 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $jobId,
-            new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
+            new ResultsJobState(
+                'complete',
+                'ended',
+                new ResultsClientMetaState(true, true, false),
+            )
         );
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
@@ -115,7 +119,11 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $job->getId(),
-            new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true))
+            new ResultsJobState(
+                'complete',
+                'ended',
+                new ResultsClientMetaState(true, true, false),
+            )
         );
 
         $this->dispatcher->dispatchImmediately($event);

@@ -128,7 +128,11 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $jobId,
-                        new ResultsJobState('awaiting-events', null, new ResultsClientMetaState(false, false)),
+                        new ResultsJobState(
+                            'awaiting-events',
+                            null,
+                            new ResultsClientMetaState(false, false, true),
+                        ),
                     );
                 },
                 'expectedResultsJobCreator' => function () {
@@ -142,7 +146,11 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState('awaiting-events', null, new ResultsClientMetaState(false, false)),
+                        new ResultsJobState(
+                            'awaiting-events',
+                            null,
+                            new ResultsClientMetaState(false, false, true),
+                        ),
                     );
                 },
                 'expectedResultsJobCreator' => function () {
@@ -163,7 +171,11 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState('awaiting-events', null, new ResultsClientMetaState(false, false)),
+                        new ResultsJobState(
+                            'awaiting-events',
+                            null,
+                            new ResultsClientMetaState(false, false, true),
+                        ),
                     );
                 },
                 'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
@@ -190,7 +202,11 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState('complete', 'ended', new ResultsClientMetaState(true, true)),
+                        new ResultsJobState(
+                            'complete',
+                            'ended',
+                            new ResultsClientMetaState(true, true, false),
+                        ),
                     );
                 },
                 'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
