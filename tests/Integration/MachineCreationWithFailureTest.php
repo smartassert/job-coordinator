@@ -40,6 +40,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
             [
                 'ended' => false,
                 'succeeded' => false,
+                'pending' => true,
             ],
             $machineData['meta_state'],
         );
