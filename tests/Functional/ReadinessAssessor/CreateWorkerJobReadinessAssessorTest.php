@@ -72,7 +72,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'preparing',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -87,7 +87,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -106,7 +106,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'failed',
-                        new MetaState(true, false),
+                        new MetaState(true, false, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -127,7 +127,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -149,7 +149,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);
@@ -174,7 +174,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                         $job->getId(),
                         $serializedSuiteId,
                         'prepared',
-                        new MetaState(true, true),
+                        new MetaState(true, true, false),
                     );
 
                     $serializedSuiteRepository->save($serializedSuite);

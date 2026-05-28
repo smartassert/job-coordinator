@@ -39,6 +39,9 @@ class Machine
     #[ORM\Column]
     private bool $isReady;
 
+    #[ORM\Column]
+    private bool $isPending;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
@@ -56,6 +59,7 @@ class Machine
         $this->stateIsSucceeded = false;
         $this->isActive = false;
         $this->isReady = false;
+        $this->isPending = true;
     }
 
     /**
@@ -120,13 +124,14 @@ class Machine
     {
         $this->stateIsEnded = $metaState->ended;
         $this->stateIsSucceeded = $metaState->succeeded;
+        $this->isPending = $metaState->pending;
 
         return $this;
     }
 
     public function getMetaState(): MetaState
     {
-        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded);
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
     }
 
     public function setIsActive(): self

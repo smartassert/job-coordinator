@@ -188,6 +188,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->applicationState->metaState->ended,
                             $applicationStates[0]->applicationState->metaState->succeeded,
+                            $applicationStates[0]->applicationState->metaState->pending,
                         ))
                     ;
                 },
@@ -197,6 +198,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->compilationState->metaState->ended,
                             $applicationStates[0]->compilationState->metaState->succeeded,
+                            $applicationStates[0]->compilationState->metaState->pending,
                         ))
                     ;
                 },
@@ -206,6 +208,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->executionState->metaState->ended,
                             $applicationStates[0]->executionState->metaState->succeeded,
+                            $applicationStates[0]->executionState->metaState->pending,
                         ))
                     ;
                 },
@@ -215,6 +218,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->eventDeliveryState->metaState->ended,
                             $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                            $applicationStates[0]->eventDeliveryState->metaState->pending,
                         ))
                     ;
                 },
@@ -232,6 +236,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->applicationState->metaState->ended,
                                 $applicationStates[0]->applicationState->metaState->succeeded,
+                                $applicationStates[0]->applicationState->metaState->pending,
                             ))
                     );
 
@@ -241,6 +246,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->compilationState->metaState->ended,
                                 $applicationStates[0]->compilationState->metaState->succeeded,
+                                $applicationStates[0]->compilationState->metaState->pending,
                             ))
                     );
 
@@ -250,6 +256,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->executionState->metaState->ended,
                                 $applicationStates[0]->executionState->metaState->succeeded,
+                                $applicationStates[0]->executionState->metaState->pending,
                             ))
                     );
 
@@ -259,6 +266,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->eventDeliveryState->metaState->ended,
                                 $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                                $applicationStates[0]->eventDeliveryState->metaState->pending,
                             ))
                     );
                 },
@@ -269,6 +277,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->applicationState->metaState->ended,
                             $applicationStates[0]->applicationState->metaState->succeeded,
+                            $applicationStates[0]->applicationState->metaState->pending,
                         ))
                     ;
                 },
@@ -278,6 +287,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->compilationState->metaState->ended,
                             $applicationStates[0]->compilationState->metaState->succeeded,
+                            $applicationStates[0]->compilationState->metaState->pending,
                         ))
                     ;
                 },
@@ -287,6 +297,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->executionState->metaState->ended,
                             $applicationStates[0]->executionState->metaState->succeeded,
+                            $applicationStates[0]->executionState->metaState->pending,
                         ))
                     ;
                 },
@@ -296,6 +307,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[0]->eventDeliveryState->metaState->ended,
                             $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                            $applicationStates[0]->eventDeliveryState->metaState->pending,
                         ))
                     ;
                 },
@@ -313,6 +325,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->applicationState->metaState->ended,
                                 $applicationStates[0]->applicationState->metaState->succeeded,
+                                $applicationStates[0]->applicationState->metaState->pending,
                             ))
                     );
 
@@ -322,6 +335,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->compilationState->metaState->ended,
                                 $applicationStates[0]->compilationState->metaState->succeeded,
+                                $applicationStates[0]->compilationState->metaState->pending,
                             ))
                     );
 
@@ -331,6 +345,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->executionState->metaState->ended,
                                 $applicationStates[0]->executionState->metaState->succeeded,
+                                $applicationStates[0]->executionState->metaState->pending,
                             ))
                     );
 
@@ -340,6 +355,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                             ->setMetaState(new MetaState(
                                 $applicationStates[0]->eventDeliveryState->metaState->ended,
                                 $applicationStates[0]->eventDeliveryState->metaState->succeeded,
+                                $applicationStates[0]->eventDeliveryState->metaState->pending,
                             ))
                     );
                 },
@@ -350,6 +366,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[1]->applicationState->metaState->ended,
                             $applicationStates[1]->applicationState->metaState->succeeded,
+                            $applicationStates[1]->applicationState->metaState->pending,
                         ))
                     ;
                 },
@@ -359,6 +376,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[1]->compilationState->metaState->ended,
                             $applicationStates[1]->compilationState->metaState->succeeded,
+                            $applicationStates[1]->compilationState->metaState->pending,
                         ))
                     ;
                 },
@@ -368,6 +386,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setMetaState(new MetaState(
                             $applicationStates[1]->executionState->metaState->ended,
                             $applicationStates[1]->executionState->metaState->succeeded,
+                            $applicationStates[1]->executionState->metaState->succeeded,
                         ))
                     ;
                 },
@@ -376,6 +395,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
                         ->setState($applicationStates[1]->eventDeliveryState->state)
                         ->setMetaState(new MetaState(
                             $applicationStates[1]->eventDeliveryState->metaState->ended,
+                            $applicationStates[1]->eventDeliveryState->metaState->succeeded,
                             $applicationStates[1]->eventDeliveryState->metaState->succeeded,
                         ))
                     ;

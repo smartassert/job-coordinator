@@ -46,6 +46,7 @@ class ResultsJobFactory implements EventSubscriberInterface
                 new MetaState(
                     $event->resultsJob->state->metaState->ended,
                     $event->resultsJob->state->metaState->succeeded,
+                    $event->resultsJob->state->metaState->pending,
                 )
             );
             $this->resultsJobRepository->save($resultsJob);

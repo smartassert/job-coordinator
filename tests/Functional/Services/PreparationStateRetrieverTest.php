@@ -123,7 +123,7 @@ class PreparationStateRetrieverTest extends WebTestCase
                 $job->getId(),
                 md5((string) rand()),
                 'requested',
-                new MetaState(false, false),
+                new MetaState(false, false, true),
             ));
 
             $machineRepository->save(new Machine($job->getId(), md5((string) rand()), md5((string) rand())));

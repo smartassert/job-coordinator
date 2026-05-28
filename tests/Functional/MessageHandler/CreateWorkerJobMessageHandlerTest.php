@@ -109,7 +109,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
         $this->createResultsJob($job);
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
@@ -184,7 +184,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
         $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());
@@ -276,7 +276,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $machine->setIsActive();
         $machineRepository->save($machine);
 
-        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true));
+        $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
         $this->createResultsJob($job);
 
         $serializedSuiteContent = md5((string) rand());

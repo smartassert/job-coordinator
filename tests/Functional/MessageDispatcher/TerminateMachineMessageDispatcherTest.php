@@ -113,7 +113,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
                 $job->getId(),
                 'state',
                 'state-category',
-            )->setMetaState(new MetaState(true, true))
+            )->setMetaState(new MetaState(true, true, false))
         );
 
         $event = new ResultsJobStateRetrievedEvent(

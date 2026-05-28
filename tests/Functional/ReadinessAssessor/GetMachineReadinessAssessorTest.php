@@ -57,7 +57,7 @@ class GetMachineReadinessAssessorTest extends WebTestCase
             'machine has end state' => [
                 'setup' => function (JobInterface $job, MachineRepository $machineRepository): void {
                     $machine = new Machine($job->getId(), 'state', 'state-category')
-                        ->setMetaState(new MetaState(true, false))
+                        ->setMetaState(new MetaState(true, false, false))
                     ;
 
                     $machineRepository->save($machine);

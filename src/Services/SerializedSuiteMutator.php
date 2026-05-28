@@ -45,6 +45,7 @@ class SerializedSuiteMutator implements EventSubscriberInterface
         $serializedSuite->setMetaState(new MetaState(
             $event->serializedSuite->getMetaState()->ended,
             $event->serializedSuite->getMetaState()->succeeded,
+            $event->serializedSuite->getMetaState()->pending,
         ));
 
         $this->serializedSuiteRepository->save($serializedSuite);

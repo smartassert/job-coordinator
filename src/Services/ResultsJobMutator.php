@@ -50,6 +50,7 @@ class ResultsJobMutator implements EventSubscriberInterface
         $resultsJob->setMetaState(new MetaState(
             $event->resultsJobState->metaState->ended,
             $event->resultsJobState->metaState->succeeded,
+            $event->resultsJobState->metaState->pending,
         ));
 
         $this->resultsJobRepository->save($resultsJob);

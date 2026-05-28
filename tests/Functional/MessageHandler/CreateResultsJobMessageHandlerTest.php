@@ -105,6 +105,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 new MetaState(
                     $resultsJobModel->state->metaState->ended,
                     $resultsJobModel->state->metaState->succeeded,
+                    $resultsJobModel->state->metaState->pending,
                 ),
             ),
             $resultsJob

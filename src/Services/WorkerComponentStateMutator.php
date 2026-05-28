@@ -66,6 +66,7 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
             ->setMetaState(new MetaState(
                 $componentState->metaState->ended,
                 $componentState->metaState->succeeded,
+                $componentState->metaState->pending,
             ))
         ;
 

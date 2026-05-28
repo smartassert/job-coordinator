@@ -62,7 +62,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
                     );
 
                     $applicationState->setState('state');
-                    $applicationState->setMetaState(new MetaState(true, true));
+                    $applicationState->setMetaState(new MetaState(true, true, false));
 
                     $workerComponentStateRepository->save($applicationState);
                 },
@@ -83,7 +83,7 @@ class GetWorkerJobReadinessAssessorTest extends WebTestCase
                     );
 
                     $applicationState->setState('state');
-                    $applicationState->setMetaState(new MetaState(false, false));
+                    $applicationState->setMetaState(new MetaState(false, false, true));
 
                     $workerComponentStateRepository->save($applicationState);
                 },

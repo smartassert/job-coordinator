@@ -45,6 +45,7 @@ class SerializedSuiteFactory implements EventSubscriberInterface
                     new MetaState(
                         $event->serializedSuite->getMetaState()->ended,
                         $event->serializedSuite->getMetaState()->succeeded,
+                        $event->serializedSuite->getMetaState()->pending,
                     )
                 )
             );

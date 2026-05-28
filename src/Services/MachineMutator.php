@@ -60,6 +60,7 @@ class MachineMutator implements EventSubscriberInterface
             new MetaState(
                 $event->getMachine()->metaState->ended,
                 $event->getMachine()->metaState->succeeded,
+                $event->getMachine()->metaState->pending,
             )
         );
 

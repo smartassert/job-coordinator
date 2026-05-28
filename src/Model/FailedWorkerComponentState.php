@@ -21,6 +21,6 @@ class FailedWorkerComponentState implements WorkerComponentStateInterface
 
     public function getMetaState(): MetaState
     {
-        return new MetaState(true, false);
+        return new MetaState(true, false, false);
     }
 }

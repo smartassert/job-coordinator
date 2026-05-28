@@ -20,4 +20,9 @@ enum PreparationState: string
     {
         return self::SUCCEEDED === $state;
     }
+
+    public static function isPendingState(PreparationState $state): bool
+    {
+        return self::PENDING === $state;
+    }
 }
