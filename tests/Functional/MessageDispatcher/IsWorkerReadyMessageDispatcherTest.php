@@ -6,11 +6,13 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsActiveEvent;
+use App\Event\MessageNotHandleableEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageDispatcher\IsWorkerReadyMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Tests\Services\Factory\JobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState;
@@ -58,6 +60,10 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             MachineIsActiveEvent::class => [
                 'expectedListenedForEvent' => MachineIsActiveEvent::class,
                 'expectedMethod' => 'dispatchImmediately',
+            ],
+            MessageNotHandleableEvent::class => [
+                'expectedListenedForEvent' => MessageNotHandleableEvent::class,
+                'expectedMethod' => 'redispatch',
             ],
         ];
     }
@@ -130,5 +136,26 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
         self::assertEquals([new NonDelayedStamp()], $dispatchedEnvelope->all(NonDelayedStamp::class));
+    }
+
+    public function testRedispatch(): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machineIpAddress = '127.0.0.1';
+        $authenticationToken = md5((string) rand());
+
+        $message = new IsWorkerReadyMessage($authenticationToken, $job->getId(), $machineIpAddress);
+        $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
+
+        $this->dispatcher->redispatch($event);
+
+        $envelopes = $this->messengerTransport->getSent();
+        self::assertCount(1, $envelopes);
+
+        $dispatchedEnvelope = $envelopes[0];
+        self::assertEquals($message, $dispatchedEnvelope->getMessage());
     }
 }
