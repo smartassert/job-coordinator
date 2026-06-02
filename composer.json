@@ -18,7 +18,7 @@
         "smartassert/sources-client": "^14.0",
         "smartassert/users-security-bundle": "^12.0",
         "smartassert/worker-client": "^10.0",
-        "smartassert/worker-manager-client": "^13.0",
+        "smartassert/worker-manager-client": "^15.0",
         "smartassert/worker-message-failed-event-bundle": "^4",
         "symfony/console": "8.0.*",
         "symfony/doctrine-messenger": "8.0.*",
