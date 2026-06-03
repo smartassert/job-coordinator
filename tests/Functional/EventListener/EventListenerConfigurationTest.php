@@ -28,15 +28,12 @@ class EventListenerConfigurationTest extends WebTestCase
         $listenerFound = false;
         foreach ($listeners as $listenerConfiguration) {
             \assert(is_array($listenerConfiguration));
-            \assert(isset($listenerConfiguration[0]));
-            \assert(isset($listenerConfiguration[1]));
 
             $listenerClass = $listenerConfiguration[0];
             $listenerMethod = $listenerConfiguration[1];
 
             if (
                 is_object($listenerClass)
-                && is_string($listenerMethod)
                 && $expectedListenerClass === $listenerClass::class
                 && $expectedListenerMethod === $listenerMethod
             ) {
