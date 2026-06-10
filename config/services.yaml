@@ -75,6 +75,10 @@ services:
         arguments:
             $baseUrl: '%env(string:WORKER_MANAGER_BASE_URL)%'
 
+    SmartAssert\WorkerManagerClient\Factory\ActionFailureFactory: ~
+
+    SmartAssert\WorkerManagerClient\Factory\MachineFactory: ~
+
     SmartAssert\WorkerManagerClient\Client: ~
 
     SmartAssert\SourcesClient\ExceptionFactory: ~
