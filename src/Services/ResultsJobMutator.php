@@ -41,16 +41,16 @@ class ResultsJobMutator implements EventSubscriberInterface
             return;
         }
 
-        $resultsJob->setState($event->resultsJobState->state);
+        $resultsJob->setState($event->resultsJob->state->state);
 
-        if (null !== $event->resultsJobState->endState) {
-            $resultsJob->setEndState($event->resultsJobState->endState);
+        if (null !== $event->resultsJob->state->endState) {
+            $resultsJob->setEndState($event->resultsJob->state->endState);
         }
 
         $resultsJob->setMetaState(new MetaState(
-            $event->resultsJobState->metaState->ended,
-            $event->resultsJobState->metaState->succeeded,
-            $event->resultsJobState->metaState->pending,
+            $event->resultsJob->state->metaState->ended,
+            $event->resultsJob->state->metaState->succeeded,
+            $event->resultsJob->state->metaState->pending,
         ));
 
         $this->resultsJobRepository->save($resultsJob);

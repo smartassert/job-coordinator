@@ -14,6 +14,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -128,10 +129,14 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $jobId,
-                        new ResultsJobState(
-                            'awaiting-events',
-                            null,
-                            new ResultsClientMetaState(false, false, true),
+                        new ResultsClientJob(
+                            $jobId,
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'awaiting-events',
+                                null,
+                                new ResultsClientMetaState(false, false, true),
+                            )
                         ),
                     );
                 },
@@ -146,10 +151,14 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState(
-                            'awaiting-events',
-                            null,
-                            new ResultsClientMetaState(false, false, true),
+                        new ResultsClientJob(
+                            $job->getId(),
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'awaiting-events',
+                                null,
+                                new ResultsClientMetaState(false, false, true),
+                            ),
                         ),
                     );
                 },
@@ -171,10 +180,14 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState(
-                            'awaiting-events',
-                            null,
-                            new ResultsClientMetaState(false, false, true),
+                        new ResultsClientJob(
+                            $job->getId(),
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'awaiting-events',
+                                null,
+                                new ResultsClientMetaState(false, false, true),
+                            ),
                         ),
                     );
                 },
@@ -202,10 +215,14 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
-                        new ResultsJobState(
-                            'complete',
-                            'ended',
-                            new ResultsClientMetaState(true, true, false),
+                        new ResultsClientJob(
+                            $job->getId(),
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'complete',
+                                'ended',
+                                new ResultsClientMetaState(true, true, false),
+                            ),
                         ),
                     );
                 },

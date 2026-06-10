@@ -21,6 +21,7 @@ use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
@@ -220,11 +221,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             new ResultsJobStateRetrievedEvent(
                 'authentication token',
                 $jobId,
-                new ResultsJobState(
-                    'irrelevant',
-                    'irrelevant',
-                    new ResultsClientMetaState(false, false, false),
-                )
+                new ResultsJob(
+                    'job-label',
+                    '/event/add/results-token',
+                    new ResultsJobState(
+                        'irrelevant',
+                        'irrelevant',
+                        new ResultsClientMetaState(false, false, false),
+                    )
+                ),
             )
         );
     }
