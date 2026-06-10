@@ -90,7 +90,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         ;
 
         self::expectException(RemoteJobActionException::class);
-        self::expectExceptionMessage(sprintf(
+        self::expectExceptionMessageIsOrContains(sprintf(
             'Failed to retrieve serialized-suite for job "%s": %s',
             $job->getId(),
             $serializedSuiteClientException->getMessage()
