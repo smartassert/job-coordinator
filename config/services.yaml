@@ -39,8 +39,13 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Enum/'
+            - '../src/Event/'
+            - '../src/Exception/'
+            - '../src/Message/'
+            - '../src/Model/'
+            - '../src/Request/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
