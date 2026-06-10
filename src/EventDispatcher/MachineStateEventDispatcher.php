@@ -43,9 +43,9 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     {
         $machineWasPreviouslyNotYetActive
             = !$event->previous->hasActiveState
-            && !$event->previous->hasFailedState
+            && !$event->previous->metaState->hasFailedState()
             && !$event->previous->hasEndingState
-            && !$event->previous->hasEndState;
+            && !$event->previous->metaState->hasEndState();
 
         $machineIsNowActive = $event->getMachine()->hasActiveState;
 

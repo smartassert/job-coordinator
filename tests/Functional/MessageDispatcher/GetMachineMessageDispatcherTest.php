@@ -81,8 +81,6 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             [],
             false,
             false,
-            false,
-            false,
             new WorkerManagerClientMetaState(false, false, true),
         );
 
@@ -118,8 +116,6 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             [],
             false,
             false,
-            false,
-            true,
             new WorkerManagerClientMetaState(true, false, true),
         );
 
@@ -146,8 +142,6 @@ class GetMachineMessageDispatcherTest extends WebTestCase
             'create/requested',
             'pre_active',
             [],
-            false,
-            false,
             false,
             false,
             new WorkerManagerClientMetaState(false, false, true),

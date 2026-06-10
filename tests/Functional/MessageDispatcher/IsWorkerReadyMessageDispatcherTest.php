@@ -80,8 +80,6 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             [$machineIpAddress],
             null,
             false,
-            true,
-            false,
             false,
             new MetaState(false, false, false),
         );
@@ -116,9 +114,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             'active',
             [$machineIpAddress],
             null,
-            false,
             true,
-            false,
             false,
             new MetaState(false, false, false),
         );

@@ -17,10 +17,8 @@ class HttpResponseFactory
             'state' => $machine->state,
             'state_category' => $machine->stateCategory,
             'ip_addresses' => $machine->ipAddresses,
-            'has_failed_state' => $machine->hasFailedState,
             'has_active_state' => $machine->hasActiveState,
             'has_ending_state' => $machine->hasEndingState,
-            'has_end_state' => $machine->hasEndState,
             'meta_state' => [
                 'ended' => $machine->metaState->ended,
                 'succeeded' => $machine->metaState->succeeded,
