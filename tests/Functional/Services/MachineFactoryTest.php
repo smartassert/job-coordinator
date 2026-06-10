@@ -126,8 +126,6 @@ class MachineFactoryTest extends WebTestCase
                         [],
                         false,
                         false,
-                        false,
-                        false,
                         new WorkerManagerClientMetaState(false, false, true),
                     );
                 },
@@ -146,10 +144,8 @@ class MachineFactoryTest extends WebTestCase
                         'find/not-findable',
                         'end',
                         [],
-                        true,
                         false,
                         false,
-                        true,
                         new WorkerManagerClientMetaState(true, false, true),
                     );
                 },

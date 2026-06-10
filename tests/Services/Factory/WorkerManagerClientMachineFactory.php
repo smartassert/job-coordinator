@@ -21,10 +21,8 @@ class WorkerManagerClientMachineFactory
         string $state,
         string $stateCategory,
         array $ipAddresses,
-        bool $hasFailedState,
         bool $hasActiveState,
         bool $hasEndingState,
-        bool $hasEndState,
         MetaState $metaState,
         ?ActionFailure $actionFailure = null,
     ): Machine {
@@ -34,10 +32,8 @@ class WorkerManagerClientMachineFactory
             $stateCategory,
             $ipAddresses,
             $actionFailure,
-            $hasFailedState,
             $hasActiveState,
             $hasEndingState,
-            $hasEndState,
             new MetaState(
                 $metaState->ended,
                 $metaState->succeeded,
@@ -63,10 +59,8 @@ class WorkerManagerClientMachineFactory
             md5((string) rand()),
             md5((string) rand()),
             [],
-            $hasFailedState,
             $hasActiveState,
             $hasEndingState,
-            $hasEnded,
             new MetaState(
                 ended: $hasEnded,
                 succeeded: $hasSucceeded,

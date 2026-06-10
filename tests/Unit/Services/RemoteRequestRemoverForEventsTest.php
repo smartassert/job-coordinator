@@ -57,8 +57,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                     md5((string) rand()),
                     [md5((string) rand())],
                     false,
-                    true,
-                    false,
                     false,
                     new WorkerManagerClientMetaState(false, false, true)
                 )
@@ -257,8 +255,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                     md5((string) rand()),
                     md5((string) rand()),
                     [md5((string) rand())],
-                    false,
-                    true,
                     false,
                     false,
                     new WorkerManagerClientMetaState(false, false, true),

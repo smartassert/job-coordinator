@@ -141,8 +141,6 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             [],
             false,
             false,
-            false,
-            false,
             new WorkerManagerClientMetaState(false, false, true),
         );
 

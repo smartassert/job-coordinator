@@ -11,6 +11,8 @@ use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
 use SmartAssert\ServiceClient\ResponseFactory\ResponseFactory;
 use SmartAssert\WorkerManagerClient\Client;
+use SmartAssert\WorkerManagerClient\Factory\ActionFailureFactory;
+use SmartAssert\WorkerManagerClient\Factory\MachineFactory;
 use SmartAssert\WorkerManagerClient\RequestFactory;
 
 class HttpMockedWorkerManagerClientFactory
@@ -34,8 +36,12 @@ class HttpMockedWorkerManagerClientFactory
             new CurlExceptionFactory()
         );
 
-        $requestFactory = new RequestFactory('null');
-
-        return new Client($serviceClient, $requestFactory);
+        return new Client(
+            $serviceClient,
+            new RequestFactory('null'),
+            new MachineFactory(
+                new ActionFailureFactory(),
+            ),
+        );
     }
 }
