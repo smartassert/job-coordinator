@@ -21,6 +21,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
+use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -96,6 +97,8 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
+                'label' => $job->getId(),
+                'event_add_url' => 'event/add/results-token',
                 'state' => $resultsJobState,
                 'end_state' => null,
             ])),
@@ -115,11 +118,15 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
             new ResultsJobStateRetrievedEvent(
                 self::$apiToken,
                 $job->getId(),
-                new ResultsJobState(
-                    $resultsJobState,
-                    null,
-                    new ResultsClientMetaState(false, false, true),
-                )
+                new ResultsJob(
+                    $job->getId(),
+                    'event/add/results-token',
+                    new ResultsJobState(
+                        $resultsJobState,
+                        null,
+                        new ResultsClientMetaState(false, false, true),
+                    ),
+                ),
             ),
             $event
         );

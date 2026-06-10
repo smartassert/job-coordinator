@@ -17,6 +17,7 @@ use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -73,10 +74,14 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $jobId,
-            new ResultsJobState(
-                'complete',
-                'ended',
-                new ResultsClientMetaState(true, true, false),
+            new ResultsJob(
+                $jobId,
+                'event/add/results-token',
+                new ResultsJobState(
+                    'complete',
+                    'ended',
+                    new ResultsClientMetaState(true, true, false),
+                ),
             )
         );
 
@@ -119,11 +124,15 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $event = new ResultsJobStateRetrievedEvent(
             md5((string) rand()),
             $job->getId(),
-            new ResultsJobState(
-                'complete',
-                'ended',
-                new ResultsClientMetaState(true, true, false),
-            )
+            new ResultsJob(
+                $job->getId(),
+                'event/add/results-token',
+                new ResultsJobState(
+                    'complete',
+                    'ended',
+                    new ResultsClientMetaState(true, true, false),
+                ),
+            ),
         );
 
         $this->dispatcher->dispatchImmediately($event);

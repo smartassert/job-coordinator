@@ -43,11 +43,11 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
         }
 
         try {
-            $resultsJobState = $this->resultsClient->getJobStatus($message->authenticationToken, $message->getJobId());
+            $resultsJob = $this->resultsClient->getJobStatus($message->authenticationToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobStateRetrievedEvent(
                 $message->authenticationToken,
                 $message->getJobId(),
-                $resultsJobState
+                $resultsJob
             ));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);

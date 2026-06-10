@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
+use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ResultsJobStateRetrievedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
@@ -19,6 +19,6 @@ class ResultsJobStateRetrievedEvent extends Event implements JobEventInterface, 
     public function __construct(
         private readonly string $authenticationToken,
         private readonly string $jobId,
-        public readonly ResultsJobState $resultsJobState,
+        public readonly ResultsJob $resultsJob,
     ) {}
 }

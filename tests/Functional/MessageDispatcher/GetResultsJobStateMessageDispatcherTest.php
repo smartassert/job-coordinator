@@ -163,11 +163,15 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
                     return new ResultsJobStateRetrievedEvent(
                         $authenticationToken,
                         $job->getId(),
-                        new ResultsJobState(
-                            'awaiting-events',
-                            null,
-                            new ResultsClientMetaState(false, false, true),
-                        )
+                        new ResultsJob(
+                            $job->getId(),
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'awaiting-events',
+                                null,
+                                new ResultsClientMetaState(false, false, true),
+                            ),
+                        ),
                     );
                 },
             ],
