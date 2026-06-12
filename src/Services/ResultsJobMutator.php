@@ -24,12 +24,12 @@ class ResultsJobMutator implements EventSubscriberInterface
     {
         return [
             ResultsJobRetrievedEvent::class => [
-                ['setState', 1000],
+                ['update', 1000],
             ],
         ];
     }
 
-    public function setState(ResultsJobRetrievedEvent $event): void
+    public function update(ResultsJobRetrievedEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {
@@ -41,17 +41,23 @@ class ResultsJobMutator implements EventSubscriberInterface
             return;
         }
 
-        $resultsJob->setState($event->resultsJob->state->state);
+        $remoteResultsJob = $event->resultsJob;
 
-        if (null !== $event->resultsJob->state->endState) {
-            $resultsJob->setEndState($event->resultsJob->state->endState);
+        $resultsJob->setState($remoteResultsJob->state->state);
+
+        if (null !== $remoteResultsJob->state->endState) {
+            $resultsJob->setEndState($remoteResultsJob->state->endState);
         }
 
         $resultsJob->setMetaState(new MetaState(
-            $event->resultsJob->state->metaState->ended,
-            $event->resultsJob->state->metaState->succeeded,
-            $event->resultsJob->state->metaState->pending,
+            $remoteResultsJob->state->metaState->ended,
+            $remoteResultsJob->state->metaState->succeeded,
+            $remoteResultsJob->state->metaState->pending,
         ));
+
+        if ($remoteResultsJob->hasEvents) {
+            $resultsJob->setHasEvents();
+        }
 
         $this->resultsJobRepository->save($resultsJob);
     }

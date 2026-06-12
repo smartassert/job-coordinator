@@ -72,7 +72,7 @@ class ResultsJobMutatorTest extends WebTestCase
         return [
             ResultsJobRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
-                'expectedMethod' => 'setState',
+                'expectedMethod' => 'update',
             ],
         ];
     }
@@ -83,8 +83,8 @@ class ResultsJobMutatorTest extends WebTestCase
      * @param callable(?JobInterface): ResultsJobRetrievedEvent $eventCreator
      * @param callable(?JobInterface): ?ResultsJob              $expectedResultsJobCreator
      */
-    #[DataProvider('setStateSuccessDataProvider')]
-    public function testSetStateSuccess(
+    #[DataProvider('updateSuccessDataProvider')]
+    public function testUpdateSuccess(
         callable $jobCreator,
         callable $resultsJobCreator,
         callable $eventCreator,
@@ -98,7 +98,7 @@ class ResultsJobMutatorTest extends WebTestCase
 
         $event = $eventCreator($job);
 
-        $this->resultsJobMutator->setState($event);
+        $this->resultsJobMutator->update($event);
 
         $resultsJob = null === $job
             ? null
@@ -110,7 +110,7 @@ class ResultsJobMutatorTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public static function setStateSuccessDataProvider(): array
+    public static function updateSuccessDataProvider(): array
     {
         $resultsJobToken = md5((string) rand());
         $jobCreator = function (JobFactory $jobFactory) {
@@ -238,6 +238,42 @@ class ResultsJobMutatorTest extends WebTestCase
                         'ended',
                         new MetaState(true, true, false),
                     );
+                },
+            ],
+            'has hasEvents change' => [
+                'jobCreator' => $jobCreator,
+                'resultsJobCreator' => function (
+                    JobInterface $job,
+                    ResultsJobFactory $resultsJobFactory
+                ) use (
+                    $resultsJobToken
+                ) {
+                    $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
+                },
+                'eventCreator' => function (JobInterface $job) {
+                    return new ResultsJobRetrievedEvent(
+                        md5((string) rand()),
+                        $job->getId(),
+                        new ResultsClientJob(
+                            $job->getId(),
+                            '/event/add/results-token',
+                            new ResultsJobState(
+                                'complete',
+                                'ended',
+                                new ResultsClientMetaState(true, true, false),
+                            ),
+                            true,
+                        ),
+                    );
+                },
+                'expectedResultsJobCreator' => function (JobInterface $job) use ($resultsJobToken) {
+                    return new ResultsJob(
+                        $job->getId(),
+                        $resultsJobToken,
+                        'complete',
+                        'ended',
+                        new MetaState(true, true, false),
+                    )->setHasEvents();
                 },
             ],
         ];
