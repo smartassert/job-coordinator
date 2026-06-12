@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
@@ -60,8 +60,8 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
     public static function eventSubscriptionsDataProvider(): array
     {
         return [
-            ResultsJobStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
+            ResultsJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
                 'expectedMethod' => 'dispatchImmediately',
             ],
         ];
@@ -71,7 +71,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
     {
         $jobId = md5((string) rand());
 
-        $event = new ResultsJobStateRetrievedEvent(
+        $event = new ResultsJobRetrievedEvent(
             md5((string) rand()),
             $jobId,
             new ResultsJob(
@@ -122,7 +122,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
             )->setMetaState(new MetaState(true, true, false))
         );
 
-        $event = new ResultsJobStateRetrievedEvent(
+        $event = new ResultsJobRetrievedEvent(
             md5((string) rand()),
             $job->getId(),
             new ResultsJob(

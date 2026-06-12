@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\ResultsJob;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Repository\ResultsJobRepository;
@@ -70,18 +70,18 @@ class ResultsJobMutatorTest extends WebTestCase
     public static function eventSubscriptionsDataProvider(): array
     {
         return [
-            ResultsJobStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
+            ResultsJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
                 'expectedMethod' => 'setState',
             ],
         ];
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface                    $jobCreator
-     * @param callable(?JobInterface, ResultsJobFactory): void       $resultsJobCreator
-     * @param callable(?JobInterface): ResultsJobStateRetrievedEvent $eventCreator
-     * @param callable(?JobInterface): ?ResultsJob                   $expectedResultsJobCreator
+     * @param callable(JobFactory): ?JobInterface               $jobCreator
+     * @param callable(?JobInterface, ResultsJobFactory): void  $resultsJobCreator
+     * @param callable(?JobInterface): ResultsJobRetrievedEvent $eventCreator
+     * @param callable(?JobInterface): ?ResultsJob              $expectedResultsJobCreator
      */
     #[DataProvider('setStateSuccessDataProvider')]
     public function testSetStateSuccess(
@@ -126,7 +126,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 'eventCreator' => function () {
                     $jobId = (string) new Ulid();
 
-                    return new ResultsJobStateRetrievedEvent(
+                    return new ResultsJobRetrievedEvent(
                         md5((string) rand()),
                         $jobId,
                         new ResultsClientJob(
@@ -149,7 +149,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'resultsJobCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
-                    return new ResultsJobStateRetrievedEvent(
+                    return new ResultsJobRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
                         new ResultsClientJob(
@@ -179,7 +179,7 @@ class ResultsJobMutatorTest extends WebTestCase
                     $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    return new ResultsJobStateRetrievedEvent(
+                    return new ResultsJobRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
                         new ResultsClientJob(
@@ -215,7 +215,7 @@ class ResultsJobMutatorTest extends WebTestCase
                     $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    return new ResultsJobStateRetrievedEvent(
+                    return new ResultsJobRetrievedEvent(
                         md5((string) rand()),
                         $job->getId(),
                         new ResultsClientJob(

@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\RemoteRequestType;
 
-class GetResultsJobStateMessage extends AbstractAuthenticatedRemoteRequestMessage
+class GetResultsJobMessage extends AbstractAuthenticatedRemoteRequestMessage
 {
     public function getRemoteRequestType(): RemoteRequestType
     {

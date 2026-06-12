@@ -17,7 +17,7 @@ parameters:
         App\Message\GetSerializedSuiteMessage: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\GetMachineMessage: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\CreateResultsJobMessage: '%env(int:CREATE_RESULTS_JOB_DISPATCH_DELAY_MS)%'
-        App\Message\GetResultsJobStateMessage: '%env(int:RESULTS_JOB_STATE_CHANGE_CHECK_PERIOD_MS)%'
+        App\Message\GetResultsJobMessage: '%env(int:RESULTS_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\GetWorkerJobMessage: '%env(int:GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS)%'
 
 services:
@@ -172,7 +172,7 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessAssessor'
 
-    App\MessageHandler\GetResultsJobStateMessageHandler:
+    App\MessageHandler\GetResultsJobMessageHandler:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessAssessor'
 
@@ -212,7 +212,7 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessAssessor'
 
-    App\MessageDispatcher\GetResultsJobStateMessageDispatcher:
+    App\MessageDispatcher\GetResultsJobMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessAssessor'
 

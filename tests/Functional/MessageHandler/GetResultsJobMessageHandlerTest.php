@@ -7,10 +7,10 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\GetResultsJobStateMessage;
-use App\MessageHandler\GetResultsJobStateMessageHandler;
+use App\Message\GetResultsJobMessage;
+use App\MessageHandler\GetResultsJobMessageHandler;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
@@ -27,12 +27,12 @@ use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
-class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -56,7 +56,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -109,13 +109,13 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler = $this->createHandler($assessor, $resultsClient);
 
-        $handler(new GetResultsJobStateMessage(self::$apiToken, $job->getId()));
+        $handler(new GetResultsJobMessage(self::$apiToken, $job->getId()));
 
-        $events = $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class);
+        $events = $this->eventRecorder->all(ResultsJobRetrievedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new ResultsJobStateRetrievedEvent(
+            new ResultsJobRetrievedEvent(
                 self::$apiToken,
                 $job->getId(),
                 new ResultsJob(
@@ -135,18 +135,18 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     protected function getHandlerClass(): string
     {
-        return GetResultsJobStateMessageHandler::class;
+        return GetResultsJobMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return GetResultsJobStateMessage::class;
+        return GetResultsJobMessage::class;
     }
 
     private function createHandler(
         ReadinessAssessorInterface $readinessAssessor,
         ResultsClient $resultsClient,
-    ): GetResultsJobStateMessageHandler {
+    ): GetResultsJobMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -156,7 +156,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
-        return new GetResultsJobStateMessageHandler(
+        return new GetResultsJobMessageHandler(
             $readinessAssessor,
             $resultsClient,
             $eventDispatcher,

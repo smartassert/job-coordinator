@@ -11,7 +11,7 @@ use App\Event\MachineIsReadyEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerStateRetrievedEvent;
@@ -48,8 +48,8 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
             CreateWorkerJobRequestedEvent::class => [
                 ['removeWorkerJobCreateRequests', 0],
             ],
-            ResultsJobStateRetrievedEvent::class => [
-                ['removeResultsStateGetRequests', 0],
+            ResultsJobRetrievedEvent::class => [
+                ['removeResultsJobGetRequests', 0],
             ],
             MachineTerminationRequestedEvent::class => [
                 ['removeMachineTerminationRequests', 0],
@@ -93,7 +93,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobCreation());
     }
 
-    public function removeResultsStateGetRequests(ResultsJobStateRetrievedEvent $event): void
+    public function removeResultsJobGetRequests(ResultsJobRetrievedEvent $event): void
     {
         $this->removeForEventAndType($event, RemoteRequestType::createForResultsJobRetrieval());
     }

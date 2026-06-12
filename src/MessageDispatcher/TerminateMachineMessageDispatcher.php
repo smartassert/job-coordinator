@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,13 +23,13 @@ readonly class TerminateMachineMessageDispatcher implements EventSubscriberInter
     public static function getSubscribedEvents(): array
     {
         return [
-            ResultsJobStateRetrievedEvent::class => [
+            ResultsJobRetrievedEvent::class => [
                 ['dispatchImmediately', 100],
             ],
         ];
     }
 
-    public function dispatchImmediately(ResultsJobStateRetrievedEvent $event): void
+    public function dispatchImmediately(ResultsJobRetrievedEvent $event): void
     {
         $message = new TerminateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());

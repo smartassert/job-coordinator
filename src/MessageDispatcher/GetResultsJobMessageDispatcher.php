@@ -6,12 +6,12 @@ namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
-use App\Message\GetResultsJobStateMessage;
+use App\Event\ResultsJobRetrievedEvent;
+use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
+readonly class GetResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
@@ -27,15 +27,15 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
             ResultsJobCreatedEvent::class => [
                 ['dispatch', 100],
             ],
-            ResultsJobStateRetrievedEvent::class => [
+            ResultsJobRetrievedEvent::class => [
                 ['dispatch', 100],
             ],
         ];
     }
 
-    public function dispatch(ResultsJobCreatedEvent|ResultsJobStateRetrievedEvent $event): void
+    public function dispatch(ResultsJobCreatedEvent|ResultsJobRetrievedEvent $event): void
     {
-        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
+        $message = new GetResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
