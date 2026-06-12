@@ -8,9 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\WorkerStateRetrievedEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\GetResultsJobStateMessage;
 use App\Message\GetWorkerJobMessage;
-use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
@@ -175,12 +173,12 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     protected function getHandlerClass(): string
     {
-        return GetResultsJobStateMessageHandler::class;
+        return GetWorkerJobMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return GetResultsJobStateMessage::class;
+        return GetWorkerJobMessage::class;
     }
 
     private function createHandler(
