@@ -136,7 +136,8 @@ class ResultsJobMutatorTest extends WebTestCase
                                 'awaiting-events',
                                 null,
                                 new ResultsClientMetaState(false, false, true),
-                            )
+                            ),
+                            false,
                         ),
                     );
                 },
@@ -159,6 +160,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 null,
                                 new ResultsClientMetaState(false, false, true),
                             ),
+                            false,
                         ),
                     );
                 },
@@ -188,6 +190,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 null,
                                 new ResultsClientMetaState(false, false, true),
                             ),
+                            false,
                         ),
                     );
                 },
@@ -223,6 +226,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 'ended',
                                 new ResultsClientMetaState(true, true, false),
                             ),
+                            false,
                         ),
                     );
                 },

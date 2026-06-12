@@ -112,7 +112,8 @@ class ResultsJobFactoryTest extends WebTestCase
                 $resultsJobState,
                 $resultsJobEndState,
                 new ResultsClientMetaState(false, false, true),
-            )
+            ),
+            false,
         );
 
         $event = new ResultsJobCreatedEvent('authentication token', $job->getId(), $resultsJob);

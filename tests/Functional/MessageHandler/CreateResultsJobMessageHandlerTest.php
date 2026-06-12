@@ -73,7 +73,8 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'awaiting-events',
                 null,
                 new ResultsClientMetaState(false, false, true),
-            )
+            ),
+            false,
         );
 
         $resultsClient = HttpMockedResultsClientFactory::create([
