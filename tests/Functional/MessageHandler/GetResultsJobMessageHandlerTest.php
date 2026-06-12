@@ -10,7 +10,7 @@ use App\Enum\MessageState;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobMessage;
-use App\MessageHandler\GetResultsJobStateMessageHandler;
+use App\MessageHandler\GetResultsJobMessageHandler;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
@@ -27,7 +27,7 @@ use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Ulid;
 
-class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCase
+class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
@@ -135,7 +135,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     protected function getHandlerClass(): string
     {
-        return GetResultsJobStateMessageHandler::class;
+        return GetResultsJobMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
@@ -146,7 +146,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     private function createHandler(
         ReadinessAssessorInterface $readinessAssessor,
         ResultsClient $resultsClient,
-    ): GetResultsJobStateMessageHandler {
+    ): GetResultsJobMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
@@ -156,7 +156,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
-        return new GetResultsJobStateMessageHandler(
+        return new GetResultsJobMessageHandler(
             $readinessAssessor,
             $resultsClient,
             $eventDispatcher,

@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHandler
+final readonly class GetResultsJobMessageHandler extends AbstractMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
