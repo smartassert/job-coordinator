@@ -49,7 +49,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
                 ['removeWorkerJobCreateRequests', 0],
             ],
             ResultsJobRetrievedEvent::class => [
-                ['removeResultsStateGetRequests', 0],
+                ['removeResultsJobGetRequests', 0],
             ],
             MachineTerminationRequestedEvent::class => [
                 ['removeMachineTerminationRequests', 0],
@@ -93,7 +93,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobCreation());
     }
 
-    public function removeResultsStateGetRequests(ResultsJobRetrievedEvent $event): void
+    public function removeResultsJobGetRequests(ResultsJobRetrievedEvent $event): void
     {
         $this->removeForEventAndType($event, RemoteRequestType::createForResultsJobRetrieval());
     }

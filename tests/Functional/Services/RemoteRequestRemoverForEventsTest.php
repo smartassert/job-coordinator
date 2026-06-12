@@ -76,7 +76,7 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
             ],
             ResultsJobRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
-                'expectedMethod' => 'removeResultsStateGetRequests',
+                'expectedMethod' => 'removeResultsJobGetRequests',
             ],
             MachineTerminationRequestedEvent::class => [
                 'expectedListenedForEvent' => MachineTerminationRequestedEvent::class,

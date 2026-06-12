@@ -199,7 +199,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         );
     }
 
-    public function testRemoveResultsStateGetRequests(): void
+    public function testRemoveResultsJobGetRequests(): void
     {
         $jobId = md5((string) rand());
 
@@ -217,7 +217,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
-        $remoteRequestRemoverForEvents->removeResultsStateGetRequests(
+        $remoteRequestRemoverForEvents->removeResultsJobGetRequests(
             new ResultsJobRetrievedEvent(
                 'authentication token',
                 $jobId,
