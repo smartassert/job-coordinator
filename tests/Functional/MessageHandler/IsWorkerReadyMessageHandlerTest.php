@@ -7,9 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\MachineIsReadyEvent;
-use App\Message\GetResultsJobStateMessage;
 use App\Message\IsWorkerReadyMessage;
-use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
@@ -215,12 +213,12 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     protected function getHandlerClass(): string
     {
-        return GetResultsJobStateMessageHandler::class;
+        return IsWorkerReadyMessageHandler::class;
     }
 
     protected function getHandledMessageClass(): string
     {
-        return GetResultsJobStateMessage::class;
+        return IsWorkerReadyMessage::class;
     }
 
     private function createHandler(
