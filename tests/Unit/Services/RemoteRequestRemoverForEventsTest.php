@@ -9,7 +9,7 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Model\RemoteRequestType;
@@ -218,7 +218,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeResultsStateGetRequests(
-            new ResultsJobStateRetrievedEvent(
+            new ResultsJobRetrievedEvent(
                 'authentication token',
                 $jobId,
                 new ResultsJob(

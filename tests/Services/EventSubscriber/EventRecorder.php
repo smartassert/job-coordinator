@@ -17,7 +17,7 @@ use App\Event\MachineStateChangeEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Event\ResultsJobCreatedEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\SerializedSuiteSerializedEvent;
@@ -62,7 +62,7 @@ class EventRecorder implements EventSubscriberInterface, \Countable
             MachineTerminationRequestedEvent::class => [
                 ['addEvent', 1000],
             ],
-            ResultsJobStateRetrievedEvent::class => [
+            ResultsJobRetrievedEvent::class => [
                 ['addEvent', 1000],
             ],
             ResultsJobCreatedEvent::class => [

@@ -7,7 +7,7 @@ namespace App\Event;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ResultsJobStateRetrievedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
+class ResultsJobRetrievedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
 {
     use GetJobIdTrait;
     use GetAuthenticationTokenTrait;

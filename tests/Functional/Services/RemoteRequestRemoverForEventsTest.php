@@ -10,7 +10,7 @@ use App\Event\MachineIsReadyEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Event\ResultsJobCreatedEvent;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Event\WorkerStateRetrievedEvent;
@@ -74,8 +74,8 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
                 'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
                 'expectedMethod' => 'removeWorkerJobCreateRequests',
             ],
-            ResultsJobStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => ResultsJobStateRetrievedEvent::class,
+            ResultsJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
                 'expectedMethod' => 'removeResultsStateGetRequests',
             ],
             MachineTerminationRequestedEvent::class => [

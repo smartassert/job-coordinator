@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -44,7 +44,7 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
 
         try {
             $resultsJob = $this->resultsClient->getJobStatus($message->authenticationToken, $message->getJobId());
-            $this->eventDispatcher->dispatch(new ResultsJobStateRetrievedEvent(
+            $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent(
                 $message->authenticationToken,
                 $message->getJobId(),
                 $resultsJob

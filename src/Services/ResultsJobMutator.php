@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\ResultsJob;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Model\MetaState;
 use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,13 +23,13 @@ class ResultsJobMutator implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ResultsJobStateRetrievedEvent::class => [
+            ResultsJobRetrievedEvent::class => [
                 ['setState', 1000],
             ],
         ];
     }
 
-    public function setState(ResultsJobStateRetrievedEvent $event): void
+    public function setState(ResultsJobRetrievedEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {

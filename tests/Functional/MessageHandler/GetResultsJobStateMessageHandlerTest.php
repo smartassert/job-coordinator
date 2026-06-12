@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
-use App\Event\ResultsJobStateRetrievedEvent;
+use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobStateMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
@@ -111,11 +111,11 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler(new GetResultsJobStateMessage(self::$apiToken, $job->getId()));
 
-        $events = $this->eventRecorder->all(ResultsJobStateRetrievedEvent::class);
+        $events = $this->eventRecorder->all(ResultsJobRetrievedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new ResultsJobStateRetrievedEvent(
+            new ResultsJobRetrievedEvent(
                 self::$apiToken,
                 $job->getId(),
                 new ResultsJob(
