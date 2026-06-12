@@ -16,7 +16,8 @@ use App\Model\SerializeToArrayInterface;
  *   end_state: ?string,
  *   meta_state: MetaState,
  *   requests: RemoteRequestCollection,
- *   preparation: Preparation
+ *   preparation: Preparation,
+ *   has_events: bool,
  * }
  */
 readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInterface
@@ -64,6 +65,7 @@ readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInte
             'meta_state' => $this->getMetaState(),
             'requests' => $this->requests,
             'preparation' => $this->preparation,
+            'has_events' => $this->entity?->hasEvents() ?? false,
         ];
     }
 }

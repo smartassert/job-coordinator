@@ -114,4 +114,9 @@ class ResultsJob
 
         return $this;
     }
+
+    public function hasEvents(): bool
+    {
+        return $this->hasEvents;
+    }
 }
