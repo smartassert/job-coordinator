@@ -11,7 +11,7 @@ use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInterface
+readonly class GetResultsJobMessageDispatcher implements EventSubscriberInterface
 {
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,

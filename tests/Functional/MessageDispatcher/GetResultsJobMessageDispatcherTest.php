@@ -9,7 +9,7 @@ use App\Event\JobEventInterface;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Message\GetResultsJobMessage;
-use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
+use App\MessageDispatcher\GetResultsJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -21,7 +21,7 @@ use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
-class GetResultsJobStateMessageDispatcherTest extends WebTestCase
+class GetResultsJobMessageDispatcherTest extends WebTestCase
 {
     private InMemoryTransport $messengerTransport;
 
@@ -37,8 +37,8 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
-        $dispatcher = self::getContainer()->get(GetResultsJobStateMessageDispatcher::class);
-        \assert($dispatcher instanceof GetResultsJobStateMessageDispatcher);
+        $dispatcher = self::getContainer()->get(GetResultsJobMessageDispatcher::class);
+        \assert($dispatcher instanceof GetResultsJobMessageDispatcher);
 
         $subscribedEvents = $dispatcher::getSubscribedEvents();
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
@@ -92,7 +92,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
-        $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
+        $dispatcher = new GetResultsJobMessageDispatcher($messageDispatcher, $assessor);
 
         $dispatcher->dispatch($event);
 
@@ -124,7 +124,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
-        $dispatcher = new GetResultsJobStateMessageDispatcher($messageDispatcher, $assessor);
+        $dispatcher = new GetResultsJobMessageDispatcher($messageDispatcher, $assessor);
 
         $dispatcher->dispatch($event);
 

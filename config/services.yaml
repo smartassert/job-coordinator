@@ -212,7 +212,7 @@ services:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetMachineReadinessAssessor'
 
-    App\MessageDispatcher\GetResultsJobStateMessageDispatcher:
+    App\MessageDispatcher\GetResultsJobMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\GetResultsJobReadinessAssessor'
 
