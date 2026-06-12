@@ -7,7 +7,7 @@ namespace App\MessageDispatcher;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
-use App\Message\GetResultsJobStateMessage;
+use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -35,7 +35,7 @@ readonly class GetResultsJobStateMessageDispatcher implements EventSubscriberInt
 
     public function dispatch(ResultsJobCreatedEvent|ResultsJobRetrievedEvent $event): void
     {
-        $message = new GetResultsJobStateMessage($event->getAuthenticationToken(), $event->getJobId());
+        $message = new GetResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;

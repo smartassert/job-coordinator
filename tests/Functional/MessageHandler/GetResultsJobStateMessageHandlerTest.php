@@ -9,7 +9,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\GetResultsJobStateMessage;
+use App\Message\GetResultsJobMessage;
 use App\MessageHandler\GetResultsJobStateMessageHandler;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -32,7 +32,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeNotHandleable(): void
     {
         $jobId = (string) new Ulid();
-        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -56,7 +56,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
     public function testInvokeResultsClientThrowsException(): void
     {
         $jobId = (string) new Ulid();
-        $message = new GetResultsJobStateMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -109,7 +109,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler = $this->createHandler($assessor, $resultsClient);
 
-        $handler(new GetResultsJobStateMessage(self::$apiToken, $job->getId()));
+        $handler(new GetResultsJobMessage(self::$apiToken, $job->getId()));
 
         $events = $this->eventRecorder->all(ResultsJobRetrievedEvent::class);
         $event = $events[0] ?? null;
@@ -140,7 +140,7 @@ class GetResultsJobStateMessageHandlerTest extends AbstractMessageHandlerTestCas
 
     protected function getHandledMessageClass(): string
     {
-        return GetResultsJobStateMessage::class;
+        return GetResultsJobMessage::class;
     }
 
     private function createHandler(

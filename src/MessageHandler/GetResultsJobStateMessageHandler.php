@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
-use App\Message\GetResultsJobStateMessage;
+use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -33,7 +33,7 @@ final readonly class GetResultsJobStateMessageHandler extends AbstractMessageHan
      * @throws RemoteJobActionException
      * @throws ExceptionInterface
      */
-    public function __invoke(GetResultsJobStateMessage $message): void
+    public function __invoke(GetResultsJobMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         $this->setMessageState($message, $readiness);

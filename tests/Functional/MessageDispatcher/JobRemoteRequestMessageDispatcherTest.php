@@ -8,7 +8,7 @@ use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\CreateMachineMessage;
-use App\Message\GetResultsJobStateMessage;
+use App\Message\GetResultsJobMessage;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
@@ -86,13 +86,13 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         return [
             'without stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    return new GetResultsJobStateMessage('api token', $job->getId());
+                    return new GetResultsJobMessage('api token', $job->getId());
                 },
                 'stamps' => [],
             ],
             'with stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    return new GetResultsJobStateMessage('api token', $job->getId());
+                    return new GetResultsJobMessage('api token', $job->getId());
                 },
                 'stamps' => [
                     new NonDelayedStamp(),

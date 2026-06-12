@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\JobEventInterface;
 use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
-use App\Message\GetResultsJobStateMessage;
+use App\Message\GetResultsJobMessage;
 use App\MessageDispatcher\GetResultsJobStateMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
@@ -128,7 +128,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
 
         $dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobStateMessage($authenticationToken, $job->getId()));
+        $this->assertDispatchedMessage(new GetResultsJobMessage($authenticationToken, $job->getId()));
     }
 
     /**
@@ -180,7 +180,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
         ];
     }
 
-    private function assertDispatchedMessage(GetResultsJobStateMessage $expected): void
+    private function assertDispatchedMessage(GetResultsJobMessage $expected): void
     {
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
