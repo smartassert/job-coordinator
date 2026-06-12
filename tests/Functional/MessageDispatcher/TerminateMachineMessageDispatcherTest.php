@@ -82,6 +82,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
                     'ended',
                     new ResultsClientMetaState(true, true, false),
                 ),
+                false,
             )
         );
 
@@ -132,6 +133,7 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
                     'ended',
                     new ResultsClientMetaState(true, true, false),
                 ),
+                false,
             ),
         );
 

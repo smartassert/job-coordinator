@@ -228,7 +228,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                         'irrelevant',
                         'irrelevant',
                         new ResultsClientMetaState(false, false, false),
-                    )
+                    ),
+                    false,
                 ),
             )
         );

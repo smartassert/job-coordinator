@@ -151,7 +151,8 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
                                 'awaiting-events',
                                 null,
                                 new ResultsClientMetaState(false, false, true),
-                            )
+                            ),
+                            false,
                         )
                     );
                 },
@@ -171,6 +172,7 @@ class GetResultsJobStateMessageDispatcherTest extends WebTestCase
                                 null,
                                 new ResultsClientMetaState(false, false, true),
                             ),
+                            false,
                         ),
                     );
                 },

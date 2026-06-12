@@ -25,7 +25,7 @@ class ResultsClientJobFactory
     ): Job {
         $metaState = $metaState ?? new MetaState(false, false, false);
 
-        return new Job($label, $token, new JobState($state, $endState, $metaState));
+        return new Job($label, $token, new JobState($state, $endState, $metaState), false);
     }
 
     public static function createRandom(): Job
