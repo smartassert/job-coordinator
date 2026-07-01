@@ -102,6 +102,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'event_add_url' => 'event/add/results-token',
                 'state' => $resultsJobState,
                 'end_state' => null,
+                'has_events' => false,
             ])),
         ]);
 

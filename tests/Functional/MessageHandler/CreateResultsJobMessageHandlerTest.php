@@ -84,6 +84,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'event_add_url' => $resultsJobModel->authenticator,
                 'state' => $resultsJobModel->state->state,
                 'end_state' => $resultsJobModel->state->endState,
+                'has_events' => $resultsJobModel->hasEvents,
             ])),
         ]);
 
