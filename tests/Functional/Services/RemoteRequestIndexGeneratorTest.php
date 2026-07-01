@@ -8,6 +8,7 @@ use App\Entity\RemoteRequest;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestIndexGenerator;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -59,7 +60,7 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
      */
     public static function generateDataProvider(): array
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         return [
             'no existing remote requests' => [
@@ -70,7 +71,7 @@ class RemoteRequestIndexGeneratorTest extends WebTestCase
             ],
             'no existing remote requests for job' => [
                 'existingRemoteRequests' => (function () {
-                    $jobId = md5((string) rand());
+                    $jobId = Id::generate();
 
                     return [
                         new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),

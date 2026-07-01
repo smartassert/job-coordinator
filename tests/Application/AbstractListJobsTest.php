@@ -9,10 +9,10 @@ use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Services\JobStore;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
-use Symfony\Component\Uid\Ulid;
 
 /**
  * @phpstan-type JobsSetupResult array{api_token: non-empty-string, job_ids: string[], suite_id: non-empty-string}
@@ -25,7 +25,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->suiteId = (string) new Ulid();
+        $this->suiteId = Id::generate();
     }
 
     #[DataProvider('getBadMethodDataProvider')]
@@ -140,7 +140,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                     return [
                         'api_token' => $apiTokenProvider->get('user1@example.com'),
                         'job_ids' => [],
-                        'suite_id' => (string) new Ulid(),
+                        'suite_id' => Id::generate(),
                     ];
                 },
                 'expectedCreator' => function () {
@@ -149,7 +149,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
             ],
             'single job for user' => [
                 'setup' => function (ApiTokenProvider $apiTokenProvider, ApplicationClient $applicationClient) {
-                    $suiteId = (string) new Ulid();
+                    $suiteId = Id::generate();
 
                     $apiToken = $apiTokenProvider->get('user1@example.com');
 
@@ -177,8 +177,8 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
             ],
             'multiple jobs for user across suites (1)' => [
                 'setup' => function (ApiTokenProvider $apiTokenProvider, ApplicationClient $applicationClient) {
-                    $suiteId1 = (string) new Ulid();
-                    $suiteId2 = (string) new Ulid();
+                    $suiteId1 = Id::generate();
+                    $suiteId2 = Id::generate();
 
                     $apiToken = $apiTokenProvider->get('user1@example.com');
 
@@ -216,8 +216,8 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
             ],
             'multiple jobs for user across suites (2)' => [
                 'setup' => function (ApiTokenProvider $apiTokenProvider, ApplicationClient $applicationClient) {
-                    $suiteId1 = (string) new Ulid();
-                    $suiteId2 = (string) new Ulid();
+                    $suiteId1 = Id::generate();
+                    $suiteId2 = Id::generate();
 
                     $apiToken = $apiTokenProvider->get('user1@example.com');
 
@@ -253,8 +253,8 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
             ],
             'multiple jobs for user across suites for multiple users' => [
                 'setup' => function (ApiTokenProvider $apiTokenProvider, ApplicationClient $applicationClient) {
-                    $suiteId1 = (string) new Ulid();
-                    $suiteId2 = (string) new Ulid();
+                    $suiteId1 = Id::generate();
+                    $suiteId2 = Id::generate();
 
                     $user1ApiToken = $apiTokenProvider->get('user1@example.com');
                     $user2ApiToken = $apiTokenProvider->get('user2@example.com');

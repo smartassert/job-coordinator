@@ -14,9 +14,9 @@ use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobReadinessAssessorTest extends WebTestCase
 {
@@ -66,7 +66,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
             ],
             'serialized suite is not prepared' => [
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -81,7 +81,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
             ],
             'results job does not exist' => [
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -100,7 +100,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     SerializedSuiteRepository $serializedSuiteRepository,
                     ResultsJobFactory $resultsJobFactory,
                 ): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -121,7 +121,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     SerializedSuiteRepository $serializedSuiteRepository,
                     ResultsJobFactory $resultsJobFactory,
                 ): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -143,7 +143,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     ResultsJobFactory $resultsJobFactory,
                     MachineRepository $machineRepository,
                 ): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
@@ -168,7 +168,7 @@ class CreateWorkerJobReadinessAssessorTest extends WebTestCase
                     ResultsJobFactory $resultsJobFactory,
                     MachineRepository $machineRepository,
                 ): void {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),

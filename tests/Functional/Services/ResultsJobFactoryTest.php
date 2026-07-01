@@ -12,13 +12,14 @@ use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class ResultsJobFactoryTest extends WebTestCase
 {
@@ -80,7 +81,7 @@ class ResultsJobFactoryTest extends WebTestCase
     public function testCreateOnResultsJobCreatedEventNoJob(): void
     {
         $jobCount = $this->jobRepository->count([]);
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $event = new ResultsJobCreatedEvent(
             'authentication token',
@@ -101,7 +102,7 @@ class ResultsJobFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->resultsJobRepository->count());
 
-        $resultsJobToken = md5((string) rand());
+        $resultsJobToken = StringValue::random();
         $resultsJobState = 'awaiting-events';
         $resultsJobEndState = null;
 

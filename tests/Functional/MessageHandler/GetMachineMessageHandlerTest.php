@@ -23,6 +23,7 @@ use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
@@ -31,7 +32,6 @@ use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -54,7 +54,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $machine = MachineFactory::createRandomForJob($jobId);
         $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -414,7 +414,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $machine = MachineFactory::create(
             $jobId,
             'up/active',

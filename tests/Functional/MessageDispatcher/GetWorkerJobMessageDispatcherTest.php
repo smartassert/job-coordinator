@@ -13,6 +13,7 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -67,7 +68,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNotReady(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
         $workerJob = WorkerClientJobFactory::createRandom();
 
         $machineIpAddress = '127.0.0.1';
@@ -92,7 +93,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelySuccess(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
         $workerJob = WorkerClientJobFactory::createRandom();
 
         $machineIpAddress = '127.0.0.1';

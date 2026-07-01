@@ -15,6 +15,7 @@ use App\Services\JobStore;
 use App\Tests\Model\StagingConfiguration;
 use App\Tests\Model\StagingOutput;
 use App\Tests\Services\ApplicationClient\Client;
+use App\Tests\Services\Generator\Id;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -57,7 +58,7 @@ readonly class Stager
      */
     private function createJob(Client $applicationClient, string $apiToken): JobInterface
     {
-        $suiteId = (string) new Ulid();
+        $suiteId = Id::generate();
         $createResponse = $applicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
 
         $createResponseStatusCode = $createResponse->getStatusCode();

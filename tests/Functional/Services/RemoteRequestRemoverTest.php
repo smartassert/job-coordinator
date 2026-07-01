@@ -12,10 +12,10 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Services\RemoteRequestRemover;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRemoverTest extends WebTestCase
 {
@@ -63,7 +63,7 @@ class RemoteRequestRemoverTest extends WebTestCase
         callable $expectedRemoteRequestFailuresCreator,
         callable $expectedRemoteRequestsCreator,
     ): void {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $this->doRemoteRequestRemoverTest(
             $jobId,

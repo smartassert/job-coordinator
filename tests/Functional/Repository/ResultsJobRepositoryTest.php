@@ -7,8 +7,8 @@ namespace App\Tests\Functional\Repository;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class ResultsJobRepositoryTest extends WebTestCase
 {
@@ -25,7 +25,7 @@ class ResultsJobRepositoryTest extends WebTestCase
 
     public function testHasDoesNotHave(): void
     {
-        self::assertFalse($this->resultsJobRepository->has((string) new Ulid()));
+        self::assertFalse($this->resultsJobRepository->has(Id::generate()));
     }
 
     public function testHasDoesHave(): void

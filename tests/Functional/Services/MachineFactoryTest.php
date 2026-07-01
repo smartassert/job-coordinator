@@ -10,12 +10,12 @@ use App\Repository\MachineRepository;
 use App\Services\MachineFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class MachineFactoryTest extends WebTestCase
 {
@@ -73,7 +73,7 @@ class MachineFactoryTest extends WebTestCase
     {
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $machine = WorkerMachineFactory::createRandomForJob($jobId);
 

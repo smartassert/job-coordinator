@@ -12,12 +12,13 @@ use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteMutatorTest extends WebTestCase
 {
@@ -108,7 +109,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
      */
     public static function setStateSuccessDataProvider(): array
     {
-        $serializedSuiteId = md5((string) rand());
+        $serializedSuiteId = Id::generate();
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();
         };
@@ -120,12 +121,12 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'serializedSuiteCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
-                    $serializedSuiteId = (string) new Ulid();
-                    $suiteId = (string) new Ulid();
+                    $jobId = Id::generate();
+                    $serializedSuiteId = Id::generate();
+                    $suiteId = Id::generate();
 
                     return new SerializedSuiteRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $jobId,
                         SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
                     );
@@ -138,10 +139,10 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     return new SerializedSuiteRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $job->getSuiteId())
                     );
@@ -166,7 +167,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
                     return new SerializedSuiteRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new SourcesSerializedSuite(
                             $serializedSuiteId,
@@ -204,7 +205,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
                     return new SerializedSuiteRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new SourcesSerializedSuite(
                             $serializedSuiteId,

@@ -22,11 +22,12 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
 {
@@ -99,7 +100,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $serializedSuite = new SerializedSuite(
             $job->getId(),
-            md5((string) rand()),
+            StringValue::random(),
             'prepared',
             new MetaState(true, true, false),
         );
@@ -120,17 +121,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     {
         $resultsJobCreatedEventCreator = function (JobInterface $job) {
             return new ResultsJobCreatedEvent(
-                md5((string) rand()),
+                StringValue::random(),
                 $job->getId(),
-                ResultsClientJobFactory::createRandom()
+                ResultsClientJobFactory::createRandom(),
             );
         };
 
         $serializedSuiteSerializedEventCreator = function (JobInterface $job) {
             return new SerializedSuiteSerializedEvent(
-                md5((string) rand()),
+                StringValue::random(),
                 $job->getId(),
-                md5((string) rand())
+                StringValue::random(),
             );
         };
 
@@ -146,7 +147,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNeverReady(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -165,7 +166,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
     public function testRedispatchNeverReady(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new CreateMachineMessage('api token', $jobId);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 

@@ -6,10 +6,10 @@ namespace App\Tests\Application;
 
 use App\Model\JobInterface;
 use App\Services\JobStore;
+use App\Tests\Services\Generator\Id;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use SmartAssert\TestAuthenticationProviderBundle\UserProvider;
-use Symfony\Component\Uid\Ulid;
 
 /**
  * @phpstan-import-type User from UserProvider
@@ -64,7 +64,7 @@ abstract class AbstractCreateJobSuccessSetup extends AbstractApplicationTest
      */
     protected static function createSuiteId(): string
     {
-        return (string) new Ulid();
+        return Id::generate();
     }
 
     protected function getJob(): ?JobInterface

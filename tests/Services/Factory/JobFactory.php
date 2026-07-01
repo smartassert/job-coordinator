@@ -6,7 +6,7 @@ namespace App\Tests\Services\Factory;
 
 use App\Model\JobInterface;
 use App\Services\JobStore;
-use Symfony\Component\Uid\Ulid;
+use App\Tests\Services\Generator\Id;
 
 readonly class JobFactory
 {
@@ -16,8 +16,8 @@ readonly class JobFactory
 
     public function createRandom(): JobInterface
     {
-        $userId = (string) new Ulid();
-        $suiteId = (string) new Ulid();
+        $userId = Id::generate();
+        $suiteId = Id::generate();
 
         $maximumDurationInSeconds = rand(1, 1000);
 

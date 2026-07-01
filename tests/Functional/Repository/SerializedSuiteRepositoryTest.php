@@ -7,8 +7,8 @@ namespace App\Tests\Functional\Repository;
 use App\Entity\SerializedSuite;
 use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
+use App\Tests\Services\Generator\Id;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteRepositoryTest extends WebTestCase
 {
@@ -25,13 +25,13 @@ class SerializedSuiteRepositoryTest extends WebTestCase
 
     public function testHasDoesNotHave(): void
     {
-        self::assertFalse($this->serializedSuiteRepository->has((string) new Ulid()));
+        self::assertFalse($this->serializedSuiteRepository->has(Id::generate()));
     }
 
     public function testHasDoesHave(): void
     {
-        $jobId = (string) new Ulid();
-        $serializedSuiteId = (string) new Ulid();
+        $jobId = Id::generate();
+        $serializedSuiteId = Id::generate();
 
         $serializedSuite = new SerializedSuite(
             $jobId,

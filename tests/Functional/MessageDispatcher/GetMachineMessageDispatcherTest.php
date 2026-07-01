@@ -13,6 +13,7 @@ use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
@@ -86,7 +87,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->persistMachine($machine);
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = new MachineCreationRequestedEvent($authenticationToken, $machine);
 
@@ -121,7 +122,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->persistMachine($machine);
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
 
@@ -149,7 +150,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->persistMachine($machine);
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = new MachineRetrievedEvent($authenticationToken, $machine, $machine);
 

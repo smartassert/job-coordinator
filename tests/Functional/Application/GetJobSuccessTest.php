@@ -28,6 +28,8 @@ use App\Repository\WorkerJobCreationFailureRepository;
 use App\Tests\Application\AbstractApplicationTest;
 use App\Tests\Model\StagingConfiguration;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use App\Tests\Services\Stager;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -521,7 +523,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $resultsJob = new ResultsJob(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'awaiting-results',
                             null,
                             new MetaState(false, false, true)
@@ -646,7 +648,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $resultsJob = new ResultsJob(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'ended',
                             'complete',
                             new MetaState(true, true, false)
@@ -771,7 +773,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $serializedSuite = new SerializedSuite(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'prepared',
                             new MetaState(true, true, false)
                         );
@@ -1019,8 +1021,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
-                        $machine = $machine->setIp(md5((string) rand()));
+                        $machine = new Machine($jobId, StringValue::random(), StringValue::random());
+                        $machine = $machine->setIp(Ip::random());
                         $machine = $machine->setMetaState(new MetaState(false, false, false));
 
                         $repository->save($machine);
@@ -1144,8 +1146,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
-                        $machine = $machine->setIp(md5((string) rand()));
+                        $machine = new Machine($jobId, StringValue::random(), StringValue::random());
+                        $machine = $machine->setIp(Ip::random());
                         $machine->setMetaState(new MetaState(true, false, false));
                         $machine->setActionFailure(new MachineActionFailure(
                             $jobId,
@@ -1280,7 +1282,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $resultsJob = new ResultsJob(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'awaiting-events',
                             null,
                             new MetaState(false, false, true)
@@ -1295,7 +1297,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $serializedSuite = new SerializedSuite(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'prepared',
                             new MetaState(true, true, false),
                         );
@@ -1306,8 +1308,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
-                        $machine = $machine->setIp(md5((string) rand()));
+                        $machine = new Machine($jobId, StringValue::random(), StringValue::random());
+                        $machine = $machine->setIp(Ip::random());
                         $machine = $machine->setMetaState(new MetaState(false, false, false));
                         $machine->setIsActive();
 
@@ -1690,10 +1692,10 @@ class GetJobSuccessTest extends AbstractApplicationTest
                     ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                         \assert('' !== $jobId);
 
-                        $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
+                        $machine = new Machine($jobId, StringValue::random(), StringValue::random());
 
                         $machine = $machine->setMetaState(new MetaState(true, false, false));
-                        $machine = $machine->setIp(md5((string) rand()));
+                        $machine = $machine->setIp(Ip::random());
 
                         $repository->save($machine);
 
@@ -1818,7 +1820,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $resultsJob = new ResultsJob(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'ended',
                             'complete',
                             new MetaState(true, true, false)
@@ -1833,7 +1835,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $serializedSuite = new SerializedSuite(
                             $jobId,
-                            md5((string) rand()),
+                            StringValue::random(),
                             'prepared',
                             new MetaState(true, true, false),
                         );
@@ -1846,7 +1848,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $machine = new Machine($jobId, 'complete', 'end');
                         $machine = $machine->setMetaState(new MetaState(true, true, false));
-                        $machine = $machine->setIp(md5((string) rand()));
+                        $machine = $machine->setIp(Ip::random());
 
                         $repository->save($machine);
 
@@ -2005,8 +2007,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
             ->withMachineCreator(function (string $jobId, MachineRepository $repository) {
                 \assert('' !== $jobId);
 
-                $machine = new Machine($jobId, md5((string) rand()), md5((string) rand()));
-                $machine = $machine->setIp(md5((string) rand()));
+                $machine = new Machine($jobId, StringValue::random(), StringValue::random());
+                $machine = $machine->setIp(Ip::random());
 
                 $repository->save($machine);
 
@@ -2271,7 +2273,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                 $resultsJob = new ResultsJob(
                     $jobId,
-                    md5((string) rand()),
+                    StringValue::random(),
                     'ended',
                     'complete',
                     new MetaState(true, true, false)
@@ -2286,7 +2288,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                 $serializedSuite = new SerializedSuite(
                     $jobId,
-                    md5((string) rand()),
+                    StringValue::random(),
                     'prepared',
                     new MetaState(true, true, false),
                 );
@@ -2299,7 +2301,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                 $machine = new Machine($jobId, 'complete', 'end');
                 $machine = $machine->setMetaState(new MetaState(true, true, false));
-                $machine = $machine->setIp(md5((string) rand()));
+                $machine = $machine->setIp(Ip::random());
 
                 $repository->save($machine);
 

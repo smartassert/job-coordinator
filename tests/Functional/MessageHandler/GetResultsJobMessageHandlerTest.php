@@ -17,6 +17,8 @@ use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -25,13 +27,12 @@ use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -55,7 +56,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeResultsClientThrowsException(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new GetResultsJobMessage(self::$apiToken, $jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -92,7 +93,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
         \assert($resultsJobFactory instanceof ResultsJobFactory);
-        $resultsJobState = md5((string) rand());
+        $resultsJobState = StringValue::random();
         $resultsJobFactory->create(job: $job, state: $resultsJobState);
 
         $resultsClient = HttpMockedResultsClientFactory::create([

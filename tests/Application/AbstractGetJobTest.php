@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Application;
 
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
-use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractGetJobTest extends AbstractApplicationTest
 {
@@ -16,7 +16,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->jobId = (string) new Ulid();
+        $this->jobId = Id::generate();
     }
 
     #[DataProvider('getBadMethodDataProvider')]
@@ -78,7 +78,7 @@ abstract class AbstractGetJobTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
-        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, (string) new Ulid());
+        $response = self::$staticApplicationClient->makeGetJobRequest($apiToken, Id::generate());
 
         echo $response->getBody()->getContents();
 

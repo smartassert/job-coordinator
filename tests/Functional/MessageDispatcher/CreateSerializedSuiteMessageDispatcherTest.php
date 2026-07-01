@@ -11,10 +11,11 @@ use App\MessageDispatcher\CreateSerializedSuiteMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 {
@@ -45,11 +46,11 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
         $parameters = [
-            md5((string) rand()) => md5((string) rand()),
-            md5((string) rand()) => md5((string) rand()),
-            md5((string) rand()) => md5((string) rand()),
+            StringValue::random() => StringValue::random(),
+            StringValue::random() => StringValue::random(),
+            StringValue::random() => StringValue::random(),
         ];
 
         $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), $parameters);
@@ -74,7 +75,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNotReady(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);

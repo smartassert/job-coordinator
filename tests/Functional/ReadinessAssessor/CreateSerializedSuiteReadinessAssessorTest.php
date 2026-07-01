@@ -11,9 +11,9 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
 {
@@ -56,7 +56,7 @@ class CreateSerializedSuiteReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository->save(
                         new SerializedSuite(
                             $job->getId(),
-                            (string) new Ulid(),
+                            Id::generate(),
                             'state',
                             new MetaState(false, false, true),
                         )

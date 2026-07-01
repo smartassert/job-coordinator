@@ -12,13 +12,14 @@ use App\Repository\ResultsJobRepository;
 use App\Services\ResultsJobMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class ResultsJobMutatorTest extends WebTestCase
 {
@@ -112,7 +113,7 @@ class ResultsJobMutatorTest extends WebTestCase
      */
     public static function updateSuccessDataProvider(): array
     {
-        $resultsJobToken = md5((string) rand());
+        $resultsJobToken = StringValue::random();
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();
         };
@@ -124,10 +125,10 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'resultsJobCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new ResultsJobRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $jobId,
                         new ResultsClientJob(
                             $jobId,
@@ -150,7 +151,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 'resultsJobCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -180,7 +181,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -216,7 +217,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -252,7 +253,7 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),

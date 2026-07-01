@@ -17,12 +17,14 @@ use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class MachineMutatorTest extends WebTestCase
 {
@@ -137,7 +139,7 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'machineCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
@@ -152,7 +154,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($jobId),
@@ -260,13 +262,13 @@ class MachineMutatorTest extends WebTestCase
             return $jobFactory->createRandom();
         };
 
-        $machineId = (string) new Ulid();
+        $machineId = Id::generate();
 
         $arbitraryMachine = MachineFactory::create(
             $machineId,
-            md5((string) rand()),
-            md5((string) rand()),
-            [md5((string) rand())],
+            StringValue::random(),
+            StringValue::random(),
+            [Ip::random()],
             false,
             false,
             new WorkerManagerClientMetaState(false, false, false),
@@ -279,10 +281,10 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'machineCreator' => function () {},
                 'eventCreator' => function () use ($arbitraryMachine) {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineIsActiveEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $jobId,
                         '127.0.0.1',
                         $arbitraryMachine,
@@ -297,7 +299,7 @@ class MachineMutatorTest extends WebTestCase
                 'machineCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
                     return new MachineIsActiveEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.1',
                         $arbitraryMachine,
@@ -319,7 +321,7 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
                     return new MachineIsActiveEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.1',
                         $arbitraryMachine,
@@ -342,7 +344,7 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
                     return new MachineIsActiveEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.1',
                         $arbitraryMachine,
@@ -367,7 +369,7 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
                     return new MachineIsActiveEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.2',
                         $arbitraryMachine,
@@ -426,15 +428,15 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'machineCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
                         MachineFactory::create(
                             $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            [md5((string) rand())],
+                            StringValue::random(),
+                            StringValue::random(),
+                            [Ip::random()],
                             true,
                             false,
                             new WorkerManagerClientMetaState(false, false, false),
@@ -450,15 +452,15 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineHasActionFailureEvent(
                         $jobId,
                         MachineFactory::create(
                             $jobId,
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            [md5((string) rand())],
+                            StringValue::random(),
+                            StringValue::random(),
+                            [Ip::random()],
                             true,
                             false,
                             new WorkerManagerClientMetaState(false, false, false),
@@ -483,9 +485,9 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         MachineFactory::create(
                             $job->getId(),
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            [md5((string) rand())],
+                            StringValue::random(),
+                            StringValue::random(),
+                            [Ip::random()],
                             true,
                             false,
                             new WorkerManagerClientMetaState(false, false, false),
@@ -518,9 +520,9 @@ class MachineMutatorTest extends WebTestCase
                         $job->getId(),
                         MachineFactory::create(
                             $job->getId(),
-                            md5((string) rand()),
-                            md5((string) rand()),
-                            [md5((string) rand())],
+                            StringValue::random(),
+                            StringValue::random(),
+                            [Ip::random()],
                             true,
                             false,
                             new WorkerManagerClientMetaState(false, false, false),
@@ -582,10 +584,10 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'machineCreator' => function () {},
                 'eventCreator' => function () {
-                    $jobId = (string) new Ulid();
+                    $jobId = Id::generate();
 
                     return new MachineIsReadyEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $jobId,
                         '127.0.0.1',
                     );
@@ -599,7 +601,7 @@ class MachineMutatorTest extends WebTestCase
                 'machineCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineIsReadyEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.1',
                     );
@@ -621,7 +623,7 @@ class MachineMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new MachineIsReadyEvent(
-                        md5((string) rand()),
+                        StringValue::random(),
                         $job->getId(),
                         '127.0.0.1',
                     );

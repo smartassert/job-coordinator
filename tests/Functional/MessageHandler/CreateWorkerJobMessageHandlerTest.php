@@ -28,6 +28,9 @@ use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
@@ -36,7 +39,6 @@ use SmartAssert\ServiceClient\Exception\CurlException;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -53,8 +55,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotYetHandleable(): void
     {
-        $jobId = (string) new Ulid();
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+        $jobId = Id::generate();
+        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, Ip::random());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -74,8 +76,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, md5((string) rand()));
+        $jobId = Id::generate();
+        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, Ip::random());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -125,13 +127,11 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             serializedSuiteClient: $serializedSuiteClient,
         );
 
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-
         $message = new CreateWorkerJobMessage(
             self::$apiToken,
             $jobId,
             $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
+            Ip::random()
         );
 
         $exception = null;
@@ -187,7 +187,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
         $this->createResultsJob($job);
 
-        $serializedSuiteContent = md5((string) rand());
+        $serializedSuiteContent = StringValue::random();
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
@@ -196,7 +196,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($serializedSuiteContent)
         ;
 
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $machineIpAddress = Ip::random();
 
         $workerJobCreateException = new CurlException(
             \Mockery::mock(RequestInterface::class),
@@ -279,7 +279,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
         $this->createResultsJob($job);
 
-        $serializedSuiteContent = md5((string) rand());
+        $serializedSuiteContent = StringValue::random();
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient
@@ -288,7 +288,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($serializedSuiteContent)
         ;
 
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $machineIpAddress = Ip::random();
         $workerJob = WorkerClientJobFactory::createRandom();
 
         $workerClient = HttpMockedWorkerClientFactory::create([
@@ -370,7 +370,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     ): SerializedSuite {
         $serializedSuite = new SerializedSuite(
             $job->getId(),
-            md5((string) rand()),
+            Id::generate(),
             $state,
             $metaState,
         );

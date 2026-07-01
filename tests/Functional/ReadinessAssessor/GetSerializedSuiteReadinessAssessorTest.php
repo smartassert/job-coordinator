@@ -11,6 +11,7 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -51,7 +52,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
-                        md5((string) rand()),
+                        Id::generate(),
                         'prepared',
                         new MetaState(true, true, false),
                     );
@@ -64,7 +65,7 @@ class GetSerializedSuiteReadinessAssessorTest extends WebTestCase
                 'setup' => function (JobInterface $job, SerializedSuiteRepository $serializedSuiteRepository): void {
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
-                        md5((string) rand()),
+                        Id::generate(),
                         'preparing',
                         new MetaState(false, false, true),
                     );

@@ -9,6 +9,7 @@ use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -67,22 +68,22 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
             'no matching states' => [
                 'statesCreator' => function (JobInterface $job, WorkerComponentStateRepository $repository) {
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::APPLICATION)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::APPLICATION)
                             ->setState('compiling')
                     );
 
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::COMPILATION)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::COMPILATION)
                             ->setState('running')
                     );
 
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::EXECUTION)
                             ->setState('pending')
                     );
 
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
                     );
                 },
@@ -117,12 +118,12 @@ class WorkerComponentStateRepositoryTest extends WebTestCase
                     );
 
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EXECUTION)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::EXECUTION)
                             ->setState('pending')
                     );
 
                     $repository->save(
-                        new WorkerComponentState(md5((string) rand()), WorkerComponentName::EVENT_DELIVERY)
+                        new WorkerComponentState(Id::generate(), WorkerComponentName::EVENT_DELIVERY)
                             ->setState('running')
                     );
                 },
