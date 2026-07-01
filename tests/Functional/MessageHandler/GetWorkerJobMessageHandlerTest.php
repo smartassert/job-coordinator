@@ -31,7 +31,9 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
+        $authenticationToken = StringValue::random();
+
+        $message = new GetWorkerJobMessage($authenticationToken, $jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -52,8 +54,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerClientThrowsException(): void
     {
         $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
         $machineIpAddress = Ip::random();
-        $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
+
+        $message = new GetWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -85,8 +90,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccess(): void
     {
         $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
         $machineIpAddress = Ip::random();
-        $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
+
+        $message = new GetWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -169,7 +177,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState),
+            new WorkerJobRetrievedEvent($authenticationToken, $jobId, $machineIpAddress, $retrievedWorkerState),
             $event
         );
     }

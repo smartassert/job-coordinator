@@ -85,6 +85,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $jobCount = $this->jobRepository->count([]);
 
         $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $irrelevantApplicationState = new WorkerClientApplicationState(
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
@@ -93,7 +94,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
         );
 
-        $event = new WorkerJobRetrievedEvent($jobId, Ip::random(), $irrelevantApplicationState);
+        $event = new WorkerJobRetrievedEvent($authenticationToken, $jobId, Ip::random(), $irrelevantApplicationState);
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
@@ -123,8 +124,15 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
+        $authenticationToken = StringValue::random();
         $machineIpAddress = Ip::random();
-        $event = new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedApplicationState);
+
+        $event = new WorkerJobRetrievedEvent(
+            $authenticationToken,
+            $job->getId(),
+            $machineIpAddress,
+            $retrievedApplicationState
+        );
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
         self::assertEquals(
