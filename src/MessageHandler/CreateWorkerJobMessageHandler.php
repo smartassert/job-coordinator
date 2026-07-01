@@ -94,6 +94,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         }
 
         $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
+            $message->authenticationToken,
             $message->getJobId(),
             $message->machineIpAddress,
             $workerJob,

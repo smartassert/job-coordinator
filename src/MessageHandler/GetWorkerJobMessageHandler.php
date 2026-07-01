@@ -46,6 +46,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
 
         try {
             $this->eventDispatcher->dispatch(new WorkerJobRetrievedEvent(
+                $message->authenticationToken,
                 $message->getJobId(),
                 $message->machineIpAddress,
                 $workerClient->getApplicationState()

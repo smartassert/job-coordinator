@@ -181,6 +181,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
     public function testRemoveWorkerJobStartRequests(): void
     {
         $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -197,7 +198,12 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeWorkerJobCreateRequests(
-            new CreateWorkerJobRequestedEvent($jobId, '127.0.0.1', WorkerClientJobFactory::createRandom())
+            new CreateWorkerJobRequestedEvent(
+                $authenticationToken,
+                $jobId,
+                '127.0.0.1',
+                WorkerClientJobFactory::createRandom(),
+            )
         );
     }
 
