@@ -14,7 +14,7 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Model\RemoteRequestType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -54,7 +54,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
             MachineTerminationRequestedEvent::class => [
                 ['removeMachineTerminationRequests', 0],
             ],
-            WorkerStateRetrievedEvent::class => [
+            WorkerJobRetrievedEvent::class => [
                 ['removeWorkerJobGetRequests', 0],
             ],
             MachineIsReadyEvent::class => [
@@ -103,7 +103,7 @@ readonly class RemoteRequestRemoverForEvents implements EventSubscriberInterface
         $this->removeForEventAndType($event, RemoteRequestType::createForMachineTermination());
     }
 
-    public function removeWorkerJobGetRequests(WorkerStateRetrievedEvent $event): void
+    public function removeWorkerJobGetRequests(WorkerJobRetrievedEvent $event): void
     {
         $this->removeForEventAndType($event, RemoteRequestType::createForWorkerJobRetrieval());
     }

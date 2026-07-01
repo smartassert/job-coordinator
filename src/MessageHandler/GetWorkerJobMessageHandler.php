@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -45,7 +45,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
         try {
-            $this->eventDispatcher->dispatch(new WorkerStateRetrievedEvent(
+            $this->eventDispatcher->dispatch(new WorkerJobRetrievedEvent(
                 $message->getJobId(),
                 $message->machineIpAddress,
                 $workerClient->getApplicationState()

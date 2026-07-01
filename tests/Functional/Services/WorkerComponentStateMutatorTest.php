@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Repository\JobRepository;
@@ -71,8 +71,8 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     public static function eventSubscriptionsDataProvider(): array
     {
         return [
-            WorkerStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
+            WorkerJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => WorkerJobRetrievedEvent::class,
                 'expectedMethod' => 'setOnWorkerStateRetrievedEvent',
             ],
         ];
@@ -91,7 +91,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
         );
 
-        $event = new WorkerStateRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
+        $event = new WorkerJobRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
@@ -122,7 +122,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
         $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
-        $event = new WorkerStateRetrievedEvent($job->getId(), $machineIpAddress, $retrievedApplicationState);
+        $event = new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedApplicationState);
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
         self::assertEquals(

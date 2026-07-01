@@ -6,7 +6,7 @@ namespace App\Event;
 
 use SmartAssert\WorkerClient\Model\ApplicationState;
 
-class WorkerStateRetrievedEvent extends AbstractWorkerEvent
+class WorkerJobRetrievedEvent extends AbstractWorkerEvent
 {
     /**
      * @param non-empty-string $jobId

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetWorkerJobMessageHandler;
@@ -162,11 +162,11 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler($message);
 
-        $events = $this->eventRecorder->all(WorkerStateRetrievedEvent::class);
+        $events = $this->eventRecorder->all(WorkerJobRetrievedEvent::class);
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerStateRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState),
+            new WorkerJobRetrievedEvent($jobId, $machineIpAddress, $retrievedWorkerState),
             $event
         );
     }
