@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
@@ -58,8 +58,8 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
                 'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
                 'expectedMethod' => 'dispatchImmediately',
             ],
-            WorkerStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
+            WorkerJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => WorkerJobRetrievedEvent::class,
                 'expectedMethod' => 'dispatchImmediately',
             ],
         ];

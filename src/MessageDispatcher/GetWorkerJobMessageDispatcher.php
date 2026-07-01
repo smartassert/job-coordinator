@@ -8,7 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIpAddressInterface;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,7 +29,7 @@ readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
             CreateWorkerJobRequestedEvent::class => [
                 ['dispatchImmediately', 100],
             ],
-            WorkerStateRetrievedEvent::class => [
+            WorkerJobRetrievedEvent::class => [
                 ['dispatchImmediately', 100],
             ],
         ];

@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Model\MetaState;
 use App\Repository\WorkerComponentStateRepository;
 use SmartAssert\WorkerClient\Model\ComponentState;
@@ -25,13 +25,13 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WorkerStateRetrievedEvent::class => [
+            WorkerJobRetrievedEvent::class => [
                 ['setOnWorkerStateRetrievedEvent', 1000],
             ],
         ];
     }
 
-    public function setOnWorkerStateRetrievedEvent(WorkerStateRetrievedEvent $event): void
+    public function setOnWorkerStateRetrievedEvent(WorkerJobRetrievedEvent $event): void
     {
         $job = $this->jobStore->retrieve($event->getJobId());
         if (null === $job) {

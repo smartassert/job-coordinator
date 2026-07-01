@@ -13,7 +13,7 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Event\WorkerStateRetrievedEvent;
+use App\Event\WorkerJobRetrievedEvent;
 use App\Services\RemoteRequestRemoverForEvents;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -82,8 +82,8 @@ class RemoteRequestRemoverForEventsTest extends WebTestCase
                 'expectedListenedForEvent' => MachineTerminationRequestedEvent::class,
                 'expectedMethod' => 'removeMachineTerminationRequests',
             ],
-            WorkerStateRetrievedEvent::class => [
-                'expectedListenedForEvent' => WorkerStateRetrievedEvent::class,
+            WorkerJobRetrievedEvent::class => [
+                'expectedListenedForEvent' => WorkerJobRetrievedEvent::class,
                 'expectedMethod' => 'removeWorkerJobGetRequests',
             ],
             MachineIsReadyEvent::class => [
