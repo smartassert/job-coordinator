@@ -13,6 +13,7 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -215,7 +216,7 @@ class RemoteRequestStateTrackerTest extends WebTestCase
 
     private static function createMessage(MessageState $state): JobRemoteRequestMessageInterface
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $message = \Mockery::mock(JobRemoteRequestMessageInterface::class);
         $message

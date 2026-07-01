@@ -10,6 +10,7 @@ use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -122,7 +123,7 @@ class RemoteRequestFailureRepositoryTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation())
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation())
                             ->setFailure($remoteRequestFailure),
                     ];
                 },

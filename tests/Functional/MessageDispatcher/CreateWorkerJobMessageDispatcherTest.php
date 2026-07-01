@@ -13,10 +13,11 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\JobStore;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 {
@@ -55,7 +56,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobStore instanceof JobStore);
 
         $event = new MachineIsReadyEvent(
-            md5((string) rand()),
+            StringValue::random(),
             $job->getId(),
             '127.0.0.1',
         );
@@ -80,7 +81,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNoJob(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $jobRemoteRequestMessageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($jobRemoteRequestMessageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -97,7 +98,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         );
 
         $event = new MachineIsReadyEvent(
-            md5((string) rand()),
+            StringValue::random(),
             $jobId,
             '127.0.0.1',
         );
@@ -120,7 +121,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobStore instanceof JobStore);
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = new MachineIsReadyEvent($authenticationToken, $job->getId(), $machineIpAddress);
 
@@ -162,7 +163,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $job = $jobFactory->createRandom();
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $message = new CreateWorkerJobMessage(
             $authenticationToken,

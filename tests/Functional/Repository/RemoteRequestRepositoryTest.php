@@ -11,10 +11,10 @@ use App\Enum\RemoteRequestFailureType;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRepositoryTest extends WebTestCase
 {
@@ -67,7 +67,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
      */
     public static function getLargestIndexDataProvider(): array
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         return [
             'no existing remote requests' => [
@@ -78,7 +78,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
             ],
             'no existing remote requests for job' => [
                 'existingRemoteRequests' => (function () {
-                    $jobId = md5((string) rand());
+                    $jobId = Id::generate();
 
                     return [
                         new RemoteRequest($jobId, RemoteRequestType::createForResultsJobCreation(), 0),
@@ -190,7 +190,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
@@ -208,11 +208,11 @@ class RemoteRequestRepositoryTest extends WebTestCase
                     \assert($remoteRequestFailure instanceof RemoteRequestFailure);
 
                     return [
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0)
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0)
                             ->setFailure($remoteRequestFailure),
                     ];
                 },
@@ -227,9 +227,9 @@ class RemoteRequestRepositoryTest extends WebTestCase
                 },
                 'remoteRequestsCreator' => function () {
                     return [
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
-                        new RemoteRequest(md5((string) rand()), RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0),
+                        new RemoteRequest(Id::generate(), RemoteRequestType::createForMachineCreation(), 0),
                     ];
                 },
                 'remoteRequestFailureId' => RemoteRequestFailure::generateId(RemoteRequestFailureType::HTTP, 404, null),
@@ -264,7 +264,7 @@ class RemoteRequestRepositoryTest extends WebTestCase
      */
     public static function findAllForJobAndComponentDataProvider(): array
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         return [
             'no remote requests' => [

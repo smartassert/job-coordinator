@@ -12,12 +12,13 @@ use App\Repository\SerializedSuiteRepository;
 use App\Services\SerializedSuiteFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SourcesSerializedSuite;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class SerializedSuiteFactoryTest extends WebTestCase
 {
@@ -80,9 +81,9 @@ class SerializedSuiteFactoryTest extends WebTestCase
     {
         $jobCount = $this->jobRepository->count([]);
 
-        $jobId = (string) new Ulid();
-        $serializedSuiteId = (string) new Ulid();
-        $suiteId = (string) new Ulid();
+        $jobId = Id::generate();
+        $serializedSuiteId = Id::generate();
+        $suiteId = Id::generate();
 
         $event = new SerializedSuiteCreatedEvent(
             'authentication token',
@@ -103,9 +104,9 @@ class SerializedSuiteFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->serializedSuiteRepository->count([]));
 
-        $serializedSuiteId = md5((string) rand());
-        $suiteId = md5((string) rand());
-        $serializedSuiteState = md5((string) rand());
+        $serializedSuiteId = Id::generate();
+        $suiteId = Id::generate();
+        $serializedSuiteState = StringValue::random();
 
         $sourcesSerializedSuite = new SourcesSerializedSuite(
             $serializedSuiteId,

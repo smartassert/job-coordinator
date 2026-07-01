@@ -8,6 +8,7 @@ use App\Model\JobInterface;
 use App\Services\JobStore;
 use App\Tests\Application\AbstractApplicationTest;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\Generator\Id;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 use Symfony\Component\Uid\Ulid;
 
@@ -30,7 +31,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
-        $suiteId = (string) new Ulid();
+        $suiteId = Id::generate();
 
         $jobStore = self::getContainer()->get(JobStore::class);
         \assert($jobStore instanceof JobStore);
@@ -68,7 +69,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         \assert($apiTokenProvider instanceof ApiTokenProvider);
         $apiToken = $apiTokenProvider->get('user1@example.com');
 
-        $suiteId = (string) new Ulid();
+        $suiteId = Id::generate();
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
         self::assertSame(200, $createResponse->getStatusCode());

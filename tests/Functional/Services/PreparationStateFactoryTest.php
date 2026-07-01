@@ -25,6 +25,8 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\PreparationStateFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -129,12 +131,12 @@ class PreparationStateFactoryTest extends WebTestCase
                     $serializedSuiteRepository->save(
                         new SerializedSuite(
                             $job->getId(),
-                            md5((string) rand()),
-                            md5((string) rand()),
+                            Id::generate(),
+                            StringValue::random(),
                             new MetaState(false, false, true),
                         )
                     );
-                    $machineRepository->save(new Machine($job->getId(), md5((string) rand()), md5((string) rand())));
+                    $machineRepository->save(new Machine($job->getId(), StringValue::random(), StringValue::random()));
                     $workerComponentStateRepository->save(
                         new WorkerComponentState($job->getId(), WorkerComponentName::APPLICATION)
                             ->setState('awaiting-job')

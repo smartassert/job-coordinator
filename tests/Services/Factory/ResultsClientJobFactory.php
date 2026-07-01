@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
+use App\Tests\Services\Generator\StringValue;
 use SmartAssert\ResultsClient\Model\Job;
 use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\MetaState;
@@ -31,9 +32,9 @@ class ResultsClientJobFactory
     public static function createRandom(): Job
     {
         return self::create(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
+            StringValue::random(),
+            StringValue::random(),
+            StringValue::random(),
         );
     }
 }

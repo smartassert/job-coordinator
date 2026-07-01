@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\Machine;
 use App\Repository\MachineRepository;
+use App\Tests\Services\Generator\Id;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class MachineRepositoryTest extends WebTestCase
 {
@@ -24,12 +24,12 @@ class MachineRepositoryTest extends WebTestCase
 
     public function testHasDoesNotHave(): void
     {
-        self::assertFalse($this->machineRepository->has((string) new Ulid()));
+        self::assertFalse($this->machineRepository->has(Id::generate()));
     }
 
     public function testHasDoesHave(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $machine = new Machine($jobId, 'up/active', 'active');
         $this->machineRepository->save($machine);

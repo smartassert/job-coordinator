@@ -19,9 +19,9 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class CreateMachineReadinessAssessorTest extends WebTestCase
 {
@@ -82,7 +82,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
                     \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite(
@@ -116,7 +116,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
                     \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite(
@@ -134,7 +134,7 @@ class CreateMachineReadinessAssessorTest extends WebTestCase
                     $serializedSuiteRepository = $services[SerializedSuiteRepository::class];
                     \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-                    $serializedSuiteId = (string) new Ulid();
+                    $serializedSuiteId = Id::generate();
 
                     $serializedSuiteRepository->save(
                         new SerializedSuite(

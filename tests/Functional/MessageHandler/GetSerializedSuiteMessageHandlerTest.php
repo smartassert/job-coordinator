@@ -17,19 +17,20 @@ use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
-        $suiteId = (string) new Ulid();
-        $serializedSuiteId = (string) new Ulid();
+        $jobId = Id::generate();
+        $suiteId = Id::generate();
+        $serializedSuiteId = Id::generate();
         $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -73,14 +74,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $serializedSuite = new SerializedSuite(
             $job->getId(),
-            md5((string) rand()),
+            Id::generate(),
             'requested',
             new MetaState(false, false, true),
         );
         $serializedSuiteRepository->save($serializedSuite);
         \assert('' !== $serializedSuite->id);
 
-        $serializedSuiteClientException = new \Exception(md5((string) rand()));
+        $serializedSuiteClientException = new \Exception(StringValue::random());
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
         $serializedSuiteClient

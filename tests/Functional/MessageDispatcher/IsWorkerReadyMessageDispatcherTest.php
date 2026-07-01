@@ -13,12 +13,13 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
-use Symfony\Component\Uid\Ulid;
 
 class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 {
@@ -70,7 +71,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelyNotReady(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $machineIpAddress = '127.0.0.1';
         $machine = new Machine(
@@ -104,8 +105,8 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 
     public function testDispatchImmediatelySuccess(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $machineIpAddress = '127.0.0.1';
         $machine = new Machine(
@@ -141,7 +142,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         $job = $jobFactory->createRandom();
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $message = new IsWorkerReadyMessage($authenticationToken, $job->getId(), $machineIpAddress);
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);

@@ -13,20 +13,21 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -48,8 +49,8 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotYetHandleable(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -71,8 +72,8 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
         $machineIpAddress = '127.0.0.1';
 
         $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
@@ -102,8 +103,8 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccessIsNotReady(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
         $machineIpAddress = '127.0.0.1';
 
         $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
@@ -138,8 +139,8 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccessIsReady(): void
     {
-        $jobId = (string) new Ulid();
-        $authenticationToken = (string) new Ulid();
+        $jobId = Id::generate();
+        $authenticationToken = StringValue::random();
         $machineIpAddress = '127.0.0.1';
 
         $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);

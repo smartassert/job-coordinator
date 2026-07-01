@@ -8,6 +8,8 @@ use App\Entity\SerializedSuite;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Repository\SerializedSuiteRepository;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 
 readonly class SerializedSuiteFactory
 {
@@ -17,8 +19,8 @@ readonly class SerializedSuiteFactory
 
     public function createNewForJob(JobInterface $job): SerializedSuite
     {
-        $serializedSuiteId = md5((string) rand());
-        $state = md5((string) rand());
+        $serializedSuiteId = Id::generate();
+        $state = StringValue::random();
 
         $serializedSuite = new SerializedSuite(
             $job->getId(),

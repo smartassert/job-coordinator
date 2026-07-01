@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Application;
 
 use App\Request\CreateJobRequest;
+use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
-use Symfony\Component\Uid\Ulid;
 
 abstract class AbstractCreateJobTest extends AbstractApplicationTest
 {
@@ -17,7 +17,7 @@ abstract class AbstractCreateJobTest extends AbstractApplicationTest
     {
         parent::setUp();
 
-        $this->suiteId = (string) new Ulid();
+        $this->suiteId = Id::generate();
     }
 
     #[DataProvider('createBadMethodDataProvider')]

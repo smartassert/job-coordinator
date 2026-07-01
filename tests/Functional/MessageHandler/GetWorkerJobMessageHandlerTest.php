@@ -14,6 +14,10 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Generator\BoolValue;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -21,13 +25,12 @@ use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use SmartAssert\WorkerClient\Model\MetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -48,8 +51,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $jobId = (string) new Ulid();
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $jobId = Id::generate();
+        $machineIpAddress = Ip::random();
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -81,8 +84,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = (string) new Ulid();
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $jobId = Id::generate();
+        $machineIpAddress = Ip::random();
         $message = new GetWorkerJobMessage($jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -93,20 +96,20 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $retrievedWorkerState = new ApplicationState(
             new ComponentState(
-                md5((string) rand()),
-                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+                StringValue::random(),
+                new MetaState(BoolValue::random(), BoolValue::random(), BoolValue::random())
             ),
             new ComponentState(
-                md5((string) rand()),
-                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+                StringValue::random(),
+                new MetaState(BoolValue::random(), BoolValue::random(), BoolValue::random())
             ),
             new ComponentState(
-                md5((string) rand()),
-                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+                StringValue::random(),
+                new MetaState(BoolValue::random(), BoolValue::random(), BoolValue::random())
             ),
             new ComponentState(
-                md5((string) rand()),
-                new MetaState((bool) rand(0, 1), (bool) rand(0, 1), (bool) rand(0, 1))
+                StringValue::random(),
+                new MetaState(BoolValue::random(), BoolValue::random(), BoolValue::random())
             ),
         );
 

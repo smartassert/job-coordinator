@@ -10,12 +10,13 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Uid\Ulid;
 
 class MachineStateEventDispatcherTest extends WebTestCase
 {
@@ -32,10 +33,10 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     public function testDispatchMachineStateChangeEventNoStateChange(): void
     {
-        $machineId = (string) new Ulid();
+        $machineId = Id::generate();
 
         $event = new MachineRetrievedEvent(
-            md5((string) rand()),
+            StringValue::random(),
             MachineFactory::create(
                 $machineId,
                 'unchanged-state',
@@ -65,8 +66,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     public function testDispatchMachineStateChangeEventHasStateChange(): void
     {
-        $machineId = (string) new Ulid();
-        $authenticationToken = md5((string) rand());
+        $machineId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $previousMachine = MachineFactory::create(
             $machineId,
@@ -117,12 +118,12 @@ class MachineStateEventDispatcherTest extends WebTestCase
      */
     public static function dispatchMachineIsActiveEventNotActiveDataProvider(): array
     {
-        $machineId = (string) new Ulid();
+        $machineId = Id::generate();
 
         return [
             'unknown -> unknown' => [
                 'event' => new MachineRetrievedEvent(
-                    md5((string) rand()),
+                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'unknown',
@@ -145,7 +146,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'unknown -> finding' => [
                 'event' => new MachineRetrievedEvent(
-                    md5((string) rand()),
+                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'unknown',
@@ -168,7 +169,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'finding -> finding' => [
                 'event' => new MachineRetrievedEvent(
-                    md5((string) rand()),
+                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'find/finding',
@@ -191,7 +192,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'finding -> active without ip address' => [
                 'event' => new MachineRetrievedEvent(
-                    md5((string) rand()),
+                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'find/finding',
@@ -232,8 +233,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
      */
     public static function dispatchMachineIsActiveEventIsActiveDataProvider(): array
     {
-        $machineId = (string) new Ulid();
-        $authenticationToken = md5((string) rand());
+        $machineId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         return [
             'unknown -> active' => [
@@ -315,8 +316,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     public function testDispatchMachineHasActionFailureEventNoActionFailure(): void
     {
-        $machineId = (string) new Ulid();
-        $authenticationToken = md5((string) rand());
+        $machineId = Id::generate();
+        $authenticationToken = StringValue::random();
 
         $previousMachine = MachineFactory::create(
             $machineId,
@@ -349,8 +350,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
     {
-        $machineId = (string) new Ulid();
-        $authenticationToken = md5((string) rand());
+        $machineId = Id::generate();
+        $authenticationToken = StringValue::random();
         $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
 
         $previousMachine = MachineFactory::create(

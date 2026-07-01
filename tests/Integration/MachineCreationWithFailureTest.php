@@ -6,10 +6,10 @@ namespace App\Tests\Integration;
 
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
+use App\Tests\Services\Generator\StringValue;
 use SmartAssert\TestSourcesClient\FileClient;
 use SmartAssert\TestSourcesClient\FileSourceClient;
 use SmartAssert\TestSourcesClient\SuiteClient;
-use Symfony\Component\Uid\Ulid;
 
 class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
 {
@@ -90,7 +90,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         $fileSourceClient = self::getContainer()->get(FileSourceClient::class);
         \assert($fileSourceClient instanceof FileSourceClient);
 
-        $fileSourceLabel = (string) new Ulid();
+        $fileSourceLabel = StringValue::random();
 
         $fileSourceId = $fileSourceClient->create(self::$apiToken, $fileSourceLabel);
         \assert(is_string($fileSourceId));
@@ -103,7 +103,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         $suiteClient = self::getContainer()->get(SuiteClient::class);
         \assert($suiteClient instanceof SuiteClient);
 
-        $suiteLabel = (string) new Ulid();
+        $suiteLabel = StringValue::random();
 
         $suiteId = $suiteClient->create(self::$apiToken, $fileSourceId, $suiteLabel, ['test.yaml']);
         \assert(is_string($suiteId));

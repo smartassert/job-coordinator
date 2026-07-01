@@ -13,13 +13,15 @@ use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerComponentStateMutator;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerClient\Model\ApplicationState as WorkerClientApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState as WorkerClientComponentState;
 use SmartAssert\WorkerClient\Model\MetaState as WorkerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Uid\Ulid;
 
 class WorkerComponentStateMutatorTest extends WebTestCase
 {
@@ -82,7 +84,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     {
         $jobCount = $this->jobRepository->count([]);
 
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
 
         $irrelevantApplicationState = new WorkerClientApplicationState(
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
@@ -91,7 +93,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
         );
 
-        $event = new WorkerJobRetrievedEvent($jobId, md5((string) rand()), $irrelevantApplicationState);
+        $event = new WorkerJobRetrievedEvent($jobId, Ip::random(), $irrelevantApplicationState);
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
@@ -121,7 +123,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
-        $machineIpAddress = rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255) . '.' . rand(0, 255);
+        $machineIpAddress = Ip::random();
         $event = new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedApplicationState);
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
@@ -165,16 +167,16 @@ class WorkerComponentStateMutatorTest extends WebTestCase
     {
         $applicationStates = [
             new WorkerClientApplicationState(
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
             ),
             new WorkerClientApplicationState(
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
-                new WorkerClientComponentState(md5((string) rand()), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
+                new WorkerClientComponentState(StringValue::random(), new WorkerClientMetaState(false, false, false)),
             ),
         ];
 

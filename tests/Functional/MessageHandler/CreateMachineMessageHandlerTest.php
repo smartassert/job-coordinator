@@ -22,18 +22,18 @@ use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\Id;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Uid\Ulid;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeNotYetHandleable(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -58,7 +58,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeNotHandleable(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -83,7 +83,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = (string) new Ulid();
+        $jobId = Id::generate();
         $message = new CreateMachineMessage(self::$apiToken, $jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
@@ -116,7 +116,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
-        $serializedSuiteId = (string) new Ulid();
+        $serializedSuiteId = Id::generate();
 
         $serializedSuiteRepository->save(
             new SerializedSuite(

@@ -14,6 +14,7 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\Model\JobInterface;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
+use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -77,7 +78,7 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = $eventCreator($job, $authenticationToken);
         \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobRetrievedEvent);
@@ -109,7 +110,7 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = md5((string) rand());
+        $authenticationToken = StringValue::random();
 
         $event = $eventCreator($job, $authenticationToken);
         \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobRetrievedEvent);

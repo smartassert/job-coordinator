@@ -20,18 +20,20 @@ use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
+use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
-use Symfony\Component\Uid\Ulid;
 
 class RemoteRequestRemoverForEventsTest extends TestCase
 {
     public function testRemoveMachineCreateRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -54,9 +56,9 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 '127.0.0.1',
                 MachineFactory::create(
                     $jobId,
-                    md5((string) rand()),
-                    md5((string) rand()),
-                    [md5((string) rand())],
+                    StringValue::random(),
+                    StringValue::random(),
+                    [Ip::random()],
                     false,
                     false,
                     new WorkerManagerClientMetaState(false, false, true)
@@ -67,7 +69,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveResultsCreateRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -92,7 +94,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveSerializedSuiteCreateRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -108,8 +110,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
-        $serializedSuiteId = (string) new Ulid();
-        $suiteId = (string) new Ulid();
+        $serializedSuiteId = Id::generate();
+        $suiteId = Id::generate();
 
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
             new SerializedSuiteCreatedEvent(
@@ -122,7 +124,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveMachineGetRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -149,7 +151,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveSerializedSuiteGetRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -163,8 +165,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             ->andReturn([])
         ;
 
-        $serializedSuiteId = (string) new Ulid();
-        $suiteId = (string) new Ulid();
+        $serializedSuiteId = Id::generate();
+        $suiteId = Id::generate();
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(
@@ -178,7 +180,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveWorkerJobStartRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -201,7 +203,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveResultsJobGetRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -237,7 +239,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
     public function testRemoveMachineTerminationRequests(): void
     {
-        $jobId = md5((string) rand());
+        $jobId = Id::generate();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -258,9 +260,9 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                 $jobId,
                 MachineFactory::create(
                     $jobId,
-                    md5((string) rand()),
-                    md5((string) rand()),
-                    [md5((string) rand())],
+                    StringValue::random(),
+                    StringValue::random(),
+                    [Ip::random()],
                     false,
                     false,
                     new WorkerManagerClientMetaState(false, false, true),

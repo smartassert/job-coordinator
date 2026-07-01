@@ -8,6 +8,7 @@ use App\Entity\ResultsJob;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\Repository\ResultsJobRepository;
+use App\Tests\Services\Generator\StringValue;
 
 readonly class ResultsJobFactory
 {
@@ -27,8 +28,8 @@ readonly class ResultsJobFactory
         ?string $endState = null,
         ?MetaState $metaState = null,
     ): ResultsJob {
-        $token = $token ?? md5((string) rand());
-        $state = is_string($state) ? $state : md5((string) rand());
+        $token = $token ?? StringValue::random();
+        $state = is_string($state) ? $state : StringValue::random();
         $metaState = $metaState ?? new MetaState(false, false, true);
 
         $resultsJob = new ResultsJob($job->getId(), $token, $state, $endState, $metaState);
