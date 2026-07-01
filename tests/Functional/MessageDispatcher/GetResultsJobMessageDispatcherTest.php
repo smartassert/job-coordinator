@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\JobEventInterface;
-use App\Event\ResultsJobCreatedEvent;
+use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Message\GetResultsJobMessage;
 use App\MessageDispatcher\GetResultsJobMessageDispatcher;
@@ -19,6 +18,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
+use SmartAssert\WorkerClient\Model\Job as WorkerJob;
+use SmartAssert\WorkerClient\Model\ResourceReference;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -57,9 +58,9 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
     public static function eventSubscriptionsDataProvider(): array
     {
         return [
-            ResultsJobCreatedEvent::class => [
-                'expectedListenedForEvent' => ResultsJobCreatedEvent::class,
-                'expectedMethod' => 'dispatch',
+            CreateWorkerJobRequestedEvent::class => [
+                'expectedListenedForEvent' => CreateWorkerJobRequestedEvent::class,
+                'expectedMethod' => 'dispatchImmediately',
             ],
             ResultsJobRetrievedEvent::class => [
                 'expectedListenedForEvent' => ResultsJobRetrievedEvent::class,
@@ -69,9 +70,103 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface $job, string $authenticationToken): JobEventInterface $eventCreator
+     * @param callable(JobInterface $job, string $authenticationToken): CreateWorkerJobRequestedEvent $eventCreator
      */
-    #[DataProvider('eventDataProvider')]
+    #[DataProvider('dispatchImmediatelyEventDataProvider')]
+    public function testDispatchImmediatelyNotReady(callable $eventCreator): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $authenticationToken = StringValue::random();
+
+        $event = $eventCreator($job, $authenticationToken);
+
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NEVER)
+        ;
+
+        $dispatcher = new GetResultsJobMessageDispatcher($messageDispatcher, $assessor);
+
+        $dispatcher->dispatchImmediately($event);
+
+        self::assertCount(0, $this->messengerTransport->getSent());
+    }
+
+    /**
+     * @param callable(JobInterface $job, string $authenticationToken): CreateWorkerJobRequestedEvent $eventCreator
+     */
+    #[DataProvider('dispatchImmediatelyEventDataProvider')]
+    public function testDispatchImmediatelySuccess(callable $eventCreator): void
+    {
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $authenticationToken = StringValue::random();
+
+        $event = $eventCreator($job, $authenticationToken);
+
+        $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
+        \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
+
+        $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
+        $assessor
+            ->shouldReceive('isReady')
+            ->with($job->getId())
+            ->andReturn(MessageHandlingReadiness::NOW)
+        ;
+
+        $dispatcher = new GetResultsJobMessageDispatcher($messageDispatcher, $assessor);
+
+        $dispatcher->dispatchImmediately($event);
+
+        $this->assertDispatchedMessage(new GetResultsJobMessage($authenticationToken, $job->getId()));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function dispatchImmediatelyEventDataProvider(): array
+    {
+        return [
+            CreateWorkerJobRequestedEvent::class => [
+                'eventCreator' => function (JobInterface $job, string $authenticationToken) {
+                    \assert('' !== $authenticationToken);
+
+                    return new CreateWorkerJobRequestedEvent(
+                        $authenticationToken,
+                        $job->getId(),
+                        '127.0.0.1',
+                        new WorkerJob(
+                            new ResourceReference(
+                                $job->getId(),
+                                StringValue::random(),
+                            ),
+                            600,
+                            [],
+                            [],
+                            [],
+                            [],
+                            [],
+                        ),
+                    );
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @param callable(JobInterface $job, string $authenticationToken): ResultsJobRetrievedEvent $eventCreator
+     */
+    #[DataProvider('dispatchEventDataProvider')]
     public function testDispatchNotReady(callable $eventCreator): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -81,7 +176,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
         $authenticationToken = StringValue::random();
 
         $event = $eventCreator($job, $authenticationToken);
-        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobRetrievedEvent);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -101,9 +195,9 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobInterface $job, string $authenticationToken): JobEventInterface $eventCreator
+     * @param callable(JobInterface $job, string $authenticationToken): ResultsJobRetrievedEvent $eventCreator
      */
-    #[DataProvider('eventDataProvider')]
+    #[DataProvider('dispatchEventDataProvider')]
     public function testDispatchSuccess(callable $eventCreator): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -113,7 +207,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
         $authenticationToken = StringValue::random();
 
         $event = $eventCreator($job, $authenticationToken);
-        \assert($event instanceof ResultsJobCreatedEvent || $event instanceof ResultsJobRetrievedEvent);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -135,29 +228,9 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
     /**
      * @return array<mixed>
      */
-    public static function eventDataProvider(): array
+    public static function dispatchEventDataProvider(): array
     {
         return [
-            ResultsJobCreatedEvent::class => [
-                'eventCreator' => function (JobInterface $job, string $authenticationToken) {
-                    \assert('' !== $authenticationToken);
-
-                    return new ResultsJobCreatedEvent(
-                        $authenticationToken,
-                        $job->getId(),
-                        new ResultsJob(
-                            $job->getId(),
-                            'token',
-                            new ResultsJobState(
-                                'awaiting-events',
-                                null,
-                                new ResultsClientMetaState(false, false, true),
-                            ),
-                            false,
-                        )
-                    );
-                },
-            ],
             ResultsJobRetrievedEvent::class => [
                 'eventCreator' => function (JobInterface $job, string $authenticationToken) {
                     \assert('' !== $authenticationToken);

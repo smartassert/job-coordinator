@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\ResultsJobCreatedEvent;
+use App\Event\AuthenticatingEventInterface;
+use App\Event\CreateWorkerJobRequestedEvent;
+use App\Event\JobEventInterface;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -24,8 +26,8 @@ readonly class GetResultsJobMessageDispatcher implements EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            ResultsJobCreatedEvent::class => [
-                ['dispatch', 100],
+            CreateWorkerJobRequestedEvent::class => [
+                ['dispatchImmediately', 100],
             ],
             ResultsJobRetrievedEvent::class => [
                 ['dispatch', 100],
@@ -33,14 +35,32 @@ readonly class GetResultsJobMessageDispatcher implements EventSubscriberInterfac
         ];
     }
 
-    public function dispatch(ResultsJobCreatedEvent|ResultsJobRetrievedEvent $event): void
+    public function dispatchImmediately(CreateWorkerJobRequestedEvent $event): void
     {
+        $this->createAndHandleMessage(
+            $event,
+            fn (GetResultsJobMessage $message) => $this->messageDispatcher->dispatchWithNonDelayedStamp($message)
+        );
+    }
+
+    public function dispatch(ResultsJobRetrievedEvent $event): void
+    {
+        $this->createAndHandleMessage(
+            $event,
+            fn (GetResultsJobMessage $message) => $this->messageDispatcher->dispatch($message)
+        );
+    }
+
+    private function createAndHandleMessage(
+        AuthenticatingEventInterface&JobEventInterface $event,
+        callable $action
+    ): void {
         $message = new GetResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;
         }
 
-        $this->messageDispatcher->dispatch($message);
+        $action($message);
     }
 }

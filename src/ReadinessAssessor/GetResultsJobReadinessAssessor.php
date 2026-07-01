@@ -4,39 +4,25 @@ declare(strict_types=1);
 
 namespace App\ReadinessAssessor;
 
+use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\PreparationState;
-use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
-use App\Services\PreparationStateFactory;
+use App\Repository\WorkerComponentStateRepository;
 
 readonly class GetResultsJobReadinessAssessor implements ReadinessAssessorInterface
 {
     public function __construct(
-        private ResultsJobRepository $resultsJobRepository,
-        private PreparationStateFactory $preparationStateFactory,
-        private MachineRepository $machineRepository,
+        private WorkerComponentStateRepository $workerComponentStateRepository,
     ) {}
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $resultsJob = $this->resultsJobRepository->find($jobId);
-        if (null === $resultsJob) {
-            return MessageHandlingReadiness::NEVER;
-        }
+        $applicationState = $this->workerComponentStateRepository->getApplicationState($jobId);
 
-        if ($resultsJob->hasEndState()) {
+        if (
+            $applicationState instanceof WorkerComponentState
+            && $applicationState->getMetaState()->ended
+        ) {
             return MessageHandlingReadiness::NEVER;
-        }
-
-        $preparationState = $this->preparationStateFactory->createState($jobId);
-        if (PreparationState::FAILED === $preparationState) {
-            return MessageHandlingReadiness::NEVER;
-        }
-
-        $machine = $this->machineRepository->find($jobId);
-        if (null === $machine) {
-            return MessageHandlingReadiness::EVENTUALLY;
         }
 
         return MessageHandlingReadiness::NOW;

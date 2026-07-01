@@ -4,55 +4,45 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\ReadinessAssessor;
 
-use App\Entity\Machine;
+use App\Entity\WorkerComponentState;
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\PreparationState;
+use App\Enum\WorkerComponentName;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
-use App\Repository\MachineRepository;
-use App\Repository\ResultsJobRepository;
-use App\Services\PreparationStateFactory;
+use App\Repository\WorkerComponentStateRepository;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\ResultsJobFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class GetResultsJobReadinessAssessorTest extends WebTestCase
 {
+    private GetResultsJobReadinessAssessor $assessor;
+
+    protected function setUp(): void
+    {
+        $assessor = self::getContainer()->get(GetResultsJobReadinessAssessor::class);
+        \assert($assessor instanceof GetResultsJobReadinessAssessor);
+
+        $this->assessor = $assessor;
+    }
+
     /**
-     * @param callable(JobInterface, ResultsJobFactory, MachineRepository): void $setup
-     * @param callable(JobInterface): PreparationStateFactory                    $preparationStateFactoryCreator
+     * @param callable(JobInterface, WorkerComponentStateRepository): void $setup
      */
     #[DataProvider('isReadyDataProvider')]
-    public function testIsReady(
-        callable $setup,
-        callable $preparationStateFactoryCreator,
-        MessageHandlingReadiness $expected
-    ): void {
+    public function testIsReady(callable $setup, MessageHandlingReadiness $expected): void
+    {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
-        \assert($resultsJobRepository instanceof ResultsJobRepository);
+        $workerComponentStateRepository = self::getContainer()->get(WorkerComponentStateRepository::class);
+        \assert($workerComponentStateRepository instanceof WorkerComponentStateRepository);
 
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
+        $setup($job, $workerComponentStateRepository);
 
-        $resultsJobFactory = self::getContainer()->get(ResultsJobFactory::class);
-        \assert($resultsJobFactory instanceof ResultsJobFactory);
-
-        $setup($job, $resultsJobFactory, $machineRepository);
-        $jobPreparationInspector = $preparationStateFactoryCreator($job);
-
-        $assessor = new GetResultsJobReadinessAssessor(
-            $resultsJobRepository,
-            $jobPreparationInspector,
-            $machineRepository
-        );
-
-        self::assertSame($expected, $assessor->isReady($job->getId()));
+        self::assertSame($expected, $this->assessor->isReady($job->getId()));
     }
 
     /**
@@ -61,78 +51,41 @@ class GetResultsJobReadinessAssessorTest extends WebTestCase
     public static function isReadyDataProvider(): array
     {
         return [
-            'results job does not exist' => [
-                'setup' => function (): void {},
-                'preparationStateFactoryCreator' => function (): PreparationStateFactory {
-                    return \Mockery::mock(PreparationStateFactory::class);
-                },
-                'expected' => MessageHandlingReadiness::NEVER,
-            ],
-            'results job has end state' => [
-                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
-                    $resultsJobFactory->create(
-                        job: $job,
-                        endState: 'end-state',
-                        metaState: new MetaState(true, false, false),
-                    );
-                },
-                'preparationStateFactoryCreator' => function (): PreparationStateFactory {
-                    return \Mockery::mock(PreparationStateFactory::class);
-                },
-                'expected' => MessageHandlingReadiness::NEVER,
-            ],
-            'job preparation has failed' => [
-                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
-                    $resultsJobFactory->create($job);
-                },
-                'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {
-                    $factory = \Mockery::mock(PreparationStateFactory::class);
-                    $factory
-                        ->shouldReceive('createState')
-                        ->with($job->getId())
-                        ->andReturn(PreparationState::FAILED)
-                    ;
-
-                    return $factory;
-                },
-                'expected' => MessageHandlingReadiness::NEVER,
-            ],
-            'machine is null' => [
-                'setup' => function (JobInterface $job, ResultsJobFactory $resultsJobFactory): void {
-                    $resultsJobFactory->create($job);
-                },
-                'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {
-                    $factory = \Mockery::mock(PreparationStateFactory::class);
-                    $factory
-                        ->shouldReceive('createState')
-                        ->with($job->getId())
-                        ->andReturn(PreparationState::SUCCEEDED)
-                    ;
-
-                    return $factory;
-                },
-                'expected' => MessageHandlingReadiness::EVENTUALLY,
-            ],
-            'ready' => [
+            'application state has end state' => [
                 'setup' => function (
                     JobInterface $job,
-                    ResultsJobFactory $resultsJobFactory,
-                    MachineRepository $machineRepository
+                    WorkerComponentStateRepository $workerComponentStateRepository
                 ): void {
-                    $resultsJobFactory->create($job);
+                    $applicationState = new WorkerComponentState(
+                        $job->getId(),
+                        WorkerComponentName::APPLICATION,
+                    );
 
-                    $machine = new Machine($job->getId(), 'up/active', 'up');
-                    $machineRepository->save($machine);
+                    $applicationState->setState('state');
+                    $applicationState->setMetaState(new MetaState(true, true, false));
+
+                    $workerComponentStateRepository->save($applicationState);
                 },
-                'preparationStateFactoryCreator' => function (JobInterface $job): PreparationStateFactory {
-                    $factory = \Mockery::mock(PreparationStateFactory::class);
-                    $factory
-                        ->shouldReceive('createState')
-                        ->with($job->getId())
-                        ->andReturn(PreparationState::SUCCEEDED)
-                    ;
+                'expected' => MessageHandlingReadiness::NEVER,
+            ],
+            'application state does not exist' => [
+                'setup' => function (): void {},
+                'expected' => MessageHandlingReadiness::NOW,
+            ],
+            'application state is not end state' => [
+                'setup' => function (
+                    JobInterface $job,
+                    WorkerComponentStateRepository $workerComponentStateRepository
+                ): void {
+                    $applicationState = new WorkerComponentState(
+                        $job->getId(),
+                        WorkerComponentName::APPLICATION,
+                    );
 
-                    return $factory;
+                    $applicationState->setState('state');
+                    $applicationState->setMetaState(new MetaState(false, false, true));
+
+                    $workerComponentStateRepository->save($applicationState);
                 },
                 'expected' => MessageHandlingReadiness::NOW,
             ],
