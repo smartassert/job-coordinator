@@ -11,7 +11,7 @@ use App\Message\CreateWorkerJobMessage;
 use App\MessageDispatcher\CreateWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\JobStore;
+use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
@@ -52,8 +52,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRemoteRequestMessageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($jobRemoteRequestMessageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         $event = new MachineIsReadyEvent(
             StringValue::random(),
@@ -71,7 +71,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $assessor,
-            $jobStore,
+            $jobRepository,
         );
 
         $dispatcher->dispatchImmediately($event);
@@ -86,15 +86,15 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRemoteRequestMessageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($jobRemoteRequestMessageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         $readinessAssessor = \Mockery::mock(ReadinessAssessorInterface::class);
 
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $readinessAssessor,
-            $jobStore,
+            $jobRepository,
         );
 
         $event = new MachineIsReadyEvent(
@@ -117,8 +117,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRemoteRequestMessageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($jobRemoteRequestMessageDispatcher instanceof JobRemoteRequestMessageDispatcher);
 
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         $machineIpAddress = '127.0.0.1';
         $authenticationToken = StringValue::random();
@@ -135,7 +135,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $dispatcher = new CreateWorkerJobMessageDispatcher(
             $jobRemoteRequestMessageDispatcher,
             $assessor,
-            $jobStore,
+            $jobRepository,
         );
 
         $dispatcher->dispatchImmediately($event);
