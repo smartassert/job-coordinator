@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Job;
 use App\Event\JobCreatedEvent;
 use App\Model\JobInterface;
 use App\Repository\JobRepository;
 use App\Request\CreateJobRequest;
 use App\Services\JobStatusFactory;
-use App\Services\JobStore;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\UsersSecurityBundle\Security\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Ulid;
 
 readonly class JobController
 {
     public function __construct(
         private JobRepository $jobRepository,
         private JobStatusFactory $jobStatusFactory,
-        private JobStore $jobStore,
     ) {}
 
     #[Route('/{suiteId<[A-Z90-9]{26}>}', name: 'job_create', methods: ['POST'])]
@@ -30,11 +30,13 @@ readonly class JobController
         User $user,
         EventDispatcherInterface $eventDispatcher,
     ): JsonResponse {
-        $job = $this->jobStore->create(
+        $job = new Job(
+            (string) new Ulid(),
             $user->getUserIdentifier(),
             $request->suiteId,
-            $request->maximumDurationInSeconds
+            $request->maximumDurationInSeconds,
         );
+        $this->jobRepository->store($job);
 
         $eventDispatcher->dispatch(
             new JobCreatedEvent($user->getSecurityToken(), $job->getId(), $job->getSuiteId(), $request->parameters)
@@ -62,6 +64,6 @@ readonly class JobController
             ]
         );
 
-        return new JsonResponse($this->jobStore->hydrateFromJobEntities($jobEntities));
+        return new JsonResponse($jobEntities);
     }
 }
