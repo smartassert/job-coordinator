@@ -36,7 +36,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
@@ -116,7 +116,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $serializedSuiteReadException = new \Exception('Failed to read serialized suite');
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('read')
             ->with(self::$apiToken, $serializedSuite->id)
@@ -189,7 +189,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $serializedSuiteContent = StringValue::random();
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('read')
             ->with(self::$apiToken, $serializedSuite->id)
@@ -281,7 +281,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $serializedSuiteContent = StringValue::random();
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('read')
             ->with(self::$apiToken, $serializedSuite->id)
@@ -383,7 +383,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        ?SerializedSuiteClient $serializedSuiteClient = null,
+        ?SerializedSuiteClientInterface $serializedSuiteClient = null,
         ?WorkerClientFactory $workerClientFactory = null,
         ?ReadinessAssessorInterface $readinessAssessor = null,
     ): CreateWorkerJobMessageHandler {
@@ -391,7 +391,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);
 
         if (null === $serializedSuiteClient) {
-            $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+            $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         }
 
         if (null === $workerClientFactory) {

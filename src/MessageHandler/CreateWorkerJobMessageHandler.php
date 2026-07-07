@@ -17,7 +17,7 @@ use App\Repository\SerializedSuiteRepository;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,7 +29,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         private ReadinessAssessorInterface $readinessAssessor,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
-        private SerializedSuiteClient $serializedSuiteClient,
+        private SerializedSuiteClientInterface $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,

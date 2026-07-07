@@ -24,7 +24,9 @@ class SourcesClientSerializedSuiteFactory
             'requested',
             new MetaState(false, false, true),
             null,
-            null
+            null,
+            [],
+            [],
         );
     }
 }
