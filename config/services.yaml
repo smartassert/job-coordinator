@@ -54,6 +54,12 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
+    Symfony\Component\Webhook\Controller\WebhookController:
+        arguments:
+            $parsers:
+
+#            $parsers: !tagged_iterator 'webhook.parser'
+
     Psr\Http\Client\ClientInterface:
         class: GuzzleHttp\Client
 
