@@ -18,12 +18,7 @@ readonly class JobStore
 
     public function retrieve(string $jobId): ?JobInterface
     {
-        $entity = $this->jobRepository->find($jobId);
-        if (null === $entity) {
-            return null;
-        }
-
-        return $this->hydrateFromJobEntity($entity);
+        return $this->jobRepository->find($jobId);
     }
 
     /**
