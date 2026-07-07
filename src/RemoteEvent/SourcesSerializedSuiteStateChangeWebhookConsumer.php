@@ -6,7 +6,7 @@ use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\Consumer\ConsumerInterface;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 
-#[AsRemoteEventConsumer('sources_serialized-suite_state_change')]
+#[AsRemoteEventConsumer('sources.serialized_suite.state_change')]
 final class SourcesSerializedSuiteStateChangeWebhookConsumer implements ConsumerInterface
 {
     public function __construct()
