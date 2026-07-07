@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Model\JobInterface;
+use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
-use App\Services\JobStore;
 use App\Tests\Model\StagingConfiguration;
 use App\Tests\Model\StagingOutput;
 use App\Tests\Services\ApplicationClient\Client;
@@ -23,7 +23,7 @@ readonly class Stager
 {
     public function __construct(
         private ApiTokenProvider $apiTokenProvider,
-        private JobStore $jobStore,
+        private JobRepository $jobRepository,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private MachineRepository $machineRepository,
         private EntityRemover $entityRemover,
@@ -94,7 +94,7 @@ readonly class Stager
             ));
         }
 
-        $job = $this->jobStore->retrieve($jobId);
+        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
         if (null === $job) {
             throw new \RuntimeException(sprintf(
                 'Failed to create job: job not found in job store; expected to find job with id "%s"',

@@ -16,11 +16,6 @@ readonly class JobStore
         private JobRepository $jobRepository,
     ) {}
 
-    public function retrieve(string $jobId): ?JobInterface
-    {
-        return $this->jobRepository->find($jobId);
-    }
-
     /**
      * @param JobEntity[] $jobEntities
      *

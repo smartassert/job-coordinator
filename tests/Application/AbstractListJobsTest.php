@@ -7,7 +7,6 @@ namespace App\Tests\Application;
 use App\Entity\Job;
 use App\Model\JobInterface;
 use App\Repository\JobRepository;
-use App\Services\JobStore;
 use App\Tests\Services\ApplicationClient\Client as ApplicationClient;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -86,7 +85,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
     /**
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
-     * @param callable(Job[], JobStore): JobInterface[]                      $expectedCreator
+     * @param callable(Job[], JobRepository): JobInterface[]                 $expectedCreator
      */
     #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void
@@ -123,10 +122,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
         $responseData = json_decode($response->getBody()->getContents(), true);
 
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
-
-        self::assertSame($expectedCreator($filteredJobs, $jobStore), $responseData);
+        self::assertSame($expectedCreator($filteredJobs, $jobRepository), $responseData);
     }
 
     /**
@@ -165,9 +161,10 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId,
                     ];
                 },
-                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                'expectedCreator' => function (array $jobs, JobRepository $jobRepository) {
                     $serializedJobs = [];
-                    $job = $jobStore->retrieve($jobs[0]->id);
+                    $job = $jobRepository->findOneBy(['id' => $jobs[0]->id]);
+
                     if (null !== $job) {
                         $serializedJobs[] = $job->toArray();
                     }
@@ -202,10 +199,11 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId1,
                     ];
                 },
-                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                'expectedCreator' => function (array $jobs, JobRepository $jobRepository) {
                     $serializedJobs = [];
                     foreach ([$jobs[2], $jobs[0]] as $jobEntity) {
-                        $job = $jobStore->retrieve($jobEntity->id);
+                        $job = $jobRepository->findOneBy(['id' => $jobEntity->id]);
+
                         if (null !== $job) {
                             $serializedJobs[] = $job->toArray();
                         }
@@ -241,9 +239,10 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId2,
                     ];
                 },
-                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                'expectedCreator' => function (array $jobs, JobRepository $jobRepository) {
                     $serializedJobs = [];
-                    $job = $jobStore->retrieve($jobs[1]->id);
+                    $job = $jobRepository->findOneBy(['id' => $jobs[1]->id]);
+
                     if (null !== $job) {
                         $serializedJobs[] = $job->toArray();
                     }
@@ -283,10 +282,11 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
                         'suite_id' => $suiteId1,
                     ];
                 },
-                'expectedCreator' => function (array $jobs, JobStore $jobStore) {
+                'expectedCreator' => function (array $jobs, JobRepository $jobRepository) {
                     $serializedJobs = [];
                     foreach ([$jobs[3], $jobs[0]] as $jobEntity) {
-                        $job = $jobStore->retrieve($jobEntity->id);
+                        $job = $jobRepository->findOneBy(['id' => $jobEntity->id]);
+
                         if (null !== $job) {
                             $serializedJobs[] = $job->toArray();
                         }
