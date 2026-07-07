@@ -94,7 +94,8 @@ services:
         arguments:
             $baseUrl: '%env(string:SOURCES_BASE_URL)%'
 
-    SmartAssert\SourcesClient\SerializedSuiteClient: ~
+    SmartAssert\SourcesClient\SerializedSuiteClientInterface:
+        class: SmartAssert\SourcesClient\SerializedSuiteClient
 
     SmartAssert\WorkerClient\Factory\ResourceReferenceFactory: ~
 

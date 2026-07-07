@@ -21,7 +21,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -36,10 +36,10 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $serializedSuiteClientException = new \Exception('Failed to create serialized suite');
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), $serializedSuiteCreateParameters)
+            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), null, $serializedSuiteCreateParameters)
             ->andThrow($serializedSuiteClientException)
         ;
 
@@ -97,12 +97,19 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             new SourcesClientMetaState(false, false, true),
             null,
             null,
+            [
+                'preparing/running',
+                'preparing/halted',
+                'prepared',
+                'failed',
+            ],
+            [],
         );
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('create')
-            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), $serializedSuiteParameters)
+            ->with(self::$apiToken, $job->getId(), $job->getSuiteId(), null, $serializedSuiteParameters)
             ->andReturn($serializedSuiteModel)
         ;
 
@@ -184,7 +191,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $handler = new CreateSerializedSuiteMessageHandler(
             $assessor,
-            \Mockery::mock(SerializedSuiteClient::class),
+            \Mockery::mock(SerializedSuiteClientInterface::class),
             $eventDispatcher,
             $messageBus,
             $logger,

@@ -177,6 +177,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
                             new SourcesClientMetaState(false, false, true),
                             null,
                             null,
+                            [],
+                            [],
                         ),
                     );
                 },
@@ -215,6 +217,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
                             new SourcesClientMetaState(true, true, false),
                             null,
                             null,
+                            [],
+                            [],
                         ),
                     );
                 },

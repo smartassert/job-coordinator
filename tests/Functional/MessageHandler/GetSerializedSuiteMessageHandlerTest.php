@@ -20,7 +20,7 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
 use Psr\Log\LoggerInterface;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -51,7 +51,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
-            \Mockery::mock(SerializedSuiteClient::class),
+            \Mockery::mock(SerializedSuiteClientInterface::class),
             $eventDispatcher,
             $messageBus,
             $logger,
@@ -83,7 +83,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
 
         $serializedSuiteClientException = new \Exception(StringValue::random());
 
-        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClient::class);
+        $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
             ->shouldReceive('get')
             ->with(self::$apiToken, $serializedSuite->id)

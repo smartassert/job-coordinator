@@ -115,7 +115,9 @@ class SerializedSuiteFactoryTest extends WebTestCase
             $serializedSuiteState,
             new SourcesClientMetaState(false, false, true),
             null,
-            null
+            null,
+            [],
+            [],
         );
 
         $event = new SerializedSuiteCreatedEvent('authentication token', $job->getId(), $sourcesSerializedSuite);

@@ -11,7 +11,7 @@ use App\Message\CreateSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use SmartAssert\SourcesClient\SerializedSuiteClient;
+use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -21,7 +21,7 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
-        private SerializedSuiteClient $serializedSuiteClient,
+        private SerializedSuiteClientInterface $serializedSuiteClient,
         EventDispatcherInterface $eventDispatcher,
         MessageBusInterface $messageBus,
         LoggerInterface $logger,
@@ -47,6 +47,7 @@ final readonly class CreateSerializedSuiteMessageHandler extends AbstractMessage
                 $message->authenticationToken,
                 $message->getJobId(),
                 $message->suiteId,
+                null,
                 $message->parameters,
             );
 
