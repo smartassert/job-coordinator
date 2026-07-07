@@ -7,13 +7,14 @@ namespace App\Services;
 use App\Entity\ResultsJob;
 use App\Event\ResultsJobCreatedEvent;
 use App\Model\MetaState;
+use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ResultsJobFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobStore $jobStore,
+        private readonly JobRepository $jobRepository,
         private readonly ResultsJobRepository $resultsJobRepository,
     ) {}
 
@@ -31,7 +32,7 @@ class ResultsJobFactory implements EventSubscriberInterface
 
     public function createOnResultsJobCreatedEvent(ResultsJobCreatedEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }

@@ -8,6 +8,7 @@ use App\Entity\WorkerComponentState;
 use App\Enum\WorkerComponentName;
 use App\Event\WorkerJobRetrievedEvent;
 use App\Model\MetaState;
+use App\Repository\JobRepository;
 use App\Repository\WorkerComponentStateRepository;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WorkerComponentStateMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobStore $jobStore,
+        private readonly JobRepository $jobRepository,
         private readonly WorkerComponentStateRepository $workerComponentStateRepository,
     ) {}
 
@@ -33,7 +34,7 @@ class WorkerComponentStateMutator implements EventSubscriberInterface
 
     public function setOnWorkerStateRetrievedEvent(WorkerJobRetrievedEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }

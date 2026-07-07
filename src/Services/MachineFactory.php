@@ -6,13 +6,14 @@ namespace App\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
+use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MachineFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobStore $jobStore,
+        private readonly JobRepository $jobRepository,
         private readonly MachineRepository $machineRepository,
     ) {}
 
@@ -30,7 +31,7 @@ class MachineFactory implements EventSubscriberInterface
 
     public function createOnMachineCreationRequestedEvent(MachineCreationRequestedEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }
