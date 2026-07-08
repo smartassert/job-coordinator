@@ -34,7 +34,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateMachineMessage(self::$apiToken, $jobId);
+        $message = new CreateMachineMessage($jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -59,7 +59,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateMachineMessage(self::$apiToken, $jobId);
+        $message = new CreateMachineMessage($jobId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -87,7 +87,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+        $message = new CreateMachineMessage($job->getId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -152,7 +152,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         ]);
 
         $handler = $this->createHandler($assessor, $workerManagerClient);
-        $message = new CreateMachineMessage(self::$apiToken, $job->getId());
+        $message = new CreateMachineMessage($job->getId());
 
         $handler($message);
 
