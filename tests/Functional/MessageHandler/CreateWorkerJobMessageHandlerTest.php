@@ -23,6 +23,8 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
+use App\Services\MessageStateMutator;
+use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -34,10 +36,8 @@ use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -410,21 +410,21 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             \assert($readinessAssessor instanceof ReadinessAssessorInterface);
         }
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $unhandleableMessageHandler = self::getContainer()->get(UnhandleableMessageHandler::class);
+        \assert($unhandleableMessageHandler instanceof UnhandleableMessageHandler);
 
         return new CreateWorkerJobMessageHandler(
             $readinessAssessor,
+            $messageStateMutator,
+            $unhandleableMessageHandler,
             $serializedSuiteRepository,
             $resultsJobRepository,
             $serializedSuiteClient,
             $workerClientFactory,
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
     }
 
