@@ -7,13 +7,14 @@ namespace App\Services;
 use App\Entity\SerializedSuite;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Model\MetaState;
+use App\Repository\JobRepository;
 use App\Repository\SerializedSuiteRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SerializedSuiteFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobStore $jobStore,
+        private readonly JobRepository $jobRepository,
         private readonly SerializedSuiteRepository $serializedSuiteRepository,
     ) {}
 
@@ -31,7 +32,7 @@ class SerializedSuiteFactory implements EventSubscriberInterface
 
     public function createOnSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }

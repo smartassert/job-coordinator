@@ -11,13 +11,14 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineIsReadyEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\MetaState;
+use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MachineMutator implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobStore $jobStore,
+        private readonly JobRepository $jobRepository,
         private readonly MachineRepository $machineRepository,
     ) {}
 
@@ -44,7 +45,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setStateOnMachineStateChangeEvent(MachineStateChangeEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }
@@ -69,7 +70,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function handleMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }
@@ -87,7 +88,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function handleMachineIsReadyEvent(MachineIsReadyEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }
@@ -104,7 +105,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ValueResolver;
 
 use App\Model\JobInterface;
-use App\Services\JobStore;
+use App\Repository\JobRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 readonly class JobResolver implements ValueResolverInterface
 {
     public function __construct(
-        private JobStore $jobStore,
+        private JobRepository $jobRepository,
         private Security $security,
     ) {}
 
@@ -36,7 +36,8 @@ readonly class JobResolver implements ValueResolverInterface
         }
 
         $jobId = $request->attributes->getString('jobId');
-        $job = $this->jobStore->retrieve($jobId);
+        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
+
         if (null === $job) {
             throw new AccessDeniedException();
         }

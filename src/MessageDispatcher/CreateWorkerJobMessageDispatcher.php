@@ -9,7 +9,7 @@ use App\Event\MachineIsReadyEvent;
 use App\Event\MessageNotHandleableEvent;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\JobStore;
+use App\Repository\JobRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterface
@@ -17,7 +17,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
     public function __construct(
         private JobRemoteRequestMessageDispatcher $messageDispatcher,
         private ReadinessAssessorInterface $readinessAssessor,
-        private JobStore $jobStore,
+        private JobRepository $jobRepository,
     ) {}
 
     /**
@@ -37,7 +37,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
 
     public function dispatchImmediately(MachineIsReadyEvent $event): void
     {
-        $job = $this->jobStore->retrieve($event->getJobId());
+        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
         if (null === $job) {
             return;
         }

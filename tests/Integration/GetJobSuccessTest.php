@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Model\JobInterface;
-use App\Services\JobStore;
+use App\Repository\JobRepository;
 use App\Tests\Application\AbstractApplicationTest;
 use App\Tests\Services\EntityRemover;
 use App\Tests\Services\Generator\Id;
@@ -33,8 +33,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
         $suiteId = Id::generate();
 
-        $jobStore = self::getContainer()->get(JobStore::class);
-        \assert($jobStore instanceof JobStore);
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
 
         $createResponse = self::$staticApplicationClient->makeCreateJobRequest($apiToken, $suiteId, 600);
 
@@ -47,7 +47,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
         self::assertTrue(Ulid::isValid($createResponseData['id']));
         $jobId = $createResponseData['id'];
 
-        $job = $jobStore->retrieve($jobId);
+        $job = $jobRepository->findOneBy(['id' => $jobId]);
         self::assertInstanceOf(JobInterface::class, $job);
 
         $getResponse = self::$staticApplicationClient->makeGetJobRequest($apiToken, $jobId);
