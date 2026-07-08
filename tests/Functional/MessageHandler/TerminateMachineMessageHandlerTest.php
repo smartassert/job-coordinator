@@ -11,9 +11,11 @@ use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -73,12 +75,15 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -97,18 +102,20 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = Id::generate();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
         $machine = MachineFactory::create(
-            $jobId,
+            $job->getId(),
             'create/requested',
             'pre_active',
             [],
@@ -129,7 +136,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
         self::assertInstanceOf(MachineTerminationRequestedEvent::class, $event);
 
-        self::assertSame($jobId, $event->getJobId());
+        self::assertSame($job->getId(), $event->getJobId());
     }
 
     protected function getHandlerClass(): string
@@ -155,11 +162,15 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new TerminateMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $workerManagerClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }

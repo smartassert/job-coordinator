@@ -11,10 +11,12 @@ use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Request;
@@ -140,15 +142,17 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccessIsReady(): void
     {
-        $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createForUserToken(self::$apiToken);
+
         $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($job->getToken(), $job->getId(), $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -208,7 +212,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new MachineIsReadyEvent($authenticationToken, $jobId, $machineIpAddress),
+            new MachineIsReadyEvent($job->getToken(), $job->getId(), $machineIpAddress),
             $event
         );
     }
@@ -242,6 +246,9 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new IsWorkerReadyMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -249,6 +256,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerClientFactory,
             $eventDispatcher,
             $logger,
+            $authenticationTokenProvider,
         );
     }
 }

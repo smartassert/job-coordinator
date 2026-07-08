@@ -19,6 +19,7 @@ use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
@@ -53,13 +54,16 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $machine = MachineFactory::createRandomForJob($jobId);
-        $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machine = MachineFactory::createRandomForJob($job->getId());
+        $message = new GetMachineMessage(self::$apiToken, $job->getId(), $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -88,7 +92,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -179,7 +183,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -330,7 +334,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -464,11 +468,15 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new GetMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $workerManagerClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }

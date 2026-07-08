@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsReadyEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
@@ -26,6 +27,7 @@ final readonly class IsWorkerReadyMessageHandler
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -56,9 +58,14 @@ final readonly class IsWorkerReadyMessageHandler
             return;
         }
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         $this->eventDispatcher->dispatch(
             new MachineIsReadyEvent(
-                $message->authenticationToken,
+                $authenticationToken,
                 $message->getJobId(),
                 $message->machineIpAddress
             )

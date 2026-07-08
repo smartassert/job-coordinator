@@ -23,6 +23,7 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
@@ -350,7 +351,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
 
-        return $jobFactory->createRandom();
+        return $jobFactory->createForUserToken(self::$apiToken);
     }
 
     private function createResultsJob(JobInterface $job): void
@@ -416,6 +417,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $unhandleableMessageHandler = self::getContainer()->get(UnhandleableMessageHandler::class);
         \assert($unhandleableMessageHandler instanceof UnhandleableMessageHandler);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new CreateWorkerJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -425,6 +429,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $serializedSuiteClient,
             $workerClientFactory,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 

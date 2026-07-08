@@ -43,4 +43,9 @@ interface JobInterface extends \JsonSerializable
      * @return SerializedJob
      */
     public function jsonSerialize(): array;
+
+    /**
+     * @return non-empty-string
+     */
+    public function getToken(): string;
 }

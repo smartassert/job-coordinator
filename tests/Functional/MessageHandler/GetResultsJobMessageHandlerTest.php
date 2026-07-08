@@ -14,6 +14,7 @@ use App\MessageHandler\GetResultsJobMessageHandler;
 use App\ReadinessAssessor\GetResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -55,12 +56,15 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeResultsClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $message = new GetResultsJobMessage(self::$apiToken, $job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -82,7 +86,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -154,11 +158,15 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new GetResultsJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $resultsClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }
