@@ -19,7 +19,7 @@ readonly class CreateWorkerJobReadinessAssessor implements ReadinessAssessorInte
 
     public function isReady(string $jobId): MessageHandlingReadiness
     {
-        $serializedSuite = $this->serializedSuiteRepository->get($jobId);
+        $serializedSuite = $this->serializedSuiteRepository->findByJobId($jobId);
         if (null === $serializedSuite || $serializedSuite->isPreparing()) {
             return MessageHandlingReadiness::EVENTUALLY;
         }

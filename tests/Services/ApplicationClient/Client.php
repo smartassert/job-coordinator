@@ -73,6 +73,22 @@ class Client
     }
 
     /**
+     * @param array<string, string> $headers
+     */
+    public function makeSourcesSerializedSuiteStateChangedNotifyRequest(
+        array $headers,
+        string $body,
+        string $method = 'POST',
+    ): ResponseInterface {
+        return $this->client->makeRequest(
+            $method,
+            $this->router->generate('_webhook_controller', ['type' => 'sources.serialized_suite.state_changed']),
+            $headers,
+            $body,
+        );
+    }
+
+    /**
      * @return array<string, string>
      */
     private function createAuthorizationHeader(?string $authenticationToken): array

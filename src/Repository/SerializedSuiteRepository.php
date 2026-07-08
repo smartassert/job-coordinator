@@ -29,7 +29,7 @@ class SerializedSuiteRepository extends ServiceEntityRepository implements JobCo
         return $this->count(['jobId' => $jobId]) > 0;
     }
 
-    public function get(string $jobId): ?SerializedSuite
+    public function findByJobId(string $jobId): ?SerializedSuite
     {
         $entity = $this->findOneBy(['jobId' => $jobId]);
         if (null === $entity || '' === $entity->getState()) {
@@ -37,5 +37,10 @@ class SerializedSuiteRepository extends ServiceEntityRepository implements JobCo
         }
 
         return $entity;
+    }
+
+    public function findBySerializedSuiteId(string $serializedSuiteId): ?SerializedSuite
+    {
+        return $this->findOneBy(['id' => $serializedSuiteId]);
     }
 }

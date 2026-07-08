@@ -31,7 +31,7 @@ readonly class CreateMachineReadinessAssessor implements ReadinessAssessorInterf
             return MessageHandlingReadiness::NEVER;
         }
 
-        $serializedSuite = $this->serializedSuiteRepository->get($jobId);
+        $serializedSuite = $this->serializedSuiteRepository->findByJobId($jobId);
         if (null === $serializedSuite || !$serializedSuite->isPrepared()) {
             return MessageHandlingReadiness::EVENTUALLY;
         }
