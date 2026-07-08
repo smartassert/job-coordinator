@@ -30,18 +30,28 @@ readonly class Job implements JobInterface
     #[ORM\Column]
     public int $maximumDurationInSeconds;
 
+    #[ORM\Column(type: 'text')]
+    public string $token;
+
     /**
      * @param non-empty-string $id
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
+     * @param non-empty-string $token
      */
-    public function __construct(string $id, string $userId, string $suiteId, int $maximumDurationInSeconds)
-    {
+    public function __construct(
+        string $id,
+        string $userId,
+        string $suiteId,
+        int $maximumDurationInSeconds,
+        string $token,
+    ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
+        $this->token = $token;
     }
 
     /**
@@ -74,6 +84,14 @@ readonly class Job implements JobInterface
     public function getMaximumDurationInSeconds(): int
     {
         return max($this->maximumDurationInSeconds, 1);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**

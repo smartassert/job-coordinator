@@ -15,6 +15,7 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -32,12 +33,15 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
     public function testInvokeResultsClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $message = new CreateResultsJobMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -59,7 +63,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $resultsJobRepository = self::getContainer()->get(ResultsJobRepository::class);
         \assert($resultsJobRepository instanceof ResultsJobRepository);
@@ -96,7 +100,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($resultsJob);
 
-        $handler(new CreateResultsJobMessage(self::$apiToken, $job->getId()));
+        $handler(new CreateResultsJobMessage($job->getId()));
 
         $resultsJob = $resultsJobRepository->find($job->getId());
         self::assertEquals(
@@ -117,14 +121,14 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $job->getId(), $resultsJobModel), $event);
+        self::assertEquals(new ResultsJobCreatedEvent($job->getId(), $resultsJobModel), $event);
     }
 
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new CreateResultsJobMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -166,11 +170,15 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new CreateResultsJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $resultsClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }

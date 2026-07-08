@@ -12,7 +12,6 @@ use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SerializedSuiteFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -77,10 +76,9 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $serializedSuite = $serializedSuiteFactory->createNewForJob($job);
         \assert('' !== $serializedSuite->id);
 
-        $authenticationToken = StringValue::random();
         $serializedSuiteModel = SourcesClientSerializedSuiteFactory::create($serializedSuite->id, $job->getSuiteId());
 
-        $event = new SerializedSuiteCreatedEvent($authenticationToken, $job->getId(), $serializedSuiteModel);
+        $event = new SerializedSuiteCreatedEvent($job->getId(), $serializedSuiteModel);
 
         $this->dispatcher->dispatchImmediately($event);
 
@@ -88,7 +86,6 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new GetSerializedSuiteMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getSuiteId(),
             $serializedSuite->id
@@ -103,7 +100,6 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
         $suiteId = Id::generate();
         $serializedSuiteId = Id::generate();
         $serializedSuite = SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId);
@@ -111,7 +107,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $dispatcher = self::getContainer()->get(GetSerializedSuiteMessageDispatcher::class);
         \assert($dispatcher instanceof GetSerializedSuiteMessageDispatcher);
 
-        $event = new SerializedSuiteCreatedEvent($authenticationToken, $jobId, $serializedSuite);
+        $event = new SerializedSuiteCreatedEvent($jobId, $serializedSuite);
 
         $dispatcher->dispatchImmediately($event);
 

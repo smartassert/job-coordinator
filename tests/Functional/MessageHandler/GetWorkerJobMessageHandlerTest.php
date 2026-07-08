@@ -12,9 +12,11 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
+use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\BoolValue;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\Ip;
@@ -30,9 +32,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
-        $message = new GetWorkerJobMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -52,16 +53,18 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
         $machineIpAddress = Ip::random();
 
-        $message = new GetWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -88,16 +91,18 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeSuccess(): void
     {
-        $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createForUserToken(self::$apiToken);
+
         $machineIpAddress = Ip::random();
 
-        $message = new GetWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -176,7 +181,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobRetrievedEvent($authenticationToken, $jobId, $machineIpAddress, $retrievedWorkerState),
+            new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedWorkerState),
             $event
         );
     }
@@ -204,11 +209,15 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new GetWorkerJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $workerClientFactory,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }

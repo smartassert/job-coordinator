@@ -13,7 +13,6 @@ use App\Services\SerializedSuiteMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\SourcesClient\Model\MetaState as SourcesClientMetaState;
@@ -126,7 +125,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     $suiteId = Id::generate();
 
                     return new SerializedSuiteRetrievedEvent(
-                        StringValue::random(),
                         $jobId,
                         SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
                     );
@@ -142,7 +140,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     $serializedSuiteId = Id::generate();
 
                     return new SerializedSuiteRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $job->getSuiteId())
                     );
@@ -167,7 +164,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
                     return new SerializedSuiteRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new SourcesSerializedSuite(
                             $serializedSuiteId,
@@ -207,7 +203,6 @@ class SerializedSuiteMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
                     return new SerializedSuiteRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new SourcesSerializedSuite(
                             $serializedSuiteId,

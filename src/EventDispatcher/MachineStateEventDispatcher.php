@@ -56,7 +56,6 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
             }
 
             $this->eventDispatcher->dispatch(new MachineIsActiveEvent(
-                $event->getAuthenticationToken(),
                 $event->getJobId(),
                 $primaryIpAddress,
                 $event->getMachine(),

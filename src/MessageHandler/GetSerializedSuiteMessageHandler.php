@@ -9,6 +9,7 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
@@ -23,6 +24,7 @@ final readonly class GetSerializedSuiteMessageHandler
         private MessageStateMutator $messageStateMutator,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -38,14 +40,15 @@ final readonly class GetSerializedSuiteMessageHandler
             return;
         }
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
-            $serializedSuite = $this->serializedSuiteClient->get(
-                $message->authenticationToken,
-                $message->serializedSuiteId,
-            );
+            $serializedSuite = $this->serializedSuiteClient->get($authenticationToken, $message->serializedSuiteId);
 
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
-                $message->authenticationToken,
                 $message->getJobId(),
                 $serializedSuite
             ));

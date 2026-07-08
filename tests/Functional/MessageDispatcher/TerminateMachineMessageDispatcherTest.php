@@ -17,7 +17,6 @@ use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
@@ -74,7 +73,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $event = new ResultsJobRetrievedEvent(
-            StringValue::random(),
             $jobId,
             new ResultsJob(
                 $jobId,
@@ -125,7 +123,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         );
 
         $event = new ResultsJobRetrievedEvent(
-            StringValue::random(),
             $job->getId(),
             new ResultsJob(
                 $job->getId(),
@@ -141,21 +138,20 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $this->assertDispatchedMessage($event->getAuthenticationToken(), $event->getJobId());
+        $this->assertDispatchedMessage($event->getJobId());
     }
 
     /**
-     * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      */
-    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
+    private function assertDispatchedMessage(string $jobId): void
     {
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
         self::assertEquals(
-            new TerminateMachineMessage($authenticationToken, $jobId),
+            new TerminateMachineMessage($jobId),
             $envelope->getMessage()
         );
 

@@ -51,7 +51,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
             new MachineIsActiveEvent(
-                'authentication token',
                 $jobId,
                 '127.0.0.1',
                 MachineFactory::create(
@@ -88,7 +87,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $resultsClientJob = ResultsClientJobFactory::createRandom();
 
         $remoteRequestRemoverForEvents->removeResultsCreateRequests(
-            new ResultsJobCreatedEvent('authentication token', $jobId, $resultsClientJob)
+            new ResultsJobCreatedEvent($jobId, $resultsClientJob)
         );
     }
 
@@ -115,7 +114,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeSerializedSuiteCreateRequests(
             new SerializedSuiteCreatedEvent(
-                'authentication token',
                 $jobId,
                 SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
             )
@@ -142,7 +140,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
             new MachineRetrievedEvent(
-                'authentication token',
                 WorkerManagerClientMachineFactory::createRandomForJob($jobId),
                 WorkerManagerClientMachineFactory::createRandomForJob($jobId),
             )
@@ -171,7 +168,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
         $remoteRequestRemoverForEvents->removeSerializedSuiteGetRequests(
             new SerializedSuiteRetrievedEvent(
-                'authentication token',
                 $jobId,
                 SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
             )
@@ -181,7 +177,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
     public function testRemoveWorkerJobStartRequests(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         $remoteRequestRemover = \Mockery::mock(RemoteRequestRemover::class);
         $remoteRequestRemover
@@ -199,7 +194,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeWorkerJobCreateRequests(
             new CreateWorkerJobRequestedEvent(
-                $authenticationToken,
                 $jobId,
                 '127.0.0.1',
                 WorkerClientJobFactory::createRandom(),
@@ -227,7 +221,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeResultsJobGetRequests(
             new ResultsJobRetrievedEvent(
-                'authentication token',
                 $jobId,
                 new ResultsJob(
                     'job-label',

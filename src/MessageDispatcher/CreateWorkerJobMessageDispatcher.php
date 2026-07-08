@@ -43,7 +43,6 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
         }
 
         $message = new CreateWorkerJobMessage(
-            $event->getAuthenticationToken(),
             $event->getJobId(),
             $job->getMaximumDurationInSeconds(),
             $event->ipAddress

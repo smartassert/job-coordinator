@@ -17,7 +17,6 @@ use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\DataProvider\RemoteRequestFailureCreationDataProviderTrait;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Generator\StringValue;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -105,7 +104,7 @@ class RemoteRequestExceptionHandlerTest extends WebTestCase
                     return function (JobInterface $job) use ($inner) {
                         return new RemoteJobActionException(
                             $inner,
-                            new CreateMachineMessage(StringValue::random(), $job->getId()),
+                            new CreateMachineMessage($job->getId()),
                         );
                     };
                 },

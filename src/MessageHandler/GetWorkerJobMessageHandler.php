@@ -9,6 +9,7 @@ use App\Event\WorkerJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -23,6 +24,7 @@ final readonly class GetWorkerJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -40,9 +42,13 @@ final readonly class GetWorkerJobMessageHandler
 
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
             $this->eventDispatcher->dispatch(new WorkerJobRetrievedEvent(
-                $message->authenticationToken,
                 $message->getJobId(),
                 $message->machineIpAddress,
                 $workerClient->getApplicationState()

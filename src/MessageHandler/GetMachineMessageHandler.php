@@ -9,6 +9,7 @@ use App\Event\MachineRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,6 +24,7 @@ final readonly class GetMachineMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -40,11 +42,15 @@ final readonly class GetMachineMessageHandler
 
         $previousMachine = $message->machine;
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
-            $machine = $this->workerManagerClient->getMachine($message->authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClient->getMachine($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
-                $message->authenticationToken,
                 $previousMachine,
                 $machine
             ));

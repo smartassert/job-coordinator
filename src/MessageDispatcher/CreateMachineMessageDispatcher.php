@@ -39,7 +39,7 @@ readonly class CreateMachineMessageDispatcher implements EventSubscriberInterfac
 
     public function dispatchImmediately(ResultsJobCreatedEvent|SerializedSuiteSerializedEvent $event): void
     {
-        $message = new CreateMachineMessage($event->getAuthenticationToken(), $event->getJobId());
+        $message = new CreateMachineMessage($event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;

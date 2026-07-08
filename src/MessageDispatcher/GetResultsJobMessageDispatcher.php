@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\AuthenticatingEventInterface;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\ResultsJobRetrievedEvent;
@@ -51,11 +50,9 @@ readonly class GetResultsJobMessageDispatcher implements EventSubscriberInterfac
         );
     }
 
-    private function createAndHandleMessage(
-        AuthenticatingEventInterface&JobEventInterface $event,
-        callable $action
-    ): void {
-        $message = new GetResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
+    private function createAndHandleMessage(JobEventInterface $event, callable $action): void
+    {
+        $message = new GetResultsJobMessage($event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;

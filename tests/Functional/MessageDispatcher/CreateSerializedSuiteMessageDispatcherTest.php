@@ -46,26 +46,20 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = StringValue::random();
         $parameters = [
             StringValue::random() => StringValue::random(),
             StringValue::random() => StringValue::random(),
             StringValue::random() => StringValue::random(),
         ];
 
-        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), $parameters);
+        $event = new JobCreatedEvent($job->getId(), $job->getSuiteId(), $parameters);
 
         $this->dispatcher->dispatchImmediately($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateSerializedSuiteMessage(
-            $authenticationToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $parameters
-        );
+        $expectedMessage = new CreateSerializedSuiteMessage($job->getId(), $job->getSuiteId(), $parameters);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -76,7 +70,7 @@ class CreateSerializedSuiteMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = Id::generate();
-        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
+        $event = new JobCreatedEvent($jobId, 'suite id', []);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

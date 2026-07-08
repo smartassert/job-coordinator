@@ -11,7 +11,6 @@ use App\Event\MachineStateChangeEvent;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
@@ -36,7 +35,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $machineId = Id::generate();
 
         $event = new MachineRetrievedEvent(
-            StringValue::random(),
             MachineFactory::create(
                 $machineId,
                 'unchanged-state',
@@ -67,7 +65,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineStateChangeEventHasStateChange(): void
     {
         $machineId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         $previousMachine = MachineFactory::create(
             $machineId,
@@ -89,7 +86,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             new WorkerManagerClientMetaState(false, false, false),
         );
 
-        $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -123,7 +120,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
         return [
             'unknown -> unknown' => [
                 'event' => new MachineRetrievedEvent(
-                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'unknown',
@@ -146,7 +142,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'unknown -> finding' => [
                 'event' => new MachineRetrievedEvent(
-                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'unknown',
@@ -169,7 +164,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'finding -> finding' => [
                 'event' => new MachineRetrievedEvent(
-                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'find/finding',
@@ -192,7 +186,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'finding -> active without ip address' => [
                 'event' => new MachineRetrievedEvent(
-                    StringValue::random(),
                     MachineFactory::create(
                         $machineId,
                         'find/finding',
@@ -234,12 +227,10 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public static function dispatchMachineIsActiveEventIsActiveDataProvider(): array
     {
         $machineId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         return [
             'unknown -> active' => [
                 'event' => new MachineRetrievedEvent(
-                    $authenticationToken,
                     MachineFactory::create(
                         $machineId,
                         'unknown',
@@ -260,7 +251,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
                     ),
                 ),
                 'expected' => new MachineIsActiveEvent(
-                    $authenticationToken,
                     $machineId,
                     '127.0.0.1',
                     MachineFactory::create(
@@ -276,7 +266,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             'finding -> active' => [
                 'event' => new MachineRetrievedEvent(
-                    $authenticationToken,
                     MachineFactory::create(
                         $machineId,
                         'find/finding',
@@ -297,7 +286,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
                     ),
                 ),
                 'expected' => new MachineIsActiveEvent(
-                    $authenticationToken,
                     $machineId,
                     '127.0.0.2',
                     MachineFactory::create(
@@ -317,7 +305,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEventNoActionFailure(): void
     {
         $machineId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         $previousMachine = MachineFactory::create(
             $machineId,
@@ -339,7 +326,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             new WorkerManagerClientMetaState(false, false, false),
         );
 
-        $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -351,7 +338,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
     {
         $machineId = Id::generate();
-        $authenticationToken = StringValue::random();
         $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
 
         $previousMachine = MachineFactory::create(
@@ -374,7 +360,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             $actionFailure
         );
 
-        $event = new MachineRetrievedEvent($authenticationToken, $previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

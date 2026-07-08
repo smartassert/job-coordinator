@@ -16,6 +16,7 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
@@ -30,7 +31,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobId = Id::generate();
         $suiteId = Id::generate();
         $serializedSuiteId = Id::generate();
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage($jobId, $suiteId, $serializedSuiteId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -45,11 +46,15 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
             $messageStateMutator,
             \Mockery::mock(SerializedSuiteClientInterface::class),
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
 
         self::assertSame(MessageState::HANDLING, $message->getState());
@@ -101,19 +106,18 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
             $messageStateMutator,
             $serializedSuiteClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
 
-        $message = new GetSerializedSuiteMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuite->id
-        );
+        $message = new GetSerializedSuiteMessage($job->getId(), $job->getSuiteId(), $serializedSuite->id);
 
         ($handler)($message);
 
@@ -135,6 +139,6 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
 
-        return $jobFactory->createRandom();
+        return $jobFactory->createForUserToken(self::$apiToken);
     }
 }

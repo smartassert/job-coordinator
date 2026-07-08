@@ -9,6 +9,7 @@ use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -23,6 +24,7 @@ final readonly class TerminateMachineMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -38,8 +40,13 @@ final readonly class TerminateMachineMessageHandler
             return;
         }
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
-            $machine = $this->workerManagerClient->deleteMachine($message->authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClient->deleteMachine($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($message->getJobId(), $machine));
         } catch (\Throwable $e) {

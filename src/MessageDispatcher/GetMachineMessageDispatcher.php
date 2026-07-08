@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\AuthenticatingEventInterface as AuthenticatingEvent;
 use App\Event\JobEventInterface as JobEvent;
 use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineEventInterface as MachineEvent;
@@ -51,13 +50,9 @@ readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
     /**
      * @param StampInterface[] $stamps
      */
-    private function doDispatch(AuthenticatingEvent&JobEvent&MachineEvent $event, array $stamps = []): void
+    private function doDispatch(JobEvent&MachineEvent $event, array $stamps = []): void
     {
-        $message = new GetMachineMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->getMachine()
-        );
+        $message = new GetMachineMessage($event->getJobId(), $event->getMachine());
 
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {

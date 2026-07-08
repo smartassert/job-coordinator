@@ -35,11 +35,12 @@ readonly class JobController
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds,
+            $user->getSecurityToken(),
         );
         $this->jobRepository->store($job);
 
         $eventDispatcher->dispatch(
-            new JobCreatedEvent($user->getSecurityToken(), $job->getId(), $job->getSuiteId(), $request->parameters)
+            new JobCreatedEvent($job->getId(), $job->getSuiteId(), $request->parameters)
         );
 
         return new JsonResponse($this->jobStatusFactory->create($job));

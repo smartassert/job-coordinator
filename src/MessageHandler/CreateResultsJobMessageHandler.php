@@ -9,6 +9,7 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
@@ -23,6 +24,7 @@ final readonly class CreateResultsJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -38,10 +40,14 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
-            $resultsJob = $this->resultsClient->createJob($message->authenticationToken, $message->getJobId());
+            $resultsJob = $this->resultsClient->createJob($authenticationToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
-                $message->authenticationToken,
                 $message->getJobId(),
                 $resultsJob
             ));

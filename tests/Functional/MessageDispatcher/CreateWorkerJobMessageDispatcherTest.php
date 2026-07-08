@@ -14,7 +14,6 @@ use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\JobRepository;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -55,11 +54,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $event = new MachineIsReadyEvent(
-            StringValue::random(),
-            $job->getId(),
-            '127.0.0.1',
-        );
+        $event = new MachineIsReadyEvent($job->getId(), '127.0.0.1');
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -97,11 +92,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $jobRepository,
         );
 
-        $event = new MachineIsReadyEvent(
-            StringValue::random(),
-            $jobId,
-            '127.0.0.1',
-        );
+        $event = new MachineIsReadyEvent($jobId, '127.0.0.1');
 
         $dispatcher->dispatchImmediately($event);
 
@@ -121,9 +112,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobRepository instanceof JobRepository);
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = StringValue::random();
 
-        $event = new MachineIsReadyEvent($authenticationToken, $job->getId(), $machineIpAddress);
+        $event = new MachineIsReadyEvent($job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -144,7 +134,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
@@ -163,10 +152,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $job = $jobFactory->createRandom();
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = StringValue::random();
 
         $message = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
@@ -179,7 +166,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress

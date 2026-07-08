@@ -84,7 +84,6 @@ class ResultsJobFactoryTest extends WebTestCase
         $jobId = Id::generate();
 
         $event = new ResultsJobCreatedEvent(
-            'authentication token',
             $jobId,
             ResultsClientJobFactory::createRandom()
         );
@@ -117,7 +116,7 @@ class ResultsJobFactoryTest extends WebTestCase
             false,
         );
 
-        $event = new ResultsJobCreatedEvent('authentication token', $job->getId(), $resultsJob);
+        $event = new ResultsJobCreatedEvent($job->getId(), $resultsJob);
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 

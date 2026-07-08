@@ -19,6 +19,7 @@ use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
@@ -53,13 +54,16 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     public function testInvokeWorkerManagerClientThrowsException(): void
     {
-        $jobId = Id::generate();
-        $machine = MachineFactory::createRandomForJob($jobId);
-        $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
+        $jobFactory = self::getContainer()->get(JobFactory::class);
+        \assert($jobFactory instanceof JobFactory);
+        $job = $jobFactory->createRandom();
+
+        $machine = MachineFactory::createRandomForJob($job->getId());
+        $message = new GetMachineMessage($job->getId(), $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
-            ->with($jobId)
+            ->with($job->getId())
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
@@ -88,7 +92,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -120,17 +124,17 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         self::assertEquals(
-            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            [new MachineRetrievedEvent($previous, $current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
 
         $events = $this->eventRecorder->all(MachineRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new MachineRetrievedEvent(self::$apiToken, $previous, $current), $event);
+        self::assertEquals(new MachineRetrievedEvent($previous, $current), $event);
     }
 
     /**
@@ -179,7 +183,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -211,7 +215,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor,
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
@@ -299,7 +303,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     \assert('' !== $authenticationToken);
 
                     return new MachineIsActiveEvent(
-                        $authenticationToken,
                         $job->getId(),
                         '127.0.0.1',
                         MachineFactory::create(
@@ -330,7 +333,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
-        $job = $jobFactory->createRandom();
+        $job = $jobFactory->createForUserToken(self::$apiToken);
 
         $previous = $previousMachineCreator($job);
         $current = $currentMachineCreator($job);
@@ -362,7 +365,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor,
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -372,7 +375,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals($current, $latestEvent->getMachine());
 
         self::assertEquals(
-            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            [new MachineRetrievedEvent($previous, $current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
     }
@@ -423,7 +426,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             new WorkerManagerClientMetaState(false, false, false),
         );
-        $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
+        $message = new GetMachineMessage($jobId, $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -464,11 +467,15 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
+        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+
         return new GetMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $workerManagerClient,
             $eventDispatcher,
+            $authenticationTokenProvider,
         );
     }
 }

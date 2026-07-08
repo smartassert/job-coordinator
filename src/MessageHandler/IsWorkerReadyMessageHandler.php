@@ -57,11 +57,7 @@ final readonly class IsWorkerReadyMessageHandler
         }
 
         $this->eventDispatcher->dispatch(
-            new MachineIsReadyEvent(
-                $message->authenticationToken,
-                $message->getJobId(),
-                $message->machineIpAddress
-            )
+            new MachineIsReadyEvent($message->getJobId(), $message->machineIpAddress)
         );
     }
 }
