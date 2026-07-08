@@ -20,6 +20,7 @@ readonly class JobFactory
     {
         $userId = Id::generate();
         $suiteId = Id::generate();
+        $token = Id::generate();
 
         $maximumDurationInSeconds = rand(1, 1000);
 
@@ -28,6 +29,7 @@ readonly class JobFactory
             $userId,
             $suiteId,
             $maximumDurationInSeconds,
+            $token,
         );
         $this->jobRepository->store($job);
 

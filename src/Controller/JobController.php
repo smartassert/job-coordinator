@@ -35,6 +35,7 @@ readonly class JobController
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds,
+            $user->getSecurityToken(),
         );
         $this->jobRepository->store($job);
 
