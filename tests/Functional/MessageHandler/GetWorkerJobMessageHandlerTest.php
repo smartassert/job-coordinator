@@ -12,6 +12,7 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
+use App\Services\MessageStateMutator;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Generator\BoolValue;
@@ -20,11 +21,9 @@ use App\Tests\Services\Generator\Ip;
 use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerClient\Model\ApplicationState;
 use SmartAssert\WorkerClient\Model\ComponentState;
 use SmartAssert\WorkerClient\Model\MetaState;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -202,18 +201,14 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
         return new GetWorkerJobMessageHandler(
             $readinessAssessor,
+            $messageStateMutator,
             $workerClientFactory,
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
     }
 }

@@ -11,12 +11,12 @@ use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -152,18 +152,14 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
         return new TerminateMachineMessageHandler(
             $readinessAssessor,
+            $messageStateMutator,
             $workerManagerClient,
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
     }
 }

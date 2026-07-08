@@ -19,6 +19,7 @@ use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestRepository;
+use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -26,12 +27,10 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFacto
 use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Log\LoggerInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -462,18 +461,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
         return new GetMachineMessageHandler(
             $readinessAssessor,
+            $messageStateMutator,
             $workerManagerClient,
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
     }
 }

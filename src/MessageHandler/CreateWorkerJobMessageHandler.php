@@ -14,29 +14,27 @@ use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\MessageStateMutator;
+use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandler
+final readonly class CreateWorkerJobMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
+        private MessageStateMutator $messageStateMutator,
+        private UnhandleableMessageHandler $unhandleableMessageHandler,
         private SerializedSuiteRepository $serializedSuiteRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
-        EventDispatcherInterface $eventDispatcher,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-    ) {
-        parent::__construct($eventDispatcher, $messageBus, $logger);
-    }
+        private EventDispatcherInterface $eventDispatcher,
+    ) {}
 
     /**
      * @throws RemoteJobActionException
@@ -45,7 +43,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
     public function __invoke(CreateWorkerJobMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
-        $this->setMessageState($message, $readiness);
+        $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
@@ -54,7 +52,7 @@ final readonly class CreateWorkerJobMessageHandler extends AbstractMessageHandle
         $serializedSuiteEntity = $this->serializedSuiteRepository->get($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if (null === $serializedSuiteEntity || null === $resultsJob) {
-            $this->handleNonHandleableMessage($message, MessageHandlingReadiness::EVENTUALLY);
+            $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
             return;
         }

@@ -9,25 +9,21 @@ use App\Event\SerializedSuiteRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHandler
+final readonly class GetSerializedSuiteMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
+        private MessageStateMutator $messageStateMutator,
         private SerializedSuiteClientInterface $serializedSuiteClient,
-        EventDispatcherInterface $eventDispatcher,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-    ) {
-        parent::__construct($eventDispatcher, $messageBus, $logger);
-    }
+        private EventDispatcherInterface $eventDispatcher,
+    ) {}
 
     /**
      * @throws RemoteJobActionException
@@ -36,7 +32,7 @@ final readonly class GetSerializedSuiteMessageHandler extends AbstractMessageHan
     public function __invoke(GetSerializedSuiteMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
-        $this->setMessageState($message, $readiness);
+        $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;

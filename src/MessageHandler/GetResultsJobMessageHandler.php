@@ -9,25 +9,21 @@ use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class GetResultsJobMessageHandler extends AbstractMessageHandler
+final readonly class GetResultsJobMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
+        private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
-        EventDispatcherInterface $eventDispatcher,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-    ) {
-        parent::__construct($eventDispatcher, $messageBus, $logger);
-    }
+        private EventDispatcherInterface $eventDispatcher,
+    ) {}
 
     /**
      * @throws RemoteJobActionException
@@ -36,7 +32,7 @@ final readonly class GetResultsJobMessageHandler extends AbstractMessageHandler
     public function __invoke(GetResultsJobMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
-        $this->setMessageState($message, $readiness);
+        $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;

@@ -16,13 +16,12 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
+use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
-use Psr\Log\LoggerInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -43,18 +42,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $eventDispatcher = self::getContainer()->get(\Psr\EventDispatcher\EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
+            $messageStateMutator,
             \Mockery::mock(SerializedSuiteClientInterface::class),
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
 
         self::assertSame(MessageState::HANDLING, $message->getState());
@@ -103,18 +98,14 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $assessor = self::getContainer()->get(GetSerializedSuiteReadinessAssessor::class);
         \assert($assessor instanceof ReadinessAssessorInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
-
-        $logger = self::getContainer()->get(LoggerInterface::class);
-        \assert($logger instanceof LoggerInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
 
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
+            $messageStateMutator,
             $serializedSuiteClient,
             $eventDispatcher,
-            $messageBus,
-            $logger,
         );
 
         $message = new GetSerializedSuiteMessage(

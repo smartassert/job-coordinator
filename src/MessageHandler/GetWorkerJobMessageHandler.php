@@ -9,25 +9,21 @@ use App\Event\WorkerJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\MessageStateMutator;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
+final readonly class GetWorkerJobMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
+        private MessageStateMutator $messageStateMutator,
         private WorkerClientFactory $workerClientFactory,
-        EventDispatcherInterface $eventDispatcher,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-    ) {
-        parent::__construct($eventDispatcher, $messageBus, $logger);
-    }
+        private EventDispatcherInterface $eventDispatcher,
+    ) {}
 
     /**
      * @throws RemoteJobActionException
@@ -36,7 +32,7 @@ final readonly class GetWorkerJobMessageHandler extends AbstractMessageHandler
     public function __invoke(GetWorkerJobMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
-        $this->setMessageState($message, $readiness);
+        $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
