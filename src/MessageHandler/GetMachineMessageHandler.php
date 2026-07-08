@@ -51,7 +51,6 @@ final readonly class GetMachineMessageHandler
             $machine = $this->workerManagerClient->getMachine($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
-                $authenticationToken,
                 $previousMachine,
                 $machine
             ));

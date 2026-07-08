@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use App\Event\AuthenticatingEventInterface as AuthenticatingEvent;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
-class MachineCreationRequestedEvent extends AbstractMachineEvent implements JobEventInterface, AuthenticatingEvent
+class MachineCreationRequestedEvent extends AbstractMachineEvent implements JobEventInterface
 {
-    use GetAuthenticationTokenTrait;
-
-    /**
-     * @param non-empty-string $authenticationToken
-     */
     public function __construct(
-        private readonly string $authenticationToken,
         Machine $machine,
     ) {
         parent::__construct($machine);

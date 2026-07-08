@@ -49,7 +49,6 @@ final readonly class GetSerializedSuiteMessageHandler
             $serializedSuite = $this->serializedSuiteClient->get($authenticationToken, $message->serializedSuiteId);
 
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $serializedSuite
             ));

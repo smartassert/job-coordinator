@@ -120,19 +120,11 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public static function dispatchImmediatelySuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (JobInterface $job) {
-            return new ResultsJobCreatedEvent(
-                StringValue::random(),
-                $job->getId(),
-                ResultsClientJobFactory::createRandom(),
-            );
+            return new ResultsJobCreatedEvent($job->getId(), ResultsClientJobFactory::createRandom());
         };
 
         $serializedSuiteSerializedEventCreator = function (JobInterface $job) {
-            return new SerializedSuiteSerializedEvent(
-                StringValue::random(),
-                $job->getId(),
-                StringValue::random(),
-            );
+            return new SerializedSuiteSerializedEvent($job->getId(), StringValue::random());
         };
 
         return [
@@ -148,7 +140,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNeverReady(): void
     {
         $jobId = Id::generate();
-        $event = new SerializedSuiteSerializedEvent('api token', $jobId, 'serialized suite id');
+        $event = new SerializedSuiteSerializedEvent($jobId, 'serialized suite id');
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

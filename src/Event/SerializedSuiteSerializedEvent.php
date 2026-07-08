@@ -6,18 +6,15 @@ namespace App\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SerializedSuiteSerializedEvent extends Event implements JobEventInterface, AuthenticatingEventInterface
+class SerializedSuiteSerializedEvent extends Event implements JobEventInterface
 {
     use GetJobIdTrait;
-    use GetAuthenticationTokenTrait;
 
     /**
-     * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
      */
     public function __construct(
-        private readonly string $authenticationToken,
         private readonly string $jobId,
         public readonly string $serializedSuiteId,
     ) {}

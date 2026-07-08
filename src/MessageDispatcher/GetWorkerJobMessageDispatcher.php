@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageDispatcher;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Event\AuthenticatingEventInterface;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\JobEventInterface;
 use App\Event\MachineIpAddressInterface;
@@ -37,7 +36,7 @@ readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
     }
 
     public function dispatchImmediately(
-        AuthenticatingEventInterface&JobEventInterface&MachineIpAddressInterface $event
+        JobEventInterface&MachineIpAddressInterface $event
     ): void {
         $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
 

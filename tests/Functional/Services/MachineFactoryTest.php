@@ -77,7 +77,7 @@ class MachineFactoryTest extends WebTestCase
 
         $machine = WorkerMachineFactory::createRandomForJob($jobId);
 
-        $event = new MachineCreationRequestedEvent('authentication token', $machine);
+        $event = new MachineCreationRequestedEvent($machine);
 
         $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 
@@ -101,7 +101,7 @@ class MachineFactoryTest extends WebTestCase
 
         $machine = $workerManagerClientMachineCreator($job->getId());
 
-        $event = new MachineCreationRequestedEvent('authentication token', $machine);
+        $event = new MachineCreationRequestedEvent($machine);
 
         $this->machineFactory->createOnMachineCreationRequestedEvent($event);
 

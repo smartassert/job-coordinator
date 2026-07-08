@@ -55,7 +55,6 @@ final readonly class CreateSerializedSuiteMessageHandler
             );
 
             $this->eventDispatcher->dispatch(new SerializedSuiteCreatedEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $serializedSuite
             ));

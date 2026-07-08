@@ -48,7 +48,6 @@ final readonly class GetResultsJobMessageHandler
         try {
             $resultsJob = $this->resultsClient->getJobStatus($authenticationToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $resultsJob
             ));

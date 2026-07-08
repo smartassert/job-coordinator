@@ -169,7 +169,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new MachineCreationRequestedEvent(self::$apiToken, $machine),
+            new MachineCreationRequestedEvent($machine),
             $event
         );
     }

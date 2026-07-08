@@ -48,7 +48,6 @@ final readonly class CreateResultsJobMessageHandler
         try {
             $resultsJob = $this->resultsClient->createJob($authenticationToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $resultsJob
             ));

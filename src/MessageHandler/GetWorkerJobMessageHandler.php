@@ -49,7 +49,6 @@ final readonly class GetWorkerJobMessageHandler
 
         try {
             $this->eventDispatcher->dispatch(new WorkerJobRetrievedEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $message->machineIpAddress,
                 $workerClient->getApplicationState()

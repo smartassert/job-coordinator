@@ -128,7 +128,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     $jobId = Id::generate();
 
                     return new ResultsJobRetrievedEvent(
-                        StringValue::random(),
                         $jobId,
                         new ResultsClientJob(
                             $jobId,
@@ -151,7 +150,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 'resultsJobCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -181,7 +179,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -217,7 +214,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),
@@ -253,7 +249,6 @@ class ResultsJobMutatorTest extends WebTestCase
                 },
                 'eventCreator' => function (JobInterface $job) {
                     return new ResultsJobRetrievedEvent(
-                        StringValue::random(),
                         $job->getId(),
                         new ResultsClientJob(
                             $job->getId(),

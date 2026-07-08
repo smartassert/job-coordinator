@@ -86,7 +86,6 @@ class SerializedSuiteFactoryTest extends WebTestCase
         $suiteId = Id::generate();
 
         $event = new SerializedSuiteCreatedEvent(
-            'authentication token',
             $jobId,
             SourcesClientSerializedSuiteFactory::create($serializedSuiteId, $suiteId)
         );
@@ -120,7 +119,7 @@ class SerializedSuiteFactoryTest extends WebTestCase
             [],
         );
 
-        $event = new SerializedSuiteCreatedEvent('authentication token', $job->getId(), $sourcesSerializedSuite);
+        $event = new SerializedSuiteCreatedEvent($job->getId(), $sourcesSerializedSuite);
 
         $this->serializedSuiteFactory->createOnSerializedSuiteCreatedEvent($event);
 

@@ -14,7 +14,6 @@ use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -70,11 +69,10 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
         $workerJob = WorkerClientJobFactory::createRandom();
         $machineIpAddress = '127.0.0.1';
 
-        $event = new CreateWorkerJobRequestedEvent($authenticationToken, $jobId, $machineIpAddress, $workerJob);
+        $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -95,11 +93,10 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelySuccess(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
         $workerJob = WorkerClientJobFactory::createRandom();
         $machineIpAddress = '127.0.0.1';
 
-        $event = new CreateWorkerJobRequestedEvent($authenticationToken, $jobId, $machineIpAddress, $workerJob);
+        $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
 
         $this->dispatcher->dispatchImmediately($event);
 

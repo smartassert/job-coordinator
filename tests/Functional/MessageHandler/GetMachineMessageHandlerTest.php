@@ -127,14 +127,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler(new GetMachineMessage($previous->id, $previous));
 
         self::assertEquals(
-            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            [new MachineRetrievedEvent($previous, $current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
 
         $events = $this->eventRecorder->all(MachineRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new MachineRetrievedEvent(self::$apiToken, $previous, $current), $event);
+        self::assertEquals(new MachineRetrievedEvent($previous, $current), $event);
     }
 
     /**
@@ -303,7 +303,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     \assert('' !== $authenticationToken);
 
                     return new MachineIsActiveEvent(
-                        $authenticationToken,
                         $job->getId(),
                         '127.0.0.1',
                         MachineFactory::create(
@@ -376,7 +375,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals($current, $latestEvent->getMachine());
 
         self::assertEquals(
-            [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
+            [new MachineRetrievedEvent($previous, $current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
     }

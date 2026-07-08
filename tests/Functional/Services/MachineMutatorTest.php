@@ -283,12 +283,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function () use ($arbitraryMachine) {
                     $jobId = Id::generate();
 
-                    return new MachineIsActiveEvent(
-                        StringValue::random(),
-                        $jobId,
-                        '127.0.0.1',
-                        $arbitraryMachine,
-                    );
+                    return new MachineIsActiveEvent($jobId, '127.0.0.1', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -298,12 +293,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
-                    return new MachineIsActiveEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.1',
-                        $arbitraryMachine,
-                    );
+                    return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -320,12 +310,7 @@ class MachineMutatorTest extends WebTestCase
                     return $machine;
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
-                    return new MachineIsActiveEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.1',
-                        $arbitraryMachine,
-                    );
+                    return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
@@ -343,12 +328,7 @@ class MachineMutatorTest extends WebTestCase
                     return $machine;
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
-                    return new MachineIsActiveEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.1',
-                        $arbitraryMachine,
-                    );
+                    return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
@@ -368,12 +348,7 @@ class MachineMutatorTest extends WebTestCase
                     return $machine;
                 },
                 'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
-                    return new MachineIsActiveEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.2',
-                        $arbitraryMachine,
-                    );
+                    return new MachineIsActiveEvent($job->getId(), '127.0.0.2', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')
@@ -586,11 +561,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function () {
                     $jobId = Id::generate();
 
-                    return new MachineIsReadyEvent(
-                        StringValue::random(),
-                        $jobId,
-                        '127.0.0.1',
-                    );
+                    return new MachineIsReadyEvent($jobId, '127.0.0.1');
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -600,11 +571,7 @@ class MachineMutatorTest extends WebTestCase
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
                 'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsReadyEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.1',
-                    );
+                    return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -622,11 +589,7 @@ class MachineMutatorTest extends WebTestCase
                     return $machine;
                 },
                 'eventCreator' => function (JobInterface $job) {
-                    return new MachineIsReadyEvent(
-                        StringValue::random(),
-                        $job->getId(),
-                        '127.0.0.1',
-                    );
+                    return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
                 },
                 'expectedMachineCreator' => function (JobInterface $job) {
                     return new Machine($job->getId(), 'up/started', 'pre_active')

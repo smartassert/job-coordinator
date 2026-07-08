@@ -121,7 +121,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new ResultsJobCreatedEvent(self::$apiToken, $job->getId(), $resultsJobModel), $event);
+        self::assertEquals(new ResultsJobCreatedEvent($job->getId(), $resultsJobModel), $event);
     }
 
     public function testInvokeNotHandleable(): void

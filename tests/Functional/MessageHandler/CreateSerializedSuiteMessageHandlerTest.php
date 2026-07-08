@@ -150,7 +150,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new SerializedSuiteCreatedEvent(self::$apiToken, $job->getId(), $serializedSuiteModel),
+            new SerializedSuiteCreatedEvent($job->getId(), $serializedSuiteModel),
             $event
         );
     }

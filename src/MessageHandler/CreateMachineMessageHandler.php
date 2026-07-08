@@ -49,7 +49,7 @@ final readonly class CreateMachineMessageHandler
             $machine = $this->workerManagerClient->createMachine($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(
-                new MachineCreationRequestedEvent($authenticationToken, $machine)
+                new MachineCreationRequestedEvent($machine)
             );
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);

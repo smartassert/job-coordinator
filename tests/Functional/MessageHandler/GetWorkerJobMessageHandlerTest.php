@@ -181,7 +181,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobRetrievedEvent($job->getToken(), $job->getId(), $machineIpAddress, $retrievedWorkerState),
+            new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedWorkerState),
             $event
         );
     }

@@ -142,7 +142,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
                     \assert('' !== $authenticationToken);
 
                     return new CreateWorkerJobRequestedEvent(
-                        $authenticationToken,
                         $job->getId(),
                         '127.0.0.1',
                         new WorkerJob(
@@ -236,7 +235,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
                     \assert('' !== $authenticationToken);
 
                     return new ResultsJobRetrievedEvent(
-                        $authenticationToken,
                         $job->getId(),
                         new ResultsJob(
                             $job->getId(),

@@ -209,7 +209,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new MachineIsReadyEvent($job->getToken(), $job->getId(), $machineIpAddress),
+            new MachineIsReadyEvent($job->getId(), $machineIpAddress),
             $event
         );
     }

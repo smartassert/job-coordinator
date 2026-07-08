@@ -12,7 +12,6 @@ use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -46,9 +45,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = StringValue::random();
-
-        $event = new JobCreatedEvent($authenticationToken, $job->getId(), $job->getSuiteId(), []);
+        $event = new JobCreatedEvent($job->getId(), $job->getSuiteId(), []);
 
         $this->dispatcher->dispatchImmediately($event);
 
@@ -66,7 +63,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
     public function testDispatchImmediatelyNotReady(): void
     {
         $jobId = Id::generate();
-        $event = new JobCreatedEvent('api token', $jobId, 'suite id', []);
+        $event = new JobCreatedEvent($jobId, 'suite id', []);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor

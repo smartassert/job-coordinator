@@ -65,7 +65,6 @@ final readonly class IsWorkerReadyMessageHandler
 
         $this->eventDispatcher->dispatch(
             new MachineIsReadyEvent(
-                $authenticationToken,
                 $message->getJobId(),
                 $message->machineIpAddress
             )

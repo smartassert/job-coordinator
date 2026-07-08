@@ -96,7 +96,6 @@ final readonly class CreateWorkerJobMessageHandler
         }
 
         $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
-            $authenticationToken,
             $message->getJobId(),
             $message->machineIpAddress,
             $workerJob,
