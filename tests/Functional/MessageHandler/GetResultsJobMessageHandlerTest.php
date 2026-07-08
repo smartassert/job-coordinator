@@ -33,7 +33,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new GetResultsJobMessage(self::$apiToken, $jobId);
+        $message = new GetResultsJobMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -60,7 +60,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $message = new GetResultsJobMessage(self::$apiToken, $job->getId());
+        $message = new GetResultsJobMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -114,7 +114,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($assessor, $resultsClient);
 
-        $handler(new GetResultsJobMessage(self::$apiToken, $job->getId()));
+        $handler(new GetResultsJobMessage($job->getId()));
 
         $events = $this->eventRecorder->all(ResultsJobRetrievedEvent::class);
         $event = $events[0] ?? null;

@@ -86,13 +86,13 @@ class JobRemoteRequestMessageDispatcherTest extends WebTestCase
         return [
             'without stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    return new GetResultsJobMessage('api token', $job->getId());
+                    return new GetResultsJobMessage($job->getId());
                 },
                 'stamps' => [],
             ],
             'with stamps' => [
                 'messageCreator' => function (JobInterface $job) {
-                    return new GetResultsJobMessage('api token', $job->getId());
+                    return new GetResultsJobMessage($job->getId());
                 },
                 'stamps' => [
                     new NonDelayedStamp(),

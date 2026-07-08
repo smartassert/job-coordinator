@@ -128,7 +128,7 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher->dispatchImmediately($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobMessage($authenticationToken, $job->getId()));
+        $this->assertDispatchedMessage(new GetResultsJobMessage($job->getId()));
     }
 
     /**
@@ -222,7 +222,7 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
 
         $dispatcher->dispatch($event);
 
-        $this->assertDispatchedMessage(new GetResultsJobMessage($authenticationToken, $job->getId()));
+        $this->assertDispatchedMessage(new GetResultsJobMessage($job->getId()));
     }
 
     /**
