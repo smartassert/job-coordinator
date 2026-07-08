@@ -8,25 +8,25 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsReadyEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\MessageStateMutator;
+use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
-final readonly class IsWorkerReadyMessageHandler extends AbstractMessageHandler
+final readonly class IsWorkerReadyMessageHandler
 {
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
+        private MessageStateMutator $messageStateMutator,
+        private UnhandleableMessageHandler $unhandleableMessageHandler,
         private WorkerClientFactory $workerClientFactory,
-        EventDispatcherInterface $eventDispatcher,
-        MessageBusInterface $messageBus,
+        private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
-    ) {
-        parent::__construct($eventDispatcher, $messageBus, $logger);
-    }
+    ) {}
 
     /**
      * @throws ExceptionInterface
@@ -34,7 +34,7 @@ final readonly class IsWorkerReadyMessageHandler extends AbstractMessageHandler
     public function __invoke(IsWorkerReadyMessage $message): void
     {
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
-        $this->setMessageState($message, $readiness);
+        $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
@@ -51,7 +51,7 @@ final readonly class IsWorkerReadyMessageHandler extends AbstractMessageHandler
         ));
 
         if (!$isReady) {
-            $this->handleNonHandleableMessage($message, MessageHandlingReadiness::EVENTUALLY);
+            $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
             return;
         }

@@ -11,6 +11,8 @@ use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
+use App\Services\MessageStateMutator;
+use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Generator\Id;
@@ -20,7 +22,6 @@ use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use SmartAssert\ServiceClient\Exception\CurlException;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -232,17 +233,21 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
 
-        $messageBus = self::getContainer()->get(MessageBusInterface::class);
-        \assert($messageBus instanceof MessageBusInterface);
+        $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
+        \assert($messageStateMutator instanceof MessageStateMutator);
+
+        $unhandleableMessageHandler = self::getContainer()->get(UnhandleableMessageHandler::class);
+        \assert($unhandleableMessageHandler instanceof UnhandleableMessageHandler);
 
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
         return new IsWorkerReadyMessageHandler(
             $readinessAssessor,
+            $messageStateMutator,
+            $unhandleableMessageHandler,
             $workerClientFactory,
             $eventDispatcher,
-            $messageBus,
             $logger,
         );
     }
