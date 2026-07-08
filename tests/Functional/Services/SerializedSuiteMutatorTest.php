@@ -187,7 +187,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                 },
             ],
-            'has state change' => [
+            'has invalid state change, no previous states' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function (
                     JobInterface $job,
@@ -196,8 +196,8 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
-                        'requested',
-                        new MetaState(false, false, true),
+                        'preparing/running',
+                        new MetaState(false, false, false),
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
@@ -208,12 +208,108 @@ class SerializedSuiteMutatorTest extends WebTestCase
                             $serializedSuiteId,
                             'suite id',
                             [],
-                            'prepared',
+                            'requested',
+                            new SourcesClientMetaState(false, false, true),
+                            null,
+                            null,
+                            [],
+                            [
+                                'preparing/running',
+                                'preparing/halted',
+                                'failed',
+                                'prepared',
+                            ],
+                        ),
+                    );
+                },
+                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                    return new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'preparing/running',
+                        new MetaState(false, false, false),
+                    );
+                },
+            ],
+            'has invalid state change, no matching previous state' => [
+                'jobCreator' => $jobCreator,
+                'serializedSuiteCreator' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) use ($serializedSuiteId) {
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'preparing/running',
+                        new MetaState(false, false, false),
+                    );
+                    $serializedSuiteRepository->save($serializedSuite);
+                },
+                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                    return new SerializedSuiteRetrievedEvent(
+                        $job->getId(),
+                        new SourcesSerializedSuite(
+                            $serializedSuiteId,
+                            'suite id',
+                            [],
+                            'requested',
+                            new SourcesClientMetaState(false, false, true),
+                            null,
+                            null,
+                            [],
+                            [
+                                'preparing/running',
+                                'preparing/halted',
+                                'failed',
+                                'prepared',
+                            ],
+                        ),
+                    );
+                },
+                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                    return new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'preparing/running',
+                        new MetaState(false, false, false),
+                    );
+                },
+            ],
+            'has valid state change' => [
+                'jobCreator' => $jobCreator,
+                'serializedSuiteCreator' => function (
+                    JobInterface $job,
+                    SerializedSuiteRepository $serializedSuiteRepository
+                ) use ($serializedSuiteId) {
+                    $serializedSuite = new SerializedSuite(
+                        $job->getId(),
+                        $serializedSuiteId,
+                        'prepared',
+                        new MetaState(true, true, false),
+                    );
+                    $serializedSuiteRepository->save($serializedSuite);
+                },
+                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                    return new SerializedSuiteRetrievedEvent(
+                        $job->getId(),
+                        new SourcesSerializedSuite(
+                            $serializedSuiteId,
+                            'suite id',
+                            [],
+                            'preparing/running',
                             new SourcesClientMetaState(true, true, false),
                             null,
                             null,
-                            [],
-                            [],
+                            [
+                                'preparing/running',
+                                'preparing/halted',
+                            ],
+                            [
+                                'preparing/running',
+                                'preparing/halted',
+                                'failed',
+                                'prepared',
+                            ],
                         ),
                     );
                 },

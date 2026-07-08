@@ -42,6 +42,18 @@ class SerializedSuiteMutator implements EventSubscriberInterface
             return;
         }
 
+        if ($serializedSuite->getState() === $event->serializedSuite->getState()) {
+            return;
+        }
+
+        if (!in_array($serializedSuite->getState(), $event->serializedSuite->getPreviousStates(), true)) {
+            return;
+        }
+
+        var_dump($serializedSuite->getState());
+        var_dump($event->serializedSuite->getState());
+        var_dump($event->serializedSuite->getPreviousStates());
+
         $serializedSuite->setState($event->serializedSuite->getState());
         $serializedSuite->setMetaState(new MetaState(
             $event->serializedSuite->getMetaState()->ended,
