@@ -11,7 +11,6 @@ use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
@@ -243,9 +242,6 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
-
         return new IsWorkerReadyMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -253,7 +249,6 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerClientFactory,
             $eventDispatcher,
             $logger,
-            $authenticationTokenProvider,
         );
     }
 }
