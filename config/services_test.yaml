@@ -79,3 +79,19 @@ services:
 
     App\Tests\Services\Stager:
         public: true
+
+    Symfony\Component\Webhook\Server\HeadersConfigurator:
+        public: true
+
+    Symfony\Component\Webhook\Server\HeaderSignatureConfigurator:
+        public: true
+
+    Symfony\Component\Webhook\Server\NativeJsonPayloadSerializer: ~
+
+    Symfony\Component\Webhook\Server\JsonBodyConfigurator:
+        public: true
+        arguments:
+            $payloadSerializer: '@Symfony\Component\Webhook\Server\NativeJsonPayloadSerializer'
+
+    App\Tests\Services\Factory\RemoteEventConfigurationFactory:
+        public: true

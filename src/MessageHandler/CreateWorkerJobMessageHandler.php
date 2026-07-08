@@ -51,7 +51,7 @@ final readonly class CreateWorkerJobMessageHandler
             return;
         }
 
-        $serializedSuiteEntity = $this->serializedSuiteRepository->get($message->getJobId());
+        $serializedSuiteEntity = $this->serializedSuiteRepository->findByJobId($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         if (null === $serializedSuiteEntity || null === $resultsJob) {
             $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
