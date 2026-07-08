@@ -141,21 +141,20 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $this->assertDispatchedMessage($event->getAuthenticationToken(), $event->getJobId());
+        $this->assertDispatchedMessage($event->getJobId());
     }
 
     /**
-     * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      */
-    private function assertDispatchedMessage(string $authenticationToken, string $jobId): void
+    private function assertDispatchedMessage(string $jobId): void
     {
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
         $envelope = $envelopes[0];
         self::assertEquals(
-            new TerminateMachineMessage($authenticationToken, $jobId),
+            new TerminateMachineMessage($jobId),
             $envelope->getMessage()
         );
 

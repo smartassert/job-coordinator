@@ -37,7 +37,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $job->getId());
+        $message = new CreateResultsJobMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -100,7 +100,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertNull($resultsJob);
 
-        $handler(new CreateResultsJobMessage(self::$apiToken, $job->getId()));
+        $handler(new CreateResultsJobMessage($job->getId()));
 
         $resultsJob = $resultsJobRepository->find($job->getId());
         self::assertEquals(
@@ -128,7 +128,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $message = new CreateResultsJobMessage(self::$apiToken, $jobId);
+        $message = new CreateResultsJobMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')

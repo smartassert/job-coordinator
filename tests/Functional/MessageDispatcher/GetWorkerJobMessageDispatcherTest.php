@@ -103,7 +103,7 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $expectedMessage = new GetWorkerJobMessage($authenticationToken, $jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

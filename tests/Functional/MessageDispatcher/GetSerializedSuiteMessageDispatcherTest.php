@@ -88,7 +88,6 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new GetSerializedSuiteMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getSuiteId(),
             $serializedSuite->id

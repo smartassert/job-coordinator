@@ -31,7 +31,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $jobId = Id::generate();
         $suiteId = Id::generate();
         $serializedSuiteId = Id::generate();
-        $message = new GetSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteId);
+        $message = new GetSerializedSuiteMessage($jobId, $suiteId, $serializedSuiteId);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -117,12 +117,7 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
             $authenticationTokenProvider,
         );
 
-        $message = new GetSerializedSuiteMessage(
-            self::$apiToken,
-            $job->getId(),
-            $job->getSuiteId(),
-            $serializedSuite->id
-        );
+        $message = new GetSerializedSuiteMessage($job->getId(), $job->getSuiteId(), $serializedSuite->id);
 
         ($handler)($message);
 

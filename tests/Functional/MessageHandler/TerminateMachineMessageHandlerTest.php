@@ -28,7 +28,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $message = new TerminateMachineMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -52,7 +52,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new TerminateMachineMessage(self::$apiToken, $jobId);
+        $message = new TerminateMachineMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -79,7 +79,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
+        $message = new TerminateMachineMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -106,7 +106,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $message = new TerminateMachineMessage(self::$apiToken, $job->getId());
+        $message = new TerminateMachineMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')

@@ -144,7 +144,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
@@ -163,10 +162,8 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $job = $jobFactory->createRandom();
 
         $machineIpAddress = '127.0.0.1';
-        $authenticationToken = StringValue::random();
 
         $message = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
@@ -179,7 +176,6 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         self::assertCount(1, $envelopes);
 
         $expectedMessage = new CreateWorkerJobMessage(
-            $authenticationToken,
             $job->getId(),
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress

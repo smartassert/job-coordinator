@@ -55,7 +55,7 @@ class CreateResultsJobMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateResultsJobMessage($authenticationToken, $job->getId());
+        $expectedMessage = new CreateResultsJobMessage($job->getId());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());

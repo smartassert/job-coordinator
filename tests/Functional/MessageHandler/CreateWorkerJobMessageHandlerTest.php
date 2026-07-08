@@ -57,7 +57,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, Ip::random());
+        $message = new CreateWorkerJobMessage($jobId, 600, Ip::random());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -78,7 +78,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateWorkerJobMessage(self::$apiToken, $jobId, 600, Ip::random());
+        $message = new CreateWorkerJobMessage($jobId, 600, Ip::random());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -129,7 +129,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $message = new CreateWorkerJobMessage(
-            self::$apiToken,
             $jobId,
             $job->getMaximumDurationInSeconds(),
             Ip::random()
@@ -226,7 +225,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $message = new CreateWorkerJobMessage(
-            self::$apiToken,
             $jobId,
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress
@@ -317,7 +315,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $message = new CreateWorkerJobMessage(
-            self::$apiToken,
             $jobId,
             $job->getMaximumDurationInSeconds(),
             $machineIpAddress

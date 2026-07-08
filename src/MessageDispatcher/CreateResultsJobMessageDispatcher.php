@@ -31,7 +31,7 @@ readonly class CreateResultsJobMessageDispatcher implements EventSubscriberInter
 
     public function dispatchImmediately(JobCreatedEvent $event): void
     {
-        $message = new CreateResultsJobMessage($event->getAuthenticationToken(), $event->getJobId());
+        $message = new CreateResultsJobMessage($event->getJobId());
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
             return;

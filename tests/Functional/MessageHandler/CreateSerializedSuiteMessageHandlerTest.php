@@ -64,7 +64,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         );
 
         $message = new CreateSerializedSuiteMessage(
-            self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
             $serializedSuiteCreateParameters
@@ -134,7 +133,6 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         );
 
         $handler(new CreateSerializedSuiteMessage(
-            self::$apiToken,
             $job->getId(),
             $job->getSuiteId(),
             $serializedSuiteParameters
@@ -164,7 +162,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $serializedSuiteParameters = [
             StringValue::random() => StringValue::random(),
         ];
-        $message = new CreateSerializedSuiteMessage(self::$apiToken, $jobId, $suiteId, $serializedSuiteParameters);
+        $message = new CreateSerializedSuiteMessage($jobId, $suiteId, $serializedSuiteParameters);
 
         $serializedSuiteRepository = \Mockery::mock(SerializedSuiteRepository::class);
         $serializedSuiteRepository

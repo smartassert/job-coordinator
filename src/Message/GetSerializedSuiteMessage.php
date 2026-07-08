@@ -6,20 +6,18 @@ namespace App\Message;
 
 use App\Model\RemoteRequestType;
 
-class GetSerializedSuiteMessage extends AbstractAuthenticatedRemoteRequestMessage
+class GetSerializedSuiteMessage extends AbstractRemoteRequestMessage
 {
     /**
-     * @param non-empty-string $authenticationToken
      * @param non-empty-string $jobId
      * @param non-empty-string $serializedSuiteId
      */
     public function __construct(
-        string $authenticationToken,
         string $jobId,
         public readonly string $suiteId,
         public readonly string $serializedSuiteId,
     ) {
-        parent::__construct($authenticationToken, $jobId);
+        parent::__construct($jobId);
     }
 
     public function getRemoteRequestType(): RemoteRequestType

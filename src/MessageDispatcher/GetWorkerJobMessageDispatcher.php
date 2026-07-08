@@ -39,11 +39,7 @@ readonly class GetWorkerJobMessageDispatcher implements EventSubscriberInterface
     public function dispatchImmediately(
         AuthenticatingEventInterface&JobEventInterface&MachineIpAddressInterface $event
     ): void {
-        $message = new GetWorkerJobMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->getMachineIpAddress()
-        );
+        $message = new GetWorkerJobMessage($event->getJobId(), $event->getMachineIpAddress());
 
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {

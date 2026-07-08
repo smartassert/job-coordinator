@@ -30,9 +30,8 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
-        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -55,7 +54,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobId = Id::generate();
         $authenticationToken = StringValue::random();
 
-        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -76,10 +75,9 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerClientThrowsException(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
         $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -107,10 +105,9 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccessIsNotReady(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
         $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($authenticationToken, $jobId, $machineIpAddress);
+        $message = new IsWorkerReadyMessage($jobId, $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -148,7 +145,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($job->getToken(), $job->getId(), $machineIpAddress);
+        $message = new IsWorkerReadyMessage($job->getId(), $machineIpAddress);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')

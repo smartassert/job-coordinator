@@ -59,7 +59,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $job = $jobFactory->createRandom();
 
         $machine = MachineFactory::createRandomForJob($job->getId());
-        $message = new GetMachineMessage(self::$apiToken, $job->getId(), $machine);
+        $message = new GetMachineMessage($job->getId(), $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -124,7 +124,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         self::assertEquals(
             [new MachineRetrievedEvent(self::$apiToken, $previous, $current)],
@@ -215,7 +215,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor,
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
@@ -366,7 +366,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $readinessAssessor,
         );
 
-        $handler(new GetMachineMessage(self::$apiToken, $previous->id, $previous));
+        $handler(new GetMachineMessage($previous->id, $previous));
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -427,7 +427,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             false,
             new WorkerManagerClientMetaState(false, false, false),
         );
-        $message = new GetMachineMessage(self::$apiToken, $jobId, $machine);
+        $message = new GetMachineMessage($jobId, $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')

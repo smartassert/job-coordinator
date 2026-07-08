@@ -36,7 +36,6 @@ readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInt
     public function dispatchImmediately(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
     {
         $message = new GetSerializedSuiteMessage(
-            $event->getAuthenticationToken(),
             $event->getJobId(),
             $event->serializedSuite->getSuiteId(),
             $event->serializedSuite->getId()

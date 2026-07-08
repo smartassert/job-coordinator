@@ -31,12 +31,7 @@ readonly class CreateSerializedSuiteMessageDispatcher implements EventSubscriber
 
     public function dispatchImmediately(JobCreatedEvent $event): void
     {
-        $message = new CreateSerializedSuiteMessage(
-            $event->getAuthenticationToken(),
-            $event->getJobId(),
-            $event->getSuiteId(),
-            $event->parameters
-        );
+        $message = new CreateSerializedSuiteMessage($event->getJobId(), $event->getSuiteId(), $event->parameters);
 
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {

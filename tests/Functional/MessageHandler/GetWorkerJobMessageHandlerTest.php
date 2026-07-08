@@ -32,9 +32,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
-        $message = new GetWorkerJobMessage($authenticationToken, $jobId, '127.0.0.1');
+        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -58,10 +57,9 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $authenticationToken = StringValue::random();
         $machineIpAddress = Ip::random();
 
-        $message = new GetWorkerJobMessage($authenticationToken, $job->getId(), $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -99,7 +97,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $machineIpAddress = Ip::random();
 
-        $message = new GetWorkerJobMessage($job->getToken(), $job->getId(), $machineIpAddress);
+        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
