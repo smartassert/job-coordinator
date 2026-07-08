@@ -9,9 +9,11 @@ framework:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     auto_setup: false
+            sync: 'sync://'
 
         routing:
             '*': async
+            Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventMessage: sync
 
 when@test:
     framework:
