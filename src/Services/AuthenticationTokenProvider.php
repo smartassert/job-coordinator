@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Model\JobInterface;
 use App\Repository\JobRepository;
 
 readonly class AuthenticationTokenProvider
@@ -13,9 +12,12 @@ readonly class AuthenticationTokenProvider
         private JobRepository $jobRepository,
     ) {}
 
-    public function get(JobInterface $job): ?string
+    /**
+     * @return ?non-empty-string
+     */
+    public function get(string $jobId): ?string
     {
-        $job = $this->jobRepository->findOneBy(['id' => $job->getId()]);
+        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
 
         return $job?->getToken();
     }

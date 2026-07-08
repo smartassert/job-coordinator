@@ -18,9 +18,24 @@ readonly class JobFactory
 
     public function createRandom(): JobInterface
     {
+        return $this->create(Id::generate());
+    }
+
+    /**
+     * @param non-empty-string $token
+     */
+    public function createForUserToken(string $token): JobInterface
+    {
+        return $this->create($token);
+    }
+
+    /**
+     * @param non-empty-string $token
+     */
+    private function create(string $token): JobInterface
+    {
         $userId = Id::generate();
         $suiteId = Id::generate();
-        $token = Id::generate();
 
         $maximumDurationInSeconds = rand(1, 1000);
 

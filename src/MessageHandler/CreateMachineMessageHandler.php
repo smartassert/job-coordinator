@@ -9,6 +9,7 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -23,6 +24,7 @@ final readonly class CreateMachineMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClient $workerManagerClient,
         private EventDispatcherInterface $eventDispatcher,
+        private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
 
     /**
@@ -38,11 +40,16 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
+        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        if (null === $authenticationToken) {
+            return;
+        }
+
         try {
-            $machine = $this->workerManagerClient->createMachine($message->authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClient->createMachine($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(
-                new MachineCreationRequestedEvent($message->authenticationToken, $machine)
+                new MachineCreationRequestedEvent($authenticationToken, $machine)
             );
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
