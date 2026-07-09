@@ -25,6 +25,7 @@ final readonly class CreateSerializedSuiteMessageHandler
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private EventDispatcherInterface $eventDispatcher,
         private AuthenticationTokenProvider $authenticationTokenProvider,
+        private string $notifyUrl,
     ) {}
 
     /**
@@ -50,7 +51,7 @@ final readonly class CreateSerializedSuiteMessageHandler
                 $authenticationToken,
                 $message->getJobId(),
                 $message->suiteId,
-                null,
+                $this->notifyUrl,
                 $message->parameters,
             );
 
