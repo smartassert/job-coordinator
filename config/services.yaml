@@ -20,6 +20,7 @@ parameters:
         App\Message\GetResultsJobMessage: '%env(int:RESULTS_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\GetWorkerJobMessage: '%env(int:GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS)%'
     sources_notify_secret: '%env(string:SOURCES_NOTIFY_SECRET)%'
+    notify_url: '%env(string:SELF_URL)%/notify'
 
 services:
     # default configuration for services in *this* file
@@ -171,6 +172,7 @@ services:
     App\MessageHandler\CreateSerializedSuiteMessageHandler:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor'
+            $notifyUrl: '%notify_url%'
 
     App\MessageHandler\CreateWorkerJobMessageHandler:
         arguments:
