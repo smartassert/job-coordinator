@@ -36,7 +36,7 @@ services:
         class: GuzzleHttp\Client
         arguments:
             $config:
-                base_uri: "https://localhost/"
+                base_uri: "http://localhost/"
                 verify: false
 
     SmartAssert\SymfonyTestClient\HttpClient:
