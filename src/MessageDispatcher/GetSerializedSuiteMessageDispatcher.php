@@ -25,15 +25,15 @@ readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInt
     {
         return [
             SerializedSuiteCreatedEvent::class => [
-                ['dispatchImmediately', 100],
+                ['dispatch', 100],
             ],
             SerializedSuiteRetrievedEvent::class => [
-                ['dispatchImmediately', 100],
+                ['dispatch', 100],
             ],
         ];
     }
 
-    public function dispatchImmediately(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
+    public function dispatch(SerializedSuiteCreatedEvent|SerializedSuiteRetrievedEvent $event): void
     {
         $message = new GetSerializedSuiteMessage(
             $event->getJobId(),
@@ -46,6 +46,6 @@ readonly class GetSerializedSuiteMessageDispatcher implements EventSubscriberInt
             return;
         }
 
-        $this->messageDispatcher->dispatchWithNonDelayedStamp($message);
+        $this->messageDispatcher->dispatch($message);
     }
 }

@@ -5,7 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     users_security_bundle_base_url: '%env(string:AUTHENTICATION_BASE_URL)%'
-    users_security_bundle_public_pattern: '^/(status)|(health-check)'
+    users_security_bundle_public_pattern: '^/(status)|(health-check)|(notify/*)'
     users_security_bundle_secured_pattern: '^/*'
     users_security_bundle_access_control_path: '^/*'
     health_check_bundle_enable_status_readiness_inspector: true
@@ -20,6 +20,8 @@ parameters:
         App\Message\GetResultsJobMessage: '%env(int:RESULTS_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\GetWorkerJobMessage: '%env(int:GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\CreateMachineMessage: '%env(int:CREATE_MACHINE_DISPATCH_DELAY_MS)%'
+    sources_notify_secret: '%env(string:SOURCES_NOTIFY_SECRET)%'
+    notify_url: '%env(string:SELF_URL)%/notify'
 
 services:
     # default configuration for services in *this* file
@@ -54,6 +56,12 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    Symfony\Component\Webhook\Controller\WebhookController:
+        arguments:
+            $parsers:
+
+#            $parsers: !tagged_iterator 'webhook.parser'
 
     Psr\Http\Client\ClientInterface:
         class: GuzzleHttp\Client
@@ -165,6 +173,7 @@ services:
     App\MessageHandler\CreateSerializedSuiteMessageHandler:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor'
+            $notifyUrl: '%notify_url%'
 
     App\MessageHandler\CreateWorkerJobMessageHandler:
         arguments:

@@ -17,6 +17,8 @@ ARG GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS=3000
 ARG CREATE_MACHINE_DISPATCH_DELAY_MS=1000
 ARG IS_READY=0
 ARG VERSION=dockerfile_version
+ARG SOURCES_NOTIFY_SECRET=sources_notify_secret
+ARG SELF_URL=https://job-coordinator.example.com
 
 ENV APP_ENV=$APP_ENV
 ENV DATABASE_URL=$DATABASE_URL
@@ -33,6 +35,8 @@ ENV GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS=$GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS
 ENV CREATE_MACHINE_DISPATCH_DELAY_MS=$CREATE_MACHINE_DISPATCH_DELAY_MS
 ENV IS_READY=$IS_READY
 ENV VERSION=$VERSION
+ENV SOURCES_NOTIFY_SECRET=$SOURCES_NOTIFY_SECRET
+ENV SELF_URL=$SELF_URL
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -58,6 +62,7 @@ COPY public/index.php public/
 COPY src /app/src
 COPY config/bundles.php config/services.yaml /app/config/
 COPY config/packages/*.yaml /app/config/packages/
+COPY config/routes/*.yaml /app/config/routes/
 COPY config/routes.yaml /app/config/
 COPY migrations /app/migrations
 

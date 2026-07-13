@@ -17,10 +17,13 @@ readonly class SerializedSuiteFactory
         private SerializedSuiteRepository $serializedSuiteRepository,
     ) {}
 
-    public function createNewForJob(JobInterface $job): SerializedSuite
+    /**
+     * @param ?non-empty-string $state
+     */
+    public function createNewForJob(JobInterface $job, ?string $state = null): SerializedSuite
     {
         $serializedSuiteId = Id::generate();
-        $state = StringValue::random();
+        $state = null === $state ? StringValue::random() : $state;
 
         $serializedSuite = new SerializedSuite(
             $job->getId(),

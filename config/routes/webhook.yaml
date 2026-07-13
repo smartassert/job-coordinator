@@ -1,0 +1,4 @@
+webhook:
+    methods: [POST]
+    resource: '@FrameworkBundle/Resources/config/routing/webhook.php'
+    prefix: /notify

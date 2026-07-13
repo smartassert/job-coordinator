@@ -56,16 +56,16 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         return [
             SerializedSuiteCreatedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteCreatedEvent::class,
-                'expectedMethod' => 'dispatchImmediately',
+                'expectedMethod' => 'dispatch',
             ],
             SerializedSuiteRetrievedEvent::class => [
                 'expectedListenedForEvent' => SerializedSuiteRetrievedEvent::class,
-                'expectedMethod' => 'dispatchImmediately',
+                'expectedMethod' => 'dispatch',
             ],
         ];
     }
 
-    public function testDispatchImmediatelySuccess(): void
+    public function testDispatchSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -80,7 +80,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteCreatedEvent($job->getId(), $serializedSuiteModel);
 
-        $this->dispatcher->dispatchImmediately($event);
+        $this->dispatcher->dispatch($event);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
@@ -94,10 +94,18 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
 
-        self::assertSame([], $dispatchedEnvelope->all(DelayStamp::class));
+        $messageDelays = self::getContainer()->getParameter('message_delays');
+        \assert(is_array($messageDelays));
+
+        self::assertEquals(
+            [
+                new DelayStamp($messageDelays[GetSerializedSuiteMessage::class]),
+            ],
+            $dispatchedEnvelope->all(DelayStamp::class)
+        );
     }
 
-    public function testDispatchImmediatelyNotReady(): void
+    public function testDispatchNotReady(): void
     {
         $jobId = Id::generate();
         $suiteId = Id::generate();
@@ -109,7 +117,7 @@ class GetSerializedSuiteMessageDispatcherTest extends WebTestCase
 
         $event = new SerializedSuiteCreatedEvent($jobId, $serializedSuite);
 
-        $dispatcher->dispatchImmediately($event);
+        $dispatcher->dispatch($event);
 
         self::assertSame([], $this->messengerTransport->getSent());
     }

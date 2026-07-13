@@ -49,6 +49,11 @@ class SerializedSuite
         $this->isPending = $metaState->pending;
     }
 
+    public function getJobId(): string
+    {
+        return $this->jobId;
+    }
+
     public function getState(): string
     {
         return $this->state;
