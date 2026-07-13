@@ -27,6 +27,7 @@ use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
@@ -250,6 +251,17 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
 
         $envelope = $envelopes[0];
         self::assertEquals(new CreateMachineMessage($jobId), $envelope->getMessage());
+
         self::assertEquals([], $envelope->all(NonDelayedStamp::class));
+
+        $messageDelays = self::getContainer()->getParameter('message_delays');
+        \assert(is_array($messageDelays));
+
+        self::assertEquals(
+            [
+                new DelayStamp($messageDelays[CreateMachineMessage::class]),
+            ],
+            $envelope->all(DelayStamp::class)
+        );
     }
 }
