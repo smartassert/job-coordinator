@@ -90,7 +90,7 @@ services:
     restart: unless-stopped
 
   sources-service:
-    image: ghcr.io/smartassert/sources:22.0
+    image: ghcr.io/smartassert/sources:22.2
     container_name: sources-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
@@ -98,6 +98,7 @@ services:
       REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
       REMOTE_STORAGE_KEY_ID: remote_storage_key_id
       IS_READY: 1
+      NOTIFY_SECRET: sources_notify_secret
     depends_on:
       - postgres
 
@@ -123,6 +124,8 @@ services:
         WORKER_MANAGER_BASE_URL: http://worker-manager-http
         SOURCES_BASE_URL: http://sources-http
         VERSION: ${VERSION}
+        SELF_URL: http://app-http
+        SOURCES_NOTIFY_SECRET: sources_notify_secret
     container_name: app
     restart: unless-stopped
     depends_on:
