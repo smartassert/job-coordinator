@@ -245,6 +245,7 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
                                 new ResultsClientMetaState(false, false, true),
                             ),
                             false,
+                            [],
                         ),
                     );
                 },

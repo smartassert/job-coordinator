@@ -231,6 +231,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
                         new ResultsClientMetaState(false, false, false),
                     ),
                     false,
+                    [],
                 ),
             )
         );

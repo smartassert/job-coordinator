@@ -131,6 +131,7 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                         new ResultsClientMetaState(false, false, true),
                     ),
                     false,
+                    [],
                 ),
             ),
             $event

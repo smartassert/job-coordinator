@@ -12,10 +12,11 @@ use SmartAssert\ResultsClient\Model\MetaState;
 class ResultsClientJobFactory
 {
     /**
-     * @param non-empty-string  $label
-     * @param non-empty-string  $token
-     * @param non-empty-string  $state
-     * @param ?non-empty-string $endState
+     * @param non-empty-string   $label
+     * @param non-empty-string   $token
+     * @param non-empty-string   $state
+     * @param ?non-empty-string  $endState
+     * @param non-empty-string[] $previousStates
      */
     public static function create(
         string $label,
@@ -23,10 +24,11 @@ class ResultsClientJobFactory
         string $state,
         ?string $endState = null,
         ?MetaState $metaState = null,
+        array $previousStates = [],
     ): Job {
         $metaState = $metaState ?? new MetaState(false, false, false);
 
-        return new Job($label, $token, new JobState($state, $endState, $metaState), false);
+        return new Job($label, $token, new JobState($state, $endState, $metaState), false, $previousStates);
     }
 
     public static function createRandom(): Job

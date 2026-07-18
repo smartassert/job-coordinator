@@ -138,6 +138,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 new ResultsClientMetaState(false, false, true),
                             ),
                             false,
+                            [],
                         ),
                     );
                 },
@@ -160,6 +161,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 new ResultsClientMetaState(false, false, true),
                             ),
                             false,
+                            [],
                         ),
                     );
                 },
@@ -189,6 +191,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 new ResultsClientMetaState(false, false, true),
                             ),
                             false,
+                            [],
                         ),
                     );
                 },
@@ -224,6 +227,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 new ResultsClientMetaState(true, true, false),
                             ),
                             false,
+                            [],
                         ),
                     );
                 },
@@ -259,6 +263,7 @@ class ResultsJobMutatorTest extends WebTestCase
                                 new ResultsClientMetaState(true, true, false),
                             ),
                             true,
+                            [],
                         ),
                     );
                 },
