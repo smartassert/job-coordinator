@@ -21,6 +21,7 @@ parameters:
         App\Message\GetWorkerJobMessage: '%env(int:GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\CreateMachineMessage: '%env(int:CREATE_MACHINE_DISPATCH_DELAY_MS)%'
     sources_notify_secret: '%env(string:SOURCES_NOTIFY_SECRET)%'
+    results_notify_secret: '%env(string:RESULTS_NOTIFY_SECRET)%'
     notify_url: '%env(string:SELF_URL)%/notify'
 
 services:
