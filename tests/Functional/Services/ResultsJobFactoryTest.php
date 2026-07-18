@@ -114,6 +114,7 @@ class ResultsJobFactoryTest extends WebTestCase
                 new ResultsClientMetaState(false, false, true),
             ),
             false,
+            [],
         );
 
         $event = new ResultsJobCreatedEvent($job->getId(), $resultsJob);

@@ -80,6 +80,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 new ResultsClientMetaState(false, false, true),
             ),
             false,
+            [],
         );
 
         $resultsClient = HttpMockedResultsClientFactory::create([
