@@ -170,6 +170,7 @@ services:
     App\MessageHandler\CreateResultsJobMessageHandler:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateResultsJobReadinessAssessor'
+            $notifyUrl: '%notify_url%'
 
     App\MessageHandler\CreateSerializedSuiteMessageHandler:
         arguments:
