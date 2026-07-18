@@ -4,3 +4,6 @@ framework:
       sources.serialized_suite.state_changed:
         service: Symfony\Component\Webhook\Client\RequestParser
         secret: '%sources_notify_secret%'
+      results.job.state_changed:
+        service: Symfony\Component\Webhook\Client\RequestParser
+        secret: '%results_notify_secret%'
