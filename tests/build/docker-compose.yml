@@ -38,6 +38,7 @@ services:
       AUTHENTICATION_BASE_URL: http://users-http
       IS_READY: 1
       SELF_URL: http://results-http
+      NOTIFY_SECRET: results_notify_secret
     depends_on:
       - postgres
       - users-http
@@ -126,6 +127,7 @@ services:
         VERSION: ${VERSION}
         SELF_URL: http://app-http
         SOURCES_NOTIFY_SECRET: sources_notify_secret
+        RESULTS_NOTIFY_SECRET: results_notify_secret
     container_name: app
     restart: unless-stopped
     depends_on:
