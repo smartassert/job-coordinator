@@ -19,12 +19,16 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateResultsJobMessageHandler
 {
+    /**
+     * @param non-empty-string $notifyUrl
+     */
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
         private AuthenticationTokenProvider $authenticationTokenProvider,
+        private string $notifyUrl,
     ) {}
 
     /**
@@ -46,7 +50,12 @@ final readonly class CreateResultsJobMessageHandler
         }
 
         try {
-            $resultsJob = $this->resultsClient->createJob($authenticationToken, $message->getJobId(), null);
+            $resultsJob = $this->resultsClient->createJob(
+                $authenticationToken,
+                $message->getJobId(),
+                $this->notifyUrl,
+            );
+
             $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
                 $message->getJobId(),
                 $resultsJob
