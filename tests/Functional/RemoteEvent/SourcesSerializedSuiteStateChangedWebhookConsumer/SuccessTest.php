@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\RemoteEvent\SourcesSerializedSuiteStateChangedWebhookConsumer;
 
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\SerializedSuiteFactory;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
