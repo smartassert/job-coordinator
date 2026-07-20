@@ -16,8 +16,6 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
     use GetClientAdapterTrait;
     use CreateSuiteIdTrait;
 
-    private const int MICROSECONDS_PER_SECOND = 1000000;
-
     public static function tearDownAfterClass(): void
     {
         $entityRemover = self::getContainer()->get(EntityRemover::class);

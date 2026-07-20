@@ -13,8 +13,6 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
     use GetClientAdapterTrait;
     use CreateSuiteIdTrait;
 
-    private const int MICROSECONDS_PER_SECOND = 1000000;
-
     public static function tearDownAfterClass(): void
     {
         $entityRemover = self::getContainer()->get(EntityRemover::class);
@@ -31,6 +29,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
 
         $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
         $machineData = $this->getMachineData($jobId);
+        \assert(is_array($machineData));
 
         self::assertSame('pre_active', $machineData['state_category']);
         self::assertNull($machineData['ip_address']);
@@ -54,6 +53,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
 
         $this->waitUntilJobStateCategoryIs($jobId, 'end');
         $machineData = $this->getMachineData($jobId);
+        \assert(is_array($machineData));
 
         self::assertSame('end', $machineData['state_category']);
         self::assertNull($machineData['ip_address']);
@@ -85,9 +85,6 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         self::assertNotSame([], $machineData['requests']);
     }
 
-    /**
-     * @return array<mixed>
-     */
     private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): void
     {
         new WaitFor()->waitFor(
