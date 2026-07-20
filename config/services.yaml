@@ -80,6 +80,8 @@ services:
 
     SmartAssert\ResultsClient\EventFactory: ~
 
+    SmartAssert\ResultsClient\JobFactory: ~
+
     SmartAssert\ResultsClient\ClientInterface:
         class: SmartAssert\ResultsClient\Client
         arguments:
