@@ -47,10 +47,7 @@ final readonly class GetResultsJobMessageHandler
 
         try {
             $resultsJob = $this->resultsClient->getJobStatus($authenticationToken, $message->getJobId());
-            $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent(
-                $message->getJobId(),
-                $resultsJob
-            ));
+            $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent($resultsJob));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
         }

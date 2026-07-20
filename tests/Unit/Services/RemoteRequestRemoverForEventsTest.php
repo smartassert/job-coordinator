@@ -221,9 +221,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeResultsJobGetRequests(
             new ResultsJobRetrievedEvent(
-                $jobId,
                 new ResultsJob(
-                    'job-label',
+                    $jobId,
                     '/event/add/results-token',
                     new ResultsJobState(
                         'irrelevant',
