@@ -180,6 +180,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $resultsClient,
             $eventDispatcher,
             $authenticationTokenProvider,
+            'https://example.com/notify',
         );
     }
 }
