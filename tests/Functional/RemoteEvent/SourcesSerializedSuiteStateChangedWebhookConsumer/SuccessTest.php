@@ -5,37 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\RemoteEvent\SourcesSerializedSuiteStateChangedWebhookConsumer;
 
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Tests\Application\AbstractApplicationTest;
-use App\Tests\Functional\Application\GetClientAdapterTrait;
-use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\RemoteEventConfigurationFactory;
 use App\Tests\Services\Factory\SerializedSuiteFactory;
 use SmartAssert\SourcesClient\Model\SerializedSuite as SerializedSuiteModel;
 use SmartAssert\SourcesClient\SerializedSuiteFactory as SerializedSuiteModelFactory;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Uid\Ulid;
 
-class SuccessTest extends AbstractApplicationTest
+class SuccessTest extends AbstractConsumerTestCase
 {
-    use GetClientAdapterTrait;
-
-    private RemoteEventConfigurationFactory $remoteEventConfigurationFactory;
-    private string $sourcesNotifySecret;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $remoteEventConfigurationFactory = self::getContainer()->get(RemoteEventConfigurationFactory::class);
-        \assert($remoteEventConfigurationFactory instanceof RemoteEventConfigurationFactory);
-        $this->remoteEventConfigurationFactory = $remoteEventConfigurationFactory;
-
-        $sourcesNotifySecret = self::getContainer()->getParameter('sources_notify_secret');
-        \assert(is_string($sourcesNotifySecret));
-        $this->sourcesNotifySecret = $sourcesNotifySecret;
-    }
-
     public function testSuccess(): void
     {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -72,7 +50,7 @@ class SuccessTest extends AbstractApplicationTest
             payload: $serializedSuiteModelData,
         );
 
-        $remoteEventConfiguration = $this->remoteEventConfigurationFactory->create($event, $this->sourcesNotifySecret);
+        $remoteEventConfiguration = $this->remoteEventConfigurationFactory->create($event, $this->notifySecret);
 
         $response = self::$staticApplicationClient->makeSourcesSerializedSuiteStateChangedNotifyRequest(
             $remoteEventConfiguration->headers,
@@ -80,9 +58,6 @@ class SuccessTest extends AbstractApplicationTest
         );
 
         self::assertSame(202, $response->getStatusCode());
-
-        $eventRecorder = self::getContainer()->get(EventRecorder::class);
-        \assert($eventRecorder instanceof EventRecorder);
 
         $serializedSuiteModelFactory = self::getContainer()->get(SerializedSuiteModelFactory::class);
         \assert($serializedSuiteModelFactory instanceof SerializedSuiteModelFactory);
@@ -94,7 +69,7 @@ class SuccessTest extends AbstractApplicationTest
             [
                 new SerializedSuiteRetrievedEvent($job->getId(), $serializedSuiteModel),
             ],
-            $eventRecorder->all(SerializedSuiteRetrievedEvent::class),
+            $this->eventRecorder->all(SerializedSuiteRetrievedEvent::class),
         );
     }
 }
