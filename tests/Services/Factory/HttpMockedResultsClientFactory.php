@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ResultsClient\Client;
 use SmartAssert\ResultsClient\EventFactory;
+use SmartAssert\ResultsClient\JobFactory as ResultsClientJobFactory;
 use SmartAssert\ResultsClient\ResourceReferenceFactory;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
@@ -39,6 +40,8 @@ class HttpMockedResultsClientFactory
             new ResourceReferenceFactory()
         );
 
-        return new Client('null', $serviceClient, $eventFactory);
+        $jobFactory = new ResultsClientJobFactory();
+
+        return new Client('null', $serviceClient, $eventFactory, $jobFactory);
     }
 }
