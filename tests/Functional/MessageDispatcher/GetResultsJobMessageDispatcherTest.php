@@ -235,7 +235,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
                     \assert('' !== $authenticationToken);
 
                     return new ResultsJobRetrievedEvent(
-                        $job->getId(),
                         new ResultsJob(
                             $job->getId(),
                             '/event/add/results-token',

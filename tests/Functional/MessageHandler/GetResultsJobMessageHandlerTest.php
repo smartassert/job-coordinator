@@ -121,7 +121,6 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         self::assertEquals(
             new ResultsJobRetrievedEvent(
-                $job->getId(),
                 new ResultsJob(
                     $job->getId(),
                     'event/add/results-token',

@@ -73,7 +73,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $event = new ResultsJobRetrievedEvent(
-            $jobId,
             new ResultsJob(
                 $jobId,
                 'event/add/results-token',
@@ -124,7 +123,6 @@ class TerminateMachineMessageDispatcherTest extends WebTestCase
         );
 
         $event = new ResultsJobRetrievedEvent(
-            $job->getId(),
             new ResultsJob(
                 $job->getId(),
                 'event/add/results-token',
