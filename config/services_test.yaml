@@ -95,3 +95,7 @@ services:
 
     App\Tests\Services\Factory\RemoteEventConfigurationFactory:
         public: true
+
+    SmartAssert\ResultsClient\AddEventClientInterface:
+        class: SmartAssert\ResultsClient\AddEventClient
+        public: true

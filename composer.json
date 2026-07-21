@@ -158,6 +158,7 @@
             "echo '[results] setup'",
             "docker compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:database:create --if-not-exists --ansi",
             "docker compose -f tests/build/docker-compose.yml exec -T results-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --ansi",
+            "docker compose -f tests/build/docker-compose.yml exec -T results-service php bin/console messenger:setup-transports",
             "echo ''"
         ],
         "worker-manager-setup": [
@@ -195,7 +196,7 @@
         "integration-logs": "docker compose -f tests/build/docker-compose.yml logs",
         "integration-teardown": "docker compose -f ./tests/build/docker-compose.yml down",
         "messenger-setup": [
-            "echo '[job-coordinator] messanger-setup'",
+            "echo '[job-coordinator] messenger-setup'",
             "php bin/console messenger:setup-transports",
             "echo ''"
         ],
