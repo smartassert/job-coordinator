@@ -10,13 +10,12 @@ use App\Repository\SerializedSuiteRepository;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\WaitFor\WaitFor;
 
 class SerializedSuiteIsPreparedBeforeExplicitlyRetrieved extends AbstractCreateJobSuccessSetup
 {
     use GetClientAdapterTrait;
     use CreateSuiteIdTrait;
-
-    private const int MICROSECONDS_PER_SECOND = 1000000;
 
     public static function tearDownAfterClass(): void
     {
@@ -50,23 +49,12 @@ class SerializedSuiteIsPreparedBeforeExplicitlyRetrieved extends AbstractCreateJ
 
     private function waitUntilSerializedSuiteStateIsPrepared(int $waitThresholdInSeconds): void
     {
-        $waitThreshold = self::MICROSECONDS_PER_SECOND * $waitThresholdInSeconds;
-        $totalWaitTime = 0;
-        $period = (int) (self::MICROSECONDS_PER_SECOND * 0.1);
-
-        $stateIsPrepared = false;
-
-        while (false === $stateIsPrepared && $totalWaitTime < $waitThreshold) {
-            $totalWaitTime += $period;
-            usleep($period);
-            $state = $this->getSerializedSuiteState();
-
-            $stateIsPrepared = 'prepared' === $state;
-        }
-
-        if ($totalWaitTime >= $waitThreshold) {
-            throw new \RuntimeException('Exceeded threshold waiting for serialized suite state to be "prepared"');
-        }
+        new WaitFor()->waitFor(
+            $waitThresholdInSeconds,
+            function () {
+                return 'prepared' === $this->getSerializedSuiteState();
+            },
+        );
     }
 
     private function getSerializedSuiteState(): ?string
@@ -76,10 +64,10 @@ class SerializedSuiteIsPreparedBeforeExplicitlyRetrieved extends AbstractCreateJ
             return null;
         }
 
-        $foo = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($foo instanceof EntityManagerInterface);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
 
-        $foo->clear();
+        $entityManager->clear();
 
         $serializedSuiteRepository = self::getContainer()->get(SerializedSuiteRepository::class);
         \assert($serializedSuiteRepository instanceof SerializedSuiteRepository);

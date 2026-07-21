@@ -6,13 +6,12 @@ namespace App\Tests\Integration;
 
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
+use webignition\WaitFor\WaitFor;
 
 class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
 {
     use GetClientAdapterTrait;
     use CreateSuiteIdTrait;
-
-    private const int MICROSECONDS_PER_SECOND = 1000000;
 
     public static function tearDownAfterClass(): void
     {
@@ -28,7 +27,9 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         $jobId = $this->getJob()?->getId();
         \assert(is_string($jobId));
 
-        $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
+        $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
+        $machineData = $this->getMachineData($jobId);
+        \assert(is_array($machineData));
 
         self::assertSame('pre_active', $machineData['state_category']);
         self::assertNull($machineData['ip_address']);
@@ -50,7 +51,9 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         );
         self::assertNotSame([], $machineData['requests']);
 
-        $machineData = $this->waitUntilJobStateCategoryIs($jobId, 'end');
+        $this->waitUntilJobStateCategoryIs($jobId, 'end');
+        $machineData = $this->getMachineData($jobId);
+        \assert(is_array($machineData));
 
         self::assertSame('end', $machineData['state_category']);
         self::assertNull($machineData['ip_address']);
@@ -82,35 +85,16 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         self::assertNotSame([], $machineData['requests']);
     }
 
-    /**
-     * @return array<mixed>
-     */
-    private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): array
+    private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): void
     {
-        $waitThreshold = self::MICROSECONDS_PER_SECOND * 90;
-        $totalWaitTime = 0;
-        $period = (int) (self::MICROSECONDS_PER_SECOND * 0.1);
+        new WaitFor()->waitFor(
+            90,
+            function () use ($jobId, $stateCategory) {
+                $machineData = $this->getMachineData($jobId);
 
-        $has = false;
-
-        while (false === $has && $totalWaitTime < $waitThreshold) {
-            $totalWaitTime += $period;
-            usleep($period);
-
-            $machineData = $this->getMachineData($jobId);
-
-            $has = is_array($machineData) && $machineData['state_category'] === $stateCategory;
-        }
-
-        if ($totalWaitTime >= $waitThreshold) {
-            throw new \RuntimeException(
-                'Exceeded threshold waiting for machine state category to be "' . $stateCategory . '".'
-            );
-        }
-
-        \assert(is_array($machineData));
-
-        return $machineData;
+                return is_array($machineData) && $machineData['state_category'] === $stateCategory;
+            },
+        );
     }
 
     /**

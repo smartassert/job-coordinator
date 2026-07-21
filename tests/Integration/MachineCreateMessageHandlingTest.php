@@ -9,13 +9,12 @@ use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
+use webignition\WaitFor\WaitFor;
 
 class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
 {
     use GetClientAdapterTrait;
     use CreateSuiteIdTrait;
-
-    private const int MICROSECONDS_PER_SECOND = 1000000;
 
     public static function tearDownAfterClass(): void
     {
@@ -39,7 +38,7 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         $jobId = $this->getJob()?->getId();
         \assert(is_string($jobId));
 
-        $this->waitUntilSuccessfulMachineCreateRemoteRequestExists($jobId);
+        $this->waitUntilMachineCreateRemoteRequestsExist($jobId, RequestState::SUCCEEDED->value);
 
         $successfulMachineCreateRequestCount = $remoteRequestRepository->count(
             [
@@ -56,28 +55,14 @@ class MachineCreateMessageHandlingTest extends AbstractCreateJobSuccessSetup
         );
     }
 
-    private function waitUntilSuccessfulMachineCreateRemoteRequestExists(string $jobId): void
-    {
-        $this->waitUntilMachineCreateRemoteRequestsExist($jobId, RequestState::SUCCEEDED->value);
-    }
-
     private function waitUntilMachineCreateRemoteRequestsExist(string $jobId, ?string $state): void
     {
-        $waitThreshold = self::MICROSECONDS_PER_SECOND * 30;
-        $totalWaitTime = 0;
-        $period = (int) (self::MICROSECONDS_PER_SECOND * 0.1);
-
-        $has = false;
-
-        while (false === $has && $totalWaitTime < $waitThreshold) {
-            $totalWaitTime += $period;
-            usleep($period);
-            $has = $this->hasMachineCreateRemoteRequests($jobId, $state);
-        }
-
-        if ($totalWaitTime >= $waitThreshold) {
-            throw new \RuntimeException('Exceeded threshold waiting for machine create remote requests');
-        }
+        new WaitFor()->waitFor(
+            30,
+            function () use ($jobId, $state) {
+                return $this->hasMachineCreateRemoteRequests($jobId, $state);
+            },
+        );
     }
 
     private function hasMachineCreateRemoteRequests(string $jobId, ?string $state = null): bool
