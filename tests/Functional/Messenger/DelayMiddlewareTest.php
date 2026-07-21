@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Messenger;
 
-use App\Messenger\DelayMiddleware;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use webignition\SymfonyMessengerDelayMiddleware\DelayMiddleware;
 
 class DelayMiddlewareTest extends WebTestCase
 {

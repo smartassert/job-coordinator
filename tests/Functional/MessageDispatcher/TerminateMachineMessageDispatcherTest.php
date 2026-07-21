@@ -10,7 +10,6 @@ use App\Event\ResultsJobRetrievedEvent;
 use App\Message\TerminateMachineMessage;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\MessageDispatcher\TerminateMachineMessageDispatcher;
-use App\Messenger\NonDelayedStamp;
 use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
@@ -23,6 +22,7 @@ use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 class TerminateMachineMessageDispatcherTest extends WebTestCase
 {

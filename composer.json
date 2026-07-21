@@ -31,7 +31,8 @@
         "symfony/security-bundle": "8.1.*",
         "symfony/uid": "8.1.*",
         "symfony/webhook": "8.1.*",
-        "symfony/yaml": "8.1.*"
+        "symfony/yaml": "8.1.*",
+        "webignition/symfony-messenger-delay-middleware": "dev-github-2"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "dev-master#32c1c3f8fb65051f27a2d295e9c467b7ebe9de11",

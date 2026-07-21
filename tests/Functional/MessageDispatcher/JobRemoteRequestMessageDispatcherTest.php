@@ -11,7 +11,6 @@ use App\Message\CreateMachineMessage;
 use App\Message\GetResultsJobMessage;
 use App\Message\JobRemoteRequestMessageInterface;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\RemoteRequestType;
 use App\Repository\RemoteRequestRepository;
@@ -21,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 class JobRemoteRequestMessageDispatcherTest extends WebTestCase
 {

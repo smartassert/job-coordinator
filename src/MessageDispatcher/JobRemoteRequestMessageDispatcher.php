@@ -8,7 +8,6 @@ use App\Entity\RemoteRequest;
 use App\Enum\RequestState;
 use App\Event\JobRemoteRequestMessageCreatedEvent;
 use App\Message\JobRemoteRequestMessageInterface;
-use App\Messenger\NonDelayedStamp;
 use App\Repository\JobRepository;
 use App\Repository\RemoteRequestRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -16,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 class JobRemoteRequestMessageDispatcher
 {
