@@ -80,9 +80,42 @@ class Client
         string $body,
         string $method = 'POST',
     ): ResponseInterface {
+        return $this->makeNotifyRequest(
+            'sources.serialized_suite.state_changed',
+            $headers,
+            $body,
+            $method,
+        );
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    public function makeResultsJobStateChangedNotifyRequest(
+        array $headers,
+        string $body,
+        string $method = 'POST',
+    ): ResponseInterface {
+        return $this->makeNotifyRequest(
+            'results.job.state_changed',
+            $headers,
+            $body,
+            $method,
+        );
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    public function makeNotifyRequest(
+        string $type,
+        array $headers,
+        string $body,
+        string $method = 'POST',
+    ): ResponseInterface {
         return $this->client->makeRequest(
             $method,
-            $this->router->generate('_webhook_controller', ['type' => 'sources.serialized_suite.state_changed']),
+            $this->router->generate('_webhook_controller', ['type' => $type]),
             $headers,
             $body,
         );
