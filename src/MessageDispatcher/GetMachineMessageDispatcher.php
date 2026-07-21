@@ -10,10 +10,10 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineEventInterface as MachineEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
-use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
 {

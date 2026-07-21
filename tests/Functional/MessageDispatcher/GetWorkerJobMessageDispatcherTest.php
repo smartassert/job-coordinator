@@ -10,13 +10,13 @@ use App\Event\WorkerJobRetrievedEvent;
 use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Messenger\NonDelayedStamp;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 class GetWorkerJobMessageDispatcherTest extends WebTestCase
 {

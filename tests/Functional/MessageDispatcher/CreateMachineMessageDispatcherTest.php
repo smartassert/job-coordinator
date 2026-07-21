@@ -12,7 +12,6 @@ use App\Event\SerializedSuiteSerializedEvent;
 use App\Message\CreateMachineMessage;
 use App\MessageDispatcher\CreateMachineMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Messenger\NonDelayedStamp;
 use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -29,6 +28,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
 
 class CreateMachineMessageDispatcherTest extends WebTestCase
 {

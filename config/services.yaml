@@ -125,7 +125,7 @@ services:
 
     SmartAssert\WorkerClient\Factory\ComponentStateFactory: ~
 
-    App\Messenger\DelayMiddleware:
+    webignition\SymfonyMessengerDelayMiddleware\DelayMiddleware:
         arguments:
             $delays: '%message_delays%'
 

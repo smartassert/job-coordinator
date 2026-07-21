@@ -3,7 +3,7 @@ framework:
         buses:
             messenger.bus.default:
                 middleware:
-                    - App\Messenger\DelayMiddleware
+                    - webignition\SymfonyMessengerDelayMiddleware\DelayMiddleware
         transports:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
