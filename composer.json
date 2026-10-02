@@ -44,6 +44,7 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^13",
+        "smartassert/symfony-remote-event-request-factory": "^0.1.0",
         "smartassert/symfony-test-client": "^3",
         "smartassert/test-authenticaton-provider-bundle": "^6",
         "smartassert/test-sources-client": "^0.5.0",

@@ -50,11 +50,9 @@ class SuccessTest extends AbstractConsumerTestCase
             payload: $serializedSuiteModelData,
         );
 
-        $remoteEventConfiguration = $this->remoteEventConfigurationFactory->create($event, $this->notifySecret);
-
         $response = self::$staticApplicationClient->makeSourcesSerializedSuiteStateChangedNotifyRequest(
-            $remoteEventConfiguration->headers,
-            $remoteEventConfiguration->body,
+            $this->remoteEventRequestFactory->createHeaders($event, $this->notifySecret),
+            $this->remoteEventRequestFactory->createBody($event, $this->notifySecret),
         );
 
         self::assertSame(202, $response->getStatusCode());
