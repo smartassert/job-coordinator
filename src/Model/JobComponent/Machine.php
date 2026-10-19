@@ -6,7 +6,6 @@ namespace App\Model\JobComponent;
 
 use App\Entity\Machine as MachineEntity;
 use App\Entity\MachineActionFailure;
-use App\Enum\JobComponentName;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;

@@ -10,6 +10,14 @@ use App\Model\JobComponent\ResultsJob;
 use App\Model\JobComponent\SerializedSuite;
 use App\Model\JobComponent\WorkerJob;
 
+/**
+ * @phpstan-import-type SerializedMetaState from MetaState
+ * @phpstan-import-type SerializedPreparationState from PreparationState
+ * @phpstan-import-type SerializedResultsJob from ResultsJob
+ * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
+ * @phpstan-import-type SerializedMachine from Machine
+ * @phpstan-import-type SerializedWorkerState from WorkerJob
+ */
 readonly class JobStatus implements \JsonSerializable
 {
     public function __construct(
@@ -23,15 +31,28 @@ readonly class JobStatus implements \JsonSerializable
     ) {}
 
     /**
-     * @return array<mixed>
+     * @return array{
+     *     id: non-empty-string,
+     *     suite_id: non-empty-string,
+     *     maximum_duration_in_seconds: positive-int,
+     *     created_at: positive-int,
+     *     meta_state: SerializedMetaState,
+     *     preparation: SerializedPreparationState,
+     *     components: array{
+     *         results-job: SerializedResultsJob,
+     *         serialized-suite: SerializedSerializedSuite,
+     *         machine: SerializedMachine,
+     *         worker-job: SerializedWorkerState,
+     *     }
+     * }
      */
     public function jsonSerialize(): array
     {
         return array_merge(
             $this->job->toArray(),
             [
-                'meta_state' => $this->metaState,
-                'preparation' => $this->preparationState,
+                'meta_state' => $this->metaState->jsonSerialize(),
+                'preparation' => $this->preparationState->jsonSerialize(),
                 'components' => [
                     JobComponentName::RESULTS_JOB->value => $this->resultsJob->jsonSerialize(),
                     JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite->jsonSerialize(),

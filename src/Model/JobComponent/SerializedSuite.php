@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
-use App\Enum\JobComponentName;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;

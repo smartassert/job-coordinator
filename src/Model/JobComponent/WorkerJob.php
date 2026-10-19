@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\WorkerJobCreationFailure;
-use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
 use App\Model\FailedWorkerComponentState;
 use App\Model\MetaState;

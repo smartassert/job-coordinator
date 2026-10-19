@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+/**
+ * @phpstan-type SerializedMetaState array{'ended': bool, 'succeeded': bool, 'pending': bool}
+ */
 readonly class MetaState implements \JsonSerializable
 {
     public function __construct(
@@ -13,7 +16,7 @@ readonly class MetaState implements \JsonSerializable
     ) {}
 
     /**
-     * @return array{'ended': bool, 'succeeded': bool, 'pending': bool}
+     * @return SerializedMetaState
      */
     public function jsonSerialize(): array
     {
