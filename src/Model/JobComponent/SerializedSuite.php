@@ -19,7 +19,7 @@ use App\Model\SerializeToArrayInterface;
  *   preparation: Preparation
  * }
  */
-readonly class SerializedSuite implements SerializeToArrayInterface, JobComponentInterface
+readonly class SerializedSuite implements SerializeToArrayInterface
 {
     public function __construct(
         private ?SerializedSuiteEntity $entity,

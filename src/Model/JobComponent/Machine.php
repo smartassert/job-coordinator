@@ -22,7 +22,7 @@ use App\Model\SerializeToArrayInterface;
  *   is_active: bool,
  * }
  */
-readonly class Machine implements SerializeToArrayInterface, JobComponentInterface
+readonly class Machine implements SerializeToArrayInterface
 {
     public function __construct(
         private ?MachineEntity $entity,

@@ -20,7 +20,7 @@ use App\Model\SerializeToArrayInterface;
  *   has_events: bool,
  * }
  */
-readonly class ResultsJob implements SerializeToArrayInterface, JobComponentInterface
+readonly class ResultsJob implements SerializeToArrayInterface
 {
     public function __construct(
         private ?ResultsJobEntity $entity,
