@@ -28,11 +28,6 @@ readonly class ResultsJob implements SerializeToArrayInterface
         private Preparation $preparation,
     ) {}
 
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::RESULTS_JOB;
-    }
-
     public function getMetaState(): MetaState
     {
         if ($this->preparation->hasFailure()) {

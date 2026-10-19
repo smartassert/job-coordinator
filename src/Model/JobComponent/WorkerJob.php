@@ -39,11 +39,6 @@ class WorkerJob implements SerializeToArrayInterface
         private readonly Preparation $preparation,
     ) {}
 
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::WORKER_JOB;
-    }
-
     /**
      * @return SerializedWorkerState
      */

@@ -30,11 +30,6 @@ readonly class Machine implements SerializeToArrayInterface
         private Preparation $preparation,
     ) {}
 
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::MACHINE;
-    }
-
     public function getMetaState(): MetaState
     {
         if ($this->preparation->hasFailure()) {

@@ -32,11 +32,6 @@ readonly class SerializedSuite implements SerializeToArrayInterface
         return null === $this->entity && $this->requests->isEmpty();
     }
 
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::SERIALIZED_SUITE;
-    }
-
     public function getMetaState(): MetaState
     {
         if ($this->preparation->hasFailure()) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Enum\JobComponentName;
 use App\Model\JobComponent\Machine;
 use App\Model\JobComponent\ResultsJob;
 use App\Model\JobComponent\SerializedSuite;
@@ -32,10 +33,10 @@ readonly class JobStatus implements \JsonSerializable
                 'meta_state' => $this->metaState,
                 'preparation' => $this->preparationState,
                 'components' => [
-                    $this->resultsJob->getName()->value => $this->resultsJob->jsonSerialize(),
-                    $this->serializedSuite->getName()->value => $this->serializedSuite->jsonSerialize(),
-                    $this->machine->getName()->value => $this->machine->jsonSerialize(),
-                    $this->workerJob->getName()->value => $this->workerJob->jsonSerialize(),
+                    JobComponentName::RESULTS_JOB->value => $this->resultsJob->jsonSerialize(),
+                    JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite->jsonSerialize(),
+                    JobComponentName::MACHINE->value => $this->machine->jsonSerialize(),
+                    JobComponentName::WORKER_JOB->value => $this->workerJob->jsonSerialize(),
                 ],
             ]
         );
