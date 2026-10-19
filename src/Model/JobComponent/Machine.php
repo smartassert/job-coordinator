@@ -52,7 +52,7 @@ readonly class Machine implements SerializeToArrayInterface
      */
     public function jsonSerialize(): array
     {
-        $stateCategory = $this->entity?->getStateCategory() ?? null;
+        $stateCategory = $this->entity?->getStateCategory();
         if ($this->preparation->hasFailure()) {
             $stateCategory = 'end';
         }
