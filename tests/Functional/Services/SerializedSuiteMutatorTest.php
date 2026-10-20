@@ -79,7 +79,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface                      $jobCreator
      * @param callable(?JobInterface, SerializedSuiteRepository): void $serializedSuiteCreator
-     * @param callable(?JobInterface): SerializedSuiteRetrievedEvent   $eventCreator
+     * @param callable(?JobInterface): ?SerializedSuiteRetrievedEvent   $eventCreator
      * @param callable(?JobInterface): ?SerializedSuite                $expectedSerializedSuiteCreator
      */
     #[DataProvider('setStateSuccessDataProvider')]
@@ -93,6 +93,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
         $serializedSuiteCreator($job, $this->serializedSuiteRepository);
 
         $event = $eventCreator($job);
+        \assert(null !== $event);
 
         $this->serializedSuiteMutator->setState($event);
 
@@ -136,7 +137,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
             'no serialized suite' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function () {},
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?SerializedSuiteRetrievedEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     $serializedSuiteId = Id::generate();
 
                     return new SerializedSuiteRetrievedEvent(
@@ -151,9 +156,13 @@ class SerializedSuiteMutatorTest extends WebTestCase
             'no state change' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function (
-                    JobInterface $job,
+                    ?JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
-                ) use ($serializedSuiteId) {
+                ) use ($serializedSuiteId): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -162,7 +171,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuiteRetrievedEvent(
                         $job->getId(),
                         new SourcesSerializedSuite(
@@ -178,7 +191,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -190,9 +207,13 @@ class SerializedSuiteMutatorTest extends WebTestCase
             'has invalid state change, no previous states' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function (
-                    JobInterface $job,
+                    ?JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
-                ) use ($serializedSuiteId) {
+                ) use ($serializedSuiteId): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -201,7 +222,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuiteRetrievedEvent(
                         $job->getId(),
                         new SourcesSerializedSuite(
@@ -222,7 +247,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -234,9 +263,13 @@ class SerializedSuiteMutatorTest extends WebTestCase
             'has invalid state change, no matching previous state' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function (
-                    JobInterface $job,
+                    ?JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
-                ) use ($serializedSuiteId) {
+                ) use ($serializedSuiteId): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -245,7 +278,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuiteRetrievedEvent(
                         $job->getId(),
                         new SourcesSerializedSuite(
@@ -266,7 +303,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -278,9 +319,13 @@ class SerializedSuiteMutatorTest extends WebTestCase
             'has valid state change' => [
                 'jobCreator' => $jobCreator,
                 'serializedSuiteCreator' => function (
-                    JobInterface $job,
+                    ?JobInterface $job,
                     SerializedSuiteRepository $serializedSuiteRepository
-                ) use ($serializedSuiteId) {
+                ) use ($serializedSuiteId): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $serializedSuite = new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
@@ -289,7 +334,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuiteRetrievedEvent(
                         $job->getId(),
                         new SourcesSerializedSuite(
@@ -313,7 +362,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (JobInterface $job) use ($serializedSuiteId) {
+                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new SerializedSuite(
                         $job->getId(),
                         $serializedSuiteId,
