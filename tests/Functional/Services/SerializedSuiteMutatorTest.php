@@ -79,7 +79,7 @@ class SerializedSuiteMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface                      $jobCreator
      * @param callable(?JobInterface, SerializedSuiteRepository): void $serializedSuiteCreator
-     * @param callable(?JobInterface): ?SerializedSuiteRetrievedEvent   $eventCreator
+     * @param callable(?JobInterface): ?SerializedSuiteRetrievedEvent  $eventCreator
      * @param callable(?JobInterface): ?SerializedSuite                $expectedSerializedSuiteCreator
      */
     #[DataProvider('setStateSuccessDataProvider')]
@@ -171,7 +171,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                'eventCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuiteRetrievedEvent {
                     if (null === $job) {
                         return null;
                     }
@@ -191,7 +195,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                'expectedSerializedSuiteCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuite {
                     if (null === $job) {
                         return null;
                     }
@@ -222,7 +230,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                'eventCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuiteRetrievedEvent {
                     if (null === $job) {
                         return null;
                     }
@@ -247,7 +259,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                'expectedSerializedSuiteCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuite {
                     if (null === $job) {
                         return null;
                     }
@@ -278,7 +294,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                'eventCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuiteRetrievedEvent {
                     if (null === $job) {
                         return null;
                     }
@@ -303,7 +323,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                'expectedSerializedSuiteCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuite {
                     if (null === $job) {
                         return null;
                     }
@@ -334,7 +358,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                     );
                     $serializedSuiteRepository->save($serializedSuite);
                 },
-                'eventCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuiteRetrievedEvent {
+                'eventCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuiteRetrievedEvent {
                     if (null === $job) {
                         return null;
                     }
@@ -362,7 +390,11 @@ class SerializedSuiteMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedSerializedSuiteCreator' => function (?JobInterface $job) use ($serializedSuiteId): ?SerializedSuite {
+                'expectedSerializedSuiteCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $serializedSuiteId,
+                ): ?SerializedSuite {
                     if (null === $job) {
                         return null;
                     }

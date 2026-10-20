@@ -15,6 +15,7 @@ use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 
 /**
  * @phpstan-import-type SerializedJob from JobInterface
+ *
  * @phpstan-type JobsSetupResult array{api_token: non-empty-string, job_ids: string[], suite_id: non-empty-string}
  */
 abstract class AbstractListJobsTest extends AbstractApplicationTest

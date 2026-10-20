@@ -79,10 +79,10 @@ class ResultsJobMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface               $jobCreator
-     * @param callable(?JobInterface, ResultsJobFactory): void  $resultsJobCreator
+     * @param callable(JobFactory): ?JobInterface                $jobCreator
+     * @param callable(?JobInterface, ResultsJobFactory): void   $resultsJobCreator
      * @param callable(?JobInterface): ?ResultsJobRetrievedEvent $eventCreator
-     * @param callable(?JobInterface): ?ResultsJob              $expectedResultsJobCreator
+     * @param callable(?JobInterface): ?ResultsJob               $expectedResultsJobCreator
      */
     #[DataProvider('updateSuccessDataProvider')]
     public function testUpdateSuccess(

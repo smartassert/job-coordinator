@@ -96,10 +96,10 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface              $jobCreator
-     * @param callable(?JobInterface, MachineRepository): void $machineCreator
+     * @param callable(JobFactory): ?JobInterface               $jobCreator
+     * @param callable(?JobInterface, MachineRepository): void  $machineCreator
      * @param callable(?JobInterface): ?MachineStateChangeEvent $eventCreator
-     * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
+     * @param callable(?JobInterface): ?Machine                 $expectedMachineCreator
      */
     #[DataProvider('setStateOnMachineStateChangeEventDataProvider')]
     public function testSetStateOnMachineStateChangeEvent(
@@ -250,7 +250,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface              $jobCreator
      * @param callable(?JobInterface, MachineRepository): void $machineCreator
-     * @param callable(?JobInterface): ?MachineIsActiveEvent    $eventCreator
+     * @param callable(?JobInterface): ?MachineIsActiveEvent   $eventCreator
      * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsActiveEventDataProvider')]
@@ -417,10 +417,10 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface                   $jobCreator
-     * @param callable(?JobInterface, MachineRepository): void      $machineCreator
+     * @param callable(JobFactory): ?JobInterface                    $jobCreator
+     * @param callable(?JobInterface, MachineRepository): void       $machineCreator
      * @param callable(?JobInterface): ?MachineHasActionFailureEvent $eventCreator
-     * @param callable(?JobInterface): ?Machine                     $expectedMachineCreator
+     * @param callable(?JobInterface): ?Machine                      $expectedMachineCreator
      */
     #[DataProvider('setActionFailureOnMachineHasActionFailureEventDataProvider')]
     public function testSetActionFailureOnMachineHasActionFailureEvent(
@@ -552,7 +552,6 @@ class MachineMutatorTest extends WebTestCase
                         return;
                     }
 
-
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active')
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
@@ -597,7 +596,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface              $jobCreator
      * @param callable(?JobInterface, MachineRepository): void $machineCreator
-     * @param callable(?JobInterface): ?MachineIsReadyEvent     $eventCreator
+     * @param callable(?JobInterface): ?MachineIsReadyEvent    $eventCreator
      * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsReadyEventDataProvider')]
