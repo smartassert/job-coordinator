@@ -14,6 +14,7 @@ use App\Model\WorkerComponentStateInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
@@ -25,7 +26,7 @@ use App\Model\WorkerComponentStateInterface;
  *   },
  *   failure?: WorkerJobCreationFailure,
  *   preparation: Preparation,
- *   requests: RemoteRequestCollection
+ *   requests: SerializedRemoteRequestCollectionGroup
  * }
  */
 class WorkerJob implements SerializeToArrayInterface
@@ -54,7 +55,7 @@ class WorkerJob implements SerializeToArrayInterface
                 WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState,
             ],
             'preparation' => $this->preparation,
-            'requests' => $this->requests,
+            'requests' => $this->requests->jsonSerialize(),
         ];
 
         if (null !== $this->failure) {

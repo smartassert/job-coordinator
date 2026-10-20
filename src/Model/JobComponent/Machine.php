@@ -12,13 +12,14 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  *
  * @phpstan-type SerializedMachine array{
  *   state_category: ?non-empty-string,
  *   ip_address: ?non-empty-string,
  *   action_failure: ?MachineActionFailure,
  *   meta_state: SerializedMetaState,
- *   requests: RemoteRequestCollection,
+ *   requests: SerializedRemoteRequestCollectionGroup,
  *   preparation: Preparation,
  *   is_active: bool,
  * }
@@ -59,7 +60,7 @@ readonly class Machine implements SerializeToArrayInterface
             'ip_address' => $this->entity?->getIp() ?? null,
             'action_failure' => $this->entity?->getActionFailure() ?? null,
             'meta_state' => $this->getMetaState()->jsonSerialize(),
-            'requests' => $this->requests,
+            'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation,
             'is_active' => $this->entity?->getIsActive() ?? false,
         ];
