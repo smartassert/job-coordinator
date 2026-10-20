@@ -16,14 +16,15 @@ use App\Model\WorkerComponentStateInterface;
  * @phpstan-import-type SerializedMetaState from MetaState
  * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  * @phpstan-import-type SerializedPreparation from Preparation
+ * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
  *   meta_state: SerializedMetaState,
  *   components: array{
- *     compilation: WorkerComponentStateInterface,
- *     execution: WorkerComponentStateInterface,
- *     event_delivery: WorkerComponentStateInterface
+ *     compilation: SerializedWorkerComponentState,
+ *     execution: SerializedWorkerComponentState,
+ *     event_delivery: SerializedWorkerComponentState
  *   },
  *   preparation: SerializedPreparation,
  *   requests: SerializedRemoteRequestCollectionGroup,
@@ -51,9 +52,9 @@ class WorkerJob implements SerializeToArrayInterface
             'state' => $this->getState(),
             'meta_state' => $this->getMetaState()->jsonSerialize(),
             'components' => [
-                WorkerComponentName::COMPILATION->value => $this->compilationState,
-                WorkerComponentName::EXECUTION->value => $this->executionState,
-                WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState,
+                WorkerComponentName::COMPILATION->value => $this->compilationState->jsonSerialize(),
+                WorkerComponentName::EXECUTION->value => $this->executionState->jsonSerialize(),
+                WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->jsonSerialize(),
             ],
             'preparation' => $this->preparation->jsonSerialize(),
             'requests' => $this->requests->jsonSerialize(),
