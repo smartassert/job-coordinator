@@ -7,9 +7,11 @@ namespace App\Model;
 use App\Enum\PreparationState as PreparationStateEnum;
 
 /**
+ * @phpstan-import-type SerializedMetaState from MetaState
+ *
  * @phpstan-type SerializedPreparationState array{
  *   state: PreparationStateEnum,
- *   meta_state: MetaState
+ *   meta_state: SerializedMetaState
  * }
  */
 readonly class PreparationState implements \JsonSerializable
@@ -25,7 +27,7 @@ readonly class PreparationState implements \JsonSerializable
     {
         return [
             'state' => $this->state,
-            'meta_state' => $this->getMetaState(),
+            'meta_state' => $this->getMetaState()->jsonSerialize(),
         ];
     }
 
