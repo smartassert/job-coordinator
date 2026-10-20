@@ -51,7 +51,6 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
