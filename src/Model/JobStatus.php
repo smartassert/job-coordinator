@@ -17,6 +17,20 @@ use App\Model\JobComponent\WorkerJob;
  * @phpstan-import-type SerializedSerializedSuite from SerializedSuite
  * @phpstan-import-type SerializedMachine from Machine
  * @phpstan-import-type SerializedWorkerState from WorkerJob
+ * @phpstan-type SerializedJobStatus array{
+ *      id: non-empty-string,
+ *      suite_id: non-empty-string,
+ *      maximum_duration_in_seconds: positive-int,
+ *      created_at: positive-int,
+ *      meta_state: SerializedMetaState,
+ *      preparation: SerializedPreparationState,
+ *      components: array{
+ *          results-job: SerializedResultsJob,
+ *          serialized-suite: SerializedSerializedSuite,
+ *          machine: SerializedMachine,
+ *          worker-job: SerializedWorkerState,
+ *     }
+ * }
  */
 readonly class JobStatus implements \JsonSerializable
 {
