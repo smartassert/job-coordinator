@@ -11,12 +11,13 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  *
  * @phpstan-type SerializedSerializedSuite array{
  *   state: ?string,
  *   is_prepared: bool,
  *   meta_state: SerializedMetaState,
- *   requests: RemoteRequestCollection,
+ *   requests: SerializedRemoteRequestCollectionGroup,
  *   preparation: Preparation
  * }
  */
@@ -60,7 +61,7 @@ readonly class SerializedSuite implements SerializeToArrayInterface
             'state' => $state,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
             'meta_state' => $this->getMetaState()->jsonSerialize(),
-            'requests' => $this->requests,
+            'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation,
         ];
     }
