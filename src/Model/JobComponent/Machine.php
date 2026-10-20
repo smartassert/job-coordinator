@@ -59,8 +59,8 @@ readonly class Machine implements SerializeToArrayInterface
 
         return [
             'state_category' => $stateCategory,
-            'ip_address' => $this->entity?->getIp() ?? null,
-            'action_failure' => $this->entity?->getActionFailure()?->jsonSerialize() ?? null,
+            'ip_address' => $this->entity?->getIp(),
+            'action_failure' => $this->entity?->getActionFailure()?->jsonSerialize(),
             'meta_state' => $this->getMetaState()->jsonSerialize(),
             'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation->jsonSerialize(),
