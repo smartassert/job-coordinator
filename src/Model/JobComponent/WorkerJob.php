@@ -13,9 +13,10 @@ use App\Model\SerializeToArrayInterface;
 use App\Model\WorkerComponentStateInterface;
 
 /**
+ * @phpstan-import-type SerializedMetaState from MetaState
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
- *   meta_state: MetaState,
+ *   meta_state: SerializedMetaState,
  *   components: array{
  *     compilation: WorkerComponentStateInterface,
  *     execution: WorkerComponentStateInterface,
@@ -45,7 +46,7 @@ class WorkerJob implements SerializeToArrayInterface
     {
         $data = [
             'state' => $this->getState(),
-            'meta_state' => $this->getMetaState(),
+            'meta_state' => $this->getMetaState()->jsonSerialize(),
             'components' => [
                 WorkerComponentName::COMPILATION->value => $this->compilationState,
                 WorkerComponentName::EXECUTION->value => $this->executionState,
