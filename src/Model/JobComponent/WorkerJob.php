@@ -25,9 +25,9 @@ use App\Model\WorkerComponentStateInterface;
  *     execution: WorkerComponentStateInterface,
  *     event_delivery: WorkerComponentStateInterface
  *   },
- *   failure?: WorkerJobCreationFailure,
  *   preparation: SerializedPreparation,
- *   requests: SerializedRemoteRequestCollectionGroup
+ *   requests: SerializedRemoteRequestCollectionGroup,
+ *   creation_failure?: WorkerJobCreationFailure,
  * }
  */
 class WorkerJob implements SerializeToArrayInterface
