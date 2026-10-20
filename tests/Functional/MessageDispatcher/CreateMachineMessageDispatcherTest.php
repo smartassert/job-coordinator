@@ -121,7 +121,7 @@ class CreateMachineMessageDispatcherTest extends WebTestCase
     public static function dispatchImmediatelySuccessDataProvider(): array
     {
         $resultsJobCreatedEventCreator = function (JobInterface $job) {
-            return new ResultsJobCreatedEvent($job->getId(), ResultsClientJobFactory::createRandom());
+            return new ResultsJobCreatedEvent($job->getId(), ResultsClientJobFactory::createRandomCreatedJob());
         };
 
         $serializedSuiteSerializedEventCreator = function (JobInterface $job) {

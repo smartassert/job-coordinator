@@ -93,9 +93,12 @@ services:
         arguments:
             $payloadSerializer: '@Symfony\Component\Webhook\Server\NativeJsonPayloadSerializer'
 
-    SmartAssert\ResultsClient\AddEventClientInterface:
-        class: SmartAssert\ResultsClient\AddEventClient
-        public: true
-
     SmartAssert\SymfonyRemoteEventRequestFactory\Factory:
         public: true
+
+    app.services.http-client.results-client:
+        class: GuzzleHttp\Client
+        public: true
+        arguments:
+            $config:
+                verify: false

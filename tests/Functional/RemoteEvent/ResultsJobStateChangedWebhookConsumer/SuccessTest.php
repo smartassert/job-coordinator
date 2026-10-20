@@ -28,7 +28,6 @@ class SuccessTest extends AbstractConsumerTestCase
         $resultsJobModelData = [
             'label' => $job->getId(),
             'state' => $resultsJobEntity->getState(),
-            'event_add_url' => $resultsJobEntity->eventAddUrl,
             'has_events' => $resultsJobEntity->hasEvents(),
         ];
 
@@ -48,7 +47,7 @@ class SuccessTest extends AbstractConsumerTestCase
         $resultsJobModelFactory = self::getContainer()->get(ResultsJobModelFactory::class);
         \assert($resultsJobModelFactory instanceof ResultsJobModelFactory);
 
-        $resultsJobModel = $resultsJobModelFactory->create($resultsJobModelData);
+        $resultsJobModel = $resultsJobModelFactory->createForExistingJob($resultsJobModelData);
         \assert($resultsJobModel instanceof ResultsJobModel);
 
         self::assertEquals(

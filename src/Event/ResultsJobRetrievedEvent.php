@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\ResultsClient\Model\Job as ResultsJob;
+use SmartAssert\ResultsClient\Model\JobInterface as ResultsJob;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ResultsJobRetrievedEvent extends Event implements JobEventInterface
@@ -15,6 +15,6 @@ class ResultsJobRetrievedEvent extends Event implements JobEventInterface
 
     public function getJobId(): string
     {
-        return $this->resultsJob->label;
+        return $this->resultsJob->getLabel();
     }
 }

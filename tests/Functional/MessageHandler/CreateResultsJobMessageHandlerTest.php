@@ -20,10 +20,10 @@ use App\Services\MessageStateMutator;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\Client as ResultsClient;
+use SmartAssert\ResultsClient\Model\CreatedJob as ResultsCreatedJobModel;
 use SmartAssert\ResultsClient\Model\Job as ResultsJobModel;
 use SmartAssert\ResultsClient\Model\JobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
@@ -73,7 +73,6 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $resultsJobModel = new ResultsJobModel(
             $job->getId(),
-            StringValue::random(),
             new JobState(
                 'awaiting-events',
                 null,
@@ -83,13 +82,22 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             [],
         );
 
+        $resultsCreatedJobModel = new ResultsCreatedJobModel(
+            $resultsJobModel,
+            'event-notify-url',
+            'event-notify-token',
+        );
+
         $resultsClient = HttpMockedResultsClientFactory::create([
             new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-                'label' => $resultsJobModel->label,
-                'event_add_url' => $resultsJobModel->authenticator,
-                'state' => $resultsJobModel->state->state,
-                'end_state' => $resultsJobModel->state->endState,
-                'has_events' => $resultsJobModel->hasEvents,
+                'label' => $resultsCreatedJobModel->getLabel(),
+                'state' => $resultsCreatedJobModel->getState()->state,
+                'end_state' => $resultsCreatedJobModel->getState()->endState,
+                'has_events' => $resultsCreatedJobModel->hasEvents(),
+                'event_notify' => [
+                    'url' => $resultsCreatedJobModel->getEventNotifyUrl(),
+                    'token' => $resultsCreatedJobModel->getEventNotifyToken(),
+                ],
             ])),
         ]);
 
@@ -106,14 +114,15 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $resultsJob = $resultsJobRepository->find($job->getId());
         self::assertEquals(
             new ResultsJobEntity(
-                $resultsJobModel->label,
-                $resultsJobModel->authenticator,
-                $resultsJobModel->state->state,
-                $resultsJobModel->state->endState,
+                $resultsCreatedJobModel->getLabel(),
+                $resultsCreatedJobModel->getEventNotifyUrl(),
+                $resultsCreatedJobModel->getEventNotifyToken(),
+                $resultsCreatedJobModel->getState()->state,
+                $resultsCreatedJobModel->getState()->endState,
                 new MetaState(
-                    $resultsJobModel->state->metaState->ended,
-                    $resultsJobModel->state->metaState->succeeded,
-                    $resultsJobModel->state->metaState->pending,
+                    $resultsCreatedJobModel->getState()->metaState->ended,
+                    $resultsCreatedJobModel->getState()->metaState->succeeded,
+                    $resultsCreatedJobModel->getState()->metaState->pending,
                 ),
             ),
             $resultsJob
@@ -122,7 +131,7 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $events = $this->eventRecorder->all(ResultsJobCreatedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new ResultsJobCreatedEvent($job->getId(), $resultsJobModel), $event);
+        self::assertEquals(new ResultsJobCreatedEvent($job->getId(), $resultsCreatedJobModel), $event);
     }
 
     public function testInvokeNotHandleable(): void

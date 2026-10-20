@@ -528,6 +528,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $resultsJob = new ResultsJob(
                             $jobId,
                             StringValue::random(),
+                            StringValue::random(),
                             'awaiting-results',
                             null,
                             new MetaState(false, false, true)
@@ -652,6 +653,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $resultsJob = new ResultsJob(
                             $jobId,
+                            StringValue::random(),
                             StringValue::random(),
                             'ended',
                             'complete',
@@ -1287,6 +1289,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $resultsJob = new ResultsJob(
                             $jobId,
                             StringValue::random(),
+                            StringValue::random(),
                             'awaiting-events',
                             null,
                             new MetaState(false, false, true)
@@ -1825,6 +1828,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $resultsJob = new ResultsJob(
                             $jobId,
                             StringValue::random(),
+                            StringValue::random(),
                             'ended',
                             'complete',
                             new MetaState(true, true, false)
@@ -2277,6 +2281,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                 $resultsJob = new ResultsJob(
                     $jobId,
+                    StringValue::random(),
                     StringValue::random(),
                     'ended',
                     'complete',

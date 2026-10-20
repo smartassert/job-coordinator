@@ -84,7 +84,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
-        $resultsClientJob = ResultsClientJobFactory::createRandom();
+        $resultsClientJob = ResultsClientJobFactory::createRandomCreatedJob();
 
         $remoteRequestRemoverForEvents->removeResultsCreateRequests(
             new ResultsJobCreatedEvent($jobId, $resultsClientJob)
@@ -223,7 +223,6 @@ class RemoteRequestRemoverForEventsTest extends TestCase
             new ResultsJobRetrievedEvent(
                 new ResultsJob(
                     $jobId,
-                    '/event/add/results-token',
                     new ResultsJobState(
                         'irrelevant',
                         'irrelevant',

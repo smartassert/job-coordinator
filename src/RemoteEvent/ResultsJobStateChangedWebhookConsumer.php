@@ -29,12 +29,12 @@ final readonly class ResultsJobStateChangedWebhookConsumer implements ConsumerIn
             return;
         }
 
-        $eventResultsJob = $this->jobFactory->create($event->getPayload());
+        $eventResultsJob = $this->jobFactory->createForExistingJob($event->getPayload());
         if (null === $eventResultsJob) {
             return;
         }
 
-        $resultsJobEntity = $this->resultsJobRepository->findOneBy(['jobId' => $eventResultsJob->label]);
+        $resultsJobEntity = $this->resultsJobRepository->findOneBy(['jobId' => $eventResultsJob->getLabel()]);
         if (null === $resultsJobEntity) {
             return;
         }
