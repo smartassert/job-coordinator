@@ -9,6 +9,13 @@ use App\Repository\RemoteRequestFailureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedRemoteRequestFailure array{
+ *   type: value-of<RemoteRequestFailureType>,
+ *   code: int,
+ *   message: ?string
+ * }
+ */
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
 class RemoteRequestFailure implements \JsonSerializable
 {
@@ -42,16 +49,12 @@ class RemoteRequestFailure implements \JsonSerializable
     }
 
     /**
-     * @return array{
-     *   type: RemoteRequestFailureType,
-     *   code: int,
-     *   message: ?string
-     * }
+     * @return SerializedRemoteRequestFailure
      */
     public function jsonSerialize(): array
     {
         return [
-            'type' => $this->type,
+            'type' => $this->type->value,
             'code' => $this->code,
             'message' => $this->message,
         ];

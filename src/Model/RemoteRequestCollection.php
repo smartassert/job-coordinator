@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+/**
+ * @phpstan-import-type SerializedRemoteRequest from RemoteRequestInterface
+ *
+ * @phpstan-type SerializedRemoteRequestCollection array{
+ *   type: non-empty-string,
+ *   attempts: SerializedRemoteRequest[]
+ * }
+ * @phpstan-type SerializedRemoteRequestCollectionGroup SerializedRemoteRequestCollection[]
+ */
 class RemoteRequestCollection implements \JsonSerializable
 {
     /**
@@ -19,12 +28,7 @@ class RemoteRequestCollection implements \JsonSerializable
     }
 
     /**
-     * @return array<
-     *   array{
-     *     type: non-empty-string,
-     *     attempts: RemoteRequestInterface[]
-     *   }
-     * >
+     * @return SerializedRemoteRequestCollectionGroup
      */
     public function jsonSerialize(): array
     {
@@ -36,7 +40,7 @@ class RemoteRequestCollection implements \JsonSerializable
                     $requestsByType[$requestType] = [];
                 }
 
-                $requestsByType[$requestType][] = $request;
+                $requestsByType[$requestType][] = $request->jsonSerialize();
             }
         }
 
