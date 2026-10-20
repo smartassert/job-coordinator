@@ -53,7 +53,7 @@ readonly class SerializedSuite implements SerializeToArrayInterface
      */
     public function jsonSerialize(): array
     {
-        $state = $this->entity?->getState() ?? null;
+        $state = $this->entity?->getState();
         if ($this->preparation->hasFailure()) {
             $state = 'failed';
         }

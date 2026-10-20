@@ -14,6 +14,8 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\TestAuthenticationProviderBundle\ApiTokenProvider;
 
 /**
+ * @phpstan-import-type SerializedJob from JobInterface
+ *
  * @phpstan-type JobsSetupResult array{api_token: non-empty-string, job_ids: string[], suite_id: non-empty-string}
  */
 abstract class AbstractListJobsTest extends AbstractApplicationTest
@@ -85,7 +87,7 @@ abstract class AbstractListJobsTest extends AbstractApplicationTest
 
     /**
      * @param callable(ApiTokenProvider, ApplicationClient): JobsSetupResult $setup
-     * @param callable(Job[], JobRepository): JobInterface[]                 $expectedCreator
+     * @param callable(Job[], JobRepository): SerializedJob[]                $expectedCreator
      */
     #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(callable $setup, callable $expectedCreator): void

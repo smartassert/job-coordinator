@@ -17,6 +17,7 @@ use App\Enum\RequestState;
 use App\Enum\WorkerComponentName;
 use App\Enum\WorkerJobCreationStage;
 use App\Model\JobInterface;
+use App\Model\JobStatus;
 use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Repository\MachineRepository;
@@ -33,6 +34,9 @@ use App\Tests\Services\Generator\StringValue;
 use App\Tests\Services\Stager;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+/**
+ * @phpstan-import-type SerializedJobStatus from JobStatus
+ */
 class GetJobSuccessTest extends AbstractApplicationTest
 {
     use GetClientAdapterTrait;
@@ -50,7 +54,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
     }
 
     /**
-     * @param callable(JobInterface, ?SerializedSuite, ?Machine): array<mixed> $expectedSerializedJobCreator
+     * @param callable(JobInterface, ?SerializedSuite, ?Machine): SerializedJobStatus $expectedSerializedJobCreator
      */
     #[DataProvider('getDataProvider')]
     #[DataProvider('workerJobCreationFailedDataProvider')]
@@ -1032,7 +1036,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
-                    Machine $machine,
+                    ?Machine $machine,
                 ) {
                     return [
                         'id' => $job->getId(),
@@ -1083,8 +1087,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => $machine->getStateCategory(),
-                                'ip_address' => $machine->getIp(),
+                                'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
+                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => false,
@@ -1162,7 +1166,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
-                    Machine $machine,
+                    ?Machine $machine,
                 ) {
                     return [
                         'id' => $job->getId(),
@@ -1213,8 +1217,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => $machine->getStateCategory(),
-                                'ip_address' => $machine->getIp(),
+                                'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
+                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                                 'action_failure' => [
                                     'action' => 'find',
                                     'type' => 'vendor_authentication_failure',
@@ -1349,7 +1353,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
-                    Machine $machine,
+                    ?Machine $machine,
                 ) {
                     return [
                         'id' => $job->getId(),
@@ -1400,8 +1404,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => $machine->getStateCategory(),
-                                'ip_address' => $machine->getIp(),
+                                'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
+                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => false,
@@ -1704,7 +1708,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
-                    Machine $machine,
+                    ?Machine $machine,
                 ) {
                     return [
                         'id' => $job->getId(),
@@ -1755,8 +1759,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 ],
                             ],
                             'machine' => [
-                                'state_category' => $machine->getStateCategory(),
-                                'ip_address' => $machine->getIp(),
+                                'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
+                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => true,
@@ -1886,7 +1890,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 'expectedSerializedJobCreator' => function (
                     JobInterface $job,
                     ?SerializedSuite $serializedSuite,
-                    Machine $machine,
+                    ?Machine $machine,
                 ) {
                     return [
                         'id' => $job->getId(),
@@ -1938,7 +1942,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => 'end',
-                                'ip_address' => $machine->getIp(),
+                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => true,
@@ -2020,7 +2024,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
             return function (
                 JobInterface $job,
                 ?SerializedSuite $serializedSuite,
-                Machine $machine
+                ?Machine $machine
             ) use ($workerComponentsData) {
                 return [
                     'id' => $job->getId(),
@@ -2071,8 +2075,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                         ],
                         'machine' => [
-                            'state_category' => $machine->getStateCategory(),
-                            'ip_address' => $machine->getIp(),
+                            'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
+                            'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                             'action_failure' => null,
                             'meta_state' => [
                                 'ended' => false,
@@ -2313,7 +2317,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
             return function (
                 JobInterface $job,
                 ?SerializedSuite $serializedSuite,
-                Machine $machine
+                ?Machine $machine
             ) use ($creationFailureData) {
                 return [
                     'id' => $job->getId(),
@@ -2365,7 +2369,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'machine' => [
                             'state_category' => 'end',
-                            'ip_address' => $machine->getIp(),
+                            'ip_address' => $machine?->getIp() ?? 'invalid-ip',
                             'action_failure' => null,
                             'meta_state' => [
                                 'ended' => true,

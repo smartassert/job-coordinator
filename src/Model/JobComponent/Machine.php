@@ -52,15 +52,15 @@ readonly class Machine implements SerializeToArrayInterface
      */
     public function jsonSerialize(): array
     {
-        $stateCategory = $this->entity?->getStateCategory() ?? null;
+        $stateCategory = $this->entity?->getStateCategory();
         if ($this->preparation->hasFailure()) {
             $stateCategory = 'end';
         }
 
         return [
             'state_category' => $stateCategory,
-            'ip_address' => $this->entity?->getIp() ?? null,
-            'action_failure' => $this->entity?->getActionFailure()?->jsonSerialize() ?? null,
+            'ip_address' => $this->entity?->getIp(),
+            'action_failure' => $this->entity?->getActionFailure()?->jsonSerialize(),
             'meta_state' => $this->getMetaState()->jsonSerialize(),
             'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation->jsonSerialize(),

@@ -17,7 +17,6 @@ use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\StringValue;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -51,7 +50,6 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $authenticationToken = StringValue::random();
 
         $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);

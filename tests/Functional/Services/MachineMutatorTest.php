@@ -96,10 +96,10 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface              $jobCreator
-     * @param callable(?JobInterface, MachineRepository): void $machineCreator
-     * @param callable(?JobInterface): MachineStateChangeEvent $eventCreator
-     * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
+     * @param callable(JobFactory): ?JobInterface               $jobCreator
+     * @param callable(?JobInterface, MachineRepository): void  $machineCreator
+     * @param callable(?JobInterface): ?MachineStateChangeEvent $eventCreator
+     * @param callable(?JobInterface): ?Machine                 $expectedMachineCreator
      */
     #[DataProvider('setStateOnMachineStateChangeEventDataProvider')]
     public function testSetStateOnMachineStateChangeEvent(
@@ -113,6 +113,7 @@ class MachineMutatorTest extends WebTestCase
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
+        \assert(null !== $event);
 
         $this->machineMutator->setStateOnMachineStateChangeEvent($event);
 
@@ -167,13 +168,19 @@ class MachineMutatorTest extends WebTestCase
             ],
             'no state change' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active');
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineStateChangeEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($job->getId()),
                         WorkerManagerClientMachineFactory::create(
@@ -187,19 +194,29 @@ class MachineMutatorTest extends WebTestCase
                         )
                     );
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'up/started', 'pre_active');
                 },
             ],
             'has state change' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active');
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineStateChangeEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineStateChangeEvent(
                         WorkerManagerClientMachineFactory::createRandomForJob($job->getId()),
                         WorkerManagerClientMachineFactory::create(
@@ -213,7 +230,11 @@ class MachineMutatorTest extends WebTestCase
                         )
                     );
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine(
                         $job->getId(),
                         'up/active',
@@ -229,7 +250,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface              $jobCreator
      * @param callable(?JobInterface, MachineRepository): void $machineCreator
-     * @param callable(?JobInterface): MachineIsActiveEvent    $eventCreator
+     * @param callable(?JobInterface): ?MachineIsActiveEvent   $eventCreator
      * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsActiveEventDataProvider')]
@@ -243,6 +264,7 @@ class MachineMutatorTest extends WebTestCase
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
+        \assert(null !== $event);
 
         $this->machineMutator->handleMachineIsActiveEvent($event);
 
@@ -292,7 +314,11 @@ class MachineMutatorTest extends WebTestCase
             'no machine' => [
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (?JobInterface $job) use ($arbitraryMachine): ?MachineIsActiveEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
                 'expectedMachineCreator' => function () {
@@ -301,18 +327,28 @@ class MachineMutatorTest extends WebTestCase
             ],
             'no ip change' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                     ;
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (?JobInterface $job) use ($arbitraryMachine): ?MachineIsActiveEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                         ->setIsActive()
@@ -321,16 +357,26 @@ class MachineMutatorTest extends WebTestCase
             ],
             'has ip change, null to set' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active');
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (?JobInterface $job) use ($arbitraryMachine): ?MachineIsActiveEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsActiveEvent($job->getId(), '127.0.0.1', $arbitraryMachine);
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                         ->setIsActive()
@@ -339,18 +385,28 @@ class MachineMutatorTest extends WebTestCase
             ],
             'has ip change' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                     ;
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) use ($arbitraryMachine) {
+                'eventCreator' => function (?JobInterface $job) use ($arbitraryMachine): ?MachineIsActiveEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsActiveEvent($job->getId(), '127.0.0.2', $arbitraryMachine);
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.2')
                         ->setIsActive()
@@ -361,10 +417,10 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface                   $jobCreator
-     * @param callable(?JobInterface, MachineRepository): void      $machineCreator
-     * @param callable(?JobInterface): MachineHasActionFailureEvent $eventCreator
-     * @param callable(?JobInterface): ?Machine                     $expectedMachineCreator
+     * @param callable(JobFactory): ?JobInterface                    $jobCreator
+     * @param callable(?JobInterface, MachineRepository): void       $machineCreator
+     * @param callable(?JobInterface): ?MachineHasActionFailureEvent $eventCreator
+     * @param callable(?JobInterface): ?Machine                      $expectedMachineCreator
      */
     #[DataProvider('setActionFailureOnMachineHasActionFailureEventDataProvider')]
     public function testSetActionFailureOnMachineHasActionFailureEvent(
@@ -377,6 +433,7 @@ class MachineMutatorTest extends WebTestCase
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
+        \assert(null !== $event);
 
         $this->machineMutator->setActionFailureOnMachineHasActionFailureEvent($event);
 
@@ -449,13 +506,19 @@ class MachineMutatorTest extends WebTestCase
             ],
             'previous machine has no action failure' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active');
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineHasActionFailureEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
                         MachineFactory::create(
@@ -470,7 +533,11 @@ class MachineMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'find/finding', 'pre_active')
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'find', 'vendor_authentication_failure', [])
@@ -480,17 +547,23 @@ class MachineMutatorTest extends WebTestCase
             ],
             'previous machine has action failure' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'find/finding', 'pre_active')
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
                         )
                     ;
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineHasActionFailureEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineHasActionFailureEvent(
                         $job->getId(),
                         MachineFactory::create(
@@ -505,7 +578,11 @@ class MachineMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'find/finding', 'pre_active')
                         ->setActionFailure(
                             new MachineActionFailure($job->getId(), 'previous_action', 'previous_type', [])
@@ -519,7 +596,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface              $jobCreator
      * @param callable(?JobInterface, MachineRepository): void $machineCreator
-     * @param callable(?JobInterface): MachineIsReadyEvent     $eventCreator
+     * @param callable(?JobInterface): ?MachineIsReadyEvent    $eventCreator
      * @param callable(?JobInterface): ?Machine                $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsReadyEventDataProvider')]
@@ -533,6 +610,7 @@ class MachineMutatorTest extends WebTestCase
         $machineCreator($job, $this->machineRepository);
 
         $event = $eventCreator($job);
+        \assert(null !== $event);
 
         $this->machineMutator->handleMachineIsReadyEvent($event);
 
@@ -570,7 +648,11 @@ class MachineMutatorTest extends WebTestCase
             'no machine' => [
                 'jobCreator' => $jobCreator,
                 'machineCreator' => function () {},
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineIsReadyEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
                 },
                 'expectedMachineCreator' => function () {
@@ -579,19 +661,29 @@ class MachineMutatorTest extends WebTestCase
             ],
             'has machine' => [
                 'jobCreator' => $jobCreator,
-                'machineCreator' => function (JobInterface $job, MachineRepository $machineRepository) {
+                'machineCreator' => function (?JobInterface $job, MachineRepository $machineRepository): void {
+                    if (null === $job) {
+                        return;
+                    }
+
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                     ;
                     $machine = $machine->setIsActive();
                     $machineRepository->save($machine);
-
-                    return $machine;
                 },
-                'eventCreator' => function (JobInterface $job) {
+                'eventCreator' => function (?JobInterface $job): ?MachineIsReadyEvent {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
                 },
-                'expectedMachineCreator' => function (JobInterface $job) {
+                'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
+                    if (null === $job) {
+                        return null;
+                    }
+
                     return new Machine($job->getId(), 'up/started', 'pre_active')
                         ->setIp('127.0.0.1')
                         ->setIsActive()
