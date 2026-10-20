@@ -7,6 +7,13 @@ namespace App\Entity;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedMachineActionFailure array{
+ *   action: ?non-empty-string,
+ *   type: ?non-empty-string,
+ *   context: null|array<mixed>
+ * }
+ */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
 class MachineActionFailure implements \JsonSerializable
 {
