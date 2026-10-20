@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\SerializedSuite as SerializedSuiteEntity;
-use App\Enum\JobComponentName;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
@@ -19,7 +18,7 @@ use App\Model\SerializeToArrayInterface;
  *   preparation: Preparation
  * }
  */
-readonly class SerializedSuite implements SerializeToArrayInterface, JobComponentInterface
+readonly class SerializedSuite implements SerializeToArrayInterface
 {
     public function __construct(
         private ?SerializedSuiteEntity $entity,
@@ -30,11 +29,6 @@ readonly class SerializedSuite implements SerializeToArrayInterface, JobComponen
     public function isEmpty(): bool
     {
         return null === $this->entity && $this->requests->isEmpty();
-    }
-
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::SERIALIZED_SUITE;
     }
 
     public function getMetaState(): MetaState

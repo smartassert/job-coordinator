@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Model\JobComponents;
 use App\Model\JobInterface;
 use App\Model\JobStatus;
 
@@ -36,13 +35,14 @@ readonly class JobStatusFactory
             $workerJob->getMetaState(),
         ]);
 
-        $components = new JobComponents([
+        return new JobStatus(
+            $job,
+            $jobMetaState,
+            $preparationState,
             $resultsJob,
             $serializedSuite,
             $machine,
             $workerJob,
-        ]);
-
-        return new JobStatus($job, $jobMetaState, $preparationState, $components);
+        );
     }
 }

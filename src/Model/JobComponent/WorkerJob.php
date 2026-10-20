@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\WorkerJobCreationFailure;
-use App\Enum\JobComponentName;
 use App\Enum\WorkerComponentName;
 use App\Model\FailedWorkerComponentState;
 use App\Model\MetaState;
@@ -27,7 +26,7 @@ use App\Model\WorkerComponentStateInterface;
  *   requests: RemoteRequestCollection
  * }
  */
-class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
+class WorkerJob implements SerializeToArrayInterface
 {
     public function __construct(
         private readonly WorkerComponentStateInterface $applicationState,
@@ -38,11 +37,6 @@ class WorkerJob implements SerializeToArrayInterface, JobComponentInterface
         private readonly RemoteRequestCollection $requests,
         private readonly Preparation $preparation,
     ) {}
-
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::WORKER_JOB;
-    }
 
     /**
      * @return SerializedWorkerState

@@ -6,7 +6,6 @@ namespace App\Model\JobComponent;
 
 use App\Entity\Machine as MachineEntity;
 use App\Entity\MachineActionFailure;
-use App\Enum\JobComponentName;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
@@ -22,18 +21,13 @@ use App\Model\SerializeToArrayInterface;
  *   is_active: bool,
  * }
  */
-readonly class Machine implements SerializeToArrayInterface, JobComponentInterface
+readonly class Machine implements SerializeToArrayInterface
 {
     public function __construct(
         private ?MachineEntity $entity,
         private RemoteRequestCollection $requests,
         private Preparation $preparation,
     ) {}
-
-    public function getName(): JobComponentName
-    {
-        return JobComponentName::MACHINE;
-    }
 
     public function getMetaState(): MetaState
     {
