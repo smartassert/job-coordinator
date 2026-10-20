@@ -81,7 +81,7 @@ class WorkerComponentState implements WorkerComponentStateInterface
     {
         return [
             'state' => '' === $this->state ? null : $this->state,
-            'meta_state' => $this->getMetaState(),
+            'meta_state' => $this->getMetaState()->jsonSerialize(),
         ];
     }
 }
