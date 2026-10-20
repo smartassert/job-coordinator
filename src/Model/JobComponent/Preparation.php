@@ -10,10 +10,12 @@ use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
 
 /**
+ * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
+ *
  * @phpstan-type SerializedPreparation array{
  *    state: value-of<PreparationStateEnum>,
  *    request_state: value-of<RequestState>,
- *    failure?: RemoteRequestFailure
+ *    failure?: SerializedRemoteRequestFailure
  *  }
  */
 readonly class Preparation implements \JsonSerializable
@@ -40,7 +42,7 @@ readonly class Preparation implements \JsonSerializable
         ];
 
         if ($this->remoteRequestFailure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->remoteRequestFailure;
+            $data['failure'] = $this->remoteRequestFailure->jsonSerialize();
         }
 
         return $data;
