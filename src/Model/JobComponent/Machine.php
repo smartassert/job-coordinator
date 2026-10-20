@@ -13,6 +13,7 @@ use App\Model\SerializeToArrayInterface;
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
  * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
+ * @phpstan-import-type SerializedPreparation from Preparation
  *
  * @phpstan-type SerializedMachine array{
  *   state_category: ?non-empty-string,
@@ -20,7 +21,7 @@ use App\Model\SerializeToArrayInterface;
  *   action_failure: ?MachineActionFailure,
  *   meta_state: SerializedMetaState,
  *   requests: SerializedRemoteRequestCollectionGroup,
- *   preparation: Preparation,
+ *   preparation: SerializedPreparation,
  *   is_active: bool,
  * }
  */
@@ -61,7 +62,7 @@ readonly class Machine implements SerializeToArrayInterface
             'action_failure' => $this->entity?->getActionFailure() ?? null,
             'meta_state' => $this->getMetaState()->jsonSerialize(),
             'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation,
+            'preparation' => $this->preparation->jsonSerialize(),
             'is_active' => $this->entity?->getIsActive() ?? false,
         ];
     }

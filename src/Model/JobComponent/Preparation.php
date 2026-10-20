@@ -9,6 +9,13 @@ use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
 
+/**
+ * @phpstan-type SerializedPreparation array{
+ *    state: value-of<PreparationStateEnum>,
+ *    request_state: value-of<RequestState>,
+ *    failure?: RemoteRequestFailure
+ *  }
+ */
 readonly class Preparation implements \JsonSerializable
 {
     public function __construct(
@@ -23,11 +30,7 @@ readonly class Preparation implements \JsonSerializable
     }
 
     /**
-     * @return array{
-     *   state: value-of<PreparationStateEnum>,
-     *   request_state: value-of<RequestState>,
-     *   failure?: RemoteRequestFailure
-     * }
+     * @return SerializedPreparation
      */
     public function jsonSerialize(): array
     {
