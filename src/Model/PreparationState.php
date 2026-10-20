@@ -10,7 +10,7 @@ use App\Enum\PreparationState as PreparationStateEnum;
  * @phpstan-import-type SerializedMetaState from MetaState
  *
  * @phpstan-type SerializedPreparationState array{
- *   state: PreparationStateEnum,
+ *   state: value-of<PreparationStateEnum>,
  *   meta_state: SerializedMetaState
  * }
  */
@@ -26,7 +26,7 @@ readonly class PreparationState implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'state' => $this->state,
+            'state' => $this->state->value,
             'meta_state' => $this->getMetaState()->jsonSerialize(),
         ];
     }
