@@ -11,6 +11,7 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ *
  * @phpstan-type SerializedSerializedSuite array{
  *   state: ?string,
  *   is_prepared: bool,

@@ -12,6 +12,7 @@ use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ *
  * @phpstan-type SerializedMachine array{
  *   state_category: ?non-empty-string,
  *   ip_address: ?non-empty-string,

@@ -14,6 +14,7 @@ use App\Model\WorkerComponentStateInterface;
 
 /**
  * @phpstan-import-type SerializedMetaState from MetaState
+ *
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
  *   meta_state: SerializedMetaState,
