@@ -9,6 +9,16 @@ use App\Repository\WorkerJobCreationFailureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-type SerializedWorkerJobCreationFailure array{
+ *   stage: string,
+ *   exception: array{
+ *     class: string,
+ *     code: int,
+ *     message: string
+ *   }
+ * }
+ */
 #[ORM\Entity(repositoryClass: WorkerJobCreationFailureRepository::class)]
 class WorkerJobCreationFailure implements \JsonSerializable
 {
@@ -44,14 +54,7 @@ class WorkerJobCreationFailure implements \JsonSerializable
     }
 
     /**
-     * @return array{
-     *   stage: string,
-     *   exception: array{
-     *     class: string,
-     *     code: int,
-     *     message: string
-     *   }
-     * }
+     * @return SerializedWorkerJobCreationFailure
      */
     public function jsonSerialize(): array
     {

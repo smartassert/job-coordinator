@@ -17,6 +17,7 @@ use App\Model\WorkerComponentStateInterface;
  * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  * @phpstan-import-type SerializedPreparation from Preparation
  * @phpstan-import-type SerializedWorkerComponentState from WorkerComponentStateInterface
+ * @phpstan-import-type SerializedWorkerJobCreationFailure from WorkerJobCreationFailure
  *
  * @phpstan-type SerializedWorkerState array{
  *   state: string,
@@ -28,7 +29,7 @@ use App\Model\WorkerComponentStateInterface;
  *   },
  *   preparation: SerializedPreparation,
  *   requests: SerializedRemoteRequestCollectionGroup,
- *   creation_failure?: WorkerJobCreationFailure,
+ *   creation_failure?: SerializedWorkerJobCreationFailure,
  * }
  */
 class WorkerJob implements SerializeToArrayInterface
@@ -61,7 +62,7 @@ class WorkerJob implements SerializeToArrayInterface
         ];
 
         if (null !== $this->failure) {
-            $data['creation_failure'] = $this->failure;
+            $data['creation_failure'] = $this->failure->jsonSerialize();
         }
 
         return $data;
