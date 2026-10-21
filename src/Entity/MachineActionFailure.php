@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  *   type: ?non-empty-string,
  *   context: null|array<mixed>
  * }
+ * @phpstan-type MachineActionFailureContext array<string,null|int|string>
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
 class MachineActionFailure implements \JsonSerializable
@@ -28,16 +29,16 @@ class MachineActionFailure implements \JsonSerializable
     private string $type;
 
     /**
-     * @var null|array<mixed>
+     * @var ?MachineActionFailureContext
      */
     #[ORM\Column(nullable: true)]
     private ?array $context;
 
     /**
-     * @param non-empty-string  $id
-     * @param non-empty-string  $action
-     * @param non-empty-string  $type
-     * @param null|array<mixed> $context
+     * @param non-empty-string             $id
+     * @param non-empty-string             $action
+     * @param non-empty-string             $type
+     * @param ?MachineActionFailureContext $context
      */
     public function __construct(
         string $id,
@@ -55,7 +56,7 @@ class MachineActionFailure implements \JsonSerializable
      * @return array{
      *   action: ?non-empty-string,
      *   type: ?non-empty-string,
-     *   context: null|array<mixed>
+     *   context: ?MachineActionFailureContext
      * }
      */
     public function jsonSerialize(): array
