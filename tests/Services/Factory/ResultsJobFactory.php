@@ -17,22 +17,25 @@ readonly class ResultsJobFactory
     ) {}
 
     /**
-     * @param null|non-empty-string $token
+     * @param null|non-empty-string $eventNotifyUrl
+     * @param null|non-empty-string $eventNotifyToken
      * @param null|non-empty-string $state
      * @param null|non-empty-string $endState
      */
     public function create(
         JobInterface $job,
-        ?string $token = null,
+        ?string $eventNotifyUrl = null,
+        ?string $eventNotifyToken = null,
         ?string $state = null,
         ?string $endState = null,
         ?MetaState $metaState = null,
     ): ResultsJob {
-        $token = $token ?? StringValue::random();
+        $eventNotifyUrl = $eventNotifyUrl ?? StringValue::random();
+        $eventNotifyToken = $eventNotifyToken ?? StringValue::random();
         $state = is_string($state) ? $state : StringValue::random();
         $metaState = $metaState ?? new MetaState(false, false, true);
 
-        $resultsJob = new ResultsJob($job->getId(), $token, $state, $endState, $metaState);
+        $resultsJob = new ResultsJob($job->getId(), $eventNotifyUrl, $eventNotifyToken, $state, $endState, $metaState);
 
         $this->resultsJobRepository->save($resultsJob);
 

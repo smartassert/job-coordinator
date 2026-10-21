@@ -123,7 +123,6 @@ class GetResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             new ResultsJobRetrievedEvent(
                 new ResultsJob(
                     $job->getId(),
-                    'event/add/results-token',
                     new ResultsJobState(
                         $resultsJobState,
                         null,

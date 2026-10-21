@@ -237,7 +237,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsJob(
                             $job->getId(),
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'awaiting-events',
                                 null,

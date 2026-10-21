@@ -16,6 +16,7 @@ use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ResultsClient\Model\CreatedJob as ResultsClientCreatedJob;
 use SmartAssert\ResultsClient\Model\Job as ResultsClientJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
@@ -85,7 +86,7 @@ class ResultsJobFactoryTest extends WebTestCase
 
         $event = new ResultsJobCreatedEvent(
             $jobId,
-            ResultsClientJobFactory::createRandom()
+            ResultsClientJobFactory::createRandomCreatedJob()
         );
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
@@ -101,13 +102,13 @@ class ResultsJobFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->resultsJobRepository->count());
 
-        $resultsJobToken = StringValue::random();
+        $eventNotifyUrl = StringValue::random();
+        $eventNotifyToken = StringValue::random();
         $resultsJobState = 'awaiting-events';
         $resultsJobEndState = null;
 
-        $resultsJob = new ResultsClientJob(
+        $resultsClientJob = new ResultsClientJob(
             $job->getId(),
-            $resultsJobToken,
             new ResultsJobState(
                 $resultsJobState,
                 $resultsJobEndState,
@@ -117,7 +118,9 @@ class ResultsJobFactoryTest extends WebTestCase
             [],
         );
 
-        $event = new ResultsJobCreatedEvent($job->getId(), $resultsJob);
+        $resultsClientCreatedJob = new ResultsClientCreatedJob($resultsClientJob, $eventNotifyUrl, $eventNotifyToken);
+
+        $event = new ResultsJobCreatedEvent($job->getId(), $resultsClientCreatedJob);
 
         $this->resultsJobFactory->createOnResultsJobCreatedEvent($event);
 
@@ -125,7 +128,8 @@ class ResultsJobFactoryTest extends WebTestCase
         self::assertEquals(
             new ResultsJob(
                 $job->getId(),
-                $resultsJobToken,
+                $eventNotifyUrl,
+                $eventNotifyToken,
                 $resultsJobState,
                 $resultsJobEndState,
                 new MetaState(false, false, true),

@@ -12,7 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 class ResultsJob
 {
     #[ORM\Column(length: 255)]
-    public readonly string $eventAddUrl;
+    public readonly string $eventNotifyUrl;
+
+    #[ORM\Column(length: 255)]
+    public readonly string $eventNotifyToken;
 
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 32, unique: true)]
@@ -38,19 +41,20 @@ class ResultsJob
 
     /**
      * @param non-empty-string  $jobId
-     * @param non-empty-string  $eventAddUrl
      * @param non-empty-string  $state
      * @param ?non-empty-string $endState
      */
     public function __construct(
         string $jobId,
-        string $eventAddUrl,
+        string $eventNotifyUrl,
+        string $eventNotifyToken,
         string $state,
         ?string $endState,
         MetaState $metaState,
     ) {
         $this->jobId = $jobId;
-        $this->eventAddUrl = $eventAddUrl;
+        $this->eventNotifyUrl = $eventNotifyUrl;
+        $this->eventNotifyToken = $eventNotifyToken;
         $this->state = $state;
         $this->endState = $endState;
         $this->stateIsEnded = $metaState->ended;

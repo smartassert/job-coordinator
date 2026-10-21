@@ -6,13 +6,16 @@ namespace App\Tests\Integration;
 
 use App\Entity\ResultsJob;
 use App\Message\GetResultsJobMessage;
+use App\Model\JobInterface;
 use App\Repository\ResultsJobRepository;
 use App\Tests\Application\AbstractCreateJobSuccessSetup;
 use App\Tests\Services\EntityRemover;
 use Doctrine\ORM\EntityManagerInterface;
-use SmartAssert\ResultsClient\AddEventClientInterface;
-use SmartAssert\ResultsClient\Model\Event as ResultsClientEvent;
-use SmartAssert\ResultsClient\Model\ResourceReference as ResultsClientResourceReference;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use SmartAssert\SymfonyRemoteEventRequestFactory\Factory;
+use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Uid\Ulid;
 use webignition\WaitFor\WaitFor;
 
 class ResultsJobHasEventsBeforeExplicitlyRetrieved extends AbstractCreateJobSuccessSetup
@@ -39,30 +42,46 @@ class ResultsJobHasEventsBeforeExplicitlyRetrieved extends AbstractCreateJobSucc
 
         $this->waitUntilResultsJobExists($getResultsJobMessageDelay / 3);
 
+        $job = $this->getJob();
+        self::assertInstanceOf(JobInterface::class, $job);
+
         $resultsJob = $this->getResultsJob();
         self::assertInstanceOf(ResultsJob::class, $resultsJob);
 
-        $resultsAddEventClient = self::getContainer()->get(AddEventClientInterface::class);
-        \assert($resultsAddEventClient instanceof AddEventClientInterface);
+        $payload = [
+            'job' => $job->getId(),
+            'sequence_number' => 1,
+            'type' => 'job/started',
+            'label' => $job->getId(),
+            'reference' => md5($job->getId()),
+        ];
 
-        $eventAddUrl = str_replace(
+        $event = new RemoteEvent(
+            name: 'worker.event',
+            id: (string) new Ulid(),
+            payload: $payload,
+        );
+
+        $remoteEventRequestFactory = self::getContainer()->get(Factory::class);
+        \assert($remoteEventRequestFactory instanceof Factory);
+
+        $httpClient = self::getContainer()->get('app.services.http-client.results-client');
+        \assert($httpClient instanceof Client);
+
+        $eventNotifyUrl = str_replace(
             'http://results-http/',
             'http://localhost:9081/',
-            $resultsJob->eventAddUrl
+            $resultsJob->eventNotifyUrl,
         );
 
-        $resultsAddEventClient->add(
-            $eventAddUrl,
-            new ResultsClientEvent(
-                1,
-                'job/started',
-                new ResultsClientResourceReference(
-                    'label',
-                    'reference',
-                ),
-                [],
-            ),
-        );
+        $addEventResponse = $httpClient->send(new Request(
+            'POST',
+            $eventNotifyUrl,
+            $remoteEventRequestFactory->createHeaders($event, $resultsJob->eventNotifyToken),
+            $remoteEventRequestFactory->createBody($event, $resultsJob->eventNotifyToken),
+        ));
+
+        self::assertSame(202, $addEventResponse->getStatusCode());
 
         $this->waitUntilResultsJobHasEvents($getResultsJobMessageDelay / 3);
 

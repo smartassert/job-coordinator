@@ -114,7 +114,8 @@ class ResultsJobMutatorTest extends WebTestCase
      */
     public static function updateSuccessDataProvider(): array
     {
-        $resultsJobToken = StringValue::random();
+        $resultsJobEventNotifyUrl = StringValue::random();
+        $resultsJobEventNotifyToken = StringValue::random();
         $jobCreator = function (JobFactory $jobFactory) {
             return $jobFactory->createRandom();
         };
@@ -131,7 +132,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsClientJob(
                             $jobId,
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'awaiting-events',
                                 null,
@@ -157,7 +157,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsClientJob(
                             $job->getId(),
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'awaiting-events',
                                 null,
@@ -178,13 +177,19 @@ class ResultsJobMutatorTest extends WebTestCase
                     ?JobInterface $job,
                     ResultsJobFactory $resultsJobFactory
                 ) use (
-                    $resultsJobToken
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
                 ): void {
                     if (null === $job) {
                         return;
                     }
 
-                    $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
+                    $resultsJobFactory->create(
+                        job: $job,
+                        eventNotifyUrl: $resultsJobEventNotifyUrl,
+                        eventNotifyToken: $resultsJobEventNotifyToken,
+                        state: 'awaiting-events',
+                    );
                 },
                 'eventCreator' => function (?JobInterface $job): ?ResultsJobRetrievedEvent {
                     if (null === $job) {
@@ -194,7 +199,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsClientJob(
                             $job->getId(),
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'awaiting-events',
                                 null,
@@ -205,14 +209,20 @@ class ResultsJobMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedResultsJobCreator' => function (?JobInterface $job) use ($resultsJobToken): ?ResultsJob {
+                'expectedResultsJobCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
+                ): ?ResultsJob {
                     if (null === $job) {
                         return null;
                     }
 
                     return new ResultsJob(
                         $job->getId(),
-                        $resultsJobToken,
+                        $resultsJobEventNotifyUrl,
+                        $resultsJobEventNotifyToken,
                         'awaiting-events',
                         null,
                         new MetaState(false, false, true),
@@ -225,13 +235,19 @@ class ResultsJobMutatorTest extends WebTestCase
                     ?JobInterface $job,
                     ResultsJobFactory $resultsJobFactory
                 ) use (
-                    $resultsJobToken
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
                 ): void {
                     if (null === $job) {
                         return;
                     }
 
-                    $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
+                    $resultsJobFactory->create(
+                        job: $job,
+                        eventNotifyUrl: $resultsJobEventNotifyUrl,
+                        eventNotifyToken: $resultsJobEventNotifyToken,
+                        state: 'awaiting-events',
+                    );
                 },
                 'eventCreator' => function (?JobInterface $job): ?ResultsJobRetrievedEvent {
                     if (null === $job) {
@@ -241,7 +257,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsClientJob(
                             $job->getId(),
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'complete',
                                 'ended',
@@ -252,14 +267,20 @@ class ResultsJobMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedResultsJobCreator' => function (?JobInterface $job) use ($resultsJobToken): ?ResultsJob {
+                'expectedResultsJobCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
+                ): ?ResultsJob {
                     if (null === $job) {
                         return null;
                     }
 
                     return new ResultsJob(
                         $job->getId(),
-                        $resultsJobToken,
+                        $resultsJobEventNotifyUrl,
+                        $resultsJobEventNotifyToken,
                         'complete',
                         'ended',
                         new MetaState(true, true, false),
@@ -272,13 +293,19 @@ class ResultsJobMutatorTest extends WebTestCase
                     ?JobInterface $job,
                     ResultsJobFactory $resultsJobFactory
                 ) use (
-                    $resultsJobToken
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
                 ): void {
                     if (null === $job) {
                         return;
                     }
 
-                    $resultsJobFactory->create(job: $job, token: $resultsJobToken, state: 'awaiting-events');
+                    $resultsJobFactory->create(
+                        job: $job,
+                        eventNotifyUrl: $resultsJobEventNotifyUrl,
+                        eventNotifyToken: $resultsJobEventNotifyToken,
+                        state: 'awaiting-events',
+                    );
                 },
                 'eventCreator' => function (?JobInterface $job): ?ResultsJobRetrievedEvent {
                     if (null === $job) {
@@ -288,7 +315,6 @@ class ResultsJobMutatorTest extends WebTestCase
                     return new ResultsJobRetrievedEvent(
                         new ResultsClientJob(
                             $job->getId(),
-                            '/event/add/results-token',
                             new ResultsJobState(
                                 'complete',
                                 'ended',
@@ -299,14 +325,20 @@ class ResultsJobMutatorTest extends WebTestCase
                         ),
                     );
                 },
-                'expectedResultsJobCreator' => function (?JobInterface $job) use ($resultsJobToken): ?ResultsJob {
+                'expectedResultsJobCreator' => function (
+                    ?JobInterface $job,
+                ) use (
+                    $resultsJobEventNotifyUrl,
+                    $resultsJobEventNotifyToken,
+                ): ?ResultsJob {
                     if (null === $job) {
                         return null;
                     }
 
                     return new ResultsJob(
                         $job->getId(),
-                        $resultsJobToken,
+                        $resultsJobEventNotifyUrl,
+                        $resultsJobEventNotifyToken,
                         'complete',
                         'ended',
                         new MetaState(true, true, false),

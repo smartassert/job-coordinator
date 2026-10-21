@@ -44,19 +44,19 @@ class ResultsJobMutator implements EventSubscriberInterface
 
         $remoteResultsJob = $event->resultsJob;
 
-        $resultsJob->setState($remoteResultsJob->state->state);
+        $resultsJob->setState($remoteResultsJob->getState()->state);
 
-        if (null !== $remoteResultsJob->state->endState) {
-            $resultsJob->setEndState($remoteResultsJob->state->endState);
+        if (null !== $remoteResultsJob->getState()->endState) {
+            $resultsJob->setEndState($remoteResultsJob->getState()->endState);
         }
 
         $resultsJob->setMetaState(new MetaState(
-            $remoteResultsJob->state->metaState->ended,
-            $remoteResultsJob->state->metaState->succeeded,
-            $remoteResultsJob->state->metaState->pending,
+            $remoteResultsJob->getState()->metaState->ended,
+            $remoteResultsJob->getState()->metaState->succeeded,
+            $remoteResultsJob->getState()->metaState->pending,
         ));
 
-        if ($remoteResultsJob->hasEvents) {
+        if ($remoteResultsJob->hasEvents()) {
             $resultsJob->setHasEvents();
         }
 
