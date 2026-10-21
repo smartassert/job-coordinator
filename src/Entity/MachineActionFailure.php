@@ -29,22 +29,22 @@ class MachineActionFailure implements \JsonSerializable
     private string $type;
 
     /**
-     * @var ?MachineActionFailureContext
+     * @var MachineActionFailureContext
      */
-    #[ORM\Column(nullable: true)]
-    private ?array $context;
+    #[ORM\Column()]
+    private array $context;
 
     /**
-     * @param non-empty-string             $id
-     * @param non-empty-string             $action
-     * @param non-empty-string             $type
-     * @param ?MachineActionFailureContext $context
+     * @param non-empty-string            $id
+     * @param non-empty-string            $action
+     * @param non-empty-string            $type
+     * @param MachineActionFailureContext $context
      */
     public function __construct(
         string $id,
         string $action,
         string $type,
-        ?array $context = null
+        array $context,
     ) {
         $this->id = $id;
         $this->action = $action;
@@ -56,7 +56,7 @@ class MachineActionFailure implements \JsonSerializable
      * @return array{
      *   action: ?non-empty-string,
      *   type: ?non-empty-string,
-     *   context: ?MachineActionFailureContext
+     *   context: MachineActionFailureContext
      * }
      */
     public function jsonSerialize(): array

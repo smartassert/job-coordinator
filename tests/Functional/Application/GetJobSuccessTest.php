@@ -1158,7 +1158,8 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $machine->setActionFailure(new MachineActionFailure(
                             $jobId,
                             'find',
-                            'vendor_authentication_failure'
+                            'vendor_authentication_failure',
+                            [],
                         ));
 
                         $repository->save($machine);
@@ -1224,7 +1225,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                                 'action_failure' => [
                                     'action' => 'find',
                                     'type' => 'vendor_authentication_failure',
-                                    'context' => null,
+                                    'context' => [],
                                 ],
                                 'meta_state' => [
                                     'ended' => true,
