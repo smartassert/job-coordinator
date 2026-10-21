@@ -82,6 +82,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             false,
             false,
             new MetaState(false, false, false),
+            [],
         );
 
         $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);
@@ -116,6 +117,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
             true,
             false,
             new MetaState(false, false, false),
+            [],
         );
 
         $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);

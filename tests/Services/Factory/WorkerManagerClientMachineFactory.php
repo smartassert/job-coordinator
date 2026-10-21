@@ -17,6 +17,7 @@ class WorkerManagerClientMachineFactory
      * @param non-empty-string   $state
      * @param non-empty-string   $stateCategory
      * @param non-empty-string[] $ipAddresses
+     * @param non-empty-string[] $previousStates
      */
     public static function create(
         string $id,
@@ -27,6 +28,7 @@ class WorkerManagerClientMachineFactory
         bool $hasEndingState,
         MetaState $metaState,
         ?ActionFailure $actionFailure = null,
+        array $previousStates = [],
     ): Machine {
         return new Machine(
             $id,
@@ -40,7 +42,8 @@ class WorkerManagerClientMachineFactory
                 $metaState->ended,
                 $metaState->succeeded,
                 $metaState->pending,
-            )
+            ),
+            $previousStates,
         );
     }
 
