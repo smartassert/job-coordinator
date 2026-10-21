@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\SerializeToArrayInterface;
+use App\Model\Machine\ActionFailureInterface;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @phpstan-type MachineActionFailureContext array<string,null|int|string>
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
-class MachineActionFailure implements SerializeToArrayInterface
+class MachineActionFailure implements \JsonSerializable, ActionFailureInterface, SerializeToArrayInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -51,6 +52,21 @@ class MachineActionFailure implements SerializeToArrayInterface
         $this->action = $action;
         $this->type = $type;
         $this->context = $context;
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     /**

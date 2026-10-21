@@ -7,6 +7,7 @@ namespace App\Model\Machine;
 interface ActionFailureInterface
 {
     public function getAction(): string;
+
     public function getType(): string;
 
     /**
