@@ -333,7 +333,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                     ;
                     $machineRepository->save($machine);
                 },
@@ -350,7 +350,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                         ->setIsActive()
                     ;
                 },
@@ -378,7 +378,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                         ->setIsActive()
                     ;
                 },
@@ -391,7 +391,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                     ;
                     $machineRepository->save($machine);
                 },
@@ -408,7 +408,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.2')
+                        ->setIpAddress('127.0.0.2')
                         ->setIsActive()
                     ;
                 },
@@ -667,7 +667,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     $machine = new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                     ;
                     $machine = $machine->setIsActive();
                     $machineRepository->save($machine);
@@ -685,7 +685,7 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new Machine($job->getId(), 'up/started', 'pre_active')
-                        ->setIp('127.0.0.1')
+                        ->setIpAddress('127.0.0.1')
                         ->setIsActive()
                         ->setIsReady()
                     ;

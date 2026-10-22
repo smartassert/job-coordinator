@@ -34,7 +34,7 @@ readonly class CreateWorkerJobReadinessAssessor implements ReadinessAssessorInte
         }
 
         $machine = $this->machineRepository->find($jobId);
-        if (null === $machine || false === $machine->getIsActive()) {
+        if (null === $machine || false === $machine->isActive()) {
             return MessageHandlingReadiness::EVENTUALLY;
         }
 

@@ -64,6 +64,22 @@ class Machine
     }
 
     /**
+     * @return ?non-empty-string
+     */
+    public function getId(): ?string
+    {
+        return $this->getNonEmptyString($this->jobId);
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getState(): ?string
+    {
+        return $this->getNonEmptyString($this->state);
+    }
+
+    /**
      * @param non-empty-string $state
      */
     public function setState(string $state): static
@@ -78,7 +94,7 @@ class Machine
      */
     public function getStateCategory(): ?string
     {
-        return '' === $this->stateCategory ? null : $this->stateCategory;
+        return $this->getNonEmptyString($this->stateCategory);
     }
 
     /**
@@ -94,15 +110,15 @@ class Machine
     /**
      * @return ?non-empty-string
      */
-    public function getIp(): ?string
+    public function getIpAddress(): ?string
     {
-        return '' === $this->ip ? null : $this->ip;
+        return $this->getNonEmptyString($this->ip);
     }
 
     /**
      * @param non-empty-string $ip
      */
-    public function setIp(string $ip): static
+    public function setIpAddress(string $ip): static
     {
         $this->ip = $ip;
 
@@ -121,6 +137,11 @@ class Machine
         return $this;
     }
 
+    public function getMetaState(): MetaState
+    {
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
+    }
+
     public function setMetaState(MetaState $metaState): self
     {
         $this->stateIsEnded = $metaState->ended;
@@ -130,9 +151,9 @@ class Machine
         return $this;
     }
 
-    public function getMetaState(): MetaState
+    public function isActive(): bool
     {
-        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
+        return $this->isActive;
     }
 
     public function setIsActive(): self
@@ -142,9 +163,9 @@ class Machine
         return $this;
     }
 
-    public function getIsActive(): bool
+    public function isReady(): bool
     {
-        return $this->isActive;
+        return $this->isReady;
     }
 
     public function setIsReady(): self
@@ -154,9 +175,12 @@ class Machine
         return $this;
     }
 
-    public function getIsReady(): bool
+    /**
+     * @return ?non-empty-string
+     */
+    private function getNonEmptyString(?string $value): ?string
     {
-        return $this->isReady;
+        return (null === $value || '' === $value) ? null : $value;
     }
 
     public function isEnding(): bool

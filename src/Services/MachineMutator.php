@@ -84,7 +84,7 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineEntity->setIp($event->ipAddress);
+        $machineEntity->setIpAddress($event->ipAddress);
         $machineEntity->setIsActive();
 
         $this->machineRepository->save($machineEntity);
