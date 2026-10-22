@@ -12,7 +12,7 @@ namespace App\Model;
  *   created_at: positive-int
  *  }
  */
-interface JobInterface extends \JsonSerializable
+interface JobInterface extends SerializeToArrayInterface
 {
     /**
      * @return non-empty-string
@@ -38,11 +38,6 @@ interface JobInterface extends \JsonSerializable
      * @return SerializedJob
      */
     public function toArray(): array;
-
-    /**
-     * @return SerializedJob
-     */
-    public function jsonSerialize(): array;
 
     /**
      * @return non-empty-string
