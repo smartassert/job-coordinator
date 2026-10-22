@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\SerializeToArrayInterface;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @phpstan-type MachineActionFailureContext array<string,null|int|string>
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
-class MachineActionFailure implements \JsonSerializable
+class MachineActionFailure implements SerializeToArrayInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -59,7 +60,7 @@ class MachineActionFailure implements \JsonSerializable
      *   context: MachineActionFailureContext
      * }
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'action' => '' === $this->action ? null : $this->action,
