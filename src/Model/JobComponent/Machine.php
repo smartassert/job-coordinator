@@ -17,8 +17,8 @@ use App\Model\SerializeToArrayInterface;
  * @phpstan-import-type SerializedMachineActionFailure from SerializableActionFailureInterface
  *
  * @phpstan-type SerializedMachine array{
- *   state_category: ?non-empty-string,
- *   ip_address: ?non-empty-string,
+ *   state_category: ?string,
+ *   ip_address: ?string,
  *   action_failure: ?SerializedMachineActionFailure,
  *   meta_state: SerializedMetaState,
  *   requests: SerializedRemoteRequestCollectionGroup,

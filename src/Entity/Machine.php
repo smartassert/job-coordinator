@@ -69,12 +69,9 @@ class Machine implements MachineInterface
         return $this->jobId;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getState(): ?string
+    public function getState(): string
     {
-        return $this->getNonEmptyString($this->state);
+        return $this->state;
     }
 
     /**
@@ -87,12 +84,9 @@ class Machine implements MachineInterface
         return $this;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
     public function getStateCategory(): ?string
     {
-        return $this->getNonEmptyString($this->stateCategory);
+        return $this->stateCategory;
     }
 
     /**
@@ -105,12 +99,9 @@ class Machine implements MachineInterface
         return $this;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
     public function getIpAddress(): ?string
     {
-        return $this->getNonEmptyString($this->ip);
+        return $this->ip;
     }
 
     /**
@@ -171,14 +162,6 @@ class Machine implements MachineInterface
         $this->isReady = true;
 
         return $this;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    private function getNonEmptyString(?string $value): ?string
-    {
-        return (null === $value || '' === $value) ? null : $value;
     }
 
     public function isEnding(): bool
