@@ -40,7 +40,7 @@ class RemoteRequestCollection implements \JsonSerializable
                     $requestsByType[$requestType] = [];
                 }
 
-                $requestsByType[$requestType][] = $request->jsonSerialize();
+                $requestsByType[$requestType][] = $request->toArray();
             }
         }
 
