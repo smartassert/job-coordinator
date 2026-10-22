@@ -11,11 +11,11 @@ class PendingWorkerComponentState implements WorkerComponentStateInterface
         return 'pending';
     }
 
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'state' => 'pending',
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
         ];
     }
 

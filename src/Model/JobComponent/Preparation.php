@@ -8,6 +8,7 @@ use App\Entity\RemoteRequestFailure;
 use App\Enum\PreparationState;
 use App\Enum\PreparationState as PreparationStateEnum;
 use App\Enum\RequestState;
+use App\Model\SerializeToArrayInterface;
 
 /**
  * @phpstan-import-type SerializedRemoteRequestFailure from RemoteRequestFailure
@@ -18,7 +19,7 @@ use App\Enum\RequestState;
  *    failure?: SerializedRemoteRequestFailure
  *  }
  */
-readonly class Preparation implements \JsonSerializable
+readonly class Preparation implements SerializeToArrayInterface
 {
     public function __construct(
         private PreparationState $preparationState,
@@ -34,7 +35,7 @@ readonly class Preparation implements \JsonSerializable
     /**
      * @return SerializedPreparation
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $data = [
             'state' => $this->preparationState->value,
@@ -42,7 +43,7 @@ readonly class Preparation implements \JsonSerializable
         ];
 
         if ($this->remoteRequestFailure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->remoteRequestFailure->jsonSerialize();
+            $data['failure'] = $this->remoteRequestFailure->toArray();
         }
 
         return $data;

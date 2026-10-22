@@ -7,7 +7,7 @@ namespace App\Model;
 /**
  * @phpstan-type SerializedMetaState array{'ended': bool, 'succeeded': bool, 'pending': bool}
  */
-readonly class MetaState implements \JsonSerializable
+readonly class MetaState implements SerializeToArrayInterface
 {
     public function __construct(
         public bool $ended,
@@ -18,7 +18,7 @@ readonly class MetaState implements \JsonSerializable
     /**
      * @return SerializedMetaState
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'ended' => $this->ended,

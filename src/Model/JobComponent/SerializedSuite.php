@@ -51,7 +51,7 @@ readonly class SerializedSuite implements SerializeToArrayInterface
     /**
      * @return SerializedSerializedSuite
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $state = $this->entity?->getState();
         if ($this->preparation->hasFailure()) {
@@ -61,9 +61,9 @@ readonly class SerializedSuite implements SerializeToArrayInterface
         return [
             'state' => $state,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
+            'requests' => $this->requests->toArray(),
+            'preparation' => $this->preparation->toArray(),
         ];
     }
 }

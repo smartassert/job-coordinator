@@ -13,7 +13,7 @@ namespace App\Model;
  * }
  * @phpstan-type SerializedRemoteRequestCollectionGroup SerializedRemoteRequestCollection[]
  */
-class RemoteRequestCollection implements \JsonSerializable
+class RemoteRequestCollection implements SerializeToArrayInterface
 {
     /**
      * @param array<RemoteRequestInterface&TypedRemoteRequestInterface> $requests
@@ -30,7 +30,7 @@ class RemoteRequestCollection implements \JsonSerializable
     /**
      * @return SerializedRemoteRequestCollectionGroup
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $requestsByType = [];
         foreach ($this->requests as $request) {
@@ -40,7 +40,7 @@ class RemoteRequestCollection implements \JsonSerializable
                     $requestsByType[$requestType] = [];
                 }
 
-                $requestsByType[$requestType][] = $request->jsonSerialize();
+                $requestsByType[$requestType][] = $request->toArray();
             }
         }
 

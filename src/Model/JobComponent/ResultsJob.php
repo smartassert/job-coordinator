@@ -47,7 +47,7 @@ readonly class ResultsJob implements SerializeToArrayInterface
     /**
      * @return SerializedResultsJob
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $state = $this->entity?->getState();
         $endState = $this->entity?->getEndState();
@@ -60,9 +60,9 @@ readonly class ResultsJob implements SerializeToArrayInterface
         return [
             'state' => $state,
             'end_state' => $endState,
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
+            'requests' => $this->requests->toArray(),
+            'preparation' => $this->preparation->toArray(),
             'has_events' => $this->entity?->hasEvents() ?? false,
         ];
     }

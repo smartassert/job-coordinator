@@ -47,22 +47,22 @@ class WorkerJob implements SerializeToArrayInterface
     /**
      * @return SerializedWorkerState
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $data = [
             'state' => $this->getState(),
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
             'components' => [
-                WorkerComponentName::COMPILATION->value => $this->compilationState->jsonSerialize(),
-                WorkerComponentName::EXECUTION->value => $this->executionState->jsonSerialize(),
-                WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->jsonSerialize(),
+                WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
+                WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
+                WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
             ],
-            'preparation' => $this->preparation->jsonSerialize(),
-            'requests' => $this->requests->jsonSerialize(),
+            'preparation' => $this->preparation->toArray(),
+            'requests' => $this->requests->toArray(),
         ];
 
         if (null !== $this->failure) {
-            $data['creation_failure'] = $this->failure->jsonSerialize();
+            $data['creation_failure'] = $this->failure->toArray();
         }
 
         return $data;

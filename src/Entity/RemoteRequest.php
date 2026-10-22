@@ -107,14 +107,14 @@ class RemoteRequest implements RemoteRequestInterface, TypedRemoteRequestInterfa
     /**
      * @return SerializedRemoteRequest
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $data = [
             'state' => $this->state->value,
         ];
 
         if ($this->failure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->failure->jsonSerialize();
+            $data['failure'] = $this->failure->toArray();
         }
 
         return $data;

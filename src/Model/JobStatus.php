@@ -66,13 +66,13 @@ readonly class JobStatus implements \JsonSerializable
         return array_merge(
             $this->job->toArray(),
             [
-                'meta_state' => $this->metaState->jsonSerialize(),
-                'preparation' => $this->preparationState->jsonSerialize(),
+                'meta_state' => $this->metaState->toArray(),
+                'preparation' => $this->preparationState->toArray(),
                 'components' => [
-                    JobComponentName::RESULTS_JOB->value => $this->resultsJob->jsonSerialize(),
-                    JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite->jsonSerialize(),
-                    JobComponentName::MACHINE->value => $this->machine->jsonSerialize(),
-                    JobComponentName::WORKER_JOB->value => $this->workerJob->jsonSerialize(),
+                    JobComponentName::RESULTS_JOB->value => $this->resultsJob->toArray(),
+                    JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite->toArray(),
+                    JobComponentName::MACHINE->value => $this->machine->toArray(),
+                    JobComponentName::WORKER_JOB->value => $this->workerJob->toArray(),
                 ],
             ]
         );

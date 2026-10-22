@@ -50,7 +50,7 @@ readonly class Machine implements SerializeToArrayInterface
     /**
      * @return SerializedMachine
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $stateCategory = $this->entity?->getStateCategory();
         if ($this->preparation->hasFailure()) {
@@ -60,10 +60,10 @@ readonly class Machine implements SerializeToArrayInterface
         return [
             'state_category' => $stateCategory,
             'ip_address' => $this->entity?->getIp(),
-            'action_failure' => $this->entity?->getActionFailure()?->jsonSerialize(),
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'action_failure' => $this->entity?->getActionFailure()?->toArray(),
+            'meta_state' => $this->getMetaState()->toArray(),
+            'requests' => $this->requests->toArray(),
+            'preparation' => $this->preparation->toArray(),
             'is_active' => $this->entity?->getIsActive() ?? false,
         ];
     }
