@@ -64,12 +64,9 @@ class Machine implements MachineInterface
         $this->isEnding = false;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getId(): ?string
+    public function getId(): string
     {
-        return $this->getNonEmptyString($this->jobId);
+        return $this->jobId;
     }
 
     /**
