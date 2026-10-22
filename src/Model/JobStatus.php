@@ -67,7 +67,7 @@ readonly class JobStatus implements \JsonSerializable
             $this->job->toArray(),
             [
                 'meta_state' => $this->metaState->toArray(),
-                'preparation' => $this->preparationState->jsonSerialize(),
+                'preparation' => $this->preparationState->toArray(),
                 'components' => [
                     JobComponentName::RESULTS_JOB->value => $this->resultsJob->toArray(),
                     JobComponentName::SERIALIZED_SUITE->value => $this->serializedSuite->toArray(),

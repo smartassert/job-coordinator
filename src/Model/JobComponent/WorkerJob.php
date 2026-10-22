@@ -57,8 +57,8 @@ class WorkerJob implements SerializeToArrayInterface
                 WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
                 WorkerComponentName::EVENT_DELIVERY->value => $this->eventDeliveryState->toArray(),
             ],
-            'preparation' => $this->preparation->jsonSerialize(),
-            'requests' => $this->requests->jsonSerialize(),
+            'preparation' => $this->preparation->toArray(),
+            'requests' => $this->requests->toArray(),
         ];
 
         if (null !== $this->failure) {

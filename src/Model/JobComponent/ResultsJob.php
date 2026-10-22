@@ -61,8 +61,8 @@ readonly class ResultsJob implements SerializeToArrayInterface
             'state' => $state,
             'end_state' => $endState,
             'meta_state' => $this->getMetaState()->toArray(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'requests' => $this->requests->toArray(),
+            'preparation' => $this->preparation->toArray(),
             'has_events' => $this->entity?->hasEvents() ?? false,
         ];
     }

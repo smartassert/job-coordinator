@@ -14,7 +14,7 @@ use App\Enum\PreparationState as PreparationStateEnum;
  *   meta_state: SerializedMetaState
  * }
  */
-readonly class PreparationState implements \JsonSerializable
+readonly class PreparationState implements SerializeToArrayInterface
 {
     public function __construct(
         private PreparationStateEnum $state,
@@ -23,7 +23,7 @@ readonly class PreparationState implements \JsonSerializable
     /**
      * @return SerializedPreparationState
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'state' => $this->state->value,

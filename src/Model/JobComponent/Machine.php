@@ -62,8 +62,8 @@ readonly class Machine implements SerializeToArrayInterface
             'ip_address' => $this->entity?->getIp(),
             'action_failure' => $this->entity?->getActionFailure()?->toArray(),
             'meta_state' => $this->getMetaState()->toArray(),
-            'requests' => $this->requests->jsonSerialize(),
-            'preparation' => $this->preparation->jsonSerialize(),
+            'requests' => $this->requests->toArray(),
+            'preparation' => $this->preparation->toArray(),
             'is_active' => $this->entity?->getIsActive() ?? false,
         ];
     }
