@@ -47,7 +47,7 @@ class WorkerJob implements SerializeToArrayInterface
     /**
      * @return SerializedWorkerState
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $data = [
             'state' => $this->getState(),

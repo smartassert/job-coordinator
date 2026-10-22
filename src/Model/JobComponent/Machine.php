@@ -50,7 +50,7 @@ readonly class Machine implements SerializeToArrayInterface
     /**
      * @return SerializedMachine
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         $stateCategory = $this->entity?->getStateCategory();
         if ($this->preparation->hasFailure()) {
