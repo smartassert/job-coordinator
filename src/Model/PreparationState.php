@@ -27,7 +27,7 @@ readonly class PreparationState implements \JsonSerializable
     {
         return [
             'state' => $this->state->value,
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
         ];
     }
 

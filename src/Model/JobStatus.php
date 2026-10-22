@@ -66,7 +66,7 @@ readonly class JobStatus implements \JsonSerializable
         return array_merge(
             $this->job->toArray(),
             [
-                'meta_state' => $this->metaState->jsonSerialize(),
+                'meta_state' => $this->metaState->toArray(),
                 'preparation' => $this->preparationState->jsonSerialize(),
                 'components' => [
                     JobComponentName::RESULTS_JOB->value => $this->resultsJob->toArray(),

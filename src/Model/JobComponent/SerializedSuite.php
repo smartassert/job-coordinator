@@ -61,7 +61,7 @@ readonly class SerializedSuite implements SerializeToArrayInterface
         return [
             'state' => $state,
             'is_prepared' => $this->entity?->isPrepared() ?? false,
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
             'requests' => $this->requests->jsonSerialize(),
             'preparation' => $this->preparation->jsonSerialize(),
         ];

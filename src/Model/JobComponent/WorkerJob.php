@@ -51,7 +51,7 @@ class WorkerJob implements SerializeToArrayInterface
     {
         $data = [
             'state' => $this->getState(),
-            'meta_state' => $this->getMetaState()->jsonSerialize(),
+            'meta_state' => $this->getMetaState()->toArray(),
             'components' => [
                 WorkerComponentName::COMPILATION->value => $this->compilationState->toArray(),
                 WorkerComponentName::EXECUTION->value => $this->executionState->toArray(),
