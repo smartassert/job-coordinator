@@ -9,12 +9,7 @@ use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-type SerializedMachineActionFailure array{
- *   action: ?non-empty-string,
- *   type: ?non-empty-string,
- *   context: null|array<mixed>
- * }
- * @phpstan-type MachineActionFailureContext array<string,null|int|string>
+ * @phpstan-import-type MachineActionFailureContext from ActionFailureInterface
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
 class MachineActionFailure implements ActionFailureInterface
@@ -68,13 +63,6 @@ class MachineActionFailure implements ActionFailureInterface
         return $this->context;
     }
 
-    /**
-     * @return array{
-     *   action: ?non-empty-string,
-     *   type: ?non-empty-string,
-     *   context: MachineActionFailureContext
-     * }
-     */
     public function toArray(): array
     {
         return [

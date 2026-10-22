@@ -6,6 +6,14 @@ namespace App\Model\Machine;
 
 use App\Model\SerializeToArrayInterface;
 
+/**
+ * @phpstan-type SerializedMachineActionFailure array{
+ *   action: ?non-empty-string,
+ *   type: ?non-empty-string,
+ *   context: null|array<mixed>
+ * }
+ * @phpstan-type MachineActionFailureContext array<string,null|int|string>
+ */
 interface ActionFailureInterface extends SerializeToArrayInterface
 {
     public function getAction(): string;
@@ -16,4 +24,9 @@ interface ActionFailureInterface extends SerializeToArrayInterface
      * @return array<string, null|int|string>
      */
     public function getContext(): array;
+
+    /**
+     * @return SerializedMachineActionFailure
+     */
+    public function toArray(): array;
 }

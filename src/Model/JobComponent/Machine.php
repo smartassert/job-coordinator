@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\Machine as MachineEntity;
-use App\Entity\MachineActionFailure;
+use App\Model\Machine\ActionFailureInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
@@ -14,7 +14,7 @@ use App\Model\SerializeToArrayInterface;
  * @phpstan-import-type SerializedMetaState from MetaState
  * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  * @phpstan-import-type SerializedPreparation from Preparation
- * @phpstan-import-type SerializedMachineActionFailure from MachineActionFailure
+ * @phpstan-import-type SerializedMachineActionFailure from ActionFailureInterface
  *
  * @phpstan-type SerializedMachine array{
  *   state_category: ?non-empty-string,
