@@ -13,28 +13,27 @@ final readonly class WorkerManagerMachine implements MachineInterface
         private RemoteMachine $workerManagerMachine,
     ) {}
 
-    public function getId(): ?string
+    public function getId(): string
     {
-        return $this->getNonEmptyString($this->workerManagerMachine->id);
+        return $this->workerManagerMachine->id;
     }
 
-    public function getState(): ?string
+    public function getState(): string
     {
-        return $this->getNonEmptyString($this->workerManagerMachine->state);
+        return $this->workerManagerMachine->state;
     }
 
-    public function getStateCategory(): ?string
+    public function getStateCategory(): string
     {
-        return $this->getNonEmptyString($this->workerManagerMachine->stateCategory);
+        return $this->workerManagerMachine->stateCategory;
     }
 
     public function getIpAddress(): ?string
     {
         $ipAddresses = $this->workerManagerMachine->ipAddresses;
         $firstIpAddress = $ipAddresses[0] ?? null;
-        $firstIpAddress = is_string($firstIpAddress) ? $firstIpAddress : null;
 
-        return $this->getNonEmptyString($firstIpAddress);
+        return is_string($firstIpAddress) ? $firstIpAddress : null;
     }
 
     public function getActionFailure(): ?ActionFailureInterface
@@ -61,13 +60,5 @@ final readonly class WorkerManagerMachine implements MachineInterface
     public function isReady(): false
     {
         return false;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    private function getNonEmptyString(?string $value): ?string
-    {
-        return (null === $value || '' === $value) ? null : $value;
     }
 }
