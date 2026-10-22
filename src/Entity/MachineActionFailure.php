@@ -49,14 +49,14 @@ class MachineActionFailure implements SerializableActionFailureInterface
         $this->context = $context;
     }
 
-    public function getAction(): string
+    public function getAction(): ?string
     {
-        return $this->action;
+        return $this->getNonEmptyString($this->action);
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
-        return $this->type;
+        return $this->getNonEmptyString($this->type);
     }
 
     public function getContext(): array
@@ -71,5 +71,13 @@ class MachineActionFailure implements SerializableActionFailureInterface
             'type' => '' === $this->type ? null : $this->type,
             'context' => $this->context,
         ];
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    private function getNonEmptyString(?string $value): ?string
+    {
+        return (null === $value || '' === $value) ? null : $value;
     }
 }
