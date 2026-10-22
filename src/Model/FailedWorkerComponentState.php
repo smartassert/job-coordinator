@@ -11,7 +11,7 @@ class FailedWorkerComponentState implements WorkerComponentStateInterface
         return 'failed';
     }
 
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'state' => 'failed',

@@ -11,7 +11,7 @@ class PendingWorkerComponentState implements WorkerComponentStateInterface
         return 'pending';
     }
 
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'state' => 'pending',
