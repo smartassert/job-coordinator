@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Model\Machine;
 
-interface ActionFailureInterface
+use App\Model\SerializeToArrayInterface;
+
+interface ActionFailureInterface extends SerializeToArrayInterface
 {
     public function getAction(): string;
 

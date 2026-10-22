@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\Machine\ActionFailureInterface;
-use App\Model\SerializeToArrayInterface;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @phpstan-type MachineActionFailureContext array<string,null|int|string>
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
-class MachineActionFailure implements ActionFailureInterface, SerializeToArrayInterface
+class MachineActionFailure implements ActionFailureInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
