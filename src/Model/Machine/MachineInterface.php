@@ -8,15 +8,27 @@ use App\Model\MetaState;
 
 interface MachineInterface
 {
-    public function getId(): string;
+    /**
+     * @return ?non-empty-string
+     */
+    public function getId(): ?string;
 
-    public function getState(): string;
+    /**
+     * @return ?non-empty-string
+     */
+    public function getState(): ?string;
 
-    public function getStateCategory(): string;
+    /**
+     * @return ?non-empty-string
+     */
+    public function getStateCategory(): ?string;
 
+    /**
+     * @return ?non-empty-string
+     */
     public function getIpAddress(): ?string;
 
-    public function getActionFailure(): ActionFailureInterface;
+    public function getActionFailure(): ?ActionFailureInterface;
 
     public function getMetaState(): MetaState;
 
