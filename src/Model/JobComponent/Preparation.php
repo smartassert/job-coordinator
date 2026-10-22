@@ -42,7 +42,7 @@ readonly class Preparation implements \JsonSerializable
         ];
 
         if ($this->remoteRequestFailure instanceof RemoteRequestFailure) {
-            $data['failure'] = $this->remoteRequestFailure->jsonSerialize();
+            $data['failure'] = $this->remoteRequestFailure->toArray();
         }
 
         return $data;

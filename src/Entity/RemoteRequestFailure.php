@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\RemoteRequestFailureType;
+use App\Model\SerializeToArrayInterface;
 use App\Repository\RemoteRequestFailureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  * }
  */
 #[ORM\Entity(repositoryClass: RemoteRequestFailureRepository::class)]
-class RemoteRequestFailure implements \JsonSerializable
+class RemoteRequestFailure implements SerializeToArrayInterface
 {
     #[ORM\Column(type: Types::STRING, length: 64, nullable: false, enumType: RemoteRequestFailureType::class)]
     private readonly RemoteRequestFailureType $type;
@@ -51,7 +52,7 @@ class RemoteRequestFailure implements \JsonSerializable
     /**
      * @return SerializedRemoteRequestFailure
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'type' => $this->type->value,
