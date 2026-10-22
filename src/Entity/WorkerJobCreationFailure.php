@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\WorkerJobCreationStage;
+use App\Model\SerializeToArrayInterface;
 use App\Repository\WorkerJobCreationFailureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * }
  */
 #[ORM\Entity(repositoryClass: WorkerJobCreationFailureRepository::class)]
-class WorkerJobCreationFailure implements \JsonSerializable
+class WorkerJobCreationFailure implements SerializeToArrayInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -56,7 +57,7 @@ class WorkerJobCreationFailure implements \JsonSerializable
     /**
      * @return SerializedWorkerJobCreationFailure
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
         return [
             'stage' => $this->stage,

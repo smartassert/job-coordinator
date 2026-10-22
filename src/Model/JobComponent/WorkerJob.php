@@ -62,7 +62,7 @@ class WorkerJob implements SerializeToArrayInterface
         ];
 
         if (null !== $this->failure) {
-            $data['creation_failure'] = $this->failure->jsonSerialize();
+            $data['creation_failure'] = $this->failure->toArray();
         }
 
         return $data;
