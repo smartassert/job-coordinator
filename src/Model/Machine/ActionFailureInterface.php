@@ -10,14 +10,14 @@ namespace App\Model\Machine;
 interface ActionFailureInterface
 {
     /**
-     * @return ?non-empty-string
+     * @return non-empty-string
      */
-    public function getAction(): ?string;
+    public function getAction(): string;
 
     /**
-     * @return ?non-empty-string
+     * @return non-empty-string
      */
-    public function getType(): ?string;
+    public function getType(): string;
 
     /**
      * @return array<string, null|int|string>

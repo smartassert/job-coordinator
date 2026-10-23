@@ -49,14 +49,18 @@ class MachineActionFailure implements SerializableActionFailureInterface
         $this->context = $context;
     }
 
-    public function getAction(): ?string
+    public function getAction(): string
     {
-        return $this->getNonEmptyString($this->action);
+        \assert('' !== $this->action);
+
+        return $this->action;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
-        return $this->getNonEmptyString($this->type);
+        \assert('' !== $this->type);
+
+        return $this->type;
     }
 
     public function getContext(): array
@@ -67,17 +71,9 @@ class MachineActionFailure implements SerializableActionFailureInterface
     public function toArray(): array
     {
         return [
-            'action' => '' === $this->action ? null : $this->action,
-            'type' => '' === $this->type ? null : $this->type,
+            'action' => $this->getAction(),
+            'type' => $this->getType(),
             'context' => $this->context,
         ];
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    private function getNonEmptyString(?string $value): ?string
-    {
-        return (null === $value || '' === $value) ? null : $value;
     }
 }

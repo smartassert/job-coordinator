@@ -12,26 +12,18 @@ final readonly class WorkerManagerActionFailure implements ActionFailureInterfac
         private RemoteActionFailure $workerManagerActionFailure,
     ) {}
 
-    public function getAction(): ?string
+    public function getAction(): string
     {
-        return $this->getNonEmptyString($this->workerManagerActionFailure->action);
+        return $this->workerManagerActionFailure->action;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
-        return $this->getNonEmptyString($this->workerManagerActionFailure->type);
+        return $this->workerManagerActionFailure->type;
     }
 
     public function getContext(): array
     {
         return $this->workerManagerActionFailure->context;
-    }
-
-    /**
-     * @return ?non-empty-string
-     */
-    private function getNonEmptyString(?string $value): ?string
-    {
-        return (null === $value || '' === $value) ? null : $value;
     }
 }
