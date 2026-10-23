@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use App\Model\Machine\MachineInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractMachineEvent extends Event implements MachineEventInterface
 {
     public function __construct(
-        private readonly Machine $machine,
+        private readonly MachineInterface $machine,
     ) {}
 
-    public function getMachine(): Machine
+    public function getMachine(): MachineInterface
     {
         return $this->machine;
     }
