@@ -42,16 +42,16 @@ class Machine
     #[ORM\Column]
     private bool $isPending;
 
+    #[ORM\Column]
+    private bool $isEnding;
+
     /**
      * @param non-empty-string $jobId
      * @param non-empty-string $state
      * @param non-empty-string $stateCategory
      */
-    public function __construct(
-        string $jobId,
-        string $state,
-        string $stateCategory,
-    ) {
+    public function __construct(string $jobId, string $state, string $stateCategory)
+    {
         $this->jobId = $jobId;
         $this->state = $state;
         $this->stateCategory = $stateCategory;
@@ -60,6 +60,7 @@ class Machine
         $this->isActive = false;
         $this->isReady = false;
         $this->isPending = true;
+        $this->isEnding = false;
     }
 
     /**
@@ -156,5 +157,17 @@ class Machine
     public function getIsReady(): bool
     {
         return $this->isReady;
+    }
+
+    public function isEnding(): bool
+    {
+        return $this->isEnding;
+    }
+
+    public function setIsEnding(): self
+    {
+        $this->isEnding = true;
+
+        return $this;
     }
 }

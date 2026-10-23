@@ -65,6 +65,10 @@ class MachineMutator implements EventSubscriberInterface
             )
         );
 
+        if ($event->getMachine()->hasEndingState) {
+            $machineEntity->setIsEnding();
+        }
+
         $this->machineRepository->save($machineEntity);
     }
 
