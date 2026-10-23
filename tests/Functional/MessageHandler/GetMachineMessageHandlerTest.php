@@ -28,7 +28,7 @@ use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Factory\MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;

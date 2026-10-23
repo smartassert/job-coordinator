@@ -12,7 +12,7 @@ use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineEntityFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
+use App\Tests\Services\Factory\MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -76,7 +76,7 @@ class MachineEntityFactoryTest extends WebTestCase
 
         $jobId = Id::generate();
 
-        $machine = WorkerMachineFactory::createRandomForJob($jobId);
+        $machine = MachineFactory::createRandomForJob($jobId);
 
         $event = new MachineCreationRequestedEvent($machine);
 

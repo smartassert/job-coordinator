@@ -10,7 +10,7 @@ use App\Model\MetaState;
 use App\Tests\Services\Generator\BoolValue;
 use App\Tests\Services\Generator\StringValue;
 
-class WorkerManagerClientMachineFactory
+class MachineFactory
 {
     /**
      * @param non-empty-string $jobId

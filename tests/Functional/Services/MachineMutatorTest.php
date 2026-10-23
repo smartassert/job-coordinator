@@ -18,7 +18,7 @@ use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
+use App\Tests\Services\Factory\MachineFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\Ip;
 use App\Tests\Services\Generator\StringValue;
