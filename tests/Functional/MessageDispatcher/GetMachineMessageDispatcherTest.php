@@ -9,13 +9,12 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
+use App\Model\Machine\Machine;
+use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\Machine;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -74,14 +73,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $this->persistMachine($machine);
@@ -93,7 +94,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetMachineMessage($machine->id, $machine);
+        $expectedMessage = new GetMachineMessage($machine->getId(), $machine);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -107,14 +108,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
-            'create/requested',
-            'pre_active',
-            [],
+            'delete/deleted',
+            'end',
+            null,
+            null,
+            new MetaState(true, false, false),
             false,
             false,
-            new WorkerManagerClientMetaState(true, false, true),
+            false,
         );
 
         $this->persistMachine($machine);
@@ -133,14 +136,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $this->persistMachine($machine);
@@ -152,7 +157,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetMachineMessage($machine->id, $machine);
+        $expectedMessage = new GetMachineMessage($machine->getId(), $machine);
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -168,22 +173,22 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         );
     }
 
-    private function persistMachine(Machine $machine): void
+    private function persistMachine(MachineInterface $machine): void
     {
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
         $entity = new MachineEntity(
-            $machine->id,
-            $machine->state,
-            $machine->stateCategory,
+            $machine->getId(),
+            $machine->getState(),
+            $machine->getStateCategory(),
         );
 
         $entity->setMetaState(
             new MetaState(
-                $machine->metaState->ended,
-                $machine->metaState->succeeded,
-                $machine->metaState->pending,
+                $machine->getMetaState()->ended,
+                $machine->getMetaState()->succeeded,
+                $machine->getMetaState()->pending,
             )
         );
 

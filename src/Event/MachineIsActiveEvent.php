@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use App\Model\Machine\MachineInterface;
 
 class MachineIsActiveEvent extends AbstractMachineEvent implements JobEventInterface
 {
-    use GetJobIdTrait;
-
     /**
-     * @param non-empty-string $jobId
      * @param non-empty-string $ipAddress
      */
     public function __construct(
-        private readonly string $jobId,
         public readonly string $ipAddress,
-        Machine $machine,
+        MachineInterface $machine,
     ) {
         parent::__construct($machine);
+    }
+
+    public function getJobId(): string
+    {
+        return $this->getMachine()->getId();
     }
 }

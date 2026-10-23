@@ -10,12 +10,12 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageDispatcher\IsWorkerReadyMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\Model\Machine\Machine;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\Machine;
-use SmartAssert\WorkerManagerClient\Model\MetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
@@ -73,19 +73,20 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $machineIpAddress = '127.0.0.1';
+
         $machine = new Machine(
             $jobId,
             'up/active',
             'active',
-            [$machineIpAddress],
+            $machineIpAddress,
             null,
-            false,
-            false,
             new MetaState(false, false, false),
-            [],
+            true,
+            false,
+            false,
         );
 
-        $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);
+        $event = new MachineIsActiveEvent($machineIpAddress, $machine);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -108,19 +109,20 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $machineIpAddress = '127.0.0.1';
+
         $machine = new Machine(
             $jobId,
             'up/active',
             'active',
-            [$machineIpAddress],
+            $machineIpAddress,
             null,
+            new MetaState(false, false, false),
             true,
             false,
-            new MetaState(false, false, false),
-            [],
+            false,
         );
 
-        $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);
+        $event = new MachineIsActiveEvent($machineIpAddress, $machine);
 
         $this->dispatcher->dispatchImmediately($event);
 

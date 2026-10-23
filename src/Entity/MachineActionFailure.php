@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\SerializeToArrayInterface;
+use App\Model\Machine\ActionFailureInterface;
+use App\Model\Machine\SerializableActionFailureInterface;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-type SerializedMachineActionFailure array{
- *   action: ?non-empty-string,
- *   type: ?non-empty-string,
- *   context: null|array<mixed>
- * }
- * @phpstan-type MachineActionFailureContext array<string,null|int|string>
+ * @phpstan-import-type MachineActionFailureContext from ActionFailureInterface
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
-class MachineActionFailure implements SerializeToArrayInterface
+class MachineActionFailure implements SerializableActionFailureInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -53,18 +49,30 @@ class MachineActionFailure implements SerializeToArrayInterface
         $this->context = $context;
     }
 
-    /**
-     * @return array{
-     *   action: ?non-empty-string,
-     *   type: ?non-empty-string,
-     *   context: MachineActionFailureContext
-     * }
-     */
+    public function getAction(): string
+    {
+        \assert('' !== $this->action);
+
+        return $this->action;
+    }
+
+    public function getType(): string
+    {
+        \assert('' !== $this->type);
+
+        return $this->type;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
     public function toArray(): array
     {
         return [
-            'action' => '' === $this->action ? null : $this->action,
-            'type' => '' === $this->type ? null : $this->type,
+            'action' => $this->getAction(),
+            'type' => $this->getType(),
             'context' => $this->context,
         ];
     }

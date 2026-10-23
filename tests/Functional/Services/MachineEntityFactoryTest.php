@@ -6,15 +6,16 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
+use App\Model\Machine\Machine as MachineModel;
+use App\Model\Machine\MachineInterface;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineEntityFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
+use App\Tests\Services\Factory\MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MachineEntityFactoryTest extends WebTestCase
@@ -75,7 +76,7 @@ class MachineEntityFactoryTest extends WebTestCase
 
         $jobId = Id::generate();
 
-        $machine = WorkerMachineFactory::createRandomForJob($jobId);
+        $machine = MachineFactory::createRandomForJob($jobId);
 
         $event = new MachineCreationRequestedEvent($machine);
 
@@ -85,12 +86,12 @@ class MachineEntityFactoryTest extends WebTestCase
     }
 
     /**
-     * @param callable(string): WorkerManagerClientMachine $workerManagerClientMachineCreator
-     * @param callable(string): Machine                    $expectedMachineCreator
+     * @param callable(string): MachineInterface $machineCreator
+     * @param callable(string): MachineInterface $expectedMachineCreator
      */
     #[DataProvider('createOnMachineRetrievedEventSuccessDataProvider')]
     public function testCreateOnMachineRetrievedEventSuccess(
-        callable $workerManagerClientMachineCreator,
+        callable $machineCreator,
         callable $expectedMachineCreator
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
@@ -99,8 +100,7 @@ class MachineEntityFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = $workerManagerClientMachineCreator($job->getId());
-
+        $machine = $machineCreator($job->getId());
         $event = new MachineCreationRequestedEvent($machine);
 
         $this->factory->createOnMachineCreationRequestedEvent($event);
@@ -116,17 +116,19 @@ class MachineEntityFactoryTest extends WebTestCase
     {
         return [
             'without failed state' => [
-                'workerManagerClientMachineCreator' => function (string $jobId) {
+                'machineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return WorkerMachineFactory::create(
+                    return new MachineModel(
                         $jobId,
                         'find/finding',
                         'find',
-                        [],
+                        null,
+                        null,
+                        new MetaState(false, false, true),
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false, true),
+                        false,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -136,17 +138,19 @@ class MachineEntityFactoryTest extends WebTestCase
                 },
             ],
             'with failed state' => [
-                'workerManagerClientMachineCreator' => function (string $jobId) {
+                'machineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return WorkerMachineFactory::create(
+                    return new MachineModel(
                         $jobId,
                         'find/not-findable',
                         'end',
-                        [],
+                        null,
+                        null,
+                        new MetaState(true, false, false),
                         false,
                         false,
-                        new WorkerManagerClientMetaState(true, false, true),
+                        false,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {

@@ -1028,7 +1028,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         \assert('' !== $jobId);
 
                         $machine = new Machine($jobId, StringValue::random(), StringValue::random());
-                        $machine = $machine->setIp(Ip::random());
+                        $machine = $machine->setIpAddress(Ip::random());
                         $machine = $machine->setMetaState(new MetaState(false, false, false));
 
                         $repository->save($machine);
@@ -1090,7 +1090,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
-                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                                'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => false,
@@ -1153,7 +1153,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         \assert('' !== $jobId);
 
                         $machine = new Machine($jobId, StringValue::random(), StringValue::random());
-                        $machine = $machine->setIp(Ip::random());
+                        $machine = $machine->setIpAddress(Ip::random());
                         $machine->setMetaState(new MetaState(true, false, false));
                         $machine->setActionFailure(new MachineActionFailure(
                             $jobId,
@@ -1221,7 +1221,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
-                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                                'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                                 'action_failure' => [
                                     'action' => 'find',
                                     'type' => 'vendor_authentication_failure',
@@ -1317,7 +1317,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         \assert('' !== $jobId);
 
                         $machine = new Machine($jobId, StringValue::random(), StringValue::random());
-                        $machine = $machine->setIp(Ip::random());
+                        $machine = $machine->setIpAddress(Ip::random());
                         $machine = $machine->setMetaState(new MetaState(false, false, false));
                         $machine->setIsActive();
 
@@ -1409,7 +1409,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
-                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                                'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => false,
@@ -1703,7 +1703,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         $machine = new Machine($jobId, StringValue::random(), StringValue::random());
 
                         $machine = $machine->setMetaState(new MetaState(true, false, false));
-                        $machine = $machine->setIp(Ip::random());
+                        $machine = $machine->setIpAddress(Ip::random());
 
                         $repository->save($machine);
 
@@ -1764,7 +1764,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
-                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                                'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => true,
@@ -1857,7 +1857,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                         $machine = new Machine($jobId, 'complete', 'end');
                         $machine = $machine->setMetaState(new MetaState(true, true, false));
-                        $machine = $machine->setIp(Ip::random());
+                        $machine = $machine->setIpAddress(Ip::random());
 
                         $repository->save($machine);
 
@@ -1947,7 +1947,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                             ],
                             'machine' => [
                                 'state_category' => 'end',
-                                'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                                'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                                 'action_failure' => null,
                                 'meta_state' => [
                                     'ended' => true,
@@ -2017,7 +2017,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                 \assert('' !== $jobId);
 
                 $machine = new Machine($jobId, StringValue::random(), StringValue::random());
-                $machine = $machine->setIp(Ip::random());
+                $machine = $machine->setIpAddress(Ip::random());
 
                 $repository->save($machine);
 
@@ -2081,7 +2081,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'machine' => [
                             'state_category' => $machine?->getStateCategory() ?? 'invalid-state-category',
-                            'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                            'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                             'action_failure' => null,
                             'meta_state' => [
                                 'ended' => false,
@@ -2311,7 +2311,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
 
                 $machine = new Machine($jobId, 'complete', 'end');
                 $machine = $machine->setMetaState(new MetaState(true, true, false));
-                $machine = $machine->setIp(Ip::random());
+                $machine = $machine->setIpAddress(Ip::random());
 
                 $repository->save($machine);
 
@@ -2375,7 +2375,7 @@ class GetJobSuccessTest extends AbstractApplicationTest
                         ],
                         'machine' => [
                             'state_category' => 'end',
-                            'ip_address' => $machine?->getIp() ?? 'invalid-ip',
+                            'ip_address' => $machine?->getIpAddress() ?? 'invalid-ip',
                             'action_failure' => null,
                             'meta_state' => [
                                 'ended' => true,

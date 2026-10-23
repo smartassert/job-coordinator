@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use App\Model\Machine\MachineInterface;
 
 class MachineCreationRequestedEvent extends AbstractMachineEvent implements JobEventInterface
 {
     public function __construct(
-        Machine $machine,
+        MachineInterface $machine,
     ) {
         parent::__construct($machine);
     }
 
     public function getJobId(): string
     {
-        return $this->getMachine()->id;
+        return $this->getMachine()->getId();
     }
 }

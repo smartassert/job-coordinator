@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine
+class Machine implements MachineInterface
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -63,6 +64,18 @@ class Machine
         $this->isEnding = false;
     }
 
+    public function getId(): string
+    {
+        return $this->jobId;
+    }
+
+    public function getState(): string
+    {
+        \assert('' !== $this->state);
+
+        return $this->state;
+    }
+
     /**
      * @param non-empty-string $state
      */
@@ -73,12 +86,11 @@ class Machine
         return $this;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getStateCategory(): ?string
+    public function getStateCategory(): string
     {
-        return '' === $this->stateCategory ? null : $this->stateCategory;
+        \assert('' !== $this->stateCategory);
+
+        return $this->stateCategory;
     }
 
     /**
@@ -91,18 +103,15 @@ class Machine
         return $this;
     }
 
-    /**
-     * @return ?non-empty-string
-     */
-    public function getIp(): ?string
+    public function getIpAddress(): ?string
     {
-        return '' === $this->ip ? null : $this->ip;
+        return $this->ip;
     }
 
     /**
      * @param non-empty-string $ip
      */
-    public function setIp(string $ip): static
+    public function setIpAddress(string $ip): static
     {
         $this->ip = $ip;
 
@@ -121,6 +130,11 @@ class Machine
         return $this;
     }
 
+    public function getMetaState(): MetaState
+    {
+        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
+    }
+
     public function setMetaState(MetaState $metaState): self
     {
         $this->stateIsEnded = $metaState->ended;
@@ -130,9 +144,9 @@ class Machine
         return $this;
     }
 
-    public function getMetaState(): MetaState
+    public function isActive(): bool
     {
-        return new MetaState($this->stateIsEnded, $this->stateIsSucceeded, $this->isPending);
+        return $this->isActive;
     }
 
     public function setIsActive(): self
@@ -142,9 +156,9 @@ class Machine
         return $this;
     }
 
-    public function getIsActive(): bool
+    public function isReady(): bool
     {
-        return $this->isActive;
+        return $this->isReady;
     }
 
     public function setIsReady(): self
@@ -152,11 +166,6 @@ class Machine
         $this->isReady = true;
 
         return $this;
-    }
-
-    public function getIsReady(): bool
-    {
-        return $this->isReady;
     }
 
     public function isEnding(): bool

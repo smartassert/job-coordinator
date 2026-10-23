@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use SmartAssert\WorkerManagerClient\Model\Machine;
+use App\Model\Machine\MachineInterface;
 
 interface MachineEventInterface
 {
-    public function getMachine(): Machine;
+    public function getMachine(): MachineInterface;
 }

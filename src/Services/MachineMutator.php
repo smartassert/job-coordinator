@@ -55,17 +55,17 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineEntity->setState($event->getMachine()->state);
-        $machineEntity->setStateCategory($event->getMachine()->stateCategory);
+        $machineEntity->setState($event->getMachine()->getState());
+        $machineEntity->setStateCategory($event->getMachine()->getStateCategory());
         $machineEntity->setMetaState(
             new MetaState(
-                $event->getMachine()->metaState->ended,
-                $event->getMachine()->metaState->succeeded,
-                $event->getMachine()->metaState->pending,
+                $event->getMachine()->getMetaState()->ended,
+                $event->getMachine()->getMetaState()->succeeded,
+                $event->getMachine()->getMetaState()->pending,
             )
         );
 
-        if ($event->getMachine()->hasEndingState) {
+        if ($event->getMachine()->isEnding()) {
             $machineEntity->setIsEnding();
         }
 
@@ -84,7 +84,7 @@ class MachineMutator implements EventSubscriberInterface
             return;
         }
 
-        $machineEntity->setIp($event->ipAddress);
+        $machineEntity->setIpAddress($event->ipAddress);
         $machineEntity->setIsActive();
 
         $this->machineRepository->save($machineEntity);
@@ -115,7 +115,7 @@ class MachineMutator implements EventSubscriberInterface
         }
 
         $machine = $event->getMachine();
-        if (null === $machine->actionFailure) {
+        if (null === $machine->getActionFailure()) {
             return;
         }
 
@@ -131,9 +131,9 @@ class MachineMutator implements EventSubscriberInterface
         $machineEntity->setActionFailure(
             new MachineActionFailure(
                 $job->getId(),
-                $machine->actionFailure->action,
-                $machine->actionFailure->type,
-                $machine->actionFailure->context,
+                $machine->getActionFailure()->getAction(),
+                $machine->getActionFailure()->getType(),
+                $machine->getActionFailure()->getContext(),
             )
         );
     }

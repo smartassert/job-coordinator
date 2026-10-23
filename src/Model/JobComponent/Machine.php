@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model\JobComponent;
 
 use App\Entity\Machine as MachineEntity;
-use App\Entity\MachineActionFailure;
+use App\Model\Machine\SerializableActionFailureInterface;
 use App\Model\MetaState;
 use App\Model\RemoteRequestCollection;
 use App\Model\SerializeToArrayInterface;
@@ -14,11 +14,11 @@ use App\Model\SerializeToArrayInterface;
  * @phpstan-import-type SerializedMetaState from MetaState
  * @phpstan-import-type SerializedRemoteRequestCollectionGroup from RemoteRequestCollection
  * @phpstan-import-type SerializedPreparation from Preparation
- * @phpstan-import-type SerializedMachineActionFailure from MachineActionFailure
+ * @phpstan-import-type SerializedMachineActionFailure from SerializableActionFailureInterface
  *
  * @phpstan-type SerializedMachine array{
- *   state_category: ?non-empty-string,
- *   ip_address: ?non-empty-string,
+ *   state_category: ?string,
+ *   ip_address: ?string,
  *   action_failure: ?SerializedMachineActionFailure,
  *   meta_state: SerializedMetaState,
  *   requests: SerializedRemoteRequestCollectionGroup,
@@ -59,12 +59,12 @@ readonly class Machine implements SerializeToArrayInterface
 
         return [
             'state_category' => $stateCategory,
-            'ip_address' => $this->entity?->getIp(),
+            'ip_address' => $this->entity?->getIpAddress(),
             'action_failure' => $this->entity?->getActionFailure()?->toArray(),
             'meta_state' => $this->getMetaState()->toArray(),
             'requests' => $this->requests->toArray(),
             'preparation' => $this->preparation->toArray(),
-            'is_active' => $this->entity?->getIsActive() ?? false,
+            'is_active' => $this->entity?->isActive() ?? false,
         ];
     }
 }
