@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
+use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
@@ -46,9 +47,11 @@ final readonly class TerminateMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClient->deleteMachine($authenticationToken, $message->getJobId());
+            $machine = new WorkerManagerMachine(
+                $this->workerManagerClient->deleteMachine($authenticationToken, $message->getJobId()),
+            );
 
-            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($message->getJobId(), $machine));
+            $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($machine));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
         }
