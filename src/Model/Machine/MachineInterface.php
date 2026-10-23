@@ -13,9 +13,15 @@ interface MachineInterface
      */
     public function getId(): string;
 
+    /**
+     * @return non-empty-string
+     */
     public function getState(): string;
 
-    public function getStateCategory(): ?string;
+    /**
+     * @return non-empty-string
+     */
+    public function getStateCategory(): string;
 
     public function getIpAddress(): ?string;
 

@@ -71,6 +71,8 @@ class Machine implements MachineInterface
 
     public function getState(): string
     {
+        \assert('' !== $this->state);
+
         return $this->state;
     }
 
@@ -84,8 +86,10 @@ class Machine implements MachineInterface
         return $this;
     }
 
-    public function getStateCategory(): ?string
+    public function getStateCategory(): string
     {
+        \assert('' !== $this->stateCategory);
+
         return $this->stateCategory;
     }
 
