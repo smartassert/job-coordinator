@@ -9,13 +9,12 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
+use App\Model\Machine\Machine;
 use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -74,14 +73,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $this->persistMachine($machine);
@@ -107,14 +108,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
-            'create/requested',
-            'pre_active',
-            [],
+            'delete/deleted',
+            'end',
+            null,
+            null,
+            new MetaState(true, false, false),
             false,
             false,
-            new WorkerManagerClientMetaState(true, false, true),
+            false,
         );
 
         $this->persistMachine($machine);
@@ -133,14 +136,16 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $this->persistMachine($machine);

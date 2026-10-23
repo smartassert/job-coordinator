@@ -6,7 +6,9 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
+use App\Model\Machine\Machine as MachineModel;
 use App\Model\Machine\MachineInterface;
+use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineEntityFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -14,7 +16,6 @@ use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachin
 use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MachineEntityFactoryTest extends WebTestCase
@@ -118,14 +119,16 @@ class MachineEntityFactoryTest extends WebTestCase
                 'machineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return WorkerMachineFactory::create(
+                    return new MachineModel(
                         $jobId,
                         'find/finding',
                         'find',
-                        [],
+                        null,
+                        null,
+                        new MetaState(false, false, true),
                         false,
                         false,
-                        new WorkerManagerClientMetaState(false, false, true),
+                        false,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {
@@ -138,14 +141,16 @@ class MachineEntityFactoryTest extends WebTestCase
                 'machineCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
-                    return WorkerMachineFactory::create(
+                    return new MachineModel(
                         $jobId,
                         'find/not-findable',
                         'end',
-                        [],
+                        null,
+                        null,
+                        new MetaState(true, false, false),
                         false,
                         false,
-                        new WorkerManagerClientMetaState(true, false, true),
+                        false,
                     );
                 },
                 'expectedMachineCreator' => function (string $jobId) {

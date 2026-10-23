@@ -33,7 +33,6 @@ use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -405,14 +404,16 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $jobId,
             'up/active',
             'active',
-            [],
-            true,
+            null,
+            null,
+            new MetaState(false, false, false),
             false,
-            new WorkerManagerClientMetaState(false, false, false),
+            false,
+            false,
         );
 
         $message = new GetMachineMessage($jobId, $machine);

@@ -4,76 +4,37 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
-use App\Model\Machine\WorkerManagerMachine;
+use App\Model\Machine\Machine;
+use App\Model\Machine\MachineInterface;
+use App\Model\MetaState;
 use App\Tests\Services\Generator\BoolValue;
 use App\Tests\Services\Generator\StringValue;
-use SmartAssert\WorkerManagerClient\Model\ActionFailure;
-use SmartAssert\WorkerManagerClient\Model\Machine;
-use SmartAssert\WorkerManagerClient\Model\MetaState;
 
 class WorkerManagerClientMachineFactory
 {
     /**
-     * @param non-empty-string   $id
-     * @param non-empty-string   $state
-     * @param non-empty-string   $stateCategory
-     * @param non-empty-string[] $ipAddresses
-     * @param non-empty-string[] $previousStates
-     */
-    public static function create(
-        string $id,
-        string $state,
-        string $stateCategory,
-        array $ipAddresses,
-        bool $hasActiveState,
-        bool $hasEndingState,
-        MetaState $metaState,
-        ?ActionFailure $actionFailure = null,
-        array $previousStates = [],
-    ): WorkerManagerMachine {
-        return new WorkerManagerMachine(
-            new Machine(
-                $id,
-                $state,
-                $stateCategory,
-                $ipAddresses,
-                $actionFailure,
-                $hasActiveState,
-                $hasEndingState,
-                new MetaState(
-                    $metaState->ended,
-                    $metaState->succeeded,
-                    $metaState->pending,
-                ),
-                $previousStates,
-            ),
-        );
-    }
-
-    /**
      * @param non-empty-string $jobId
      */
-    public static function createRandomForJob(string $jobId): WorkerManagerMachine
+    public static function createRandomForJob(string $jobId): MachineInterface
     {
-        $hasFailedState = BoolValue::random();
-        $hasActiveState = BoolValue::random();
-        $hasEndingState = BoolValue::random();
-        $hasEnded = BoolValue::random();
-        $hasSucceeded = $hasEnded && !$hasFailedState;
-        $isPending = !$hasEnded && !$hasActiveState;
+        $failed = BoolValue::random();
+        $active = BoolValue::random();
+        $ending = BoolValue::random();
+        $ready = BoolValue::random();
+        $ended = BoolValue::random();
+        $succeeded = $ended && !$failed;
+        $pending = !$ended && !$active;
 
-        return self::create(
+        return new Machine(
             $jobId,
             StringValue::random(),
             StringValue::random(),
-            [],
-            $hasActiveState,
-            $hasEndingState,
-            new MetaState(
-                ended: $hasEnded,
-                succeeded: $hasSucceeded,
-                pending: $isPending,
-            ),
+            null,
+            null,
+            new MetaState($ended, $succeeded, $pending),
+            $active,
+            $ready,
+            $ending,
         );
     }
 }

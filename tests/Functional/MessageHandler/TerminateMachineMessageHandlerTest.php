@@ -10,6 +10,8 @@ use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
+use App\Model\Machine\Machine;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MachineModelFactory;
@@ -18,11 +20,9 @@ use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
@@ -118,14 +118,16 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
-        $machine = MachineFactory::create(
+        $machine = new Machine(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, false),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([

@@ -11,6 +11,8 @@ use App\Event\MachineIsActiveEvent;
 use App\Event\MachineIsReadyEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\JobInterface;
+use App\Model\Machine\ActionFailure;
+use App\Model\Machine\Machine as MachineModel;
 use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
@@ -22,8 +24,6 @@ use App\Tests\Services\Generator\Ip;
 use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\ActionFailure;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MachineMutatorTest extends WebTestCase
@@ -183,14 +183,16 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         MachineFactory::createRandomForJob($job->getId()),
-                        MachineFactory::create(
+                        new MachineModel(
                             $job->getId(),
                             'up/started',
                             'pre_active',
-                            [],
+                            null,
+                            null,
+                            new MetaState(false, false, true),
                             false,
                             false,
-                            new WorkerManagerClientMetaState(false, false, true),
+                            false,
                         ),
                     );
                 },
@@ -219,14 +221,16 @@ class MachineMutatorTest extends WebTestCase
 
                     return new MachineStateChangeEvent(
                         MachineFactory::createRandomForJob($job->getId()),
-                        MachineFactory::create(
+                        new MachineModel(
                             $job->getId(),
                             'up/active',
                             'active',
-                            [],
+                            null,
+                            null,
+                            new MetaState(false, false, false),
                             true,
                             false,
-                            new WorkerManagerClientMetaState(false, false, false),
+                            false,
                         ),
                     );
                 },
@@ -289,16 +293,7 @@ class MachineMutatorTest extends WebTestCase
         };
 
         $machineId = Id::generate();
-
-        $arbitraryMachine = MachineFactory::create(
-            $machineId,
-            StringValue::random(),
-            StringValue::random(),
-            [Ip::random()],
-            false,
-            false,
-            new WorkerManagerClientMetaState(false, false, false),
-        );
+        $arbitraryMachine = MachineFactory::createRandomForJob($machineId);
 
         return [
             'no job' => [
@@ -466,15 +461,16 @@ class MachineMutatorTest extends WebTestCase
                     $jobId = Id::generate();
 
                     return new MachineHasActionFailureEvent(
-                        MachineFactory::create(
+                        new MachineModel(
                             $jobId,
                             StringValue::random(),
                             StringValue::random(),
-                            [Ip::random()],
-                            true,
-                            false,
-                            new WorkerManagerClientMetaState(false, false, false),
+                            Ip::random(),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
+                            new MetaState(false, false, false),
+                            false,
+                            false,
+                            false,
                         ),
                     );
                 },
@@ -489,15 +485,16 @@ class MachineMutatorTest extends WebTestCase
                     $jobId = Id::generate();
 
                     return new MachineHasActionFailureEvent(
-                        MachineFactory::create(
+                        new MachineModel(
                             $jobId,
                             StringValue::random(),
                             StringValue::random(),
-                            [Ip::random()],
-                            true,
-                            false,
-                            new WorkerManagerClientMetaState(false, false, false),
+                            Ip::random(),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
+                            new MetaState(false, false, false),
+                            false,
+                            false,
+                            false,
                         ),
                     );
                 },
@@ -521,15 +518,16 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new MachineHasActionFailureEvent(
-                        MachineFactory::create(
+                        new MachineModel(
                             $job->getId(),
                             StringValue::random(),
                             StringValue::random(),
-                            [Ip::random()],
-                            true,
-                            false,
-                            new WorkerManagerClientMetaState(false, false, false),
+                            Ip::random(),
                             new ActionFailure('find', 'vendor_authentication_failure', []),
+                            new MetaState(false, false, false),
+                            false,
+                            false,
+                            false,
                         ),
                     );
                 },
@@ -565,15 +563,16 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new MachineHasActionFailureEvent(
-                        MachineFactory::create(
+                        new MachineModel(
                             $job->getId(),
                             StringValue::random(),
                             StringValue::random(),
-                            [Ip::random()],
-                            true,
-                            false,
-                            new WorkerManagerClientMetaState(false, false, false),
+                            Ip::random(),
                             new ActionFailure('new_action', 'new_type', []),
+                            new MetaState(false, false, false),
+                            false,
+                            false,
+                            false,
                         ),
                     );
                 },

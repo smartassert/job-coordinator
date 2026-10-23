@@ -12,6 +12,8 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Model\Machine\Machine;
+use App\Model\MetaState;
 use App\Model\RemoteRequestType;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
@@ -26,7 +28,6 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\ResultsClient\Model\Job as ResultsJob;
 use SmartAssert\ResultsClient\Model\JobState as ResultsJobState;
 use SmartAssert\ResultsClient\Model\MetaState as ResultsClientMetaState;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 
 class RemoteRequestRemoverForEventsTest extends TestCase
 {
@@ -51,14 +52,16 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
             new MachineIsActiveEvent(
                 '127.0.0.1',
-                MachineFactory::create(
+                new Machine(
                     $jobId,
                     StringValue::random(),
                     StringValue::random(),
-                    [Ip::random()],
+                    Ip::random(),
+                    null,
+                    new MetaState(false, false, true),
                     false,
                     false,
-                    new WorkerManagerClientMetaState(false, false, true)
+                    false,
                 ),
             )
         );
@@ -253,14 +256,16 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
             new MachineTerminationRequestedEvent(
-                MachineFactory::create(
+                new Machine(
                     $jobId,
                     StringValue::random(),
                     StringValue::random(),
-                    [Ip::random()],
+                    Ip::random(),
+                    null,
+                    new MetaState(false, false, true),
                     false,
                     false,
-                    new WorkerManagerClientMetaState(false, false, true),
+                    false,
                 ),
             )
         );

@@ -8,12 +8,11 @@ use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Model\Machine\Machine;
+use App\Model\MetaState;
 use App\Tests\Services\EventSubscriber\EventRecorder;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\ActionFailure;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,26 +33,19 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
-        $event = new MachineRetrievedEvent(
-            MachineFactory::create(
-                $machineId,
-                'unchanged-state',
-                'active',
-                [],
-                true,
-                false,
-                new WorkerManagerClientMetaState(false, false, false),
-            ),
-            MachineFactory::create(
-                $machineId,
-                'unchanged-state',
-                'active',
-                [],
-                true,
-                false,
-                new WorkerManagerClientMetaState(false, false, false),
-            ),
+        $machine = new Machine(
+            $machineId,
+            'unchanged-state',
+            'active',
+            null,
+            null,
+            new MetaState(false, false, false),
+            true,
+            false,
+            false,
         );
+
+        $event = new MachineRetrievedEvent($machine, $machine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -66,24 +58,28 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
-        $previousMachine = MachineFactory::create(
+        $previousMachine = new Machine(
             $machineId,
             'previous-state',
             'active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, false),
             true,
             false,
-            new WorkerManagerClientMetaState(false, false, false),
+            false,
         );
 
-        $currentMachine = MachineFactory::create(
+        $currentMachine = new Machine(
             $machineId,
             'current-state',
             'active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, false),
             true,
             false,
-            new WorkerManagerClientMetaState(false, false, false),
+            false,
         );
 
         $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
@@ -117,92 +113,53 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
+        $unknownMachine = new Machine(
+            $machineId,
+            'unknown',
+            'unknown',
+            null,
+            null,
+            new MetaState(false, false, true),
+            false,
+            false,
+            false,
+        );
+
+        $findingMachine = new Machine(
+            $machineId,
+            'find/finding',
+            'pre_active',
+            null,
+            null,
+            new MetaState(false, false, true),
+            false,
+            false,
+            false,
+        );
+
         return [
             'unknown -> unknown' => [
-                'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'unknown',
-                        'unknown',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
-                        $machineId,
-                        'unknown',
-                        'unknown',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                ),
+                'event' => new MachineRetrievedEvent($unknownMachine, $unknownMachine),
             ],
             'unknown -> finding' => [
-                'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'unknown',
-                        'unknown',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
-                        $machineId,
-                        'find/finding',
-                        'pre_active',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                ),
+                'event' => new MachineRetrievedEvent($unknownMachine, $findingMachine),
             ],
             'finding -> finding' => [
-                'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'find/finding',
-                        'pre_active',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
-                        $machineId,
-                        'find/finding',
-                        'pre_active',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                ),
+                'event' => new MachineRetrievedEvent($findingMachine, $findingMachine),
             ],
             'finding -> active without ip address' => [
                 'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'find/finding',
-                        'pre_active',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
+                    $findingMachine,
+                    new Machine(
                         $machineId,
                         'up/active',
                         'active',
-                        [],
+                        null,
+                        null,
+                        new MetaState(false, false, false),
                         true,
                         false,
-                        new WorkerManagerClientMetaState(false, false, false),
+                        false,
                     ),
                 ),
             ],
@@ -228,74 +185,50 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
+        $unknownMachine = new Machine(
+            $machineId,
+            'unknown',
+            'unknown',
+            null,
+            null,
+            new MetaState(false, false, true),
+            false,
+            false,
+            false,
+        );
+
+        $findingMachine = new Machine(
+            $machineId,
+            'find/finding',
+            'pre_active',
+            null,
+            null,
+            new MetaState(false, false, true),
+            false,
+            false,
+            false,
+        );
+
+        $activeMachine = new Machine(
+            $machineId,
+            'up/acive',
+            'active',
+            '127.0.0.1',
+            null,
+            new MetaState(false, false, false),
+            true,
+            false,
+            false,
+        );
+
         return [
             'unknown -> active' => [
-                'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'unknown',
-                        'unknown',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
-                        $machineId,
-                        'up/active',
-                        'active',
-                        ['127.0.0.1'],
-                        true,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, false),
-                    ),
-                ),
-                'expected' => new MachineIsActiveEvent(
-                    '127.0.0.1',
-                    MachineFactory::create(
-                        $machineId,
-                        'up/active',
-                        'active',
-                        ['127.0.0.1'],
-                        true,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, false),
-                    ),
-                ),
+                'event' => new MachineRetrievedEvent($unknownMachine, $activeMachine),
+                'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
             'finding -> active' => [
-                'event' => new MachineRetrievedEvent(
-                    MachineFactory::create(
-                        $machineId,
-                        'find/finding',
-                        'pre_active',
-                        [],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
-                    MachineFactory::create(
-                        $machineId,
-                        'up/active',
-                        'active',
-                        ['127.0.0.2'],
-                        true,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, false),
-                    ),
-                ),
-                'expected' => new MachineIsActiveEvent(
-                    '127.0.0.2',
-                    MachineFactory::create(
-                        $machineId,
-                        'up/active',
-                        'active',
-                        ['127.0.0.2'],
-                        true,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, false),
-                    ),
-                ),
+                'event' => new MachineRetrievedEvent($findingMachine, $activeMachine),
+                'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
         ];
     }
@@ -304,24 +237,28 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
-        $previousMachine = MachineFactory::create(
+        $previousMachine = new Machine(
             $machineId,
             'previous-state',
             'active',
-            [],
-            true,
+            null,
+            null,
+            new MetaState(false, false, false),
             false,
-            new WorkerManagerClientMetaState(false, false, false),
+            false,
+            false,
         );
 
-        $currentMachine = MachineFactory::create(
+        $currentMachine = new Machine(
             $machineId,
             'current-state',
             'active',
-            [],
-            true,
+            null,
+            null,
+            new MetaState(false, false, false),
             false,
-            new WorkerManagerClientMetaState(false, false, false),
+            false,
+            false,
         );
 
         $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
@@ -336,27 +273,30 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
     {
         $machineId = Id::generate();
-        $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
+        $actionFailure = new \App\Model\Machine\ActionFailure('find', 'vendor_authentication_failure', []);
 
-        $previousMachine = MachineFactory::create(
+        $previousMachine = new Machine(
             $machineId,
             'find/finding',
             'finding',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
-        $currentMachine = MachineFactory::create(
+        $currentMachine = new Machine(
             $machineId,
             'find/not-findable',
-            'end',
-            [],
+            'finding',
+            null,
+            $actionFailure,
+            new MetaState(true, false, false),
             false,
-            true,
-            new WorkerManagerClientMetaState(true, false, false),
-            $actionFailure
+            false,
+            false,
         );
 
         $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
