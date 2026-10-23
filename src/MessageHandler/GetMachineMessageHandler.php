@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
+use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
@@ -48,11 +49,13 @@ final readonly class GetMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClient->getMachine($authenticationToken, $message->getJobId());
+            $machine = new WorkerManagerMachine(
+                $this->workerManagerClient->getMachine($authenticationToken, $message->getJobId()),
+            );
 
             $this->eventDispatcher->dispatch(new MachineRetrievedEvent(
                 $previousMachine,
-                $machine
+                $machine,
             ));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
