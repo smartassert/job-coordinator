@@ -6,7 +6,6 @@ namespace App\Message;
 
 use App\Model\Machine\MachineInterface;
 use App\Model\RemoteRequestType;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class GetMachineMessage extends AbstractRemoteRequestMessage
 {
