@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
+use App\Model\Machine\MachineInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 
 class HttpResponseFactory
 {
-    public static function createForWorkerManagerMachine(Machine $machine): ResponseInterface
+    public static function createForWorkerManagerMachine(MachineInterface $machine): ResponseInterface
     {
         return new Response(200, ['content-type' => 'application/json'], (string) json_encode([
-            'id' => $machine->id,
-            'state' => $machine->state,
-            'state_category' => $machine->stateCategory,
-            'ip_addresses' => $machine->ipAddresses,
-            'has_active_state' => $machine->hasActiveState,
-            'has_ending_state' => $machine->hasEndingState,
+            'id' => $machine->getId(),
+            'state' => $machine->getState(),
+            'state_category' => $machine->getStateCategory(),
+            'ip_addresses' => [
+                $machine->getIpAddress(),
+            ],
+            'has_active_state' => $machine->isActive(),
+            'has_ending_state' => $machine->isEnding(),
             'meta_state' => [
-                'ended' => $machine->metaState->ended,
-                'succeeded' => $machine->metaState->succeeded,
-                'pending' => $machine->metaState->pending,
+                'ended' => $machine->getMetaState()->ended,
+                'succeeded' => $machine->getMetaState()->succeeded,
+                'pending' => $machine->getMetaState()->pending,
             ],
         ]));
     }
