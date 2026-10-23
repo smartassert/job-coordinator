@@ -61,4 +61,9 @@ final readonly class WorkerManagerMachine implements MachineInterface
     {
         return false;
     }
+
+    public function isEnding(): bool
+    {
+        return $this->workerManagerMachine->hasEndingState;
+    }
 }

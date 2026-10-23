@@ -32,4 +32,6 @@ interface MachineInterface
     public function isActive(): bool;
 
     public function isReady(): bool;
+
+    public function isEnding(): bool;
 }
