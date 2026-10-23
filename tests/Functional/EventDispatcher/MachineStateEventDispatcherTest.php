@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\EventDispatcher;
 
+use App\Entity\Machine as MachineEntity;
 use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
@@ -11,6 +12,7 @@ use App\Event\MachineStateChangeEvent;
 use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine;
 use App\Model\MetaState;
+use App\Repository\MachineRepository;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MachineStateEventDispatcherTest extends WebTestCase
 {
     private EventRecorder $eventRecorder;
+    private MachineRepository $machineRepository;
 
     protected function setUp(): void
     {
@@ -28,13 +31,17 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $this->machineRepository = $machineRepository;
     }
 
     public function testDispatchMachineStateChangeEventNoStateChange(): void
     {
         $machineId = Id::generate();
 
-        $machine = new Machine(
+        $machineModel = new Machine(
             $machineId,
             'unchanged-state',
             'active',
@@ -46,7 +53,18 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $event = new MachineRetrievedEvent($machine, $machine);
+        $machineEntity = new MachineEntity(
+            $machineId,
+            'unchanged-state',
+            'active',
+        )
+            ->setIsActive()
+            ->setMetaState(new MetaState(false, false, false))
+        ;
+
+        $this->machineRepository->save($machineEntity);
+
+        $event = new MachineRetrievedEvent($machineModel, $machineModel);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -59,7 +77,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
     {
         $machineId = Id::generate();
 
-        $previousMachine = new Machine(
+        $previousMachineModel = new Machine(
             $machineId,
             'previous-state',
             'active',
@@ -71,7 +89,20 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $currentMachine = new Machine(
+        $previousMachineEntity = new MachineEntity(
+            $machineId,
+            'previous-state',
+            'active',
+        )
+            ->setIsActive()
+            ->setMetaState(new MetaState(false, false, false))
+        ;
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($previousMachineEntity);
+
+        $currentMachineModel = new Machine(
             $machineId,
             'current-state',
             'active',
@@ -83,7 +114,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($previousMachineModel, $currentMachineModel);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -91,7 +122,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         self::assertEquals(
             [
-                new MachineStateChangeEvent($previousMachine, $currentMachine),
+                new MachineStateChangeEvent($previousMachineModel, $currentMachineModel),
             ],
             $this->eventRecorder->all(MachineStateChangeEvent::class)
         );
