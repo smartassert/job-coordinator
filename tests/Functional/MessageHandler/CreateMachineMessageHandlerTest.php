@@ -12,22 +12,23 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
+use App\Model\Machine\Machine as MachineModel;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\AuthenticationTokenProvider;
+use App\Services\MachineModelFactory;
 use App\Services\MessageStateMutator;
+use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 
 class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 {
@@ -46,7 +47,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
 
-        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
+        $handler = $this->createHandler($assessor, $wrapper);
 
         self::assertSame(MessageState::HANDLING, $message->getState());
 
@@ -71,7 +73,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
         \assert($workerManagerClient instanceof WorkerManagerClient);
 
-        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
+        $handler = $this->createHandler($assessor, $wrapper);
 
         self::assertSame(MessageState::HANDLING, $message->getState());
 
@@ -99,7 +102,12 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerManagerException = new \Exception('Failed to create machine');
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
 
-        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
+
+        $wrapper = new WorkerManagerClientWrapper($workerManagerClient, $machineModelFactory);
+
+        $handler = $this->createHandler($assessor, $wrapper);
 
         try {
             $handler($message);
@@ -137,21 +145,28 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
         \assert($assessor instanceof CreateMachineReadinessAssessor);
 
-        $machine = MachineFactory::create(
+        $machine = new MachineModel(
             $job->getId(),
             'create/requested',
             'pre_active',
-            [],
+            null,
+            null,
+            new MetaState(false, false, true),
             false,
             false,
-            new WorkerManagerClientMetaState(false, false, true),
+            false,
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
             HttpResponseFactory::createForWorkerManagerMachine($machine),
         ]);
 
-        $handler = $this->createHandler($assessor, $workerManagerClient);
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
+
+        $wrapper = new WorkerManagerClientWrapper($workerManagerClient, $machineModelFactory);
+
+        $handler = $this->createHandler($assessor, $wrapper);
         $message = new CreateMachineMessage($job->getId());
 
         $handler($message);
@@ -186,7 +201,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
     private function createHandler(
         ReadinessAssessorInterface $assessor,
-        WorkerManagerClient $workerManagerClient,
+        WorkerManagerClientWrapper $wrapper,
     ): CreateMachineMessageHandler {
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -200,9 +215,17 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return new CreateMachineMessageHandler(
             $assessor,
             $messageStateMutator,
-            $workerManagerClient,
+            $wrapper,
             $eventDispatcher,
             $authenticationTokenProvider,
         );
+    }
+
+    private function createWorkerManagerClientWrapper(WorkerManagerClient $client): WorkerManagerClientWrapper
+    {
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
+
+        return new WorkerManagerClientWrapper($client, $machineModelFactory);
     }
 }

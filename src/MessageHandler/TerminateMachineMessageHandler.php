@@ -8,12 +8,11 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
-use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\WorkerManagerClientWrapper;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 
@@ -23,7 +22,7 @@ final readonly class TerminateMachineMessageHandler
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
-        private WorkerManagerClient $workerManagerClient,
+        private WorkerManagerClientWrapper $workerManagerClientWrapper,
         private EventDispatcherInterface $eventDispatcher,
         private AuthenticationTokenProvider $authenticationTokenProvider,
     ) {}
@@ -47,9 +46,7 @@ final readonly class TerminateMachineMessageHandler
         }
 
         try {
-            $machine = new WorkerManagerMachine(
-                $this->workerManagerClient->deleteMachine($authenticationToken, $message->getJobId()),
-            );
+            $machine = $this->workerManagerClientWrapper->delete($authenticationToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($machine));
         } catch (\Throwable $e) {

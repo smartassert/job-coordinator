@@ -12,7 +12,9 @@ use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
+use App\Services\MachineModelFactory;
 use App\Services\MessageStateMutator;
+use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -36,10 +38,10 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn(MessageHandlingReadiness::EVENTUALLY)
         ;
 
-        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
-        \assert($workerManagerClient instanceof WorkerManagerClient);
+        $wrapper = self::getContainer()->get(WorkerManagerClientWrapper::class);
+        \assert($wrapper instanceof WorkerManagerClientWrapper);
 
-        $handler = $this->createHandler($workerManagerClient, $assessor);
+        $handler = $this->createHandler($wrapper, $assessor);
 
         self::assertSame(MessageState::HANDLING, $message->getState());
 
@@ -60,10 +62,10 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
-        $workerManagerClient = self::getContainer()->get(WorkerManagerClient::class);
-        \assert($workerManagerClient instanceof WorkerManagerClient);
+        $wrapper = self::getContainer()->get(WorkerManagerClientWrapper::class);
+        \assert($wrapper instanceof WorkerManagerClientWrapper);
 
-        $handler = $this->createHandler($workerManagerClient, $assessor);
+        $handler = $this->createHandler($wrapper, $assessor);
 
         self::assertSame(MessageState::HANDLING, $message->getState());
 
@@ -89,7 +91,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $workerManagerException = new \Exception('Failed to terminate machine');
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([$workerManagerException]);
-        $handler = $this->createHandler($workerManagerClient, $assessor);
+        $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
+
+        $handler = $this->createHandler($wrapper, $assessor);
 
         try {
             $handler($message);
@@ -127,8 +131,9 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
             HttpResponseFactory::createForWorkerManagerMachine($machine),
         ]);
+        $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
 
-        $handler = $this->createHandler($workerManagerClient, $assessor);
+        $handler = $this->createHandler($wrapper, $assessor);
 
         $handler($message);
 
@@ -150,7 +155,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     private function createHandler(
-        WorkerManagerClient $workerManagerClient,
+        WorkerManagerClientWrapper $wrapper,
         ReadinessAssessorInterface $readinessAssessor,
     ): TerminateMachineMessageHandler {
         $messageBus = self::getContainer()->get(MessageBusInterface::class);
@@ -168,9 +173,17 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         return new TerminateMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
-            $workerManagerClient,
+            $wrapper,
             $eventDispatcher,
             $authenticationTokenProvider,
         );
+    }
+
+    private function createWorkerManagerClientWrapper(WorkerManagerClient $client): WorkerManagerClientWrapper
+    {
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
+
+        return new WorkerManagerClientWrapper($client, $machineModelFactory);
     }
 }
