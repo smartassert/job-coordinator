@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
+use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
@@ -46,7 +47,9 @@ final readonly class CreateMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClient->createMachine($authenticationToken, $message->getJobId());
+            $machine = new WorkerManagerMachine(
+                $this->workerManagerClient->createMachine($authenticationToken, $message->getJobId()),
+            );
 
             $this->eventDispatcher->dispatch(
                 new MachineCreationRequestedEvent($machine)

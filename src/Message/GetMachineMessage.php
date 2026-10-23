@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Model\Machine\MachineInterface;
 use App\Model\RemoteRequestType;
 use SmartAssert\WorkerManagerClient\Model\Machine;
 
@@ -14,7 +15,7 @@ class GetMachineMessage extends AbstractRemoteRequestMessage
      */
     public function __construct(
         string $jobId,
-        public readonly Machine $machine,
+        public readonly MachineInterface $machine,
     ) {
         parent::__construct($jobId);
     }

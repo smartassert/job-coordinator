@@ -43,7 +43,7 @@ final readonly class MachineEntityFactory implements EventSubscriberInterface
             return;
         }
 
-        $entity = new Machine($job->getId(), $machine->state, $machine->stateCategory);
+        $entity = new Machine($job->getId(), $machine->getState(), $machine->getStateCategory());
         $this->machineRepository->save($entity);
     }
 }
