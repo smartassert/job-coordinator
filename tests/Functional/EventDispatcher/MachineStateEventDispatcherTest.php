@@ -8,6 +8,7 @@ use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
+use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine;
 use App\Model\MetaState;
 use App\Tests\Services\EventSubscriber\EventRecorder;
@@ -273,7 +274,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
     public function testDispatchMachineHasActionFailureEvenHasActionFailure(): void
     {
         $machineId = Id::generate();
-        $actionFailure = new \App\Model\Machine\ActionFailure('find', 'vendor_authentication_failure', []);
+        $actionFailure = new ActionFailure('find', 'vendor_authentication_failure', []);
 
         $previousMachine = new Machine(
             $machineId,
