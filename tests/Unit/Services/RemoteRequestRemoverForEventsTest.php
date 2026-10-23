@@ -12,13 +12,13 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
+use App\Model\Machine\WorkerManagerMachine;
 use App\Model\RemoteRequestType;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
 use App\Tests\Services\Factory\ResultsClientJobFactory;
 use App\Tests\Services\Factory\SourcesClientSerializedSuiteFactory;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
-use App\Tests\Services\Factory\WorkerManagerClientMachineFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as MachineFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\Ip;
@@ -51,16 +51,17 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
             new MachineIsActiveEvent(
-                $jobId,
                 '127.0.0.1',
-                MachineFactory::create(
-                    $jobId,
-                    StringValue::random(),
-                    StringValue::random(),
-                    [Ip::random()],
-                    false,
-                    false,
-                    new WorkerManagerClientMetaState(false, false, true)
+                new WorkerManagerMachine(
+                    MachineFactory::create(
+                        $jobId,
+                        StringValue::random(),
+                        StringValue::random(),
+                        [Ip::random()],
+                        false,
+                        false,
+                        new WorkerManagerClientMetaState(false, false, true)
+                    ),
                 )
             )
         );
@@ -140,8 +141,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
             new MachineRetrievedEvent(
-                WorkerManagerClientMachineFactory::createRandomForJob($jobId),
-                WorkerManagerClientMachineFactory::createRandomForJob($jobId),
+                new WorkerManagerMachine(MachineFactory::createRandomForJob($jobId)),
+                new WorkerManagerMachine(MachineFactory::createRandomForJob($jobId)),
             )
         );
     }
@@ -255,16 +256,17 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
             new MachineTerminationRequestedEvent(
-                $jobId,
-                MachineFactory::create(
-                    $jobId,
-                    StringValue::random(),
-                    StringValue::random(),
-                    [Ip::random()],
-                    false,
-                    false,
-                    new WorkerManagerClientMetaState(false, false, true),
-                )
+                new WorkerManagerMachine(
+                    MachineFactory::create(
+                        $jobId,
+                        StringValue::random(),
+                        StringValue::random(),
+                        [Ip::random()],
+                        false,
+                        false,
+                        new WorkerManagerClientMetaState(false, false, true),
+                    ),
+                ),
             )
         );
     }
