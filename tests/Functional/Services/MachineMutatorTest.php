@@ -255,7 +255,7 @@ class MachineMutatorTest extends WebTestCase
     /**
      * @param callable(JobFactory): ?JobInterface                              $jobCreator
      * @param callable(?JobInterface, MachineRepository): ?MachineInterface    $machineCreator
-     * @param callable(?JobInterface, MachineInterface): ?MachineIsActiveEvent $eventCreator
+     * @param callable(?JobInterface, ?MachineInterface): ?MachineIsActiveEvent $eventCreator
      * @param callable(?JobInterface): ?MachineInterface                       $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsActiveEventDataProvider')]
