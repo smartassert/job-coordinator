@@ -4,21 +4,10 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\Machine\MachineInterface;
 use App\Model\RemoteRequestType;
 
 class GetMachineMessage extends AbstractRemoteRequestMessage
 {
-    /**
-     * @param non-empty-string $jobId
-     */
-    public function __construct(
-        string $jobId,
-        public readonly MachineInterface $machine,
-    ) {
-        parent::__construct($jobId);
-    }
-
     public function getRemoteRequestType(): RemoteRequestType
     {
         return RemoteRequestType::createForMachineRetrieval();

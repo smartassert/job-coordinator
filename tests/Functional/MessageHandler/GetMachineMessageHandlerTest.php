@@ -28,8 +28,8 @@ use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
 use App\Tests\Services\Factory\JobFactory;
-use App\Tests\Services\Factory\MachineFactory;
 use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
@@ -60,8 +60,17 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = MachineFactory::createRandomForJob($job->getId());
-        $message = new GetMachineMessage($job->getId(), $machine);
+        $machine = new MachineEntity(
+            $job->getId(),
+            StringValue::random(),
+            StringValue::random(),
+        );
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new GetMachineMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -126,7 +135,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($wrapper, $readinessAssessor);
 
-        $handler(new GetMachineMessage($previous->getId(), $previous));
+        $handler(new GetMachineMessage($previous->getId()));
 
         self::assertEquals(
             [new MachineRetrievedEvent($previous, $current)],
@@ -215,7 +224,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($wrapper, $readinessAssessor);
 
-        $handler(new GetMachineMessage($previous->getId(), $previous));
+        $handler(new GetMachineMessage($previous->getId()));
 
         $expectedEvent = $expectedEventCreator($job, self::$apiToken);
 
@@ -323,19 +332,31 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $machineRepository->save(
-            new MachineEntity(
-                $job->getId(),
-                $previous->getState(),
-                $previous->getStateCategory(),
-            )->setMetaState(
-                new MetaState(
-                    $previous->getMetaState()->ended,
-                    $previous->getMetaState()->succeeded,
-                    $previous->getMetaState()->pending,
-                ),
+        $machineEntity = new MachineEntity(
+            $job->getId(),
+            $previous->getState(),
+            $previous->getStateCategory(),
+        );
+
+        $machineEntity = $machineEntity->setMetaState(
+            new MetaState(
+                $previous->getMetaState()->ended,
+                $previous->getMetaState()->succeeded,
+                $previous->getMetaState()->pending,
             )
         );
+
+        $previousIpAddress = $previous->getIpAddress();
+        $previousIpAddress = '' === $previousIpAddress ? null : $previousIpAddress;
+        if (null !== $previousIpAddress) {
+            $machineEntity = $machineEntity->setIpAddress($previousIpAddress);
+        }
+
+        if ($previous->isActive()) {
+            $machineEntity = $machineEntity->setIsActive();
+        }
+
+        $machineRepository->save($machineEntity);
 
         $readinessAssessor = self::getContainer()->get(GetMachineReadinessAssessor::class);
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
@@ -347,7 +368,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
         $handler = $this->createHandler($wrapper, $readinessAssessor);
 
-        $handler(new GetMachineMessage($previous->getId(), $previous));
+        $handler(new GetMachineMessage($previous->getId()));
 
         $latestEvent = $this->eventRecorder->getLatest();
         self::assertNotNull($latestEvent);
@@ -404,19 +425,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $machine = new Machine(
-            $jobId,
-            'up/active',
-            'active',
-            null,
-            null,
-            new MetaState(false, false, false),
-            false,
-            false,
-            false,
-        );
-
-        $message = new GetMachineMessage($jobId, $machine);
+        $message = new GetMachineMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -460,12 +469,20 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
         \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
+
         return new GetMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $wrapper,
             $eventDispatcher,
             $authenticationTokenProvider,
+            $machineRepository,
+            $machineModelFactory,
         );
     }
 
