@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
+use App\Model\Machine\WorkerManagerMachine;
 use App\Repository\MachineRepository;
 use App\Services\MachineEntityFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -75,7 +76,7 @@ class MachineEntityFactoryTest extends WebTestCase
 
         $jobId = Id::generate();
 
-        $machine = WorkerMachineFactory::createRandomForJob($jobId);
+        $machine = new WorkerManagerMachine(WorkerMachineFactory::createRandomForJob($jobId));
 
         $event = new MachineCreationRequestedEvent($machine);
 
@@ -99,7 +100,7 @@ class MachineEntityFactoryTest extends WebTestCase
 
         self::assertSame(0, $this->machineRepository->count([]));
 
-        $machine = $workerManagerClientMachineCreator($job->getId());
+        $machine = new WorkerManagerMachine($workerManagerClientMachineCreator($job->getId()));
 
         $event = new MachineCreationRequestedEvent($machine);
 
