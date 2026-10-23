@@ -10,13 +10,12 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageDispatcher\IsWorkerReadyMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
-use App\Model\Machine\WorkerManagerMachine;
+use App\Model\Machine\Machine;
+use App\Model\MetaState;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\WorkerManagerClient\Model\Machine;
-use SmartAssert\WorkerManagerClient\Model\MetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use webignition\SymfonyMessengerDelayMiddleware\NonDelayedStamp;
@@ -75,18 +74,16 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 
         $machineIpAddress = '127.0.0.1';
 
-        $machine = new WorkerManagerMachine(
-            new Machine(
-                $jobId,
-                'up/active',
-                'active',
-                [$machineIpAddress],
-                null,
-                false,
-                false,
-                new MetaState(false, false, false),
-                [],
-            ),
+        $machine = new Machine(
+            $jobId,
+            'up/active',
+            'active',
+            $machineIpAddress,
+            null,
+            new MetaState(false, false, false),
+            true,
+            false,
+            false,
         );
 
         $event = new MachineIsActiveEvent($machineIpAddress, $machine);
@@ -113,18 +110,16 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 
         $machineIpAddress = '127.0.0.1';
 
-        $machine = new WorkerManagerMachine(
-            new Machine(
-                $jobId,
-                'up/active',
-                'active',
-                [$machineIpAddress],
-                null,
-                true,
-                false,
-                new MetaState(false, false, false),
-                [],
-            ),
+        $machine = new Machine(
+            $jobId,
+            'up/active',
+            'active',
+            $machineIpAddress,
+            null,
+            new MetaState(false, false, false),
+            true,
+            false,
+            false,
         );
 
         $event = new MachineIsActiveEvent($machineIpAddress, $machine);
