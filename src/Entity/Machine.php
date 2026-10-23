@@ -158,4 +158,16 @@ class Machine
     {
         return $this->isReady;
     }
+
+    public function isEnding(): bool
+    {
+        return $this->isEnding;
+    }
+
+    public function setIsEnding(): self
+    {
+        $this->isEnding = true;
+
+        return $this;
+    }
 }
