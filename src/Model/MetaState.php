@@ -26,4 +26,14 @@ readonly class MetaState implements SerializeToArrayInterface
             'pending' => $this->pending,
         ];
     }
+
+    public function hasFailedState(): bool
+    {
+        return $this->ended && !$this->succeeded;
+    }
+
+    public function hasEndState(): bool
+    {
+        return $this->ended;
+    }
 }
