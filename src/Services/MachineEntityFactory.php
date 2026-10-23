@@ -10,11 +10,11 @@ use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MachineFactory implements EventSubscriberInterface
+final readonly class MachineEntityFactory implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly JobRepository $jobRepository,
-        private readonly MachineRepository $machineRepository,
+        private JobRepository $jobRepository,
+        private MachineRepository $machineRepository,
     ) {}
 
     /**
