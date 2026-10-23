@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
 use App\Repository\MachineRepository;
-use App\Services\MachineFactory;
+use App\Services\MachineEntityFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\WorkerManagerClientMachineFactory as WorkerMachineFactory;
 use App\Tests\Services\Generator\Id;
@@ -17,10 +17,10 @@ use SmartAssert\WorkerManagerClient\Model\Machine as WorkerManagerClientMachine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class MachineFactoryTest extends WebTestCase
+class MachineEntityFactoryTest extends WebTestCase
 {
     private MachineRepository $machineRepository;
-    private MachineFactory $machineFactory;
+    private MachineEntityFactory $factory;
 
     protected function setUp(): void
     {
@@ -38,15 +38,15 @@ class MachineFactoryTest extends WebTestCase
 
         $this->machineRepository = $machineRepository;
 
-        $machineFactory = self::getContainer()->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $this->machineFactory = $machineFactory;
+        $factory = self::getContainer()->get(MachineEntityFactory::class);
+        \assert($factory instanceof MachineEntityFactory);
+        $this->factory = $factory;
     }
 
     #[DataProvider('eventSubscriptionsDataProvider')]
     public function testEventSubscriptions(string $expectedListenedForEvent, string $expectedMethod): void
     {
-        $subscribedEvents = $this->machineFactory::getSubscribedEvents();
+        $subscribedEvents = $this->factory::getSubscribedEvents();
         self::assertArrayHasKey($expectedListenedForEvent, $subscribedEvents);
 
         $eventSubscriptions = $subscribedEvents[$expectedListenedForEvent];
@@ -79,7 +79,7 @@ class MachineFactoryTest extends WebTestCase
 
         $event = new MachineCreationRequestedEvent($machine);
 
-        $this->machineFactory->createOnMachineCreationRequestedEvent($event);
+        $this->factory->createOnMachineCreationRequestedEvent($event);
 
         self::assertSame(0, $this->machineRepository->count([]));
     }
@@ -103,7 +103,7 @@ class MachineFactoryTest extends WebTestCase
 
         $event = new MachineCreationRequestedEvent($machine);
 
-        $this->machineFactory->createOnMachineCreationRequestedEvent($event);
+        $this->factory->createOnMachineCreationRequestedEvent($event);
 
         $machineEntity = $this->machineRepository->find($job->getId());
         self::assertEquals($expectedMachineCreator($job->getId()), $machineEntity);
