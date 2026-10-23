@@ -94,7 +94,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetMachineMessage($machine->getId(), $machine);
+        $expectedMessage = new GetMachineMessage($machine->getId());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -157,7 +157,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new GetMachineMessage($machine->getId(), $machine);
+        $expectedMessage = new GetMachineMessage($machine->getId());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());

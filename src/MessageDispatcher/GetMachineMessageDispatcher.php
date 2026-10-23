@@ -52,7 +52,7 @@ readonly class GetMachineMessageDispatcher implements EventSubscriberInterface
      */
     private function doDispatch(JobEvent&MachineEvent $event, array $stamps = []): void
     {
-        $message = new GetMachineMessage($event->getJobId(), $event->getMachine());
+        $message = new GetMachineMessage($event->getJobId());
 
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {
