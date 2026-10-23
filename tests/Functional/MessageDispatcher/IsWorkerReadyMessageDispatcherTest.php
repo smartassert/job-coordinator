@@ -10,6 +10,7 @@ use App\Event\MessageNotHandleableEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageDispatcher\IsWorkerReadyMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
+use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
@@ -73,19 +74,22 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $machineIpAddress = '127.0.0.1';
-        $machine = new Machine(
-            $jobId,
-            'up/active',
-            'active',
-            [$machineIpAddress],
-            null,
-            false,
-            false,
-            new MetaState(false, false, false),
-            [],
+
+        $machine = new WorkerManagerMachine(
+            new Machine(
+                $jobId,
+                'up/active',
+                'active',
+                [$machineIpAddress],
+                null,
+                false,
+                false,
+                new MetaState(false, false, false),
+                [],
+            ),
         );
 
-        $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);
+        $event = new MachineIsActiveEvent($machineIpAddress, $machine);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -108,19 +112,22 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         $jobId = Id::generate();
 
         $machineIpAddress = '127.0.0.1';
-        $machine = new Machine(
-            $jobId,
-            'up/active',
-            'active',
-            [$machineIpAddress],
-            null,
-            true,
-            false,
-            new MetaState(false, false, false),
-            [],
+
+        $machine = new WorkerManagerMachine(
+            new Machine(
+                $jobId,
+                'up/active',
+                'active',
+                [$machineIpAddress],
+                null,
+                true,
+                false,
+                new MetaState(false, false, false),
+                [],
+            ),
         );
 
-        $event = new MachineIsActiveEvent($jobId, $machineIpAddress, $machine);
+        $event = new MachineIsActiveEvent($machineIpAddress, $machine);
 
         $this->dispatcher->dispatchImmediately($event);
 
