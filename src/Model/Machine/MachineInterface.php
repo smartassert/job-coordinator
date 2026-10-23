@@ -8,6 +8,9 @@ use App\Model\MetaState;
 
 interface MachineInterface
 {
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string;
 
     public function getState(): string;
