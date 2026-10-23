@@ -10,7 +10,6 @@ use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\MessageHandler\TerminateMachineMessageHandler;
-use App\Model\Machine\WorkerManagerMachine;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
@@ -115,16 +114,14 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn(MessageHandlingReadiness::NOW)
         ;
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                [],
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false, true),
-            ),
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([

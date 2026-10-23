@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\Factory;
 
+use App\Model\Machine\WorkerManagerMachine;
 use App\Tests\Services\Generator\BoolValue;
 use App\Tests\Services\Generator\StringValue;
 use SmartAssert\WorkerManagerClient\Model\ActionFailure;
@@ -29,28 +30,30 @@ class WorkerManagerClientMachineFactory
         MetaState $metaState,
         ?ActionFailure $actionFailure = null,
         array $previousStates = [],
-    ): Machine {
-        return new Machine(
-            $id,
-            $state,
-            $stateCategory,
-            $ipAddresses,
-            $actionFailure,
-            $hasActiveState,
-            $hasEndingState,
-            new MetaState(
-                $metaState->ended,
-                $metaState->succeeded,
-                $metaState->pending,
+    ): WorkerManagerMachine {
+        return new WorkerManagerMachine(
+            new Machine(
+                $id,
+                $state,
+                $stateCategory,
+                $ipAddresses,
+                $actionFailure,
+                $hasActiveState,
+                $hasEndingState,
+                new MetaState(
+                    $metaState->ended,
+                    $metaState->succeeded,
+                    $metaState->pending,
+                ),
+                $previousStates,
             ),
-            $previousStates,
         );
     }
 
     /**
      * @param non-empty-string $jobId
      */
-    public static function createRandomForJob(string $jobId): Machine
+    public static function createRandomForJob(string $jobId): WorkerManagerMachine
     {
         $hasFailedState = BoolValue::random();
         $hasActiveState = BoolValue::random();

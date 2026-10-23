@@ -12,7 +12,6 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\MessageHandler\CreateMachineMessageHandler;
-use App\Model\Machine\WorkerManagerMachine;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -138,16 +137,14 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $assessor = self::getContainer()->get(CreateMachineReadinessAssessor::class);
         \assert($assessor instanceof CreateMachineReadinessAssessor);
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                [],
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false, true),
-            ),
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([

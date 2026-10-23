@@ -14,7 +14,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
-use App\Model\Machine\WorkerManagerMachine;
+use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -30,7 +30,6 @@ use App\Tests\Services\Generator\Id;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\WorkerManagerClient\Client as WorkerManagerClient;
-use SmartAssert\WorkerManagerClient\Model\Machine;
 use SmartAssert\WorkerManagerClient\Model\MetaState as WorkerManagerClientMetaState;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -59,7 +58,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = new WorkerManagerMachine(MachineFactory::createRandomForJob($job->getId()));
+        $machine = MachineFactory::createRandomForJob($job->getId());
         $message = new GetMachineMessage($job->getId(), $machine);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -85,8 +84,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): Machine $previousMachineCreator
-     * @param callable(JobInterface): Machine $currentMachineCreator
+     * @param callable(JobInterface): MachineInterface $previousMachineCreator
+     * @param callable(JobInterface): MachineInterface $currentMachineCreator
      */
     #[DataProvider('invokeNoStateChangeDataProvider')]
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
@@ -95,13 +94,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $previous = new WorkerManagerMachine(
-            $previousMachineCreator($job),
-        );
-
-        $current = new WorkerManagerMachine(
-            $currentMachineCreator($job),
-        );
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -177,9 +171,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): Machine       $previousMachineCreator
-     * @param callable(JobInterface): Machine       $currentMachineCreator
-     * @param callable(JobInterface, string): Event $expectedEventCreator
+     * @param callable(JobInterface): MachineInterface $previousMachineCreator
+     * @param callable(JobInterface): MachineInterface $currentMachineCreator
+     * @param callable(JobInterface, string): Event    $expectedEventCreator
      */
     #[DataProvider('invokeHasStateChangeDataProvider')]
     public function testInvokeHasStateChange(
@@ -191,8 +185,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $previous = new WorkerManagerMachine($previousMachineCreator($job));
-        $current = new WorkerManagerMachine($currentMachineCreator($job));
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -261,28 +255,24 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
                     \assert('' !== $authenticationToken);
 
                     return new MachineStateChangeEvent(
-                        new WorkerManagerMachine(
-                            MachineFactory::create(
-                                $job->getId(),
-                                'unknown',
-                                'unknown',
-                                [],
-                                false,
-                                false,
-                                new WorkerManagerClientMetaState(false, false, true),
-                            ),
+                        MachineFactory::create(
+                            $job->getId(),
+                            'unknown',
+                            'unknown',
+                            [],
+                            false,
+                            false,
+                            new WorkerManagerClientMetaState(false, false, true),
                         ),
-                        new WorkerManagerMachine(
-                            MachineFactory::create(
-                                $job->getId(),
-                                'find/received',
-                                'finding',
-                                [],
-                                false,
-                                false,
-                                new WorkerManagerClientMetaState(false, false, true),
-                            ),
-                        )
+                        MachineFactory::create(
+                            $job->getId(),
+                            'find/received',
+                            'finding',
+                            [],
+                            false,
+                            false,
+                            new WorkerManagerClientMetaState(false, false, true),
+                        ),
                     );
                 },
             ],
@@ -314,17 +304,15 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
 
                     return new MachineIsActiveEvent(
                         '127.0.0.1',
-                        new WorkerManagerMachine(
-                            MachineFactory::create(
-                                $job->getId(),
-                                'up/active',
-                                'active',
-                                ['127.0.0.1'],
-                                true,
-                                false,
-                                new WorkerManagerClientMetaState(false, false, false),
-                            ),
-                        )
+                        MachineFactory::create(
+                            $job->getId(),
+                            'up/active',
+                            'active',
+                            ['127.0.0.1'],
+                            true,
+                            false,
+                            new WorkerManagerClientMetaState(false, false, false),
+                        ),
                     );
                 },
             ],
@@ -332,9 +320,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): Machine $previousMachineCreator
-     * @param callable(JobInterface): Machine $currentMachineCreator
-     * @param class-string                    $expectedEventClass
+     * @param callable(JobInterface): MachineInterface $previousMachineCreator
+     * @param callable(JobInterface): MachineInterface $currentMachineCreator
+     * @param class-string                             $expectedEventClass
      */
     #[DataProvider('invokeHasEndStateChangeDataProvider')]
     public function testInvokeHasEndStateChange(
@@ -346,8 +334,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $previous = new WorkerManagerMachine($previousMachineCreator($job));
-        $current = new WorkerManagerMachine($currentMachineCreator($job));
+        $previous = $previousMachineCreator($job);
+        $current = $currentMachineCreator($job);
 
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
@@ -429,16 +417,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $jobId,
-                'up/active',
-                'active',
-                [],
-                true,
-                false,
-                new WorkerManagerClientMetaState(false, false, false),
-            ),
+        $machine = MachineFactory::create(
+            $jobId,
+            'up/active',
+            'active',
+            [],
+            true,
+            false,
+            new WorkerManagerClientMetaState(false, false, false),
         );
 
         $message = new GetMachineMessage($jobId, $machine);

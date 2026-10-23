@@ -12,7 +12,6 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Event\SerializedSuiteRetrievedEvent;
-use App\Model\Machine\WorkerManagerMachine;
 use App\Model\RemoteRequestType;
 use App\Services\RemoteRequestRemover;
 use App\Services\RemoteRequestRemoverForEvents;
@@ -52,17 +51,15 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents->removeMachineCreateRequests(
             new MachineIsActiveEvent(
                 '127.0.0.1',
-                new WorkerManagerMachine(
-                    MachineFactory::create(
-                        $jobId,
-                        StringValue::random(),
-                        StringValue::random(),
-                        [Ip::random()],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true)
-                    ),
-                )
+                MachineFactory::create(
+                    $jobId,
+                    StringValue::random(),
+                    StringValue::random(),
+                    [Ip::random()],
+                    false,
+                    false,
+                    new WorkerManagerClientMetaState(false, false, true)
+                ),
             )
         );
     }
@@ -141,8 +138,8 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
             new MachineRetrievedEvent(
-                new WorkerManagerMachine(MachineFactory::createRandomForJob($jobId)),
-                new WorkerManagerMachine(MachineFactory::createRandomForJob($jobId)),
+                MachineFactory::createRandomForJob($jobId),
+                MachineFactory::createRandomForJob($jobId),
             )
         );
     }
@@ -256,16 +253,14 @@ class RemoteRequestRemoverForEventsTest extends TestCase
 
         $remoteRequestRemoverForEvents->removeMachineTerminationRequests(
             new MachineTerminationRequestedEvent(
-                new WorkerManagerMachine(
-                    MachineFactory::create(
-                        $jobId,
-                        StringValue::random(),
-                        StringValue::random(),
-                        [Ip::random()],
-                        false,
-                        false,
-                        new WorkerManagerClientMetaState(false, false, true),
-                    ),
+                MachineFactory::create(
+                    $jobId,
+                    StringValue::random(),
+                    StringValue::random(),
+                    [Ip::random()],
+                    false,
+                    false,
+                    new WorkerManagerClientMetaState(false, false, true),
                 ),
             )
         );

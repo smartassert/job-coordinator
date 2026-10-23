@@ -10,7 +10,6 @@ use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Model\Machine\MachineInterface;
-use App\Model\Machine\WorkerManagerMachine;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -75,16 +74,14 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                [],
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false, true),
-            ),
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $this->persistMachine($machine);
@@ -110,16 +107,14 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                [],
-                false,
-                false,
-                new WorkerManagerClientMetaState(true, false, true),
-            ),
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            new WorkerManagerClientMetaState(true, false, true),
         );
 
         $this->persistMachine($machine);
@@ -138,16 +133,14 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machine = new WorkerManagerMachine(
-            MachineFactory::create(
-                $job->getId(),
-                'create/requested',
-                'pre_active',
-                [],
-                false,
-                false,
-                new WorkerManagerClientMetaState(false, false, true),
-            ),
+        $machine = MachineFactory::create(
+            $job->getId(),
+            'create/requested',
+            'pre_active',
+            [],
+            false,
+            false,
+            new WorkerManagerClientMetaState(false, false, true),
         );
 
         $this->persistMachine($machine);
