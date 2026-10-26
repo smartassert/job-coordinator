@@ -15,7 +15,6 @@ use App\Message\GetMachineMessage;
 use App\MessageHandler\GetMachineMessageHandler;
 use App\Model\JobInterface;
 use App\Model\Machine\Machine;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\GetMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
@@ -95,8 +94,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): MachineInterface $previousMachineCreator
-     * @param callable(JobInterface): MachineInterface $currentMachineCreator
+     * @param callable(JobInterface): Machine $previousMachineCreator
+     * @param callable(JobInterface): Machine $currentMachineCreator
      */
     #[DataProvider('invokeNoStateChangeDataProvider')]
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
@@ -129,7 +128,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            HttpResponseFactory::createForWorkerManagerMachine($current),
+            HttpResponseFactory::createForMachine($current),
         ]);
         $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
 
@@ -180,9 +179,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): MachineInterface $previousMachineCreator
-     * @param callable(JobInterface): MachineInterface $currentMachineCreator
-     * @param callable(JobInterface, string): Event    $expectedEventCreator
+     * @param callable(JobInterface): Machine       $previousMachineCreator
+     * @param callable(JobInterface): Machine       $currentMachineCreator
+     * @param callable(JobInterface, string): Event $expectedEventCreator
      */
     #[DataProvider('invokeHasStateChangeDataProvider')]
     public function testInvokeHasStateChange(
@@ -218,7 +217,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            HttpResponseFactory::createForWorkerManagerMachine($current),
+            HttpResponseFactory::createForMachine($current),
         ]);
         $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
 
@@ -311,9 +310,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): MachineInterface $previousMachineCreator
-     * @param callable(JobInterface): MachineInterface $currentMachineCreator
-     * @param class-string                             $expectedEventClass
+     * @param callable(JobInterface): Machine $previousMachineCreator
+     * @param callable(JobInterface): Machine $currentMachineCreator
+     * @param class-string                    $expectedEventClass
      */
     #[DataProvider('invokeHasEndStateChangeDataProvider')]
     public function testInvokeHasEndStateChange(
@@ -361,7 +360,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($readinessAssessor instanceof ReadinessAssessorInterface);
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            HttpResponseFactory::createForWorkerManagerMachine($current),
+            HttpResponseFactory::createForMachine($current),
         ]);
         $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Services\Factory;
 
 use App\Model\Machine\Machine;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Tests\Services\Generator\BoolValue;
 use App\Tests\Services\Generator\StringValue;
@@ -15,7 +14,7 @@ class MachineFactory
     /**
      * @param non-empty-string $jobId
      */
-    public static function createRandomForJob(string $jobId): MachineInterface
+    public static function createRandomForJob(string $jobId): Machine
     {
         $failed = BoolValue::random();
         $active = BoolValue::random();

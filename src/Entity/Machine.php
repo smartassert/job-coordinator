@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MachineRepository::class)]
-class Machine implements MachineInterface
+class Machine
 {
     #[ORM\Id]
     #[ORM\Column(length: 32, unique: true, nullable: false)]
@@ -64,11 +63,17 @@ class Machine implements MachineInterface
         $this->isEnding = false;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string
     {
         return $this->jobId;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getState(): string
     {
         \assert('' !== $this->state);
@@ -86,6 +91,9 @@ class Machine implements MachineInterface
         return $this;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getStateCategory(): string
     {
         \assert('' !== $this->stateCategory);

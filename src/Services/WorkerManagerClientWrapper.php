@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Model\Machine\MachineInterface;
+use App\Model\Machine\Machine;
 use Psr\Http\Client\ClientExceptionInterface;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
@@ -33,7 +33,7 @@ readonly class WorkerManagerClientWrapper
      * @throws UnauthorizedException
      * @throws CreateMachineException
      */
-    public function create(string $authenticationToken, string $machineId): MachineInterface
+    public function create(string $authenticationToken, string $machineId): Machine
     {
         return $this->machineModelFactory->createFromWorkerManagerClientMachine(
             $this->client->createMachine($authenticationToken, $machineId),
@@ -51,7 +51,7 @@ readonly class WorkerManagerClientWrapper
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
      */
-    public function get(string $authenticationToken, string $machineId): MachineInterface
+    public function get(string $authenticationToken, string $machineId): Machine
     {
         return $this->machineModelFactory->createFromWorkerManagerClientMachine(
             $this->client->getMachine($authenticationToken, $machineId),
@@ -69,7 +69,7 @@ readonly class WorkerManagerClientWrapper
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
      */
-    public function delete(string $authenticationToken, string $machineId): MachineInterface
+    public function delete(string $authenticationToken, string $machineId): Machine
     {
         return $this->machineModelFactory->createFromWorkerManagerClientMachine(
             $this->client->deleteMachine($authenticationToken, $machineId),
