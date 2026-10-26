@@ -33,10 +33,10 @@ readonly class WorkerManagerClientWrapper
      * @throws UnauthorizedException
      * @throws CreateMachineException
      */
-    public function create(string $authenticationToken, string $machineId): Machine
+    public function create(string $authenticationToken, string $machineId, string $notifyUrl): Machine
     {
         return $this->machineModelFactory->createFromWorkerManagerClientMachine(
-            $this->client->createMachine($authenticationToken, $machineId),
+            $this->client->createMachine($authenticationToken, $machineId, $notifyUrl),
         );
     }
 
