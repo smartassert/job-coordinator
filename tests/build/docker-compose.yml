@@ -65,6 +65,7 @@ services:
       SECONDARY_DIGITALOCEAN_API_TOKEN: intentionally_invalid_secondary_token
       IS_READY: 1
       WORKER_SSH_KEY_ID: 12345
+      NOTIFY_SECRET: worker_manager_notify_secret
     depends_on:
       - postgres
 
@@ -128,6 +129,7 @@ services:
         SELF_URL: http://app-http
         SOURCES_NOTIFY_SECRET: sources_notify_secret
         RESULTS_NOTIFY_SECRET: results_notify_secret
+        WORKER_MANAGER_NOTIFY_SECRET: worker_manager_notify_secret
     container_name: app
     restart: unless-stopped
     depends_on:
