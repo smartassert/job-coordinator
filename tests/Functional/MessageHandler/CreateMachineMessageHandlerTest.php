@@ -158,7 +158,7 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            HttpResponseFactory::createForWorkerManagerMachine($machine),
+            HttpResponseFactory::createForMachine($machine),
         ]);
 
         $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);

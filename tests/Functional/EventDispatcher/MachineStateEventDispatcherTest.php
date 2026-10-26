@@ -11,7 +11,6 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\EntityRemover;
@@ -356,13 +355,13 @@ class MachineStateEventDispatcherTest extends WebTestCase
         );
     }
 
-    private function persistMachineModel(MachineInterface $model): void
+    private function persistMachineModel(Machine $model): void
     {
         $entity = self::createMachineEntityFromMachine($model);
         $this->machineRepository->save($entity);
     }
 
-    private static function createMachineEntityFromMachine(MachineInterface $model): MachineEntity
+    private static function createMachineEntityFromMachine(Machine $model): MachineEntity
     {
         $entity = new MachineEntity(
             $model->getId(),

@@ -10,7 +10,6 @@ use App\Event\MachineRetrievedEvent;
 use App\Message\GetMachineMessage;
 use App\MessageDispatcher\GetMachineMessageDispatcher;
 use App\Model\Machine\Machine;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\JobFactory;
@@ -173,7 +172,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
         );
     }
 
-    private function persistMachine(MachineInterface $machine): void
+    private function persistMachine(Machine $machine): void
     {
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);

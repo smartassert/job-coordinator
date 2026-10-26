@@ -131,7 +131,7 @@ class TerminateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         );
 
         $workerManagerClient = HttpMockedWorkerManagerClientFactory::create([
-            HttpResponseFactory::createForWorkerManagerMachine($machine),
+            HttpResponseFactory::createForMachine($machine),
         ]);
         $wrapper = $this->createWorkerManagerClientWrapper($workerManagerClient);
 
