@@ -13,9 +13,9 @@ use App\Event\MachineStateChangeEvent;
 use App\Model\JobInterface;
 use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine as MachineModel;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
+use App\Services\MachineModelFactory;
 use App\Services\MachineMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\MachineFactory;
@@ -244,10 +244,10 @@ class MachineMutatorTest extends WebTestCase
     }
 
     /**
-     * @param callable(JobFactory): ?JobInterface                               $jobCreator
-     * @param callable(?JobInterface): ?Machine                                 $machineCreator
-     * @param callable(?JobInterface, ?MachineInterface): ?MachineIsActiveEvent $eventCreator
-     * @param callable(?JobInterface): ?MachineInterface                        $expectedMachineCreator
+     * @param callable(JobFactory): ?JobInterface                           $jobCreator
+     * @param callable(?JobInterface): ?Machine                             $machineCreator
+     * @param callable(?JobInterface, ?MachineModel): ?MachineIsActiveEvent $eventCreator
+     * @param callable(?JobInterface): ?Machine                             $expectedMachineCreator
      */
     #[DataProvider('handleMachineIsActiveEventDataProvider')]
     public function testHandleMachineIsActiveEvent(
@@ -256,23 +256,28 @@ class MachineMutatorTest extends WebTestCase
         callable $eventCreator,
         callable $expectedMachineCreator,
     ): void {
-        $job = $jobCreator($this->jobFactory);
-        $machine = $machineCreator($job);
+        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
+        \assert($machineModelFactory instanceof MachineModelFactory);
 
-        if ($machine instanceof Machine) {
-            $this->machineRepository->save($machine);
+        $job = $jobCreator($this->jobFactory);
+        $machineEntity = $machineCreator($job);
+        $machineModel = null;
+
+        if ($machineEntity instanceof Machine) {
+            $this->machineRepository->save($machineEntity);
+            $machineModel = $machineModelFactory->createFromMachineEntity($machineEntity);
         }
 
-        $event = $eventCreator($job, $machine);
+        $event = $eventCreator($job, $machineModel);
         \assert(null !== $event);
 
         $this->machineMutator->handleMachineIsActiveEvent($event);
 
-        $machine = null === $job
+        $machineEntity = null === $job
             ? null
             : $this->machineRepository->find($job->getId());
 
-        self::assertEquals($expectedMachineCreator($job), $machine);
+        self::assertEquals($expectedMachineCreator($job), $machineEntity);
     }
 
     /**
@@ -329,7 +334,7 @@ class MachineMutatorTest extends WebTestCase
                         ->setIpAddress('127.0.0.1')
                     ;
                 },
-                'eventCreator' => function (?JobInterface $job, ?MachineInterface $machine): ?MachineIsActiveEvent {
+                'eventCreator' => function (?JobInterface $job, ?MachineModel $machine): ?MachineIsActiveEvent {
                     if (null === $job || null === $machine) {
                         return null;
                     }
@@ -356,7 +361,7 @@ class MachineMutatorTest extends WebTestCase
 
                     return new Machine($job->getId(), 'up/started', 'pre_active');
                 },
-                'eventCreator' => function (?JobInterface $job, ?MachineInterface $machine): ?MachineIsActiveEvent {
+                'eventCreator' => function (?JobInterface $job, ?MachineModel $machine): ?MachineIsActiveEvent {
                     if (null === $job || null === $machine) {
                         return null;
                     }
@@ -385,7 +390,7 @@ class MachineMutatorTest extends WebTestCase
                         ->setIpAddress('127.0.0.1')
                     ;
                 },
-                'eventCreator' => function (?JobInterface $job, ?MachineInterface $machine): ?MachineIsActiveEvent {
+                'eventCreator' => function (?JobInterface $job, ?MachineModel $machine): ?MachineIsActiveEvent {
                     if (null === $job || null === $machine) {
                         return null;
                     }

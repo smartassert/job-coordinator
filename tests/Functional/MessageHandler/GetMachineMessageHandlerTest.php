@@ -95,8 +95,8 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): MachineInterface $previousMachineCreator
-     * @param callable(JobInterface): MachineInterface $currentMachineCreator
+     * @param callable(JobInterface): Machine $previousMachineCreator
+     * @param callable(JobInterface): Machine $currentMachineCreator
      */
     #[DataProvider('invokeNoStateChangeDataProvider')]
     public function testInvokeNoStateChange(callable $previousMachineCreator, callable $currentMachineCreator): void
@@ -311,9 +311,9 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
     }
 
     /**
-     * @param callable(JobInterface): MachineInterface $previousMachineCreator
-     * @param callable(JobInterface): MachineInterface $currentMachineCreator
-     * @param class-string                             $expectedEventClass
+     * @param callable(JobInterface): Machine $previousMachineCreator
+     * @param callable(JobInterface): Machine $currentMachineCreator
+     * @param class-string                    $expectedEventClass
      */
     #[DataProvider('invokeHasEndStateChangeDataProvider')]
     public function testInvokeHasEndStateChange(

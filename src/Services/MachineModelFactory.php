@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\Machine as MachineEntity;
 use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine;
 use App\Model\MetaState;
@@ -41,7 +42,7 @@ final readonly class MachineModelFactory
         );
     }
 
-    public function createFromMachineEntity(\App\Entity\Machine $entity): Machine
+    public function createFromMachineEntity(MachineEntity $entity): Machine
     {
         $actionFailure = null;
         $entityActionFailure = $entity->getActionFailure();

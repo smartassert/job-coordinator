@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Event;
 
-use App\Model\Machine\MachineInterface;
+use App\Model\Machine\Machine;
 
 class MachineIsActiveEvent extends AbstractMachineEvent implements JobEventInterface
 {
@@ -13,7 +13,7 @@ class MachineIsActiveEvent extends AbstractMachineEvent implements JobEventInter
      */
     public function __construct(
         public readonly string $ipAddress,
-        MachineInterface $machine,
+        Machine $machine,
     ) {
         parent::__construct($machine);
     }

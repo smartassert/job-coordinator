@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Machine;
 use App\Event\MachineCreationRequestedEvent;
 use App\Model\Machine\Machine as MachineModel;
-use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
 use App\Services\MachineEntityFactory;
@@ -86,13 +85,13 @@ class MachineEntityFactoryTest extends WebTestCase
     }
 
     /**
-     * @param callable(string): MachineInterface $machineCreator
-     * @param callable(string): MachineInterface $expectedMachineCreator
+     * @param callable(string): MachineModel $machineCreator
+     * @param callable(string): Machine      $expectedEntityCreator
      */
     #[DataProvider('createOnMachineRetrievedEventSuccessDataProvider')]
     public function testCreateOnMachineRetrievedEventSuccess(
         callable $machineCreator,
-        callable $expectedMachineCreator
+        callable $expectedEntityCreator
     ): void {
         $jobFactory = self::getContainer()->get(JobFactory::class);
         \assert($jobFactory instanceof JobFactory);
@@ -106,7 +105,7 @@ class MachineEntityFactoryTest extends WebTestCase
         $this->factory->createOnMachineCreationRequestedEvent($event);
 
         $machineEntity = $this->machineRepository->find($job->getId());
-        self::assertEquals($expectedMachineCreator($job->getId()), $machineEntity);
+        self::assertEquals($expectedEntityCreator($job->getId()), $machineEntity);
     }
 
     /**
@@ -131,7 +130,7 @@ class MachineEntityFactoryTest extends WebTestCase
                         false,
                     );
                 },
-                'expectedMachineCreator' => function (string $jobId) {
+                'expectedEntityCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return new Machine($jobId, 'find/finding', 'find');
@@ -153,7 +152,7 @@ class MachineEntityFactoryTest extends WebTestCase
                         false,
                     );
                 },
-                'expectedMachineCreator' => function (string $jobId) {
+                'expectedEntityCreator' => function (string $jobId) {
                     \assert('' !== $jobId);
 
                     return new Machine($jobId, 'find/not-findable', 'end');
