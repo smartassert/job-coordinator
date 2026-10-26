@@ -212,12 +212,16 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
         \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
 
+        $notifyUrl = self::getContainer()->getParameter('notify_url');
+        \assert(is_string($notifyUrl) && '' !== $notifyUrl);
+
         return new CreateMachineMessageHandler(
             $assessor,
             $messageStateMutator,
             $wrapper,
             $eventDispatcher,
             $authenticationTokenProvider,
+            $notifyUrl,
         );
     }
 
