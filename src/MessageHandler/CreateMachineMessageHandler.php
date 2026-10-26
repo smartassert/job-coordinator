@@ -19,6 +19,9 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateMachineMessageHandler
 {
+    /**
+     * @param non-empty-string $notifyUrl
+     */
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,

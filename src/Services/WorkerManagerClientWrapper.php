@@ -24,6 +24,7 @@ readonly class WorkerManagerClientWrapper
     /**
      * @param non-empty-string $authenticationToken
      * @param non-empty-string $machineId
+     * @param non-empty-string $notifyUrl
      *
      * @throws ClientExceptionInterface
      * @throws InvalidModelDataException
