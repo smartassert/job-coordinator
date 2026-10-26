@@ -122,7 +122,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->persistMachine($machine);
 
-        $event = new MachineRetrievedEvent($machine, $machine);
+        $event = new MachineRetrievedEvent($machine);
 
         $this->dispatcher->dispatch($event);
 
@@ -150,7 +150,7 @@ class GetMachineMessageDispatcherTest extends WebTestCase
 
         $this->persistMachine($machine);
 
-        $event = new MachineRetrievedEvent($machine, $machine);
+        $event = new MachineRetrievedEvent($machine);
 
         $this->dispatcher->dispatch($event);
 
