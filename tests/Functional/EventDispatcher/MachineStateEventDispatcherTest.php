@@ -24,6 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MachineStateEventDispatcherTest extends WebTestCase
 {
     private EventRecorder $eventRecorder;
+    private MachineRepository $machineRepository;
 
     protected function setUp(): void
     {
@@ -32,6 +33,10 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $this->machineRepository = $machineRepository;
 
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         \assert($entityRemover instanceof EntityRemover);
@@ -113,11 +118,9 @@ class MachineStateEventDispatcherTest extends WebTestCase
     #[DataProvider('dispatchMachineIsActiveEventNotActiveDataProvider')]
     public function testDispatchMachineIsActiveEventMachineNotActive(
         MachineEntity $currentMachine,
-        MachineRetrievedEvent $event
+        MachineRetrievedEvent $event,
     ): void {
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save($currentMachine);
+        $this->machineRepository->save($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -199,9 +202,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
         MachineRetrievedEvent $event,
         MachineIsActiveEvent $expected,
     ): void {
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save($currentMachine);
+        $this->machineRepository->save($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -358,10 +359,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
     private function persistMachineModel(MachineInterface $model): void
     {
         $entity = self::createMachineEntityFromMachine($model);
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save($entity);
+        $this->machineRepository->save($entity);
     }
 
     private static function createMachineEntityFromMachine(MachineInterface $model): MachineEntity
