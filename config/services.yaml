@@ -22,6 +22,7 @@ parameters:
         App\Message\CreateMachineMessage: '%env(int:CREATE_MACHINE_DISPATCH_DELAY_MS)%'
     sources_notify_secret: '%env(string:SOURCES_NOTIFY_SECRET)%'
     results_notify_secret: '%env(string:RESULTS_NOTIFY_SECRET)%'
+    worker_manager_notify_secret: '%env(string:WORKER_MANAGER_NOTIFY_SECRET)%'
     notify_url: '%env(string:SELF_URL)%/notify'
 
 services:
