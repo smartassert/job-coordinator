@@ -80,8 +80,13 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
     public function dispatchMachineHasActionFailureEvent(MachineRetrievedEvent $event): void
     {
+        $previousEntity = $this->machineRepository->find($event->getJobId());
+        if (null === $previousEntity) {
+            return;
+        }
+
         if (
-            null === $event->previous->getActionFailure()
+            null === $previousEntity->getActionFailure()
             && $event->getMachine()->getActionFailure() instanceof ActionFailureInterface
         ) {
             $this->eventDispatcher->dispatch(

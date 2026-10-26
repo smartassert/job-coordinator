@@ -36,6 +36,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $entityRemover = self::getContainer()->get(EntityRemover::class);
         \assert($entityRemover instanceof EntityRemover);
         $entityRemover->removeAllMachines();
+        $entityRemover->removeAllMachineActionFailures();
     }
 
     public function testDispatchMachineStateChangeEventNoStateChange(): void
@@ -266,6 +267,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
+        $this->persistMachineModel($previousMachine);
+
         $currentMachine = new Machine(
             $machineId,
             'current-state',
@@ -303,6 +306,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
             false,
         );
+
+        $this->persistMachineModel($previousMachine);
 
         $currentMachine = new Machine(
             $machineId,

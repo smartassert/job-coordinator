@@ -6,6 +6,7 @@ namespace App\Tests\Services;
 
 use App\Entity\Job;
 use App\Repository\JobRepository;
+use App\Repository\MachineActionFailureRepository;
 use App\Repository\MachineRepository;
 use App\Repository\RemoteRequestFailureRepository;
 use App\Repository\RemoteRequestRepository;
@@ -21,6 +22,7 @@ readonly class EntityRemover
         private JobRepository $jobRepository,
         private ResultsJobRepository $resultsJobRepository,
         private MachineRepository $machineRepository,
+        private MachineActionFailureRepository $machineActionFailureRepository,
     ) {}
 
     /**
@@ -79,6 +81,15 @@ readonly class EntityRemover
     {
         foreach ($this->machineRepository->findAll() as $entity) {
             $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeAllMachineActionFailures(): void
+    {
+        foreach ($this->machineActionFailureRepository->findAll() as $machineActionFailure) {
+            $this->entityManager->remove($machineActionFailure);
         }
 
         $this->entityManager->flush();
