@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entity\Machine as MachineEntity;
 use App\Enum\JobComponentName;
 use App\Model\JobComponent\Machine;
 use App\Model\JobInterface;
@@ -18,12 +19,20 @@ readonly class MachineComponentFactory
         private MachineRepository $machineRepository,
         private RemoteRequestRepository $remoteRequestRepository,
         private MachineFactory $preparationFactory,
+        private MachineModelFactory $machineModelFactory,
     ) {}
 
     public function createForJob(JobInterface $job): Machine
     {
+        $machineEntity = $this->machineRepository->find($job->getId());
+        $machineModel = null;
+
+        if ($machineEntity instanceof MachineEntity) {
+            $machineModel = $this->machineModelFactory->createFromMachineEntity($machineEntity);
+        }
+
         return new Machine(
-            $this->machineRepository->find($job->getId()),
+            $machineModel,
             new RemoteRequestCollection(
                 $this->remoteRequestRepository->findAllForJobAndComponent($job->getId(), JobComponentName::MACHINE)
             ),
