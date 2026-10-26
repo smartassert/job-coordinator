@@ -7,7 +7,7 @@ namespace App\Model\Machine;
 /**
  * @phpstan-import-type MachineActionFailureContext from ActionFailureInterface
  */
-final readonly class ActionFailure implements ActionFailureInterface
+final readonly class ActionFailure implements SerializableActionFailureInterface
 {
     /**
      * @param non-empty-string            $action
@@ -33,5 +33,14 @@ final readonly class ActionFailure implements ActionFailureInterface
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'action' => $this->getAction(),
+            'type' => $this->getType(),
+            'context' => $this->context,
+        ];
     }
 }
