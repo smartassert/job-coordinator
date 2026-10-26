@@ -8,7 +8,7 @@ use App\Event\MachineHasActionFailureEvent;
 use App\Event\MachineIsActiveEvent;
 use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
-use App\Model\Machine\ActionFailureInterface;
+use App\Model\Machine\ActionFailure;
 use App\Repository\MachineRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -83,7 +83,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
         if (
             null === $previousEntity->getActionFailure()
-            && $event->getMachine()->getActionFailure() instanceof ActionFailureInterface
+            && $event->getMachine()->getActionFailure() instanceof ActionFailure
         ) {
             $this->eventDispatcher->dispatch(
                 new MachineHasActionFailureEvent($event->getMachine())

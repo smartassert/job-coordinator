@@ -6,7 +6,7 @@ namespace App\Model\Machine;
 
 use App\Model\MetaState;
 
-final readonly class Machine implements MachineInterface
+final readonly class Machine
 {
     /**
      * @param non-empty-string  $id
@@ -19,23 +19,32 @@ final readonly class Machine implements MachineInterface
         private string $state,
         private string $stateCategory,
         private ?string $ipAddress,
-        private ?ActionFailureInterface $actionFailure,
+        private ?ActionFailure $actionFailure,
         private MetaState $metaState,
         private bool $isActive,
         private bool $isReady,
         private bool $isEnding,
     ) {}
 
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string
     {
         return $this->id;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getState(): string
     {
         return $this->state;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getStateCategory(): string
     {
         return $this->stateCategory;
@@ -46,7 +55,7 @@ final readonly class Machine implements MachineInterface
         return $this->ipAddress;
     }
 
-    public function getActionFailure(): ?ActionFailureInterface
+    public function getActionFailure(): ?ActionFailure
     {
         return $this->actionFailure;
     }

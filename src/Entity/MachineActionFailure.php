@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Model\Machine\ActionFailureInterface;
+use App\Model\Machine\ActionFailure;
 use App\Repository\MachineActionFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @phpstan-import-type MachineActionFailureContext from ActionFailureInterface
+ * @phpstan-import-type MachineActionFailureContext from ActionFailure
  */
 #[ORM\Entity(repositoryClass: MachineActionFailureRepository::class)]
 class MachineActionFailure
