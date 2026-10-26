@@ -11,8 +11,10 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\Machine\ActionFailure;
 use App\Model\Machine\Machine;
+use App\Model\Machine\MachineInterface;
 use App\Model\MetaState;
 use App\Repository\MachineRepository;
+use App\Tests\Services\EntityRemover;
 use App\Tests\Services\EventSubscriber\EventRecorder;
 use App\Tests\Services\Generator\Id;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,6 +32,10 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
+
+        $entityRemover = self::getContainer()->get(EntityRemover::class);
+        \assert($entityRemover instanceof EntityRemover);
+        $entityRemover->removeAllMachines();
     }
 
     public function testDispatchMachineStateChangeEventNoStateChange(): void
@@ -106,6 +112,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
     #[DataProvider('dispatchMachineIsActiveEventNotActiveDataProvider')]
     public function testDispatchMachineIsActiveEventMachineNotActive(MachineRetrievedEvent $event): void
     {
+        $this->persistMachineModel($event->previous);
+
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
         $eventDispatcher->dispatch($event);
@@ -320,7 +328,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
         );
     }
 
-    private function persistMachineModel(Machine $model): void
+    private function persistMachineModel(MachineInterface $model): void
     {
         $entity = new MachineEntity(
             $model->getId(),
