@@ -57,7 +57,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         $this->persistMachineModel($machineModel);
 
-        $event = new MachineRetrievedEvent($machineModel, $machineModel);
+        $event = new MachineRetrievedEvent($machineModel);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -96,7 +96,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $event = new MachineRetrievedEvent($previousMachineModel, $currentMachineModel);
+        $event = new MachineRetrievedEvent($currentMachineModel);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -164,20 +164,19 @@ class MachineStateEventDispatcherTest extends WebTestCase
         return [
             'unknown -> unknown' => [
                 'currentMachine' => $unknownMachineEntity,
-                'event' => new MachineRetrievedEvent($unknownMachine, $unknownMachine),
+                'event' => new MachineRetrievedEvent($unknownMachine),
             ],
             'unknown -> finding' => [
                 'currentMachine' => $findingMachineEntity,
-                'event' => new MachineRetrievedEvent($unknownMachine, $findingMachine),
+                'event' => new MachineRetrievedEvent($findingMachine),
             ],
             'finding -> finding' => [
                 'currentMachine' => $findingMachineEntity,
-                'event' => new MachineRetrievedEvent($findingMachine, $findingMachine),
+                'event' => new MachineRetrievedEvent($findingMachine),
             ],
             'finding -> active without ip address' => [
                 'currentMachine' => $findingMachineEntity,
                 'event' => new MachineRetrievedEvent(
-                    $findingMachine,
                     new Machine(
                         $machineId,
                         'up/active',
@@ -261,12 +260,12 @@ class MachineStateEventDispatcherTest extends WebTestCase
         return [
             'unknown -> active' => [
                 'currentMachine' => $unknownMachineEntity,
-                'event' => new MachineRetrievedEvent($unknownMachine, $activeMachine),
+                'event' => new MachineRetrievedEvent($activeMachine),
                 'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
             'finding -> active' => [
                 'currentMachine' => $findingMachineEntity,
-                'event' => new MachineRetrievedEvent($findingMachine, $activeMachine),
+                'event' => new MachineRetrievedEvent($activeMachine),
                 'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
         ];
@@ -302,7 +301,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -342,7 +341,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $event = new MachineRetrievedEvent($previousMachine, $currentMachine);
+        $event = new MachineRetrievedEvent($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);

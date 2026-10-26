@@ -140,10 +140,7 @@ class RemoteRequestRemoverForEventsTest extends TestCase
         $remoteRequestRemoverForEvents = new RemoteRequestRemoverForEvents($remoteRequestRemover);
 
         $remoteRequestRemoverForEvents->removeMachineGetRequests(
-            new MachineRetrievedEvent(
-                MachineFactory::createRandomForJob($jobId),
-                MachineFactory::createRandomForJob($jobId),
-            )
+            new MachineRetrievedEvent(MachineFactory::createRandomForJob($jobId)),
         );
     }
 

@@ -138,14 +138,14 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $handler(new GetMachineMessage($previous->getId()));
 
         self::assertEquals(
-            [new MachineRetrievedEvent($previous, $current)],
+            [new MachineRetrievedEvent($current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
 
         $events = $this->eventRecorder->all(MachineRetrievedEvent::class);
         $event = $events[0] ?? null;
 
-        self::assertEquals(new MachineRetrievedEvent($previous, $current), $event);
+        self::assertEquals(new MachineRetrievedEvent($current), $event);
     }
 
     /**
@@ -378,7 +378,7 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         self::assertEquals($current, $latestEvent->getMachine());
 
         self::assertEquals(
-            [new MachineRetrievedEvent($previous, $current)],
+            [new MachineRetrievedEvent($current)],
             $this->eventRecorder->all(MachineRetrievedEvent::class)
         );
     }
@@ -472,9 +472,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
-        $machineModelFactory = self::getContainer()->get(MachineModelFactory::class);
-        \assert($machineModelFactory instanceof MachineModelFactory);
-
         return new GetMachineMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -482,7 +479,6 @@ class GetMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
             $eventDispatcher,
             $authenticationTokenProvider,
             $machineRepository,
-            $machineModelFactory,
         );
     }
 
