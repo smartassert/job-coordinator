@@ -109,7 +109,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         self::assertEquals(
             [
-                new MachineStateChangeEvent($previousMachineModel, $currentMachineModel),
+                new MachineStateChangeEvent($currentMachineModel),
             ],
             $this->eventRecorder->all(MachineStateChangeEvent::class)
         );

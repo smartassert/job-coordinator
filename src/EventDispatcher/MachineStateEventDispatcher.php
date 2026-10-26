@@ -10,7 +10,6 @@ use App\Event\MachineRetrievedEvent;
 use App\Event\MachineStateChangeEvent;
 use App\Model\Machine\ActionFailureInterface;
 use App\Repository\MachineRepository;
-use App\Services\MachineModelFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,7 +18,6 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly MachineRepository $machineRepository,
-        private readonly MachineModelFactory $machineModelFactory,
     ) {}
 
     /**
@@ -44,9 +42,7 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
         }
 
         if ($previousMachineEntity->getState() !== $event->getMachine()->getState()) {
-            $previousMachineModel = $this->machineModelFactory->createFromMachineEntity($previousMachineEntity);
-
-            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($previousMachineModel, $event->getMachine()));
+            $this->eventDispatcher->dispatch(new MachineStateChangeEvent($event->getMachine()));
         }
     }
 
