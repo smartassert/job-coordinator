@@ -111,9 +111,13 @@ class MachineStateEventDispatcherTest extends WebTestCase
     }
 
     #[DataProvider('dispatchMachineIsActiveEventNotActiveDataProvider')]
-    public function testDispatchMachineIsActiveEventMachineNotActive(MachineRetrievedEvent $event): void
-    {
-        $this->persistMachineModel($event->previous);
+    public function testDispatchMachineIsActiveEventMachineNotActive(
+        MachineEntity $currentMachine,
+        MachineRetrievedEvent $event
+    ): void {
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -141,6 +145,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
+        $unknownMachineEntity = self::createMachineEntityFromMachine($unknownMachine);
+
         $findingMachine = new Machine(
             $machineId,
             'find/finding',
@@ -153,17 +159,23 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
+        $findingMachineEntity = self::createMachineEntityFromMachine($findingMachine);
+
         return [
             'unknown -> unknown' => [
+                'currentMachine' => $unknownMachineEntity,
                 'event' => new MachineRetrievedEvent($unknownMachine, $unknownMachine),
             ],
             'unknown -> finding' => [
+                'currentMachine' => $findingMachineEntity,
                 'event' => new MachineRetrievedEvent($unknownMachine, $findingMachine),
             ],
             'finding -> finding' => [
+                'currentMachine' => $findingMachineEntity,
                 'event' => new MachineRetrievedEvent($findingMachine, $findingMachine),
             ],
             'finding -> active without ip address' => [
+                'currentMachine' => $findingMachineEntity,
                 'event' => new MachineRetrievedEvent(
                     $findingMachine,
                     new Machine(
@@ -184,10 +196,13 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     #[DataProvider('dispatchMachineIsActiveEventIsActiveDataProvider')]
     public function testDispatchMachineIsActiveEventMachineIsActive(
+        MachineEntity $currentMachine,
         MachineRetrievedEvent $event,
         MachineIsActiveEvent $expected,
     ): void {
-        $this->persistMachineModel($event->previous);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($currentMachine);
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
@@ -215,6 +230,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
+        $unknownMachineEntity = self::createMachineEntityFromMachine($unknownMachine);
+
         $findingMachine = new Machine(
             $machineId,
             'find/finding',
@@ -226,6 +243,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
             false,
         );
+
+        $findingMachineEntity = self::createMachineEntityFromMachine($findingMachine);
 
         $activeMachine = new Machine(
             $machineId,
@@ -241,10 +260,12 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
         return [
             'unknown -> active' => [
+                'currentMachine' => $unknownMachineEntity,
                 'event' => new MachineRetrievedEvent($unknownMachine, $activeMachine),
                 'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
             'finding -> active' => [
+                'currentMachine' => $findingMachineEntity,
                 'event' => new MachineRetrievedEvent($findingMachine, $activeMachine),
                 'expected' => new MachineIsActiveEvent('127.0.0.1', $activeMachine),
             ],
@@ -337,6 +358,15 @@ class MachineStateEventDispatcherTest extends WebTestCase
 
     private function persistMachineModel(MachineInterface $model): void
     {
+        $entity = self::createMachineEntityFromMachine($model);
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($entity);
+    }
+
+    private static function createMachineEntityFromMachine(MachineInterface $model): MachineEntity
+    {
         $entity = new MachineEntity(
             $model->getId(),
             $model->getState(),
@@ -349,8 +379,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
             $entity->setIsActive();
         }
 
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save($entity);
+        return $entity;
     }
 }
