@@ -186,6 +186,8 @@ class MachineStateEventDispatcherTest extends WebTestCase
         MachineRetrievedEvent $event,
         MachineIsActiveEvent $expected,
     ): void {
+        $this->persistMachineModel($event->previous);
+
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         \assert($eventDispatcher instanceof EventDispatcherInterface);
         $eventDispatcher->dispatch($event);

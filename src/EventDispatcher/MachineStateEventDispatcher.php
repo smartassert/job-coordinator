@@ -52,11 +52,16 @@ class MachineStateEventDispatcher implements EventSubscriberInterface
 
     public function dispatchMachineIsActiveEvent(MachineRetrievedEvent $event): void
     {
+        $previousEntity = $this->machineRepository->find($event->getJobId());
+        if (null === $previousEntity) {
+            return;
+        }
+
         $machineWasPreviouslyNotYetActive
-            = !$event->previous->isActive()
-            && !$event->previous->getMetaState()->hasFailedState()
-            && !$event->previous->isEnding()
-            && !$event->previous->getMetaState()->hasEndState();
+            = !$previousEntity->isActive()
+            && !$previousEntity->getMetaState()->hasFailedState()
+            && !$previousEntity->isEnding()
+            && !$previousEntity->getMetaState()->hasEndState();
 
         $machineIsNowActive = $event->getMachine()->isActive();
 
