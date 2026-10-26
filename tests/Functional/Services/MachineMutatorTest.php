@@ -142,10 +142,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function () {
                     $jobId = Id::generate();
 
-                    return new MachineStateChangeEvent(
-                        MachineFactory::createRandomForJob($jobId),
-                        MachineFactory::createRandomForJob($jobId),
-                    );
+                    return new MachineStateChangeEvent(MachineFactory::createRandomForJob($jobId));
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -157,10 +154,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function () {
                     $jobId = Id::generate();
 
-                    return new MachineStateChangeEvent(
-                        MachineFactory::createRandomForJob($jobId),
-                        MachineFactory::createRandomForJob($jobId),
-                    );
+                    return new MachineStateChangeEvent(MachineFactory::createRandomForJob($jobId));
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -182,7 +176,6 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new MachineStateChangeEvent(
-                        MachineFactory::createRandomForJob($job->getId()),
                         new MachineModel(
                             $job->getId(),
                             'up/started',
@@ -220,7 +213,6 @@ class MachineMutatorTest extends WebTestCase
                     }
 
                     return new MachineStateChangeEvent(
-                        MachineFactory::createRandomForJob($job->getId()),
                         new MachineModel(
                             $job->getId(),
                             'up/active',
