@@ -7,7 +7,7 @@ namespace App\Model\Machine;
 /**
  * @phpstan-import-type MachineActionFailureContext from ActionFailureInterface
  */
-final readonly class ActionFailure implements SerializableActionFailureInterface
+final readonly class ActionFailure implements ActionFailureInterface
 {
     /**
      * @param non-empty-string            $action

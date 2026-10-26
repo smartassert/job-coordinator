@@ -19,7 +19,7 @@ final readonly class Machine implements MachineInterface
         private string $state,
         private string $stateCategory,
         private ?string $ipAddress,
-        private ?SerializableActionFailureInterface $actionFailure,
+        private ?ActionFailureInterface $actionFailure,
         private MetaState $metaState,
         private bool $isActive,
         private bool $isReady,
@@ -46,7 +46,7 @@ final readonly class Machine implements MachineInterface
         return $this->ipAddress;
     }
 
-    public function getActionFailure(): ?SerializableActionFailureInterface
+    public function getActionFailure(): ?ActionFailureInterface
     {
         return $this->actionFailure;
     }
