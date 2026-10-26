@@ -22,7 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MachineStateEventDispatcherTest extends WebTestCase
 {
     private EventRecorder $eventRecorder;
-    private MachineRepository $machineRepository;
 
     protected function setUp(): void
     {
@@ -31,10 +30,6 @@ class MachineStateEventDispatcherTest extends WebTestCase
         $eventRecorder = self::getContainer()->get(EventRecorder::class);
         \assert($eventRecorder instanceof EventRecorder);
         $this->eventRecorder = $eventRecorder;
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $this->machineRepository = $machineRepository;
     }
 
     public function testDispatchMachineStateChangeEventNoStateChange(): void
@@ -53,16 +48,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $machineEntity = new MachineEntity(
-            $machineId,
-            'unchanged-state',
-            'active',
-        )
-            ->setIsActive()
-            ->setMetaState(new MetaState(false, false, false))
-        ;
-
-        $this->machineRepository->save($machineEntity);
+        $this->persistMachineModel($machineModel);
 
         $event = new MachineRetrievedEvent($machineModel, $machineModel);
 
@@ -89,18 +75,7 @@ class MachineStateEventDispatcherTest extends WebTestCase
             false,
         );
 
-        $previousMachineEntity = new MachineEntity(
-            $machineId,
-            'previous-state',
-            'active',
-        )
-            ->setIsActive()
-            ->setMetaState(new MetaState(false, false, false))
-        ;
-
-        $machineRepository = self::getContainer()->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $machineRepository->save($previousMachineEntity);
+        $this->persistMachineModel($previousMachineModel);
 
         $currentMachineModel = new Machine(
             $machineId,
@@ -343,5 +318,24 @@ class MachineStateEventDispatcherTest extends WebTestCase
             ],
             $this->eventRecorder->all(MachineHasActionFailureEvent::class)
         );
+    }
+
+    private function persistMachineModel(Machine $model): void
+    {
+        $entity = new MachineEntity(
+            $model->getId(),
+            $model->getState(),
+            $model->getStateCategory(),
+        )
+            ->setMetaState($model->getMetaState())
+        ;
+
+        if ($model->isActive()) {
+            $entity->setIsActive();
+        }
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($entity);
     }
 }
