@@ -7,3 +7,6 @@ framework:
       results.job.state_changed:
         service: Symfony\Component\Webhook\Client\RequestParser
         secret: '%results_notify_secret%'
+      worker-manager.machine.state_changed:
+        service: Symfony\Component\Webhook\Client\RequestParser
+        secret: '%worker_manager_notify_secret%'

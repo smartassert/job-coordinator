@@ -52,7 +52,7 @@
         "symfony/http-client": "8.1.*",
         "symfony/maker-bundle": "^1.40",
         "symfony/phpunit-bridge": "8.1.*",
-        "webignition/wait-for": "^0.1.0"
+        "webignition/wait-for": "^0.2.0"
     },
     "config": {
         "allow-plugins": {

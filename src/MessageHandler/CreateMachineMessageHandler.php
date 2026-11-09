@@ -19,12 +19,16 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateMachineMessageHandler
 {
+    /**
+     * @param non-empty-string $notifyUrl
+     */
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClientWrapper $workerManagerClientWrapper,
         private EventDispatcherInterface $eventDispatcher,
         private AuthenticationTokenProvider $authenticationTokenProvider,
+        private string $notifyUrl,
     ) {}
 
     /**
@@ -46,7 +50,11 @@ final readonly class CreateMachineMessageHandler
         }
 
         try {
-            $machine = $this->workerManagerClientWrapper->create($authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClientWrapper->create(
+                $authenticationToken,
+                $message->getJobId(),
+                $this->notifyUrl,
+            );
 
             $this->eventDispatcher->dispatch(
                 new MachineCreationRequestedEvent($machine)

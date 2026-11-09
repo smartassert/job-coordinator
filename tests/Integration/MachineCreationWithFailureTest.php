@@ -27,7 +27,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         $jobId = $this->getJob()?->getId();
         \assert(is_string($jobId));
 
-        $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
+        $waitUntilPreactiveDurationInMicroseconds = $this->waitUntilJobStateCategoryIs($jobId, 'pre_active');
         $machineData = $this->getMachineData($jobId);
         \assert(is_array($machineData));
 
@@ -51,7 +51,7 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
         );
         self::assertNotSame([], $machineData['requests']);
 
-        $this->waitUntilJobStateCategoryIs($jobId, 'end');
+        $waitUntilEndedInMicroseconds = $this->waitUntilJobStateCategoryIs($jobId, 'end');
         $machineData = $this->getMachineData($jobId);
         \assert(is_array($machineData));
 
@@ -83,11 +83,17 @@ class MachineCreationWithFailureTest extends AbstractCreateJobSuccessSetup
             $machineData['preparation']
         );
         self::assertNotSame([], $machineData['requests']);
+
+        $durationInMilliseconds = ($waitUntilPreactiveDurationInMicroseconds + $waitUntilEndedInMicroseconds) / 1000;
+        $getMachinePollPeriod = self::getContainer()->getParameter('machine_state_change_check_period_ms');
+        \assert(is_int($getMachinePollPeriod));
+
+        self::assertLessThan($getMachinePollPeriod, $durationInMilliseconds);
     }
 
-    private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): void
+    private function waitUntilJobStateCategoryIs(string $jobId, string $stateCategory): int
     {
-        new WaitFor()->waitFor(
+        return new WaitFor()->waitFor(
             90,
             function () use ($jobId, $stateCategory) {
                 $machineData = $this->getMachineData($jobId);

@@ -136,5 +136,7 @@ class MachineMutator implements EventSubscriberInterface
                 $machine->getActionFailure()->getContext(),
             )
         );
+
+        $this->machineRepository->save($machineEntity);
     }
 }

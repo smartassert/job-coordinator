@@ -12,16 +12,18 @@ parameters:
     health_check_bundle_status_is_ready: '%env(bool:IS_READY)%'
     health_check_bundle_enable_status_version_inspector: true
     health_check_bundle_status_version: '%env(VERSION)%'
+    machine_state_change_check_period_ms: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
     message_delays:
         App\Message\CreateWorkerJobMessage: '%env(int:CREATE_WORKER_JOB_DELAY_MS)%'
         App\Message\GetSerializedSuiteMessage: '%env(int:SERIALIZED_SUITE_STATE_CHANGE_CHECK_PERIOD_MS)%'
-        App\Message\GetMachineMessage: '%env(int:MACHINE_STATE_CHANGE_CHECK_PERIOD_MS)%'
+        App\Message\GetMachineMessage: '%machine_state_change_check_period_ms%'
         App\Message\CreateResultsJobMessage: '%env(int:CREATE_RESULTS_JOB_DISPATCH_DELAY_MS)%'
         App\Message\GetResultsJobMessage: '%env(int:RESULTS_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\GetWorkerJobMessage: '%env(int:GET_WORKER_JOB_CHANGE_CHECK_PERIOD_MS)%'
         App\Message\CreateMachineMessage: '%env(int:CREATE_MACHINE_DISPATCH_DELAY_MS)%'
     sources_notify_secret: '%env(string:SOURCES_NOTIFY_SECRET)%'
     results_notify_secret: '%env(string:RESULTS_NOTIFY_SECRET)%'
+    worker_manager_notify_secret: '%env(string:WORKER_MANAGER_NOTIFY_SECRET)%'
     notify_url: '%env(string:SELF_URL)%/notify'
 
 services:
@@ -168,6 +170,7 @@ services:
     App\MessageHandler\CreateMachineMessageHandler:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\CreateMachineReadinessAssessor'
+            $notifyUrl: '%notify_url%'
 
     App\MessageHandler\CreateResultsJobMessageHandler:
         arguments:
