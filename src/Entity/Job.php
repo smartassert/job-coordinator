@@ -33,25 +33,31 @@ readonly class Job implements JobInterface, \JsonSerializable
     #[ORM\Column(type: 'text')]
     public string $userSecurityToken;
 
+    #[ORM\Column(length: 255)]
+    public string $notifyToken;
+
     /**
      * @param non-empty-string $id
      * @param non-empty-string $userId
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
-     * @param non-empty-string $token
+     * @param non-empty-string $userSecurityToken
+     * @param non-empty-string $notifyToken
      */
     public function __construct(
         string $id,
         string $userId,
         string $suiteId,
         int $maximumDurationInSeconds,
-        string $token,
+        string $userSecurityToken,
+        string $notifyToken,
     ) {
         $this->id = $id;
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-        $this->userSecurityToken = $token;
+        $this->userSecurityToken = $userSecurityToken;
+        $this->notifyToken = $notifyToken;
     }
 
     /**
@@ -92,6 +98,14 @@ readonly class Job implements JobInterface, \JsonSerializable
     public function getUserSecurityToken(): string
     {
         return $this->userSecurityToken;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getNotifyToken(): string
+    {
+        return $this->notifyToken;
     }
 
     /**

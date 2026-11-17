@@ -20,15 +20,32 @@ readonly class JobFactory
     public function create(User $user, CreateJobRequest $request): JobInterface
     {
         $job = new Job(
-            (string) new Ulid(),
+            $this->createJobId(),
             $user->getUserIdentifier(),
             $request->suiteId,
             $request->maximumDurationInSeconds,
             $user->getSecurityToken(),
+            $this->createNotifyToken(),
         );
 
         $this->jobRepository->store($job);
 
         return $job;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function createNotifyToken(): string
+    {
+        return (string) new Ulid();
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function createJobId(): string
+    {
+        return (string) new Ulid();
     }
 }
