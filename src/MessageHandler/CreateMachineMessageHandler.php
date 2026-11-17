@@ -10,6 +10,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerManagerClientWrapper;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -19,16 +20,15 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateMachineMessageHandler
 {
-    /**
-     * @param non-empty-string $notifyUrl
-     */
+    private const string WORKER_MANAGER_STATE_CHANGED_EVENT_NAME = 'worker-manager.machine.state_changed';
+
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClientWrapper $workerManagerClientWrapper,
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
-        private string $notifyUrl,
+        private NotifyUrlFactory $notifyUrlFactory,
     ) {}
 
     /**
@@ -37,24 +37,23 @@ final readonly class CreateMachineMessageHandler
      */
     public function __invoke(CreateMachineMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        $jobId = $message->getJobId();
+
+        $readiness = $this->readinessAssessor->isReady($jobId);
         $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }
 
-        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $userSecurityToken) {
+        $notifyUrl = $this->notifyUrlFactory->create(self::WORKER_MANAGER_STATE_CHANGED_EVENT_NAME);
+        $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
+        if (null === $notifyUrl || null === $userSecurityToken) {
             return;
         }
 
         try {
-            $machine = $this->workerManagerClientWrapper->create(
-                $userSecurityToken,
-                $message->getJobId(),
-                $this->notifyUrl,
-            );
+            $machine = $this->workerManagerClientWrapper->create($userSecurityToken, $jobId, $notifyUrl);
 
             $this->eventDispatcher->dispatch(
                 new MachineCreationRequestedEvent($machine)

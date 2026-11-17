@@ -20,6 +20,7 @@ use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MachineModelFactory;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
@@ -215,13 +216,16 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $notifyUrl = self::getContainer()->getParameter('notify_url');
         \assert(is_string($notifyUrl) && '' !== $notifyUrl);
 
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
         return new CreateMachineMessageHandler(
             $assessor,
             $messageStateMutator,
             $wrapper,
             $eventDispatcher,
             $authenticationTokenProvider,
-            $notifyUrl,
+            $notifyUrlFactory,
         );
     }
 
