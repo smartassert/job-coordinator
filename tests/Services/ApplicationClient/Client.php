@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services\ApplicationClient;
 
+use App\Enum\RemoteEventName;
 use App\Request\CreateJobRequest;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\SymfonyTestClient\ClientInterface;
@@ -97,7 +98,7 @@ class Client
         string $method = 'POST',
     ): ResponseInterface {
         return $this->makeNotifyRequest(
-            'results.job.state_changed',
+            RemoteEventName::RESULTS_JOB_STATE_CHANGED->value,
             $headers,
             $body,
             $method,

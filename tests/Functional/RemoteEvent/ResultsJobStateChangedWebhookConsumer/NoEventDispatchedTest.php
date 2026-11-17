@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\RemoteEvent\ResultsJobStateChangedWebhookConsumer;
 
+use App\Enum\RemoteEventName;
 use App\Event\ResultsJobRetrievedEvent;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\RemoteEvent\RemoteEvent;
@@ -38,7 +39,7 @@ class NoEventDispatchedTest extends AbstractConsumerTestCase
             ],
             'event encapsulates non-job object' => [
                 'event' => new RemoteEvent(
-                    name: 'results.job.state_changed',
+                    name: RemoteEventName::RESULTS_JOB_STATE_CHANGED->value,
                     id: (string) new Ulid(),
                     payload: [
                         'id' => (string) new Ulid(),
@@ -47,7 +48,7 @@ class NoEventDispatchedTest extends AbstractConsumerTestCase
             ],
             'event encapsulates invalid job' => [
                 'event' => new RemoteEvent(
-                    name: 'results.job.state_changed',
+                    name: RemoteEventName::RESULTS_JOB_STATE_CHANGED->value,
                     id: (string) new Ulid(),
                     payload: [
                         'label' => (string) new Ulid(),
