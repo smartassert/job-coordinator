@@ -36,7 +36,7 @@ readonly class JobResolver implements ValueResolverInterface
         }
 
         $jobId = $request->attributes->getString('jobId');
-        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
+        $job = $this->jobRepository->find($jobId);
 
         if (null === $job) {
             throw new AccessDeniedException();

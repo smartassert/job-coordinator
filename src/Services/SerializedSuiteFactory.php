@@ -32,7 +32,7 @@ class SerializedSuiteFactory implements EventSubscriberInterface
 
     public function createOnSerializedSuiteCreatedEvent(SerializedSuiteCreatedEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }

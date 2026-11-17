@@ -17,8 +17,6 @@ readonly class UserSecurityTokenProvider
      */
     public function get(string $jobId): ?string
     {
-        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
-
-        return $job?->getUserSecurityToken();
+        return $this->jobRepository->find($jobId)?->getUserSecurityToken();
     }
 }

@@ -45,7 +45,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setStateOnMachineStateChangeEvent(MachineStateChangeEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }
@@ -74,7 +74,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function handleMachineIsActiveEvent(MachineIsActiveEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }
@@ -92,7 +92,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function handleMachineIsReadyEvent(MachineIsReadyEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }
@@ -109,7 +109,7 @@ class MachineMutator implements EventSubscriberInterface
 
     public function setActionFailureOnMachineHasActionFailureEvent(MachineHasActionFailureEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }
