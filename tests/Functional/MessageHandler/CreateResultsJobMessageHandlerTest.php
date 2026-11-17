@@ -16,6 +16,7 @@ use App\ReadinessAssessor\CreateResultsJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use App\Tests\Services\Factory\HttpMockedResultsClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -183,13 +184,16 @@ class CreateResultsJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
         \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
         return new CreateResultsJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $resultsClient,
             $eventDispatcher,
             $authenticationTokenProvider,
-            'https://example.com/notify',
+            $notifyUrlFactory,
         );
     }
 }

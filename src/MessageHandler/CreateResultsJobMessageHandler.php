@@ -10,6 +10,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
@@ -19,16 +20,15 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateResultsJobMessageHandler
 {
-    /**
-     * @param non-empty-string $notifyUrl
-     */
+    private const string RESULTS_JOB_STATE_CHANGED_EVENT_NAME = 'results.job.state_changed';
+
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
-        private string $notifyUrl,
+        private NotifyUrlFactory $notifyUrlFactory,
     ) {}
 
     /**
@@ -37,29 +37,25 @@ final readonly class CreateResultsJobMessageHandler
      */
     public function __invoke(CreateResultsJobMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        $jobId = $message->getJobId();
+
+        $readiness = $this->readinessAssessor->isReady($jobId);
         $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }
 
-        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $userSecurityToken) {
+        $notifyUrl = $this->notifyUrlFactory->create(self::RESULTS_JOB_STATE_CHANGED_EVENT_NAME);
+        $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
+        if (null === $notifyUrl || null === $userSecurityToken) {
             return;
         }
 
         try {
-            $resultsJob = $this->resultsClient->createJob(
-                $userSecurityToken,
-                $message->getJobId(),
-                $this->notifyUrl,
-            );
+            $resultsJob = $this->resultsClient->createJob($userSecurityToken, $jobId, $notifyUrl);
 
-            $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent(
-                $message->getJobId(),
-                $resultsJob
-            ));
+            $this->eventDispatcher->dispatch(new ResultsJobCreatedEvent($jobId, $resultsJob));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
         }
