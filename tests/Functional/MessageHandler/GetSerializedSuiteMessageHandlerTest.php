@@ -16,8 +16,8 @@ use App\Model\MetaState;
 use App\ReadinessAssessor\GetSerializedSuiteReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
 use App\Tests\Services\Generator\StringValue;
@@ -46,8 +46,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+        $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,
@@ -106,8 +106,8 @@ class GetSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTestCas
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+        $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
         $handler = new GetSerializedSuiteMessageHandler(
             $assessor,

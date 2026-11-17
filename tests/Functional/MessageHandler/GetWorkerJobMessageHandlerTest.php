@@ -12,8 +12,8 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\WorkerComponentStateRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -209,8 +209,8 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+        $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
         return new GetWorkerJobMessageHandler(
             $readinessAssessor,

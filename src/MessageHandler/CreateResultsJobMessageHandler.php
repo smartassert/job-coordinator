@@ -9,8 +9,8 @@ use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -27,7 +27,7 @@ final readonly class CreateResultsJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
         private string $notifyUrl,
     ) {}
 
@@ -44,14 +44,14 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $resultsJob = $this->resultsClient->createJob(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $this->notifyUrl,
             );

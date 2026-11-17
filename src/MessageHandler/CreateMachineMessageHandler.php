@@ -9,8 +9,8 @@ use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerManagerClientWrapper;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -27,7 +27,7 @@ final readonly class CreateMachineMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClientWrapper $workerManagerClientWrapper,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
         private string $notifyUrl,
     ) {}
 
@@ -44,14 +44,14 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $machine = $this->workerManagerClientWrapper->create(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $this->notifyUrl,
             );

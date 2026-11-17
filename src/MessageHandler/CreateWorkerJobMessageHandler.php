@@ -14,9 +14,9 @@ use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
@@ -35,7 +35,7 @@ final readonly class CreateWorkerJobMessageHandler
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
     ) {}
 
     /**
@@ -61,13 +61,13 @@ final readonly class CreateWorkerJobMessageHandler
 
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $serializedSuite = $this->serializedSuiteClient->read($authenticationToken, $serializedSuiteEntity->id);
+            $serializedSuite = $this->serializedSuiteClient->read($userSecurityToken, $serializedSuiteEntity->id);
         } catch (\Throwable $e) {
             $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent(
                 $message->getJobId(),

@@ -9,8 +9,8 @@ use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,7 +24,7 @@ final readonly class CreateSerializedSuiteMessageHandler
         private MessageStateMutator $messageStateMutator,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
         private string $notifyUrl,
     ) {}
 
@@ -41,14 +41,14 @@ final readonly class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $message->suiteId,
                 $this->notifyUrl,

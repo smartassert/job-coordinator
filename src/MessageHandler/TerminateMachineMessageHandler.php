@@ -9,8 +9,8 @@ use App\Event\MachineTerminationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\TerminateMachineMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerManagerClientWrapper;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,7 +24,7 @@ final readonly class TerminateMachineMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerManagerClientWrapper $workerManagerClientWrapper,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
     ) {}
 
     /**
@@ -40,13 +40,13 @@ final readonly class TerminateMachineMessageHandler
             return;
         }
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $machine = $this->workerManagerClientWrapper->delete($authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClientWrapper->delete($userSecurityToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($machine));
         } catch (\Throwable $e) {

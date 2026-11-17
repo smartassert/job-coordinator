@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Repository\JobRepository;
 
-readonly class AuthenticationTokenProvider
+readonly class UserSecurityTokenProvider
 {
     public function __construct(
         private JobRepository $jobRepository,
@@ -19,6 +19,6 @@ readonly class AuthenticationTokenProvider
     {
         $job = $this->jobRepository->findOneBy(['id' => $jobId]);
 
-        return $job?->getToken();
+        return $job?->getUserSecurityToken();
     }
 }

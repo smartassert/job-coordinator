@@ -31,7 +31,7 @@ readonly class Job implements JobInterface, \JsonSerializable
     public int $maximumDurationInSeconds;
 
     #[ORM\Column(type: 'text')]
-    public string $token;
+    public string $userSecurityToken;
 
     /**
      * @param non-empty-string $id
@@ -51,7 +51,7 @@ readonly class Job implements JobInterface, \JsonSerializable
         $this->userId = $userId;
         $this->suiteId = $suiteId;
         $this->maximumDurationInSeconds = $maximumDurationInSeconds;
-        $this->token = $token;
+        $this->userSecurityToken = $token;
     }
 
     /**
@@ -89,9 +89,9 @@ readonly class Job implements JobInterface, \JsonSerializable
     /**
      * @return non-empty-string
      */
-    public function getToken(): string
+    public function getUserSecurityToken(): string
     {
-        return $this->token;
+        return $this->userSecurityToken;
     }
 
     /**

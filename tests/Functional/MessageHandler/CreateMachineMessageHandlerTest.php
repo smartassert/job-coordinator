@@ -18,9 +18,9 @@ use App\ReadinessAssessor\CreateMachineReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\MachineRepository;
 use App\Repository\SerializedSuiteRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MachineModelFactory;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerManagerClientWrapper;
 use App\Tests\Services\Factory\HttpMockedWorkerManagerClientFactory;
 use App\Tests\Services\Factory\HttpResponseFactory;
@@ -209,8 +209,8 @@ class CreateMachineMessageHandlerTest extends AbstractMessageHandlerTestCase
         $messageStateMutator = self::getContainer()->get(MessageStateMutator::class);
         \assert($messageStateMutator instanceof MessageStateMutator);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+        $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
         $notifyUrl = self::getContainer()->getParameter('notify_url');
         \assert(is_string($notifyUrl) && '' !== $notifyUrl);

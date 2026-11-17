@@ -9,8 +9,8 @@ use App\Event\ResultsJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetResultsJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\ResultsClient\ClientInterface as ResultsClient;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,7 +24,7 @@ final readonly class GetResultsJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private ResultsClient $resultsClient,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
     ) {}
 
     /**
@@ -40,13 +40,13 @@ final readonly class GetResultsJobMessageHandler
             return;
         }
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $resultsJob = $this->resultsClient->getJobStatus($authenticationToken, $message->getJobId());
+            $resultsJob = $this->resultsClient->getJobStatus($userSecurityToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent($resultsJob));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);
