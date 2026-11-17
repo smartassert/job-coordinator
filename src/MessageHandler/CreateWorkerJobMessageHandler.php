@@ -56,16 +56,10 @@ final readonly class CreateWorkerJobMessageHandler
         $job = $this->jobRepository->find($message->getJobId());
         $serializedSuiteEntity = $this->serializedSuiteRepository->findByJobId($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (null === $job || null === $serializedSuiteEntity || null === $resultsJob) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $job || null === $serializedSuiteEntity || null === $resultsJob || null === $userSecurityToken) {
             $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
-            return;
-        }
-
-        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
-
-        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $userSecurityToken) {
             return;
         }
 
@@ -80,6 +74,8 @@ final readonly class CreateWorkerJobMessageHandler
 
             throw new UnrecoverableRemoteJobActionException($e, $message);
         }
+
+        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
         try {
             $workerJob = $workerClient->createJob(
