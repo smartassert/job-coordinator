@@ -19,6 +19,6 @@ readonly class AuthenticationTokenProvider
     {
         $job = $this->jobRepository->findOneBy(['id' => $jobId]);
 
-        return $job?->getToken();
+        return $job?->getUserSecurityToken();
     }
 }

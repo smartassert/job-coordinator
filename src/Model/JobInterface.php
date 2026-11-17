@@ -42,5 +42,5 @@ interface JobInterface extends SerializeToArrayInterface
     /**
      * @return non-empty-string
      */
-    public function getToken(): string;
+    public function getUserSecurityToken(): string;
 }
