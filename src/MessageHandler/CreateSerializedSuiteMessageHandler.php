@@ -10,6 +10,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\SourcesClient\SerializedSuiteClientInterface;
@@ -19,13 +20,15 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateSerializedSuiteMessageHandler
 {
+    private const string SERIALIZED_SUITE_STATE_CHANGED_EVENT_NAME = 'sources.serialized_suite.state_changed';
+
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
-        private string $notifyUrl,
+        private NotifyUrlFactory $notifyUrlFactory,
     ) {}
 
     /**
@@ -34,29 +37,32 @@ final readonly class CreateSerializedSuiteMessageHandler
      */
     public function __invoke(CreateSerializedSuiteMessage $message): void
     {
-        $readiness = $this->readinessAssessor->isReady($message->getJobId());
+        $jobId = $message->getJobId();
+
+        $readiness = $this->readinessAssessor->isReady($jobId);
         $this->messageStateMutator->set($message, $readiness);
 
         if (MessageHandlingReadiness::NOW !== $readiness) {
             return;
         }
 
-        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $userSecurityToken) {
+        $notifyUrl = $this->notifyUrlFactory->create(self::SERIALIZED_SUITE_STATE_CHANGED_EVENT_NAME);
+        $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
+        if (null === $notifyUrl || null === $userSecurityToken) {
             return;
         }
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(
                 $userSecurityToken,
-                $message->getJobId(),
+                $jobId,
                 $message->suiteId,
-                $this->notifyUrl,
+                $notifyUrl,
                 $message->parameters,
             );
 
             $this->eventDispatcher->dispatch(new SerializedSuiteCreatedEvent(
-                $message->getJobId(),
+                $jobId,
                 $serializedSuite
             ));
         } catch (\Throwable $e) {
