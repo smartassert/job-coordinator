@@ -45,6 +45,7 @@ readonly class JobFactory
             $suiteId,
             $maximumDurationInSeconds,
             $token,
+            (string) new Ulid(),
         );
         $this->jobRepository->store($job);
 
