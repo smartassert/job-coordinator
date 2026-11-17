@@ -40,13 +40,13 @@ final readonly class GetSerializedSuiteMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $serializedSuite = $this->serializedSuiteClient->get($authenticationToken, $message->serializedSuiteId);
+            $serializedSuite = $this->serializedSuiteClient->get($userSecurityToken, $message->serializedSuiteId);
 
             $this->eventDispatcher->dispatch(new SerializedSuiteRetrievedEvent(
                 $message->getJobId(),

@@ -44,14 +44,14 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $resultsJob = $this->resultsClient->createJob(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $this->notifyUrl,
             );

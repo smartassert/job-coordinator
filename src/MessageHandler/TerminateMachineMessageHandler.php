@@ -40,13 +40,13 @@ final readonly class TerminateMachineMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $machine = $this->workerManagerClientWrapper->delete($authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClientWrapper->delete($userSecurityToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineTerminationRequestedEvent($machine));
         } catch (\Throwable $e) {

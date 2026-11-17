@@ -61,13 +61,13 @@ final readonly class CreateWorkerJobMessageHandler
 
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $serializedSuite = $this->serializedSuiteClient->read($authenticationToken, $serializedSuiteEntity->id);
+            $serializedSuite = $this->serializedSuiteClient->read($userSecurityToken, $serializedSuiteEntity->id);
         } catch (\Throwable $e) {
             $this->eventDispatcher->dispatch(new CreateWorkerJobFailedEvent(
                 $message->getJobId(),

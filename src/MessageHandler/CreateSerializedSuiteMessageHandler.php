@@ -41,14 +41,14 @@ final readonly class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $message->suiteId,
                 $this->notifyUrl,

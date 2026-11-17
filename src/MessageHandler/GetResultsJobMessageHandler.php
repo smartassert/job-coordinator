@@ -40,13 +40,13 @@ final readonly class GetResultsJobMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $resultsJob = $this->resultsClient->getJobStatus($authenticationToken, $message->getJobId());
+            $resultsJob = $this->resultsClient->getJobStatus($userSecurityToken, $message->getJobId());
             $this->eventDispatcher->dispatch(new ResultsJobRetrievedEvent($resultsJob));
         } catch (\Throwable $e) {
             throw new RemoteJobActionException($e, $message);

@@ -47,13 +47,13 @@ final readonly class GetMachineMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
-            $machine = $this->workerManagerClientWrapper->get($authenticationToken, $message->getJobId());
+            $machine = $this->workerManagerClientWrapper->get($userSecurityToken, $message->getJobId());
 
             $this->eventDispatcher->dispatch(new MachineRetrievedEvent($machine));
         } catch (\Throwable $e) {

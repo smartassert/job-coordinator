@@ -44,14 +44,14 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
         try {
             $machine = $this->workerManagerClientWrapper->create(
-                $authenticationToken,
+                $userSecurityToken,
                 $message->getJobId(),
                 $this->notifyUrl,
             );

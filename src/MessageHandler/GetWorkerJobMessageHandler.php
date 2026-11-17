@@ -42,8 +42,8 @@ final readonly class GetWorkerJobMessageHandler
 
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
-        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $authenticationToken) {
+        $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
+        if (null === $userSecurityToken) {
             return;
         }
 
