@@ -15,6 +15,7 @@ use App\ReadinessAssessor\CreateSerializedSuiteReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UserSecurityTokenProvider;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
@@ -36,8 +37,10 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
 
         $serializedSuiteClientException = new \Exception('Failed to create serialized suite');
 
-        $notifyUrl = self::getContainer()->getParameter('notify_url');
-        \assert(is_string($notifyUrl));
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
+        $notifyUrl = $notifyUrlFactory->create('sources.serialized_suite.state_changed');
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
@@ -58,13 +61,16 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
         \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
         $handler = new CreateSerializedSuiteMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $serializedSuiteClient,
             $eventDispatcher,
             $authenticationTokenProvider,
-            $notifyUrl,
+            $notifyUrlFactory,
         );
 
         $message = new CreateSerializedSuiteMessage(
@@ -109,8 +115,10 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             [],
         );
 
-        $notifyUrl = self::getContainer()->getParameter('notify_url');
-        \assert(is_string($notifyUrl));
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
+        $notifyUrl = $notifyUrlFactory->create('sources.serialized_suite.state_changed');
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
@@ -137,7 +145,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             $serializedSuiteClient,
             $eventDispatcher,
             $authenticationTokenProvider,
-            $notifyUrl
+            $notifyUrlFactory,
         );
 
         $handler(new CreateSerializedSuiteMessage(
@@ -195,8 +203,8 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
         \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
-        $notifyUrl = self::getContainer()->getParameter('notify_url');
-        \assert(is_string($notifyUrl));
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
 
         $handler = new CreateSerializedSuiteMessageHandler(
             $assessor,
@@ -204,7 +212,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
             \Mockery::mock(SerializedSuiteClientInterface::class),
             $eventDispatcher,
             $authenticationTokenProvider,
-            $notifyUrl,
+            $notifyUrlFactory,
         );
 
         self::assertSame(MessageState::HANDLING, $message->getState());
