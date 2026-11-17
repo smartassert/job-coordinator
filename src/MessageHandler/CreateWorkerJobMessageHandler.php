@@ -12,6 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Exception\UnrecoverableRemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MessageStateMutator;
@@ -31,6 +32,7 @@ final readonly class CreateWorkerJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private UnhandleableMessageHandler $unhandleableMessageHandler,
         private SerializedSuiteRepository $serializedSuiteRepository,
+        private JobRepository $jobRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
