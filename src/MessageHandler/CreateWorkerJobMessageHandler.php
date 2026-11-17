@@ -82,6 +82,7 @@ final readonly class CreateWorkerJobMessageHandler
             $workerJob = $workerClient->createJob(
                 $message->getJobId(),
                 $resultsJob->eventNotifyUrl,
+                $resultsJob->eventNotifyToken,
                 $message->maximumDurationInSeconds,
                 $serializedSuite
             );
