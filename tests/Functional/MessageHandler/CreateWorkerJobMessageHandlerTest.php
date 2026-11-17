@@ -19,6 +19,7 @@ use App\Model\JobInterface;
 use App\Model\MetaState;
 use App\ReadinessAssessor\CreateWorkerJobReadinessAssessor;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\JobRepository;
 use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
@@ -417,6 +418,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
         \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
+        $jobRepository = self::getContainer()->get(JobRepository::class);
+        \assert($jobRepository instanceof JobRepository);
+
         return new CreateWorkerJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -427,6 +431,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerClientFactory,
             $eventDispatcher,
             $authenticationTokenProvider,
+            $jobRepository,
         );
     }
 

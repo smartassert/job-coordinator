@@ -12,6 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Exception\UnrecoverableRemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\JobRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MessageStateMutator;
@@ -36,6 +37,7 @@ final readonly class CreateWorkerJobMessageHandler
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
+        private JobRepository $jobRepository,
     ) {}
 
     /**
@@ -51,9 +53,10 @@ final readonly class CreateWorkerJobMessageHandler
             return;
         }
 
+        $job = $this->jobRepository->find($message->getJobId());
         $serializedSuiteEntity = $this->serializedSuiteRepository->findByJobId($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (null === $serializedSuiteEntity || null === $resultsJob) {
+        if (null === $job || null === $serializedSuiteEntity || null === $resultsJob) {
             $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
             return;
