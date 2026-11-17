@@ -32,12 +32,12 @@ final readonly class CreateWorkerJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private UnhandleableMessageHandler $unhandleableMessageHandler,
         private SerializedSuiteRepository $serializedSuiteRepository,
-        private JobRepository $jobRepository,
         private ResultsJobRepository $resultsJobRepository,
         private SerializedSuiteClientInterface $serializedSuiteClient,
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
+        private JobRepository $jobRepository,
     ) {}
 
     /**
@@ -53,9 +53,10 @@ final readonly class CreateWorkerJobMessageHandler
             return;
         }
 
+        $job = $this->jobRepository->find($message->getJobId());
         $serializedSuiteEntity = $this->serializedSuiteRepository->findByJobId($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
-        if (null === $serializedSuiteEntity || null === $resultsJob) {
+        if (null === $job || null === $serializedSuiteEntity || null === $resultsJob) {
             $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
             return;
