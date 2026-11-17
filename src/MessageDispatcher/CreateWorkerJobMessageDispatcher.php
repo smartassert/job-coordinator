@@ -37,7 +37,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
 
     public function dispatchImmediately(MachineIsReadyEvent $event): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $event->getJobId()]);
+        $job = $this->jobRepository->find($event->getJobId());
         if (null === $job) {
             return;
         }

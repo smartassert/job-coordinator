@@ -33,7 +33,7 @@ class JobRemoteRequestMessageDispatcher
     public function dispatch(JobRemoteRequestMessageInterface $message, array $stamps = []): ?Envelope
     {
         if (false === $message->isRepeatable()) {
-            $job = $this->jobRepository->findOneBy(['id' => $message->getJobId()]);
+            $job = $this->jobRepository->find($message->getJobId());
             if (null === $job) {
                 return null;
             }

@@ -20,7 +20,7 @@ class RemoteRequestRemover
 
     public function removeForJobAndType(string $jobId, RemoteRequestType $type): void
     {
-        $job = $this->jobRepository->findOneBy(['id' => $jobId]);
+        $job = $this->jobRepository->find($jobId);
         if (null === $job) {
             return;
         }
