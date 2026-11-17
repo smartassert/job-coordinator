@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Repository\JobRepository;
 
-readonly class AuthenticationTokenProvider
+readonly class UserSecurityTokenProvider
 {
     public function __construct(
         private JobRepository $jobRepository,

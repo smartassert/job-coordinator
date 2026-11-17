@@ -9,8 +9,8 @@ use App\Event\WorkerJobRetrievedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,7 +24,7 @@ final readonly class GetWorkerJobMessageHandler
         private MessageStateMutator $messageStateMutator,
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
-        private AuthenticationTokenProvider $authenticationTokenProvider,
+        private UserSecurityTokenProvider $userSecurityTokenProvider,
     ) {}
 
     /**
@@ -42,7 +42,7 @@ final readonly class GetWorkerJobMessageHandler
 
         $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
 
-        $authenticationToken = $this->authenticationTokenProvider->get($message->getJobId());
+        $authenticationToken = $this->userSecurityTokenProvider->get($message->getJobId());
         if (null === $authenticationToken) {
             return;
         }

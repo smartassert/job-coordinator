@@ -23,9 +23,9 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
-use App\Services\AuthenticationTokenProvider;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
+use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
@@ -414,8 +414,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $unhandleableMessageHandler = self::getContainer()->get(UnhandleableMessageHandler::class);
         \assert($unhandleableMessageHandler instanceof UnhandleableMessageHandler);
 
-        $authenticationTokenProvider = self::getContainer()->get(AuthenticationTokenProvider::class);
-        \assert($authenticationTokenProvider instanceof AuthenticationTokenProvider);
+        $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
+        \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
         return new CreateWorkerJobMessageHandler(
             $readinessAssessor,
