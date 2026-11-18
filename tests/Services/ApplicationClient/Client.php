@@ -82,7 +82,7 @@ class Client
         string $method = 'POST',
     ): ResponseInterface {
         return $this->makeNotifyRequest(
-            'sources.serialized_suite.state_changed',
+            RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value,
             $headers,
             $body,
             $method,

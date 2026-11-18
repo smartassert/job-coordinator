@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\RemoteEvent;
 
+use App\Enum\RemoteEventName;
 use App\Event\SerializedSuiteRetrievedEvent;
 use App\Repository\SerializedSuiteRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -12,11 +13,9 @@ use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\Consumer\ConsumerInterface;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 
-#[AsRemoteEventConsumer(self::NAME)]
+#[AsRemoteEventConsumer(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value)]
 final readonly class SourcesSerializedSuiteStateChangedWebhookConsumer implements ConsumerInterface
 {
-    public const string NAME = 'sources.serialized_suite.state_changed';
-
     public function __construct(
         private SerializedSuiteFactory $serializedSuiteFactory,
         private SerializedSuiteRepository $serializedSuiteRepository,
@@ -25,7 +24,7 @@ final readonly class SourcesSerializedSuiteStateChangedWebhookConsumer implement
 
     public function consume(RemoteEvent $event): void
     {
-        if (self::NAME !== $event->getName()) {
+        if (RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value !== $event->getName()) {
             return;
         }
 
