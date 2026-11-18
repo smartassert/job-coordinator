@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RemoteEventType;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
@@ -20,8 +21,6 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateResultsJobMessageHandler
 {
-    private const string RESULTS_JOB_STATE_CHANGED_EVENT_NAME = 'results.job.state_changed';
-
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
@@ -46,7 +45,7 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(self::RESULTS_JOB_STATE_CHANGED_EVENT_NAME);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::RESULTS_JOB_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;

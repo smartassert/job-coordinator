@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\SerializedSuite;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
+use App\Enum\RemoteEventType;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
@@ -40,7 +41,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
         \assert($notifyUrlFactory instanceof NotifyUrlFactory);
 
-        $notifyUrl = $notifyUrlFactory->create('sources.serialized_suite.state_changed');
+        $notifyUrl = $notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
@@ -118,7 +119,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
         \assert($notifyUrlFactory instanceof NotifyUrlFactory);
 
-        $notifyUrl = $notifyUrlFactory->create('sources.serialized_suite.state_changed');
+        $notifyUrl = $notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient

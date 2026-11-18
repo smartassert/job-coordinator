@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RemoteEventType;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
@@ -20,8 +21,6 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateSerializedSuiteMessageHandler
 {
-    private const string SERIALIZED_SUITE_STATE_CHANGED_EVENT_NAME = 'sources.serialized_suite.state_changed';
-
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
@@ -46,7 +45,7 @@ final readonly class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(self::SERIALIZED_SUITE_STATE_CHANGED_EVENT_NAME);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;
