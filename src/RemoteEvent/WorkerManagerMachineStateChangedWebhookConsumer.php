@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RemoteEvent;
 
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\MachineRetrievedEvent;
 use App\Repository\MachineRepository;
 use App\Services\MachineModelFactory;
@@ -14,7 +14,7 @@ use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\Consumer\ConsumerInterface;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 
-#[AsRemoteEventConsumer(RemoteEventName::MACHINE_STATE_CHANGED->value)]
+#[AsRemoteEventConsumer(RemoteEventType::MACHINE_STATE_CHANGED->value)]
 final readonly class WorkerManagerMachineStateChangedWebhookConsumer implements ConsumerInterface
 {
     public function __construct(
@@ -26,7 +26,7 @@ final readonly class WorkerManagerMachineStateChangedWebhookConsumer implements 
 
     public function consume(RemoteEvent $event): void
     {
-        if (RemoteEventName::MACHINE_STATE_CHANGED->value !== $event->getName()) {
+        if (RemoteEventType::MACHINE_STATE_CHANGED->value !== $event->getName()) {
             return;
         }
 

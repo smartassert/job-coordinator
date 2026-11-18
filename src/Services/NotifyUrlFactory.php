@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use Symfony\Component\Routing\RouterInterface;
 
 readonly class NotifyUrlFactory
@@ -16,7 +16,7 @@ readonly class NotifyUrlFactory
     /**
      * @return ?non-empty-string
      */
-    public function create(RemoteEventName $eventType): ?string
+    public function create(RemoteEventType $eventType): ?string
     {
         $url = $this->router->generate('_webhook_controller', ['type' => $eventType->value]);
         if ('' === $url) {

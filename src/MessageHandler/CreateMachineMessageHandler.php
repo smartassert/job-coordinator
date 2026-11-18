@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
@@ -45,7 +45,7 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::MACHINE_STATE_CHANGED);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::MACHINE_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;

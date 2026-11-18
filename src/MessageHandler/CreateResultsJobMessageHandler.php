@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\ResultsJobCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateResultsJobMessage;
@@ -45,7 +45,7 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::RESULTS_JOB_STATE_CHANGED);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::RESULTS_JOB_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;

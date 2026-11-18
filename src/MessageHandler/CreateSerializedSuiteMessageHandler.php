@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\SerializedSuiteCreatedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateSerializedSuiteMessage;
@@ -45,7 +45,7 @@ final readonly class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\RemoteEvent\SourcesSerializedSuiteStateChangedWebhookConsumer;
 
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\SerializedSuiteRetrievedEvent;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\RemoteEvent\RemoteEvent;
@@ -39,7 +39,7 @@ class NoEventDispatchedTest extends AbstractConsumerTestCase
             ],
             'event references invalid job' => [
                 'event' => new RemoteEvent(
-                    name: RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value,
+                    name: RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED->value,
                     id: (string) new Ulid(),
                     payload: [
                         'id' => (string) new Ulid(),

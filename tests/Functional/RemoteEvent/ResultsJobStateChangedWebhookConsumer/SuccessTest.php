@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\RemoteEvent\ResultsJobStateChangedWebhookConsumer;
 
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Factory\ResultsJobFactory;
@@ -33,7 +33,7 @@ class SuccessTest extends AbstractConsumerTestCase
         ];
 
         $event = new RemoteEvent(
-            name: RemoteEventName::RESULTS_JOB_STATE_CHANGED->value,
+            name: RemoteEventType::RESULTS_JOB_STATE_CHANGED->value,
             id: (string) new Ulid(),
             payload: $resultsJobModelData,
         );

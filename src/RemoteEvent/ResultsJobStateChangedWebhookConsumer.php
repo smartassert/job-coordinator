@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\RemoteEvent;
 
-use App\Enum\RemoteEventName;
+use App\Enum\RemoteEventType;
 use App\Event\ResultsJobRetrievedEvent;
 use App\Repository\ResultsJobRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
 use Symfony\Component\RemoteEvent\Consumer\ConsumerInterface;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 
-#[AsRemoteEventConsumer(RemoteEventName::RESULTS_JOB_STATE_CHANGED->value)]
+#[AsRemoteEventConsumer(RemoteEventType::RESULTS_JOB_STATE_CHANGED->value)]
 final readonly class ResultsJobStateChangedWebhookConsumer implements ConsumerInterface
 {
     public function __construct(
@@ -24,7 +24,7 @@ final readonly class ResultsJobStateChangedWebhookConsumer implements ConsumerIn
 
     public function consume(RemoteEvent $event): void
     {
-        if (RemoteEventName::RESULTS_JOB_STATE_CHANGED->value !== $event->getName()) {
+        if (RemoteEventType::RESULTS_JOB_STATE_CHANGED->value !== $event->getName()) {
             return;
         }
 
