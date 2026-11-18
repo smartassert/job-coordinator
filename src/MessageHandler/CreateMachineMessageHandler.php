@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RemoteEventName;
 use App\Event\MachineCreationRequestedEvent;
 use App\Exception\RemoteJobActionException;
 use App\Message\CreateMachineMessage;
@@ -20,8 +21,6 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 #[AsMessageHandler]
 final readonly class CreateMachineMessageHandler
 {
-    private const string WORKER_MANAGER_STATE_CHANGED_EVENT_NAME = 'worker-manager.machine.state_changed';
-
     public function __construct(
         private ReadinessAssessorInterface $readinessAssessor,
         private MessageStateMutator $messageStateMutator,
@@ -46,7 +45,7 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(self::WORKER_MANAGER_STATE_CHANGED_EVENT_NAME);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::MACHINE_STATE_CHANGED->value);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;
