@@ -41,7 +41,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
         \assert($notifyUrlFactory instanceof NotifyUrlFactory);
 
-        $notifyUrl = $notifyUrlFactory->create(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value);
+        $notifyUrl = $notifyUrlFactory->create(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED);
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient
@@ -119,7 +119,7 @@ class CreateSerializedSuiteMessageHandlerTest extends AbstractMessageHandlerTest
         $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
         \assert($notifyUrlFactory instanceof NotifyUrlFactory);
 
-        $notifyUrl = $notifyUrlFactory->create(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED->value);
+        $notifyUrl = $notifyUrlFactory->create(RemoteEventName::SERIALIZED_SUITE_STATE_CHANGED);
 
         $serializedSuiteClient = \Mockery::mock(SerializedSuiteClientInterface::class);
         $serializedSuiteClient

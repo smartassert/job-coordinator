@@ -45,7 +45,7 @@ final readonly class CreateMachineMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::MACHINE_STATE_CHANGED->value);
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventName::MACHINE_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
         if (null === $notifyUrl || null === $userSecurityToken) {
             return;
