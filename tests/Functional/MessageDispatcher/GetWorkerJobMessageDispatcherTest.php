@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Event\CreateWorkerJobRequestedEvent;
 use App\Event\WorkerJobRetrievedEvent;
@@ -11,8 +12,10 @@ use App\Message\GetWorkerJobMessage;
 use App\MessageDispatcher\GetWorkerJobMessageDispatcher;
 use App\MessageDispatcher\JobRemoteRequestMessageDispatcher;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
 use App\Tests\Services\Factory\WorkerClientJobFactory;
 use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -70,9 +73,8 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
     {
         $jobId = Id::generate();
         $workerJob = WorkerClientJobFactory::createRandom();
-        $machineIpAddress = '127.0.0.1';
 
-        $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
+        $event = new CreateWorkerJobRequestedEvent($jobId, $workerJob);
 
         $messageDispatcher = self::getContainer()->get(JobRemoteRequestMessageDispatcher::class);
         \assert($messageDispatcher instanceof JobRemoteRequestMessageDispatcher);
@@ -84,7 +86,10 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
             ->andReturn(MessageHandlingReadiness::NEVER)
         ;
 
-        $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
+        $dispatcher = new GetWorkerJobMessageDispatcher($messageDispatcher, $assessor, $machineRepository);
         $dispatcher->dispatchImmediately($event);
 
         self::assertCount(0, $this->messengerTransport->getSent());
@@ -94,13 +99,19 @@ class GetWorkerJobMessageDispatcherTest extends WebTestCase
     {
         $jobId = Id::generate();
         $workerJob = WorkerClientJobFactory::createRandom();
-        $machineIpAddress = '127.0.0.1';
 
-        $event = new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIpAddress(Ip::random());
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $event = new CreateWorkerJobRequestedEvent($jobId, $workerJob);
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $expectedMessage = new GetWorkerJobMessage($jobId, $machineIpAddress);
+        $expectedMessage = new GetWorkerJobMessage($jobId);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);

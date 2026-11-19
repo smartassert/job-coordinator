@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\MachineIsReadyEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\MessageHandler\IsWorkerReadyMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
@@ -17,6 +19,7 @@ use App\Services\WorkerClientFactory;
 use App\Tests\Services\Factory\HttpMockedWorkerClientFactory;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
+use App\Tests\Services\Generator\Ip;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -29,7 +32,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -51,7 +54,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $message = new IsWorkerReadyMessage($jobId, '127.0.0.1');
+        $message = new IsWorkerReadyMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -72,9 +75,16 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeWorkerClientThrowsException(): void
     {
         $jobId = Id::generate();
-        $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($jobId, $machineIpAddress);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new IsWorkerReadyMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -88,7 +98,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -102,9 +112,16 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeSuccessIsNotReady(): void
     {
         $jobId = Id::generate();
-        $machineIpAddress = '127.0.0.1';
 
-        $message = new IsWorkerReadyMessage($jobId, $machineIpAddress);
+        $machine = new Machine($jobId, 'up/active', 'active');
+        $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
+
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new IsWorkerReadyMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -123,7 +140,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -140,9 +157,15 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $machineIpAddress = '127.0.0.1';
+        $machine = new Machine($job->getId(), 'up/active', 'active');
+        $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
 
-        $message = new IsWorkerReadyMessage($job->getId(), $machineIpAddress);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new IsWorkerReadyMessage($job->getId());
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -194,7 +217,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -206,7 +229,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new MachineIsReadyEvent($job->getId(), $machineIpAddress),
+            new MachineIsReadyEvent($job->getId()),
             $event
         );
     }
@@ -240,6 +263,9 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
         $logger = self::getContainer()->get(LoggerInterface::class);
         \assert($logger instanceof LoggerInterface);
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
         return new IsWorkerReadyMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -247,6 +273,7 @@ class IsWorkerReadyMessageHandlerTest extends AbstractMessageHandlerTestCase
             $workerClientFactory,
             $eventDispatcher,
             $logger,
+            $machineRepository,
         );
     }
 }

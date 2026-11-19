@@ -8,6 +8,7 @@ use App\Enum\MessageHandlingReadiness;
 use App\Event\MachineIsReadyEvent;
 use App\Message\IsWorkerReadyMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
 use App\Services\MessageStateMutator;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\WorkerClientFactory;
@@ -26,6 +27,7 @@ final readonly class IsWorkerReadyMessageHandler
         private WorkerClientFactory $workerClientFactory,
         private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
+        private MachineRepository $machineRepository,
     ) {}
 
     /**
@@ -40,7 +42,14 @@ final readonly class IsWorkerReadyMessageHandler
             return;
         }
 
-        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
+        $machine = $this->machineRepository->find($message->getJobId());
+        $ipAddress = $machine?->getIpAddress();
+
+        if (null === $machine || null === $ipAddress) {
+            return;
+        }
+
+        $workerClient = $this->workerClientFactory->create($ipAddress);
 
         $isReady = $workerClient->isReady();
         $this->logger->info(sprintf(
@@ -57,7 +66,7 @@ final readonly class IsWorkerReadyMessageHandler
         }
 
         $this->eventDispatcher->dispatch(
-            new MachineIsReadyEvent($message->getJobId(), $message->machineIpAddress)
+            new MachineIsReadyEvent($message->getJobId())
         );
     }
 }

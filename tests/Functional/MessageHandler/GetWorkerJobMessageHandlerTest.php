@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Enum\MessageHandlingReadiness;
 use App\Enum\MessageState;
 use App\Event\WorkerJobRetrievedEvent;
@@ -11,6 +12,7 @@ use App\Exception\RemoteJobActionException;
 use App\Message\GetWorkerJobMessage;
 use App\MessageHandler\GetWorkerJobMessageHandler;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
+use App\Repository\MachineRepository;
 use App\Repository\WorkerComponentStateRepository;
 use App\Services\MessageStateMutator;
 use App\Services\UserSecurityTokenProvider;
@@ -33,7 +35,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     {
         $jobId = Id::generate();
 
-        $message = new GetWorkerJobMessage($jobId, '127.0.0.1');
+        $message = new GetWorkerJobMessage($jobId);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -57,9 +59,15 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machineIpAddress = Ip::random();
+        $machine = new Machine($job->getId(), 'up/active', 'active');
+        $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
 
-        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new GetWorkerJobMessage($job->getId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -74,7 +82,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -95,9 +103,15 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createForUserToken(self::$apiToken);
 
-        $machineIpAddress = Ip::random();
+        $machine = new Machine($job->getId(), 'up/active', 'active');
+        $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
 
-        $message = new GetWorkerJobMessage($job->getId(), $machineIpAddress);
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+        $machineRepository->save($machine);
+
+        $message = new GetWorkerJobMessage($job->getId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -169,7 +183,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -181,7 +195,7 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new WorkerJobRetrievedEvent($job->getId(), $machineIpAddress, $retrievedWorkerState),
+            new WorkerJobRetrievedEvent($job->getId(), $retrievedWorkerState),
             $event
         );
     }
@@ -212,12 +226,16 @@ class GetWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $authenticationTokenProvider = self::getContainer()->get(UserSecurityTokenProvider::class);
         \assert($authenticationTokenProvider instanceof UserSecurityTokenProvider);
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
         return new GetWorkerJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
             $workerClientFactory,
             $eventDispatcher,
             $authenticationTokenProvider,
+            $machineRepository,
         );
     }
 }

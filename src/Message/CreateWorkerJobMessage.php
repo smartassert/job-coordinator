@@ -11,12 +11,10 @@ class CreateWorkerJobMessage extends AbstractRemoteRequestMessage
     /**
      * @param non-empty-string $jobId
      * @param positive-int     $maximumDurationInSeconds
-     * @param non-empty-string $machineIpAddress
      */
     public function __construct(
         string $jobId,
         public readonly int $maximumDurationInSeconds,
-        public readonly string $machineIpAddress,
     ) {
         parent::__construct($jobId);
     }

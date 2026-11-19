@@ -58,7 +58,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotYetHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateWorkerJobMessage($jobId, 600, Ip::random());
+        $message = new CreateWorkerJobMessage($jobId, 600);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -79,7 +79,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
     public function testInvokeNotHandleable(): void
     {
         $jobId = Id::generate();
-        $message = new CreateWorkerJobMessage($jobId, 600, Ip::random());
+        $message = new CreateWorkerJobMessage($jobId, 600);
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
             ->shouldReceive('isReady')
@@ -109,6 +109,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($machineRepository instanceof MachineRepository);
         $machine = new Machine($jobId, 'up/active', 'active');
         $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
         $machineRepository->save($machine);
 
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
@@ -129,11 +130,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             serializedSuiteClient: $serializedSuiteClient,
         );
 
-        $message = new CreateWorkerJobMessage(
-            $jobId,
-            $job->getMaximumDurationInSeconds(),
-            Ip::random()
-        );
+        $message = new CreateWorkerJobMessage($jobId, $job->getMaximumDurationInSeconds());
 
         $exception = null;
 
@@ -181,6 +178,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($machineRepository instanceof MachineRepository);
         $machine = new Machine($jobId, 'up/active', 'active');
         $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
         $machineRepository->save($machine);
 
         self::assertNull($workerJobCreationFailureRepository->find($jobId));
@@ -197,8 +195,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($serializedSuiteContent)
         ;
 
-        $machineIpAddress = Ip::random();
-
         $workerJobCreateException = new CurlException(
             \Mockery::mock(RequestInterface::class),
             7,
@@ -206,8 +202,8 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
                 'Failed to connect to %s port 80 after 190 ms: '
                 . 'Could not connect to server (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) '
                 . 'for http://%s/job',
-                $machineIpAddress,
-                $machineIpAddress,
+                $machine->getIpAddress(),
+                $machine->getIpAddress(),
             )
         );
 
@@ -216,7 +212,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -225,11 +221,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new CreateWorkerJobMessage(
-            $jobId,
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
+        $message = new CreateWorkerJobMessage($jobId, $job->getMaximumDurationInSeconds());
 
         $exception = null;
 
@@ -274,6 +266,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         \assert($machineRepository instanceof MachineRepository);
         $machine = new Machine($jobId, 'up/active', 'active');
         $machine->setIsActive();
+        $machine->setIpAddress(Ip::random());
         $machineRepository->save($machine);
 
         $serializedSuite = $this->createSerializedSuite($job, 'prepared', new MetaState(true, true, false));
@@ -288,7 +281,6 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             ->andReturn($serializedSuiteContent)
         ;
 
-        $machineIpAddress = Ip::random();
         $workerJob = WorkerClientJobFactory::createRandom();
 
         $workerClient = HttpMockedWorkerClientFactory::create([
@@ -306,7 +298,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $workerClientFactory = \Mockery::mock(WorkerClientFactory::class);
         $workerClientFactory
             ->shouldReceive('create')
-            ->with($machineIpAddress)
+            ->with($machine->getIpAddress())
             ->andReturn($workerClient)
         ;
 
@@ -315,11 +307,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             workerClientFactory: $workerClientFactory,
         );
 
-        $message = new CreateWorkerJobMessage(
-            $jobId,
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
+        $message = new CreateWorkerJobMessage($jobId, $job->getMaximumDurationInSeconds());
 
         $handler($message);
 
@@ -327,7 +315,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $event = $events[0] ?? null;
 
         self::assertEquals(
-            new CreateWorkerJobRequestedEvent($jobId, $machineIpAddress, $workerJob),
+            new CreateWorkerJobRequestedEvent($jobId, $workerJob),
             $event
         );
 
@@ -421,6 +409,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
+        $machineRepository = self::getContainer()->get(MachineRepository::class);
+        \assert($machineRepository instanceof MachineRepository);
+
         return new CreateWorkerJobMessageHandler(
             $readinessAssessor,
             $messageStateMutator,
@@ -432,6 +423,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $eventDispatcher,
             $authenticationTokenProvider,
             $jobRepository,
+            $machineRepository,
         );
     }
 

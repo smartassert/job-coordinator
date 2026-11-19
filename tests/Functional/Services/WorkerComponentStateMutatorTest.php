@@ -14,7 +14,6 @@ use App\Repository\WorkerComponentStateRepository;
 use App\Services\WorkerComponentStateMutator;
 use App\Tests\Services\Factory\JobFactory;
 use App\Tests\Services\Generator\Id;
-use App\Tests\Services\Generator\Ip;
 use App\Tests\Services\Generator\StringValue;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -93,7 +92,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
             new WorkerClientComponentState('state', new WorkerClientMetaState(false, false, false)),
         );
 
-        $event = new WorkerJobRetrievedEvent($jobId, Ip::random(), $irrelevantApplicationState);
+        $event = new WorkerJobRetrievedEvent($jobId, $irrelevantApplicationState);
 
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
@@ -123,13 +122,7 @@ class WorkerComponentStateMutatorTest extends WebTestCase
 
         $componentStateCreator($job, $this->workerComponentStateRepository);
 
-        $machineIpAddress = Ip::random();
-
-        $event = new WorkerJobRetrievedEvent(
-            $job->getId(),
-            $machineIpAddress,
-            $retrievedApplicationState
-        );
+        $event = new WorkerJobRetrievedEvent($job->getId(), $retrievedApplicationState);
         $this->workerComponentStateMutator->setOnWorkerStateRetrievedEvent($event);
 
         self::assertEquals(
