@@ -45,11 +45,12 @@ final readonly class CreateResultsJobMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::RESULTS_JOB_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
-        if (null === $notifyUrl || null === $userSecurityToken) {
+        if (null === $userSecurityToken) {
             return;
         }
+
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::RESULTS_JOB_STATE_CHANGED);
 
         try {
             $resultsJob = $this->resultsClient->createJob($userSecurityToken, $jobId, $notifyUrl);
