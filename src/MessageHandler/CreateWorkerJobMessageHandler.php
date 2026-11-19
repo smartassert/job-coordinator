@@ -97,7 +97,7 @@ final readonly class CreateWorkerJobMessageHandler
                 $message->getJobId(),
                 $resultsJob->eventNotifyUrl,
                 $resultsJob->eventNotifyToken,
-                $this->notifyUrlFactory->create(RemoteEventType::WORKER_EVENT),
+                $this->notifyUrlFactory->create(RemoteEventType::MACHINE_STATE_CHANGED),
                 $job->getNotifyToken(),
                 $message->maximumDurationInSeconds,
                 $serializedSuite
