@@ -45,11 +45,12 @@ final readonly class CreateSerializedSuiteMessageHandler
             return;
         }
 
-        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
         $userSecurityToken = $this->userSecurityTokenProvider->get($jobId);
-        if (null === $notifyUrl || null === $userSecurityToken) {
+        if (null === $userSecurityToken) {
             return;
         }
+
+        $notifyUrl = $this->notifyUrlFactory->create(RemoteEventType::SERIALIZED_SUITE_STATE_CHANGED);
 
         try {
             $serializedSuite = $this->serializedSuiteClient->create(

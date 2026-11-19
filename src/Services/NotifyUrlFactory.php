@@ -14,14 +14,12 @@ readonly class NotifyUrlFactory
     ) {}
 
     /**
-     * @return ?non-empty-string
+     * @return non-empty-string
      */
-    public function create(RemoteEventType $eventType): ?string
+    public function create(RemoteEventType $eventType): string
     {
         $url = $this->router->generate('_webhook_controller', ['type' => $eventType->value]);
-        if ('' === $url) {
-            return null;
-        }
+        \assert('' !== $url);
 
         return $url;
     }
