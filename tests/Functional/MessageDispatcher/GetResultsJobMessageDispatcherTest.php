@@ -143,7 +143,6 @@ class GetResultsJobMessageDispatcherTest extends WebTestCase
 
                     return new CreateWorkerJobRequestedEvent(
                         $job->getId(),
-                        '127.0.0.1',
                         new WorkerJob(
                             new ResourceReference(
                                 $job->getId(),

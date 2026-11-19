@@ -126,7 +126,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
 
         $this->dispatcher->dispatchImmediately($event);
 
-        $expectedMessage = new IsWorkerReadyMessage($jobId, $machineIpAddress);
+        $expectedMessage = new IsWorkerReadyMessage($jobId);
 
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
@@ -143,9 +143,7 @@ class IsWorkerReadyMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machineIpAddress = '127.0.0.1';
-
-        $message = new IsWorkerReadyMessage($job->getId(), $machineIpAddress);
+        $message = new IsWorkerReadyMessage($job->getId());
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $this->dispatcher->redispatch($event);

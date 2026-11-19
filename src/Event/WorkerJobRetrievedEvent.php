@@ -10,13 +10,11 @@ class WorkerJobRetrievedEvent extends AbstractWorkerEvent
 {
     /**
      * @param non-empty-string $jobId
-     * @param non-empty-string $machineIpAddress
      */
     public function __construct(
         string $jobId,
-        string $machineIpAddress,
         public readonly ApplicationState $state,
     ) {
-        parent::__construct($jobId, $machineIpAddress);
+        parent::__construct($jobId);
     }
 }

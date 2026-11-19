@@ -42,11 +42,7 @@ readonly class CreateWorkerJobMessageDispatcher implements EventSubscriberInterf
             return;
         }
 
-        $message = new CreateWorkerJobMessage(
-            $event->getJobId(),
-            $job->getMaximumDurationInSeconds(),
-            $event->ipAddress
-        );
+        $message = new CreateWorkerJobMessage($event->getJobId(), $job->getMaximumDurationInSeconds());
 
         $readiness = $this->readinessAssessor->isReady($message->getJobId());
         if (MessageHandlingReadiness::NEVER === $readiness) {

@@ -634,7 +634,7 @@ class MachineMutatorTest extends WebTestCase
                 'eventCreator' => function () {
                     $jobId = Id::generate();
 
-                    return new MachineIsReadyEvent($jobId, '127.0.0.1');
+                    return new MachineIsReadyEvent($jobId);
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -648,7 +648,7 @@ class MachineMutatorTest extends WebTestCase
                         return null;
                     }
 
-                    return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
+                    return new MachineIsReadyEvent($job->getId());
                 },
                 'expectedMachineCreator' => function () {
                     return null;
@@ -672,7 +672,7 @@ class MachineMutatorTest extends WebTestCase
                         return null;
                     }
 
-                    return new MachineIsReadyEvent($job->getId(), '127.0.0.1');
+                    return new MachineIsReadyEvent($job->getId());
                 },
                 'expectedMachineCreator' => function (?JobInterface $job): ?Machine {
                     if (null === $job) {

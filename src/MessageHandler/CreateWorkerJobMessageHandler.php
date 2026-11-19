@@ -13,6 +13,7 @@ use App\Exception\UnrecoverableRemoteJobActionException;
 use App\Message\CreateWorkerJobMessage;
 use App\ReadinessAssessor\ReadinessAssessorInterface;
 use App\Repository\JobRepository;
+use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MessageStateMutator;
@@ -38,6 +39,7 @@ final readonly class CreateWorkerJobMessageHandler
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
         private JobRepository $jobRepository,
+        private MachineRepository $machineRepository,
     ) {}
 
     /**
@@ -57,7 +59,17 @@ final readonly class CreateWorkerJobMessageHandler
         $serializedSuiteEntity = $this->serializedSuiteRepository->findByJobId($message->getJobId());
         $resultsJob = $this->resultsJobRepository->find($message->getJobId());
         $userSecurityToken = $this->userSecurityTokenProvider->get($message->getJobId());
-        if (null === $job || null === $serializedSuiteEntity || null === $resultsJob || null === $userSecurityToken) {
+        $machine = $this->machineRepository->find($message->getJobId());
+        $ipAddress = $machine?->getIpAddress();
+
+        if (
+            null === $job
+            || null === $serializedSuiteEntity
+            || null === $resultsJob
+            || null === $userSecurityToken
+            || null === $machine
+            || null === $ipAddress
+        ) {
             $this->unhandleableMessageHandler->handle($message, MessageHandlingReadiness::EVENTUALLY);
 
             return;
@@ -75,7 +87,7 @@ final readonly class CreateWorkerJobMessageHandler
             throw new UnrecoverableRemoteJobActionException($e, $message);
         }
 
-        $workerClient = $this->workerClientFactory->create($message->machineIpAddress);
+        $workerClient = $this->workerClientFactory->create($ipAddress);
 
         try {
             $workerJob = $workerClient->createJob(
@@ -97,7 +109,6 @@ final readonly class CreateWorkerJobMessageHandler
 
         $this->eventDispatcher->dispatch(new CreateWorkerJobRequestedEvent(
             $message->getJobId(),
-            $message->machineIpAddress,
             $workerJob,
         ));
     }

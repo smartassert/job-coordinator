@@ -54,7 +54,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $event = new MachineIsReadyEvent($job->getId(), '127.0.0.1');
+        $event = new MachineIsReadyEvent($job->getId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -92,7 +92,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
             $jobRepository,
         );
 
-        $event = new MachineIsReadyEvent($jobId, '127.0.0.1');
+        $event = new MachineIsReadyEvent($jobId);
 
         $dispatcher->dispatchImmediately($event);
 
@@ -111,9 +111,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
-        $machineIpAddress = '127.0.0.1';
-
-        $event = new MachineIsReadyEvent($job->getId(), $machineIpAddress);
+        $event = new MachineIsReadyEvent($job->getId());
 
         $assessor = \Mockery::mock(ReadinessAssessorInterface::class);
         $assessor
@@ -133,11 +131,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateWorkerJobMessage(
-            $job->getId(),
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
+        $expectedMessage = new CreateWorkerJobMessage($job->getId(), $job->getMaximumDurationInSeconds());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
@@ -151,13 +145,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         \assert($jobFactory instanceof JobFactory);
         $job = $jobFactory->createRandom();
 
-        $machineIpAddress = '127.0.0.1';
-
-        $message = new CreateWorkerJobMessage(
-            $job->getId(),
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
+        $message = new CreateWorkerJobMessage($job->getId(), $job->getMaximumDurationInSeconds());
         $event = new MessageNotHandleableEvent($message, MessageHandlingReadiness::EVENTUALLY);
 
         $this->dispatcher->redispatch($event);
@@ -165,11 +153,7 @@ class CreateWorkerJobMessageDispatcherTest extends WebTestCase
         $envelopes = $this->messengerTransport->getSent();
         self::assertCount(1, $envelopes);
 
-        $expectedMessage = new CreateWorkerJobMessage(
-            $job->getId(),
-            $job->getMaximumDurationInSeconds(),
-            $machineIpAddress
-        );
+        $expectedMessage = new CreateWorkerJobMessage($job->getId(), $job->getMaximumDurationInSeconds());
 
         $dispatchedEnvelope = $envelopes[0];
         self::assertEquals($expectedMessage, $dispatchedEnvelope->getMessage());
