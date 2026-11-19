@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Enum\MessageHandlingReadiness;
+use App\Enum\RemoteEventType;
 use App\Enum\WorkerJobCreationStage;
 use App\Event\CreateWorkerJobFailedEvent;
 use App\Event\CreateWorkerJobRequestedEvent;
@@ -17,6 +18,7 @@ use App\Repository\MachineRepository;
 use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
@@ -39,6 +41,7 @@ final readonly class CreateWorkerJobMessageHandler
         private EventDispatcherInterface $eventDispatcher,
         private UserSecurityTokenProvider $userSecurityTokenProvider,
         private JobRepository $jobRepository,
+        private NotifyUrlFactory $notifyUrlFactory,
         private MachineRepository $machineRepository,
     ) {}
 
@@ -94,6 +97,8 @@ final readonly class CreateWorkerJobMessageHandler
                 $message->getJobId(),
                 $resultsJob->eventNotifyUrl,
                 $resultsJob->eventNotifyToken,
+                $this->notifyUrlFactory->create(RemoteEventType::MACHINE_STATE_CHANGED),
+                $job->getNotifyToken(),
                 $message->maximumDurationInSeconds,
                 $serializedSuite
             );

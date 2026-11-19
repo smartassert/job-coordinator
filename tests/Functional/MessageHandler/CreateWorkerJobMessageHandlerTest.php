@@ -25,6 +25,7 @@ use App\Repository\ResultsJobRepository;
 use App\Repository\SerializedSuiteRepository;
 use App\Repository\WorkerJobCreationFailureRepository;
 use App\Services\MessageStateMutator;
+use App\Services\NotifyUrlFactory;
 use App\Services\UnhandleableMessageHandler;
 use App\Services\UserSecurityTokenProvider;
 use App\Services\WorkerClientFactory;
@@ -409,6 +410,9 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
         $jobRepository = self::getContainer()->get(JobRepository::class);
         \assert($jobRepository instanceof JobRepository);
 
+        $notifyUrlFactory = self::getContainer()->get(NotifyUrlFactory::class);
+        \assert($notifyUrlFactory instanceof NotifyUrlFactory);
+
         $machineRepository = self::getContainer()->get(MachineRepository::class);
         \assert($machineRepository instanceof MachineRepository);
 
@@ -423,6 +427,7 @@ class CreateWorkerJobMessageHandlerTest extends AbstractMessageHandlerTestCase
             $eventDispatcher,
             $authenticationTokenProvider,
             $jobRepository,
+            $notifyUrlFactory,
             $machineRepository,
         );
     }
