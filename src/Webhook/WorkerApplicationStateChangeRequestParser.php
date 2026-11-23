@@ -6,6 +6,8 @@ namespace App\Webhook;
 
 use App\Repository\JobRepository;
 use App\Request\WorkerApplicationStateChange\Factory;
+use App\Request\WorkerApplicationStateChange\InvalidRequestException;
+use App\Request\WorkerApplicationStateChange\Validator;
 use SmartAssert\WorkerClient\Factory\ApplicationStateFactory;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -23,6 +25,7 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
     public function __construct(
         private readonly JobRepository $jobRepository,
         private readonly Factory $requestFactory,
+        private readonly Validator $requestValidator,
         private readonly ApplicationStateFactory $applicationStateFactory,
         private readonly string $algo = 'sha256',
         private readonly string $signatureHeaderName = 'Webhook-Signature',
@@ -38,6 +41,9 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
         ]);
     }
 
+    /**
+     * @throws InvalidRequestException
+     */
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent
     {
         if (!$secret) {
@@ -46,6 +52,8 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
 
         $body = $request->toArray();
         $applicationStateChangeRequest = $this->requestFactory->create($body);
+
+        $this->requestValidator->validate($applicationStateChangeRequest);
 
         $job = $this->jobRepository->find($applicationStateChangeRequest->jobId);
         if (null === $job) {
