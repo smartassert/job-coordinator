@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Webhook;
 
 use App\Repository\JobRepository;
+use App\Request\WorkerApplicationStateChange\Factory;
 use SmartAssert\WorkerClient\Factory\ApplicationStateFactory;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -21,6 +22,7 @@ final class WorkerEventRequestParser extends AbstractRequestParser
 {
     public function __construct(
         private readonly JobRepository $jobRepository,
+        private readonly Factory $requestFactory,
         private readonly ApplicationStateFactory $applicationStateFactory,
         private readonly string $algo = 'sha256',
         private readonly string $signatureHeaderName = 'Webhook-Signature',
@@ -43,13 +45,14 @@ final class WorkerEventRequestParser extends AbstractRequestParser
         }
 
         $body = $request->toArray();
+        $applicationStateChangeRequest = $this->requestFactory->create($body);
 
-        $jobLabel = $body['job'] ?? null;
-        $jobLabel = is_string($jobLabel) ? $jobLabel : null;
-
-        $job = $this->jobRepository->find($jobLabel);
+        $job = $this->jobRepository->find($applicationStateChangeRequest->jobId);
         if (null === $job) {
-            throw new RejectWebhookException(404, \sprintf('Job "%s" not found.', $jobLabel));
+            throw new RejectWebhookException(
+                404,
+                \sprintf('Job "%s" not found.', $applicationStateChangeRequest->jobId),
+            );
         }
 
         foreach ([$this->signatureHeaderName, $this->eventHeaderName, $this->idHeaderName] as $header) {
@@ -60,10 +63,7 @@ final class WorkerEventRequestParser extends AbstractRequestParser
 
         $this->validateSignature($request->headers, $request->getContent(), $job->getNotifyToken());
 
-        $applicationStateData = $body['state'] ?? [];
-        $applicationStateData = is_array($applicationStateData) ? $applicationStateData : [];
-
-        $applicationState = $this->applicationStateFactory->create($applicationStateData);
+        $applicationState = $this->applicationStateFactory->create($applicationStateChangeRequest->stateData);
 
         if (null === $applicationState) {
             throw new RejectWebhookException(400, 'State data invalid.');
