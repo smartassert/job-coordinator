@@ -18,7 +18,7 @@ use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Webhook\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
-final class WorkerEventRequestParser extends AbstractRequestParser
+final class WorkerApplicationStateChangeRequestParser extends AbstractRequestParser
 {
     public function __construct(
         private readonly JobRepository $jobRepository,

@@ -10,3 +10,6 @@ framework:
       worker-manager.machine.state_changed:
         service: Symfony\Component\Webhook\Client\RequestParser
         secret: '%worker_manager_notify_secret%'
+      worker.application.state_changed:
+        service: App\Webhook\WorkerApplicationStateChangeRequestParser
+        secret: 'not_applicable'
