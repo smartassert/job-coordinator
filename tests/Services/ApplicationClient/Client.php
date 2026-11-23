@@ -108,6 +108,22 @@ class Client
     /**
      * @param array<string, string> $headers
      */
+    public function makeWorkerManagerMachineStateChangedNotifyRequest(
+        array $headers,
+        string $body,
+        string $method = 'POST',
+    ): ResponseInterface {
+        return $this->makeNotifyRequest(
+            RemoteEventType::MACHINE_STATE_CHANGED->value,
+            $headers,
+            $body,
+            $method,
+        );
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
     public function makeNotifyRequest(
         string $type,
         array $headers,
