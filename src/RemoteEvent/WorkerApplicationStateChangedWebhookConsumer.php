@@ -8,6 +8,8 @@ use App\Enum\RemoteEventType;
 use App\Event\WorkerJobRetrievedEvent;
 use App\Repository\JobRepository;
 use App\Request\WorkerApplicationStateChange\Factory;
+use App\Request\WorkerApplicationStateChange\InvalidRequestException;
+use App\Request\WorkerApplicationStateChange\Validator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SmartAssert\WorkerClient\Factory\ApplicationStateFactory;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
@@ -19,6 +21,7 @@ final readonly class WorkerApplicationStateChangedWebhookConsumer implements Con
 {
     public function __construct(
         private Factory $requestFactory,
+        private Validator $requestValidator,
         private JobRepository $jobRepository,
         private ApplicationStateFactory $applicationStateFactory,
         private EventDispatcherInterface $eventDispatcher,
@@ -32,12 +35,18 @@ final readonly class WorkerApplicationStateChangedWebhookConsumer implements Con
 
         $applicationStateChangeRequest = $this->requestFactory->create($event->getPayload());
 
-        $job = $this->jobRepository->find($applicationStateChangeRequest->jobId);
+        try {
+            $validatedRequest = $this->requestValidator->validate($applicationStateChangeRequest);
+        } catch (InvalidRequestException $e) {
+            return;
+        }
+
+        $job = $this->jobRepository->find($validatedRequest->jobId);
         if (null === $job) {
             return;
         }
 
-        $applicationState = $this->applicationStateFactory->create($applicationStateChangeRequest->stateData);
+        $applicationState = $this->applicationStateFactory->create($validatedRequest->stateData);
         if (null === $applicationState) {
             return;
         }
