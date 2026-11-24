@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Webhook;
 
+use App\RemoteEvent\WorkerApplicationStateChangedEvent;
 use App\Repository\JobRepository;
 use App\Request\WorkerApplicationStateChange\Factory;
 use App\Request\WorkerApplicationStateChange\InvalidRequestException;
@@ -78,10 +79,12 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
             throw new RejectWebhookException(400, 'State data invalid.');
         }
 
-        return new RemoteEvent(
+        return new WorkerApplicationStateChangedEvent(
             (string) $request->headers->get($this->eventHeaderName),
             (string) $request->headers->get($this->idHeaderName),
-            $body
+            $body,
+            $job,
+            $applicationState,
         );
     }
 

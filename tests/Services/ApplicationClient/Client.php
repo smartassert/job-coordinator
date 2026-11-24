@@ -124,6 +124,22 @@ class Client
     /**
      * @param array<string, string> $headers
      */
+    public function makeWorkerApplicationStateStateChangedNotifyRequest(
+        array $headers,
+        string $body,
+        string $method = 'POST',
+    ): ResponseInterface {
+        return $this->makeNotifyRequest(
+            RemoteEventType::WORKER_STATE_CHANGED->value,
+            $headers,
+            $body,
+            $method,
+        );
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
     public function makeNotifyRequest(
         string $type,
         array $headers,
