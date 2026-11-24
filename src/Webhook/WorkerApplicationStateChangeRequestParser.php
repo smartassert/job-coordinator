@@ -51,15 +51,16 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
         }
 
         $body = $request->toArray();
-        $applicationStateChangeRequest = $this->requestFactory->create($body);
 
-        $this->requestValidator->validate($applicationStateChangeRequest);
+        $validatedRequest = $this->requestValidator->validate(
+            $this->requestFactory->create($body),
+        );
 
-        $job = $this->jobRepository->find($applicationStateChangeRequest->jobId);
+        $job = $this->jobRepository->find($validatedRequest->jobId);
         if (null === $job) {
             throw new RejectWebhookException(
                 404,
-                \sprintf('Job "%s" not found.', $applicationStateChangeRequest->jobId),
+                \sprintf('Job "%s" not found.', $validatedRequest->jobId),
             );
         }
 
@@ -71,7 +72,7 @@ final class WorkerApplicationStateChangeRequestParser extends AbstractRequestPar
 
         $this->validateSignature($request->headers, $request->getContent(), $job->getNotifyToken());
 
-        $applicationState = $this->applicationStateFactory->create($applicationStateChangeRequest->stateData);
+        $applicationState = $this->applicationStateFactory->create($validatedRequest->stateData);
 
         if (null === $applicationState) {
             throw new RejectWebhookException(400, 'State data invalid.');
