@@ -33,10 +33,10 @@ final readonly class WorkerApplicationStateChangedWebhookConsumer implements Con
             return;
         }
 
-        $applicationStateChangeRequest = $this->requestFactory->create($event->getPayload());
-
         try {
-            $validatedRequest = $this->requestValidator->validate($applicationStateChangeRequest);
+            $validatedRequest = $this->requestValidator->validate(
+                $this->requestFactory->create($event->getPayload()),
+            );
         } catch (InvalidRequestException $e) {
             return;
         }
