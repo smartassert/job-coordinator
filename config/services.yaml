@@ -246,3 +246,6 @@ services:
     App\MessageDispatcher\IsWorkerReadyMessageDispatcher:
         arguments:
             $readinessAssessor: '@App\ReadinessAssessor\IsWorkerReadyReadinessAssessor'
+
+    App\Request\WorkerApplicationStateChange\Factory: ~
+    App\Request\WorkerApplicationStateChange\Validator: ~
